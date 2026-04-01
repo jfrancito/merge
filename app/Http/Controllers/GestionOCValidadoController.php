@@ -23,6 +23,7 @@ use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
 use App\Modelos\ContratoAnticipo;
+use App\Modelos\ContratoAnticipoDetalle;
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -268,9 +269,9 @@ class GestionOCValidadoController extends Controller
         $device_info       =   $request['device_info'];
         $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
         //geolocalización
+        return Redirect::back()->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');
 
-
-        return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
+        //return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 
     }
 
@@ -704,19 +705,28 @@ class GestionOCValidadoController extends Controller
             ->where('ACTIVO', '=', 1)
             ->first();
 
-        $contrato_anticipo = null;
         $fecha_entrega_c = '';
+        $peso_entrega_c = 0;
 
         if ($contrato_pago) {
             if ($contrato_pago->IND_CONTRATO == 'C') {
-                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $contrato_pago->ID_DOCUMENTO)->first();
+                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', trim($contrato_pago->ID_DOCUMENTO))->first();
+                if ($contrato_anticipo) {
+                    $detalles_contrato = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', trim($contrato_anticipo->ID_DOCUMENTO))
+                                            ->where('ACTIVO', '=', 1)
+                                            ->get();
+
+                    $doc_id = trim($contrato_anticipo->ID_DOCUMENTO);
+                    $pagos_contrato = DB::select("SELECT * FROM CONTRATO_PAGO WHERE ID_DOCUMENTO = ? OR ID_DOCUMENTO LIKE ?", [$doc_id, "%" . $doc_id . "%"]);
+                }
             } else {
                 if ($contrato_pago->IND_CONTRATO == 'F') {
                     $fecha_entrega_c = $contrato_pago->FECHA_ENTREGA;
+                    $peso_entrega_c = isset($contrato_pago->PESO_ENTREGA) ? $contrato_pago->PESO_ENTREGA : 0;
                 }
             }
         }
-        //dd($documentohistorial);
+        //dd($peso_entrega_c);
 
         $funcion                =   $this;
 
@@ -745,7 +755,10 @@ class GestionOCValidadoController extends Controller
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
                             'contrato_anticipo'     =>  $contrato_anticipo,
+                            'detalles_contrato'     =>  $detalles_contrato,
+                            'pagos_contrato'        =>  $pagos_contrato,
                             'fecha_entrega_c'       =>  $fecha_entrega_c,
+                            'peso_entrega_c'        =>  $peso_entrega_c,
                          ]);
     }
 
@@ -1041,7 +1054,7 @@ class GestionOCValidadoController extends Controller
                                     ->where('COD_EMPR_EMISOR','=',$empresa_relacionada->COD_EMPR)
                                     ->first();
 
-            if(count($documento_venta)>0){
+            if ($documento_venta) {
 
 
                 $referencia_venta       =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$documento_venta->COD_DOCUMENTO_CTBLE)

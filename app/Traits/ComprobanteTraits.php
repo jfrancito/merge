@@ -6234,8 +6234,10 @@ trait ComprobanteTraits
                             INNER JOIN CON.ASIENTO_MOVIMIENTO as ASM2 ON TES2.COD_ASIENTO = ASM2.COD_ASIENTO
                             INNER JOIN CON.CUENTA_CONTABLE as CTB2 ON ASM2.COD_CUENTA_CONTABLE = CTB2.COD_CUENTA_CONTABLE
                             WHERE TES2.IND_EXTORNO = 0
-                                AND TES2.COD_ESTADO = 1
-                                AND CTB2.TXT_DESCRIPCION LIKE \'%INTERES DE PRESTAMOS FINANCIEROS%\'
+                                AND TES2.COD_ESTADO = 1     
+
+                                AND (CTB2.TXT_DESCRIPCION LIKE \'%INTERES DE PRESTAMOS FINANCIEROS%\' 
+                                OR CTB2.TXT_DESCRIPCION LIKE \'%INTERESES INSTITUCIONES FINANCIERAS%\' )
                         ) as descuentos'), 'descuentos.COD_OPERACION_CAJA', '=', 'TES.COD_OPERACION_CAJA')
                         ->leftJoin(DB::raw('(
                             SELECT 
@@ -6249,8 +6251,9 @@ trait ComprobanteTraits
                             INNER JOIN CON.ASIENTO_MOVIMIENTO as ASM2 ON TES2.COD_ASIENTO = ASM2.COD_ASIENTO
                             INNER JOIN CON.CUENTA_CONTABLE as CTB2 ON ASM2.COD_CUENTA_CONTABLE = CTB2.COD_CUENTA_CONTABLE
                             WHERE TES2.IND_EXTORNO = 0
-                                AND TES2.COD_ESTADO = 1
-                                AND CTB2.TXT_DESCRIPCION LIKE \'%COMISION POR PRESTAMOS FINANCIEROS%\'
+                                AND TES2.COD_ESTADO = 1  
+                                AND (CTB2.TXT_DESCRIPCION LIKE \'%COMISION POR PRESTAMOS FINANCIEROS%\' 
+                                OR CTB2.TXT_DESCRIPCION LIKE \'%COMISION PORTES Y MANTENIMIENTO POR PRESTAMOS FINANCIERAS%\' )
                         ) as aumentos'), 'aumentos.COD_OPERACION_CAJA', '=', 'TES.COD_OPERACION_CAJA')
 
                         ->select(

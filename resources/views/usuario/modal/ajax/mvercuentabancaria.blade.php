@@ -8,42 +8,75 @@
 	<div class="modal-body">
 		<div  class="row regla-modal">
 		    <div class="col-md-12">
-      <table class="table table-striped table-borderless">
-        <thead>
-          <tr>
-            <th>INFORMACION</th>
-            <th>CUENTA BANCARIA</th>
-            @if (isset($idopcion))
-            <th>OPERACION</th> 
-            @endif
-          </tr>
-        </thead>
-        <tbody class="no-border-x">
-          @foreach($cuentabancarias as $index => $item)
-              <tr>
-                <td class="cell-detail sorting_1" style="position: relative;">
-                  <span><b>BANCO :  </b> {{$item->TXT_EMPR_BANCO}}</span>
-                  <span><b>TIPO CUENTA  : </b> {{$item->TXT_REFERENCIA}}</span>
-                  <span><b>MONEDA : </b> {{$item->TXT_CATEGORIA_MONEDA}}</span>
-                </td>
-                <td class="cell-detail sorting_1" style="position: relative;">
-                  <span><b>NRO CUENTA BANCARIA :  </b> {{$item->TXT_NRO_CUENTA_BANCARIA}}</span>
-                  <span><b>CCI  : </b> {{$item->TXT_NRO_CCI}}</span>
-                  <span><b>CARNET EXTRANJERIA : </b> {{$item->CARNET_EXTRANJERIA}}</span>
-                </td>
-                @if (isset($idopcion))
-                  <td>
-                    <a href="{{ url('/cambiar-cuenta-corriente/'.$item->COD_EMPR_TITULAR.'/'.$item->COD_EMPR_BANCO.'/'.$item->TXT_NRO_CUENTA_BANCARIA.'/'.$item->COD_CATEGORIA_MONEDA.'/'.$idoc.'/'.$idopcion) }}" class="tools select"> <span class="label label-success">CAMBIAR CUENTA</span></a>
-                  </td>
-                @endif
-
-
-              </tr>
-          @endforeach
-        </tbody>
-      </table>
-
-		        
+          
+          <div class="tab-container">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#cuentaregistrada" data-toggle="tab">CUENTAS REGISTRADAS</a></li>
+              <li><a href="#bancossincuenta" data-toggle="tab">BANCOS SIN CUENTA</a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="cuentaregistrada" class="tab-pane active cont">
+                <table class="table table-striped table-borderless">
+                  <thead>
+                    <tr>
+                      <th>INFORMACION</th>
+                      <th>CUENTA BANCARIA</th>
+                      @if (isset($idopcion))
+                      <th>OPERACION</th> 
+                      @endif
+                    </tr>
+                  </thead>
+                  <tbody class="no-border-x">
+                    @foreach($cuentabancarias as $index => $item)
+                        <tr>
+                          <td class="cell-detail sorting_1" style="position: relative;">
+                            <span><b>BANCO :  </b> {{$item->TXT_EMPR_BANCO}}</span>
+                            <span><b>TIPO CUENTA  : </b> {{$item->TXT_REFERENCIA}}</span>
+                            <span><b>MONEDA : </b> {{$item->TXT_CATEGORIA_MONEDA}}</span>
+                          </td>
+                          <td class="cell-detail sorting_1" style="position: relative;">
+                            <span><b>NRO CUENTA BANCARIA :  </b> {{$item->TXT_NRO_CUENTA_BANCARIA}}</span>
+                            <span><b>CCI  : </b> {{$item->TXT_NRO_CCI}}</span>
+                            <span><b>CARNET EXTRANJERIA : </b> {{$item->CARNET_EXTRANJERIA}}</span>
+                          </td>
+                          @if (isset($idopcion))
+                            <td>
+                              <a href="{{ url('/cambiar-cuenta-corriente/'.$item->COD_EMPR_TITULAR.'/'.$item->COD_EMPR_BANCO.'/'.$item->TXT_NRO_CUENTA_BANCARIA.'/'.$item->COD_CATEGORIA_MONEDA.'/'.$idoc.'/'.$idopcion) }}" class="tools select"> <span class="label label-success">CAMBIAR CUENTA</span></a>
+                            </td>
+                          @endif
+                        </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+              <div id="bancossincuenta" class="tab-pane cont">
+                <table class="table table-striped table-borderless">
+                  <thead>
+                    <tr>
+                      <th>BANCO</th>
+                      @if (isset($idopcion))
+                      <th>OPERACION</th> 
+                      @endif
+                    </tr>
+                  </thead>
+                  <tbody class="no-border-x">
+                    @foreach($bancos_sin_cuenta as $index => $item)
+                        <tr>
+                          <td class="cell-detail sorting_1" style="position: relative;">
+                            <span><b>BANCO :  </b> {{$item->NOM_CATEGORIA}}</span>
+                          </td>
+                          @if (isset($idopcion))
+                            <td>
+                              <a href="{{ url('/cambiar-banco-sin-cuenta/'.$item->COD_CATEGORIA.'/'.$idoc.'/'.$idopcion) }}" class="tools select"> <span class="label label-success">CAMBIAR BANCO</span></a>
+                            </td>
+                          @endif
+                        </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 				</div>
 		    </div>
 		</div>

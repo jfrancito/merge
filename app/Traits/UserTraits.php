@@ -22,7 +22,7 @@ use App\Modelos\DetraccionSunat;
 use View;
 use Session;
 use Hashids;
-Use Nexmo;
+use Nexmo;
 use Keygen;
 use Mail;
 use PDO;
@@ -34,8 +34,8 @@ use Carbon\Carbon;
 trait UserTraits
 {
 
-
-    private function envio_detraccion_sunat(){
+    private function envio_detraccion_sunat()
+    {
 
         $empresas = DB::table('FE_TOKEN')
             ->where('TIPO', 'DETRACCIONES')
@@ -52,7 +52,7 @@ trait UserTraits
         $fechaInicio = $primerDiaMesAnterior;
         $fechaFin = $ultimoDiaMes;
         // Para iterar sobre los resultados
-        DB::table('DETRACION_SUNAT')->where('fec_pago_desc','>=',$fechaInicio)->where('fec_pago_desc','<=',$fechaFin)->delete();
+        DB::table('DETRACION_SUNAT')->where('fec_pago_desc', '>=', $fechaInicio)->where('fec_pago_desc', '<=', $fechaFin)->delete();
 
         $fechaInicio_n = Carbon::createFromFormat('d/m/Y', $fechaInicio);
         $fechaFin_n = Carbon::createFromFormat('d/m/Y', $fechaFin);
@@ -64,29 +64,29 @@ trait UserTraits
         while ($fechaActual <= $fechaFin_n) {
             $fechaInicio = $fechaActual->copy()->startOfMonth()->format('d/m/Y');
             $fechaFin = $fechaActual->copy()->endOfMonth()->format('d/m/Y');
-            
+
 
             foreach ($empresas as $item) {
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
-                  CURLOPT_URL => 'https://e-plataformaunica.sunat.gob.pe/v1/recaudacion/tributaria/declapago/detracciones/t/consultar?null=null&fechaInicio='.urlencode($fechaInicio).'&fechaFin='.urlencode($fechaFin).'&tipoCuenta=1&tipoConsulta=pagosIndividuales&periodo=&_=1770216422973',
-                  CURLOPT_RETURNTRANSFER => true,
-                  CURLOPT_ENCODING => '',
-                  CURLOPT_MAXREDIRS => 10,
-                  CURLOPT_TIMEOUT => 0,
-                  CURLOPT_FOLLOWLOCATION => true,
-                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                  CURLOPT_CUSTOMREQUEST => 'GET',
-                  CURLOPT_HTTPHEADER => array(
-                    'accept: application/json, text/plain, */*',
-                    'accept-encoding: gzip, deflate, br, zstd',
-                    'accept-language: es-ES,es;q=0.9',
-                    'connection: keep-alive',
-                    'host: e-plataformaunica.sunat.gob.pe',
-                    'Cookie: _ga_MSH22BL6C7=GS1.1.1735672224.1.1.1735672333.0.0.0; _ga_6LRF6GC6EC=GS2.1.s1753135783$o7$g0$t1753135837$j6$l0$h0; site24x7rumID=989612737329205.1768856228639.1768856295052.0; _ga=GA1.3.1567168574.1705528569; _gid=GA1.3.737557782.1770216344; _ga_6NCEEN6JSV=GS2.1.s1770216343$o201$g0$t1770216373$j30$l0$h0; _ga_PZPKQVJ49Q=GS2.3.s1770216389$o48$g0$t1770216389$j60$l0$h0; TS01645459=019edc9eb891edb4e174f3bcc9525076c70beda76c2a47e82d35e47d266fb179cc4d08b25d6c1ef13f7e5401c5b8b8f813593b6527; TS01645459=014dc399cba0ba2b480d3477b305ebc140850ff5dc0e56cf3c4156f3a55c328c5a0f6629b8b15da8dfca3fe73d753db7998f9ac35a',
-                    'idformulario: *MENU*',
-                    'idcache: '.$item->TOKEN
-                  ),
+                    CURLOPT_URL => 'https://e-plataformaunica.sunat.gob.pe/v1/recaudacion/tributaria/declapago/detracciones/t/consultar?null=null&fechaInicio=' . urlencode($fechaInicio) . '&fechaFin=' . urlencode($fechaFin) . '&tipoCuenta=1&tipoConsulta=pagosIndividuales&periodo=&_=1770216422973',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_HTTPHEADER => array(
+                        'accept: application/json, text/plain, */*',
+                        'accept-encoding: gzip, deflate, br, zstd',
+                        'accept-language: es-ES,es;q=0.9',
+                        'connection: keep-alive',
+                        'host: e-plataformaunica.sunat.gob.pe',
+                        'Cookie: _ga_MSH22BL6C7=GS1.1.1735672224.1.1.1735672333.0.0.0; _ga_6LRF6GC6EC=GS2.1.s1753135783$o7$g0$t1753135837$j6$l0$h0; site24x7rumID=989612737329205.1768856228639.1768856295052.0; _ga=GA1.3.1567168574.1705528569; _gid=GA1.3.737557782.1770216344; _ga_6NCEEN6JSV=GS2.1.s1770216343$o201$g0$t1770216373$j30$l0$h0; _ga_PZPKQVJ49Q=GS2.3.s1770216389$o48$g0$t1770216389$j60$l0$h0; TS01645459=019edc9eb891edb4e174f3bcc9525076c70beda76c2a47e82d35e47d266fb179cc4d08b25d6c1ef13f7e5401c5b8b8f813593b6527; TS01645459=014dc399cba0ba2b480d3477b305ebc140850ff5dc0e56cf3c4156f3a55c328c5a0f6629b8b15da8dfca3fe73d753db7998f9ac35a',
+                        'idformulario: *MENU*',
+                        'idcache: ' . $item->TOKEN
+                    ),
                 ));
                 $response = curl_exec($curl);
                 curl_close($curl);
@@ -103,45 +103,45 @@ trait UserTraits
 
 
 
-                        $documento                              =   new DetraccionSunat;
-                        $documento->num_pres                    =   $registro['num_pres'];
-                        $documento->cod_usuario_sol             =   $registro['cod_usuario_sol'];
-                        $documento->des_prov                    =   $registro['des_prov'];
-                        $documento->cod_tipcomprobante          =   $registro['cod_tipcomprobante'];
-                        $documento->num_ruc_proveedor           =   $registro['num_ruc_proveedor'];
+                        $documento = new DetraccionSunat;
+                        $documento->num_pres = $registro['num_pres'];
+                        $documento->cod_usuario_sol = $registro['cod_usuario_sol'];
+                        $documento->des_prov = $registro['des_prov'];
+                        $documento->cod_tipcomprobante = $registro['cod_tipcomprobante'];
+                        $documento->num_ruc_proveedor = $registro['num_ruc_proveedor'];
 
-                        $documento->per_tributario              =   $registro['per_tributario'];
-                        $documento->fec_pago_desc               =   $registro['fec_pago_desc'];
-                        $documento->num_npd                     =   $registro['num_npd'];
-                        $documento->des_adq                     =   $registro['des_adq'];
-                        $documento->num_constancia              =   $registro['num_constancia'];
+                        $documento->per_tributario = $registro['per_tributario'];
+                        $documento->fec_pago_desc = $registro['fec_pago_desc'];
+                        $documento->num_npd = $registro['num_npd'];
+                        $documento->des_adq = $registro['des_adq'];
+                        $documento->num_constancia = $registro['num_constancia'];
 
-                        $documento->tip_bien                    =   $registro['tip_bien'];
-                        $documento->tip_operacion               =   $registro['tip_operacion'];
-                        $documento->num_doc_adq                 =   $registro['num_doc_adq'];
-                        $documento->mto_deposito_desc           =   $registro['mto_deposito_desc'];
-                        $documento->num_cuenta                  =   $registro['num_cuenta'];
+                        $documento->tip_bien = $registro['tip_bien'];
+                        $documento->tip_operacion = $registro['tip_operacion'];
+                        $documento->num_doc_adq = $registro['num_doc_adq'];
+                        $documento->mto_deposito_desc = $registro['mto_deposito_desc'];
+                        $documento->num_cuenta = $registro['num_cuenta'];
 
-                        $documento->mto_deposito                =   $registro['mto_deposito'];
-                        $documento->num_comprobante             =   $registro['num_comprobante'];
-                        $documento->fec_pago                    =   $fecha;
-                        $documento->tip_doc_adq                 =   $registro['tip_doc_adq'];
-                        $documento->num_serie                   =   $registro['num_serie'];
+                        $documento->mto_deposito = $registro['mto_deposito'];
+                        $documento->num_comprobante = $registro['num_comprobante'];
+                        $documento->fec_pago = $fecha;
+                        $documento->tip_doc_adq = $registro['tip_doc_adq'];
+                        $documento->num_serie = $registro['num_serie'];
 
-                        $documento->origen_desc                 =   $registro['origen_desc'];
-                        $documento->cod_tipcta                  =   $registro['cod_tipcta'];
-                        $documento->empresa_id                  =   $item->COD_EMPR;
-                        $documento->empresa_nombre              =   $item->TXT_EMPR;
-                        $documento->id_documento                =   '';
+                        $documento->origen_desc = $registro['origen_desc'];
+                        $documento->cod_tipcta = $registro['cod_tipcta'];
+                        $documento->empresa_id = $item->COD_EMPR;
+                        $documento->empresa_nombre = $item->TXT_EMPR;
+                        $documento->id_documento = '';
                         $documento->save();
 
 
                     }
-                } 
+                }
 
             }
 
-            
+
             // Avanzar al siguiente mes
             $fechaActual->addMonth();
         }
@@ -165,7 +165,8 @@ trait UserTraits
     }
 
 
-    private function eliminacion_vales_arendir() {
+    private function eliminacion_vales_arendir()
+    {
 
         $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.CULMINAR_VALE');
         $stmt->execute();
@@ -173,42 +174,43 @@ trait UserTraits
     }
 
 
-    private function envio_correo_reparacion_levantada() {
+    private function envio_correo_reparacion_levantada()
+    {
 
-        $listaliquidaciones     =   FeDocumento::where('IND_CORREO_REPARABLE', '1')
-                                    ->get();
+        $listaliquidaciones = FeDocumento::where('IND_CORREO_REPARABLE', '1')
+            ->get();
 
-        foreach($listaliquidaciones as $item){
-    
-                $larchivos              =   DB::table('CMP.DOC_ASOCIAR_COMPRA')
-                                            ->where('COD_ORDEN', 'IICHCL0000012784')
-                                            ->where('TXT_ASIGNADO', 'ARCHIVO_VIRTUAL')
-                                            ->get();
-                $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-                $email                  =   'facturacion.iacm@induamerica.com.pe';
-                if($item->COD_EMPR == 'IACHEM0000010394'){
-                    $email                  =   'facturacion.iain@induamerica.com.pe';
-                }
+        foreach ($listaliquidaciones as $item) {
+
+            $larchivos = DB::table('CMP.DOC_ASOCIAR_COMPRA')
+                ->where('COD_ORDEN', 'IICHCL0000012784')
+                ->where('TXT_ASIGNADO', 'ARCHIVO_VIRTUAL')
+                ->get();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = 'facturacion.iacm@induamerica.com.pe';
+            if ($item->COD_EMPR == 'IACHEM0000010394') {
+                $email = 'facturacion.iain@induamerica.com.pe';
+            }
 
 
-                $array                  =   Array(
-                    'item'                =>  $item,
-                    'larchivos'           =>  $larchivos
+            $array = array(
+                'item' => $item,
+                'larchivos' => $larchivos
+            );
+            $subjectcorreo = 'SE SUBSANO LA REPARACION DEL DOCUMENTO // ' . $item->ID_DOCUMENTO . ' // ' . $item->OPERACION;
+
+            Mail::send('emails.reparable', $array, function ($message) use ($emailfrom, $item, $subjectcorreo, $email) {
+                $message->from($emailfrom->correoprincipal, 'ORDEN COMPRA ' . $item->ID_DOCUMENTO);
+                $message->to($email)->cc('jorge.saldana@induamerica.com.pe');
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_CORREO_REPARABLE' => '2'
+                    ]
                 );
-                $subjectcorreo = 'SE SUBSANO LA REPARACION DEL DOCUMENTO // '.$item->ID_DOCUMENTO.' // '.$item->OPERACION;
-
-                Mail::send('emails.reparable', $array, function($message) use ($emailfrom,$item,$subjectcorreo,$email)
-                {
-                    $message->from($emailfrom->correoprincipal, 'ORDEN COMPRA '.$item->ID_DOCUMENTO);
-                    $message->to($email)->cc('jorge.saldana@induamerica.com.pe');
-                    $message->subject($subjectcorreo);
-                });
-
-                FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                            ->update(
-                                    [
-                                        'IND_CORREO_REPARABLE'=>'2'
-                                    ]);                      
         }
         print_r("Se envio correctamente el correo Adminstracion");
     }
@@ -217,57 +219,57 @@ trait UserTraits
 
 
 
-    private function envio_correo_apcli() {
+    private function envio_correo_apcli()
+    {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_clap','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('ind_email_clap', '=', 0)->where('COD_ESTADO', '<>', 'ETM0000000000006')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $usuario                =   User::where('id','=',$item->usuario_pa)->first();
-            $correocc               =   $usuario->email;
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $usuario = User::where('id', '=', $item->usuario_pa)->first();
+            $correocc = $usuario->email;
 
-            if($item->TXT_PROCEDENCIA = 'ADM'){
-                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$usuario->usuarioosiris_id)->first();
-                if($trabajador->TXT_CORREO_ELECTRONICO == ''){
-                    $correocc               =   'jose.neciosup@induamerica.com.pe';
-                }else{
-                    $correocc               =   $trabajador->TXT_CORREO_ELECTRONICO;
+            if ($item->TXT_PROCEDENCIA = 'ADM') {
+                $trabajador = STDTrabajador::where('COD_TRAB', '=', $usuario->usuarioosiris_id)->first();
+                if ($trabajador->TXT_CORREO_ELECTRONICO == '') {
+                    $correocc = 'jose.neciosup@induamerica.com.pe';
+                } else {
+                    $correocc = $trabajador->TXT_CORREO_ELECTRONICO;
                 }
             }
             //dd($usuario);
-            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
-                                        ->groupBy('COD_ORDEN')
-                                        ->groupBy('FEC_ORDEN')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')
-                                        ->groupBy('TXT_EMPR_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO')
-                                        ->groupBy('COD_EMPR')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+            $oc = VMergeOC::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)
+                ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                ->groupBy('COD_ORDEN')
+                ->groupBy('FEC_ORDEN')
+                ->groupBy('TXT_CATEGORIA_MONEDA')
+                ->groupBy('TXT_EMPR_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO')
+                ->groupBy('COD_EMPR')
+                ->groupBy('TXT_CATEGORIA_MONEDA')->first();
 
             // correos principales y  copias
             //$email                  =   $item->email;
-            $array                  =   Array(
-                'item'                =>  $item,
-                'oc'                  =>  $oc,
+            $array = array(
+                'item' => $item,
+                'oc' => $oc,
             );
 
             //whatsaap para uc
             //$mensaje            =   'COMPROBANTE : '.$item->ID_DOCUMENTO.'%0D%0A'.'Estado : '.$item->TXT_ESTADO.'%0D%0A';
             //$this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
 
-            Mail::send('emails.cli', $array, function($message) use ($emailfrom,$item,$correocc)
-            {
-                $message->from($emailfrom->correoprincipal, 'Induamerica estado de la orden de compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
+            Mail::send('emails.cli', $array, function ($message) use ($emailfrom, $item, $correocc) {
+                $message->from($emailfrom->correoprincipal, 'Induamerica estado de la orden de compra ' . $item->ID_DOCUMENTO . '(' . $item->TXT_ESTADO . ')');
                 $message->to($correocc);
-                $message->subject('Orden de Compra '.$item->TXT_ESTADO);
+                $message->subject('Orden de Compra ' . $item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-            $pedido->ind_email_clap               =   1;
+            $pedido = FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM', '=', $item->DOCUMENTO_ITEM)->first();
+            $pedido->ind_email_clap = 1;
             $pedido->save();
 
         }
@@ -277,109 +279,109 @@ trait UserTraits
 
 
 
-    private function envio_correo_co() {
+    private function envio_correo_co()
+    {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_ap','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('ind_email_ap', '=', 0)->where('COD_ESTADO', '<>', 'ETM0000000000006')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00030')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00030')->first();
 
-            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
-                                        ->groupBy('COD_ORDEN')
-                                        ->groupBy('FEC_ORDEN')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')
-                                        ->groupBy('TXT_EMPR_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO')
-                                        ->groupBy('COD_EMPR')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+            $oc = VMergeOC::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)
+                ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                ->groupBy('COD_ORDEN')
+                ->groupBy('FEC_ORDEN')
+                ->groupBy('TXT_CATEGORIA_MONEDA')
+                ->groupBy('TXT_EMPR_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO')
+                ->groupBy('COD_EMPR')
+                ->groupBy('TXT_CATEGORIA_MONEDA')->first();
 
             // correos principales y  copias
             //$email                  =   $item->email;
-            $array                  =   Array(
-                'item'                =>  $item,
-                'oc'                  =>  $oc,
+            $array = array(
+                'item' => $item,
+                'oc' => $oc,
             );
 
 
-            Mail::send('emails.ap', $array, function($message) use ($emailfrom,$item,$email)
-            {
-                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
+            Mail::send('emails.ap', $array, function ($message) use ($emailfrom, $item, $email) {
+                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra ' . $item->ID_DOCUMENTO . '(' . $item->TXT_ESTADO . ')');
                 $message->to($email->correoprincipal);
-                $message->subject('Orden de Compra '.$item->TXT_ESTADO);
+                $message->subject('Orden de Compra ' . $item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-            $pedido->ind_email_ap               =   1;
+            $pedido = FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM', '=', $item->DOCUMENTO_ITEM)->first();
+            $pedido->ind_email_ap = 1;
             $pedido->save();
 
         }
-        print("Se envio correctamente el correo Contabilidad");
+        print ("Se envio correctamente el correo Contabilidad");
     }
 
 
 
 
 
-    private function envio_correo_placon() {
+    private function envio_correo_placon()
+    {
 
-        $listadocumentos          =   DB::table('vcorreoplaconsolidado')
-                                      //->where('emailcorp','=','alexis.colchado@induamerica.com.pe')
-                                      ->get();
+        $listadocumentos = DB::table('vcorreoplaconsolidado')
+            //->where('emailcorp','=','alexis.colchado@induamerica.com.pe')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $correocc               =   $item->emailcorp;
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $correocc = $item->emailcorp;
             //$correocc               =   'jorge.saldana@induamerica.com.pe';
 
-            $array                  =   Array(
-                'item'                =>  $item
+            $array = array(
+                'item' => $item
             );
 
-            Mail::send('emails.consolidadoplanilla', $array, function($message) use ($emailfrom,$item,$correocc)
-            {
-                $message->from($emailfrom->correoprincipal, 'Planilla de Movilidad – Pendiente de Consolidación  2026 - '.$item->trabajador );
+            Mail::send('emails.consolidadoplanilla', $array, function ($message) use ($emailfrom, $item, $correocc) {
+                $message->from($emailfrom->correoprincipal, 'Planilla de Movilidad – Pendiente de Consolidación  2026 - ' . $item->trabajador);
                 //$message->to($correocc);
                 $message->to($correocc)->cc('alertassys@induamerica.com.pe');
                 $message->subject('Planilla de Movilidad Pendientes consolidar');
             });
 
         }
-        print("Se envio correctamente");
+        print ("Se envio correctamente");
     }
 
-    private function envio_correo_placon_det() {
+    private function envio_correo_placon_det()
+    {
 
-        $listadocumentos          =     DB::table('vcorreoplaconsolidadodet')->select('emailcorp','TXT_TRABAJADOR')
-                                        //->where('emailcorp','=','jecan@induamerica.com.pe')
-                                        ->groupBy('emailcorp')
-                                        ->groupBy('TXT_TRABAJADOR')
-                                        ->get();
+        $listadocumentos = DB::table('vcorreoplaconsolidadodet')->select('emailcorp', 'TXT_TRABAJADOR')
+            //->where('emailcorp','=','jecan@induamerica.com.pe')
+            ->groupBy('emailcorp')
+            ->groupBy('TXT_TRABAJADOR')
+            ->get();
 
 
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $correocc               =   $item->emailcorp;
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $correocc = $item->emailcorp;
             //$correocc               =   'jorge.saldana@induamerica.com.pe';
 
-            $listadocumentosdet     =   DB::table('vcorreoplaconsolidadodet')->select('*')
-                                        ->where('emailcorp','=',$item->emailcorp)
-                                        ->get();
+            $listadocumentosdet = DB::table('vcorreoplaconsolidadodet')->select('*')
+                ->where('emailcorp', '=', $item->emailcorp)
+                ->get();
 
-            $array                  =   Array(
-                'item'                =>  $item,
-                'listadocumentosdet'  =>  $listadocumentosdet
+            $array = array(
+                'item' => $item,
+                'listadocumentosdet' => $listadocumentosdet
             );
 
-            Mail::send('emails.consolidadoplanilladet', $array, function($message) use ($emailfrom,$item,$correocc)
-            {
+            Mail::send('emails.consolidadoplanilladet', $array, function ($message) use ($emailfrom, $item, $correocc) {
                 $message->from($emailfrom->correoprincipal, 'SU ATENCION INMEDIATA: CARGAR PLANILLAS DE MOVILIDAD A FEBRERO 2026');
                 //$message->to($correocc);
                 $message->to($correocc)->cc('alertassys@induamerica.com.pe');
@@ -387,145 +389,146 @@ trait UserTraits
             });
 
         }
-        print("Se envio correctamente");
+        print ("Se envio correctamente");
     }
 
 
 
 
-    private function envio_correo_baja() {
+    private function envio_correo_baja()
+    {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_ba','=',0)->where('COD_ESTADO','=','ETM0000000000006')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('ind_email_ba', '=', 0)->where('COD_ESTADO', '=', 'ETM0000000000006')
+            ->get();
 
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $usuario                =   User::where('id','=',$item->usuario_pa)->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $usuario = User::where('id', '=', $item->usuario_pa)->first();
 
-            $correocc               =   $usuario->email;
+            $correocc = $usuario->email;
 
-            if($item->TXT_PROCEDENCIA = 'ADM'){
-                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$usuario->usuarioosiris_id)->first();
-                if($trabajador->TXT_CORREO_ELECTRONICO == ''){
-                    $correocc               =   'jose.neciosup@induamerica.com.pe';
-                }else{
-                    $correocc               =   $trabajador->TXT_CORREO_ELECTRONICO;
+            if ($item->TXT_PROCEDENCIA = 'ADM') {
+                $trabajador = STDTrabajador::where('COD_TRAB', '=', $usuario->usuarioosiris_id)->first();
+                if ($trabajador->TXT_CORREO_ELECTRONICO == '') {
+                    $correocc = 'jose.neciosup@induamerica.com.pe';
+                } else {
+                    $correocc = $trabajador->TXT_CORREO_ELECTRONICO;
                 }
             }
-            
-        //dd($usuario);
 
-            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
-                                        ->groupBy('COD_ORDEN')
-                                        ->groupBy('FEC_ORDEN')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')
-                                        ->groupBy('TXT_EMPR_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO')
-                                        ->groupBy('COD_EMPR')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+            //dd($usuario);
+
+            $oc = VMergeOC::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)
+                ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                ->groupBy('COD_ORDEN')
+                ->groupBy('FEC_ORDEN')
+                ->groupBy('TXT_CATEGORIA_MONEDA')
+                ->groupBy('TXT_EMPR_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO')
+                ->groupBy('COD_EMPR')
+                ->groupBy('TXT_CATEGORIA_MONEDA')->first();
 
             // correos principales y  copias
             //$email                  =   $item->email;
-            $array                  =   Array(
-                'item'                =>  $item,
-                'oc'                  =>  $oc,
+            $array = array(
+                'item' => $item,
+                'oc' => $oc,
             );
 
 
-            Mail::send('emails.baja', $array, function($message) use ($emailfrom,$item,$correocc)
-            {
-                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'(RECHAZO)');
+            Mail::send('emails.baja', $array, function ($message) use ($emailfrom, $item, $correocc) {
+                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra ' . $item->ID_DOCUMENTO . '(RECHAZO)');
                 $message->to($correocc);
                 $message->subject('Orden de Compra Rechazado');
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-            $pedido->ind_email_ba               =   1;
+            $pedido = FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM', '=', $item->DOCUMENTO_ITEM)->first();
+            $pedido->ind_email_ba = 1;
             $pedido->save();
 
         }
-        print("Se envio correctamente de BAJA");
+        print ("Se envio correctamente de BAJA");
     }
 
 
 
-    private function envio_correo_adm() {
+    private function envio_correo_adm()
+    {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_adm','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('ind_email_adm', '=', 0)->where('COD_ESTADO', '<>', 'ETM0000000000006')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
 
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00031')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00031')->first();
             //dd($email);
 
-            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
-                                        ->groupBy('COD_ORDEN')
-                                        ->groupBy('FEC_ORDEN')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')
-                                        ->groupBy('TXT_EMPR_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO')
-                                        ->groupBy('COD_EMPR')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+            $oc = VMergeOC::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)
+                ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                ->groupBy('COD_ORDEN')
+                ->groupBy('FEC_ORDEN')
+                ->groupBy('TXT_CATEGORIA_MONEDA')
+                ->groupBy('TXT_EMPR_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO')
+                ->groupBy('COD_EMPR')
+                ->groupBy('TXT_CATEGORIA_MONEDA')->first();
 
             // correos principales y  copias
             //$email                  =   $item->email;
-            $array                  =   Array(
-                'item'                =>  $item,
-                'oc'                  =>  $oc,
+            $array = array(
+                'item' => $item,
+                'oc' => $oc,
             );
 
 
-            Mail::send('emails.adm', $array, function($message) use ($emailfrom,$item,$email)
-            {
-                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
+            Mail::send('emails.adm', $array, function ($message) use ($emailfrom, $item, $email) {
+                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra ' . $item->ID_DOCUMENTO . '(' . $item->TXT_ESTADO . ')');
                 $message->to($email->correoprincipal);
-                $message->subject('Orden de Compra '.$item->TXT_ESTADO);
+                $message->subject('Orden de Compra ' . $item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-            $pedido->ind_email_adm              =   1;
+            $pedido = FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM', '=', $item->DOCUMENTO_ITEM)->first();
+            $pedido->ind_email_adm = 1;
             $pedido->save();
 
         }
         print_r("Se envio correctamente el correo Adminstracion");
     }
 
-    private function envio_correo_tesoreria_lq() {
+    private function envio_correo_tesoreria_lq()
+    {
 
-        $listaliquidaciones          =      LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
-                                            //->where('ID_DOCUMENTO','=','LIQG00000329')
-                                            ->where(function($query) {
-                                                $query->whereNull('IND_CORREO')
-                                                      ->orWhere('IND_CORREO', 0);
-                                            })
-                                            //->where('ARENDIR_ID','<>','')
-                                            ->where(function($query) {
-                                                $query->whereNotNull('COD_OSIRIS')
-                                                      ->where('COD_OSIRIS', '<>', '');
-                                            })
-                                            ->get();
+        $listaliquidaciones = LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
+            //->where('ID_DOCUMENTO','=','LIQG00000329')
+            ->where(function ($query) {
+                $query->whereNull('IND_CORREO')
+                    ->orWhere('IND_CORREO', 0);
+            })
+            //->where('ARENDIR_ID','<>','')
+            ->where(function ($query) {
+                $query->whereNotNull('COD_OSIRIS')
+                    ->where('COD_OSIRIS', '<>', '');
+            })
+            ->get();
 
-        foreach($listaliquidaciones as $item){
-            $correotrabajdor         =    '';
-            $documentoCtble         =   DB::table('CMP.DOCUMENTO_CTBLE')
-                                        ->where('COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
-                                        ->where('COD_DOCUMENTO_CTBLE', $item->COD_OSIRIS)
-                                        ->first();
-                                        
-            if(count($documentoCtble)>0){
+        foreach ($listaliquidaciones as $item) {
+            $correotrabajdor = '';
+            $documentoCtble = DB::table('CMP.DOCUMENTO_CTBLE')
+                ->where('COD_CATEGORIA_ESTADO_DOC_CTBLE', '=', 'EDC0000000000009')
+                ->where('COD_DOCUMENTO_CTBLE', $item->COD_OSIRIS)
+                ->first();
 
-                $valeRendir             =   DB::table('WEB.VALE_RENDIR')
-                                            ->where('ID', $item->ARENDIR_ID)
-                                            ->first();
+            if (count($documentoCtble) > 0) {
+
+                $valeRendir = DB::table('WEB.VALE_RENDIR')
+                    ->where('ID', $item->ARENDIR_ID)
+                    ->first();
 
                 $documentos = DB::table('CMP.DOCUMENTO_CTBLE')
                     ->select([
@@ -537,137 +540,137 @@ trait UserTraits
                         'TXT_CATEGORIA_TIPO_DOC',
                         'CAN_TOTAL'
                     ])
-                    ->whereIn('COD_DOCUMENTO_CTBLE', function($query) use($documentoCtble) {
+                    ->whereIn('COD_DOCUMENTO_CTBLE', function ($query) use ($documentoCtble) {
                         $query->select('COD_TABLA_ASOC')
-                              ->from('CMP.REFERENCIA_ASOC')
-                              ->where('COD_TABLA', $documentoCtble->COD_DOCUMENTO_CTBLE);
+                            ->from('CMP.REFERENCIA_ASOC')
+                            ->where('COD_TABLA', $documentoCtble->COD_DOCUMENTO_CTBLE);
                     })
                     ->where('COD_ESTADO', 1)
                     ->get();
 
-                $vale_doc               =   '';
-                $monto_vale             =   0;
+                $vale_doc = '';
+                $monto_vale = 0;
 
 
-                $autorizacion           =   array();
-                $COD_AUTORIZACION       =   '';
+                $autorizacion = array();
+                $COD_AUTORIZACION = '';
 
-                $subjectcorreo = 'APLICACIÓN DE REEMBOLSO '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
-                if(count($valeRendir)>0){
-                    $subjectcorreo = 'APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
-                    $autorizacion       =   DB::table('TES.AUTORIZACION')
-                                            ->where('COD_AUTORIZACION', $valeRendir->ID_OSIRIS)
-                                            ->first();
+                $subjectcorreo = 'APLICACIÓN DE REEMBOLSO ' . $documentoCtble->NRO_SERIE . '-' . $documentoCtble->NRO_DOC;
+                if (count($valeRendir) > 0) {
+                    $subjectcorreo = 'APLICACION DE VALE CON LIQUIDACION ' . $documentoCtble->NRO_SERIE . '-' . $documentoCtble->NRO_DOC;
+                    $autorizacion = DB::table('TES.AUTORIZACION')
+                        ->where('COD_AUTORIZACION', $valeRendir->ID_OSIRIS)
+                        ->first();
 
                     //dd($autorizacion);
-                    if(count($autorizacion)>0){
-                        $vale_doc               =   $autorizacion->TXT_SERIE.'-'.$autorizacion->TXT_NUMERO;
-                        $monto_vale             =   $autorizacion->CAN_TOTAL;
-                        $COD_AUTORIZACION       =   $autorizacion->COD_AUTORIZACION;
+                    if (count($autorizacion) > 0) {
+                        $vale_doc = $autorizacion->TXT_SERIE . '-' . $autorizacion->TXT_NUMERO;
+                        $monto_vale = $autorizacion->CAN_TOTAL;
+                        $COD_AUTORIZACION = $autorizacion->COD_AUTORIZACION;
                     }
                 }
 
-                $termino                =   'REEMBOLSO';
-                $montotermino           =   $documentoCtble->CAN_TOTAL;
+                $termino = 'REEMBOLSO';
+                $montotermino = $documentoCtble->CAN_TOTAL;
 
-                if(count($autorizacion)>0){
-                    $montotermino           =   $autorizacion->CAN_TOTAL-$documentoCtble->CAN_TOTAL;
-                    if($autorizacion->CAN_TOTAL >  $documentoCtble->CAN_TOTAL){
-                        $termino                =   'DEVOLUCION';
+                if (count($autorizacion) > 0) {
+                    $montotermino = $autorizacion->CAN_TOTAL - $documentoCtble->CAN_TOTAL;
+                    if ($autorizacion->CAN_TOTAL > $documentoCtble->CAN_TOTAL) {
+                        $termino = 'DEVOLUCION';
                     }
                 }
 
-                $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+                $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
 
 
-                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
-                if($item->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00038')->first();
-                }else{
-                    if($item->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00039')->first();
-                    }else{
-                        if($item->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-                            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00040')->first();
+                $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00037')->first();
+                if ($item->COD_CENTRO == 'CEN0000000000004') { //rioja
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00038')->first();
+                } else {
+                    if ($item->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                        $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00039')->first();
+                    } else {
+                        if ($item->COD_CENTRO == 'CEN0000000000002') { //bellavista
+                            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00040')->first();
                         }
                     }
                 }
 
                 //TRANSFERENCIA Y REEMBOLSO
-                if($item->ARENDIR == 'REEMBOLSO' && $item->COD_CATEGORIA_TIPOPAGO == 'MPC0000000000002'){
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
+                if ($item->ARENDIR == 'REEMBOLSO' && $item->COD_CATEGORIA_TIPOPAGO == 'MPC0000000000002') {
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00037')->first();
                 }
 
-                $array                  =   Array(
-                    'item'                =>  $item,
-                    'oc'                  =>  $documentoCtble,
-                    'documentos'          =>  $documentos,
-                    'COD_AUTORIZACION'    =>  $COD_AUTORIZACION,
-                    'documentos'          =>  $documentos,
-                    'documentos'          =>  $documentos,
-                    'valeRendir'          =>  $valeRendir,
-                    'vale_doc'            =>  $vale_doc,
-                    'autorizacion'        =>  $autorizacion,
-                    'termino'             =>  $termino,
-                    'montotermino'        =>  $montotermino,
-                    'monto_vale'          =>  $monto_vale
+                $array = array(
+                    'item' => $item,
+                    'oc' => $documentoCtble,
+                    'documentos' => $documentos,
+                    'COD_AUTORIZACION' => $COD_AUTORIZACION,
+                    'documentos' => $documentos,
+                    'documentos' => $documentos,
+                    'valeRendir' => $valeRendir,
+                    'vale_doc' => $vale_doc,
+                    'autorizacion' => $autorizacion,
+                    'termino' => $termino,
+                    'montotermino' => $montotermino,
+                    'monto_vale' => $monto_vale
                 );
 
                 $user = DB::table('users')->where('id', $item->USUARIO_CREA)->first();
-                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('COD_TRAB','=',$user->usuarioosiris_id)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('COD_TRAB', '=', $user->usuarioosiris_id)->first();
                 //correo de trabajadores
-                $correotrabajador         =    '';
-                if(count($trabajadorcorreo)>0){
+                $correotrabajador = '';
+                if (count($trabajadorcorreo) > 0) {
                     if ($trabajadorcorreo->emailcorp !== null) {
                         $correotrabajador = $trabajadorcorreo->emailcorp;
                     }
                 }
 
-                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble,$subjectcorreo,$correotrabajador)
-                {
+                Mail::send('emails.tesorerialg', $array, function ($message) use ($emailfrom, $item, $email, $documentoCtble, $subjectcorreo, $correotrabajador) {
 
-                    if($correotrabajador ==''){
-                        $emailcopias        = explode(",", $email->correocopia);  
-                    }else{
-                        $emailcopias        = explode(",", $email->correocopia); 
-                        $emailcopias[]      = $correotrabajador; // Agrega al final del array
+                    if ($correotrabajador == '') {
+                        $emailcopias = explode(",", $email->correocopia);
+                    } else {
+                        $emailcopias = explode(",", $email->correocopia);
+                        $emailcopias[] = $correotrabajador; // Agrega al final del array
                     }
-                    $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
+                    $message->from($emailfrom->correoprincipal, 'LIQUIDACION ' . $item->ID_DOCUMENTO);
                     //$message->to('jorge.saldana@induamerica.com.pe');
                     $message->to($email->correoprincipal)->cc($emailcopias);
                     $message->subject($subjectcorreo);
                 });
 
-                $pedido                             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
-                $pedido->IND_CORREO                 =   1;
+                $pedido = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->first();
+                $pedido->IND_CORREO = 1;
                 $pedido->save();
-            }                            
+            }
         }
         print_r("Se envio correctamente el correo Adminstracion");
     }
 
-    private function envio_correo_jefeacopiodic() {
+    private function envio_correo_jefeacopiodic()
+    {
 
-        $listadocumentos          =   FeDocumento::where('OPERACION','=','DOCUMENTO_INTERNO_COMPRA')
-                                      ->where('COD_ESTADO','=','ETM0000000000012')
-                                      ->where('IND_EMAIL_JEFE_ACOPIO','=',0)
-                                      ->get();
+        $listadocumentos = FeDocumento::where('OPERACION', '=', 'DOCUMENTO_INTERNO_COMPRA')
+            ->where('COD_ESTADO', '=', 'ETM0000000000012')
+            ->where('IND_EMAIL_JEFE_ACOPIO', '=', 0)
+            ->get();
 
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $ordencompra         =      VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
-                                        })
-                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })                                                
-                                        ->WHERE('FE_REF_ASOC.LOTE','=',$item->ID_DOCUMENTO)                                                                                                
-                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
-                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
-                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+            $ordencompra = VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin) {
+                $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                    ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            })
+                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) {
+                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                })
+                ->WHERE('FE_REF_ASOC.LOTE', '=', $item->ID_DOCUMENTO)
+                ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO', '=', '1')
+                ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION', 'ASC')
+                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
                                                             TXT_EMPR_EMISOR,
@@ -682,41 +685,41 @@ trait UserTraits
                                                             FE_DOCUMENTO.TXT_ESTADO,
                                                             FE_REF_ASOC.TOTAL_MERGE
                                                         '))
-                                        ->first();
+                ->first();
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
-            if($ordencompra->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
-            }else{
-                if($ordencompra->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
-                }else{
-                    if($ordencompra->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00041')->first();
+            if ($ordencompra->COD_CENTRO == 'CEN0000000000004') { //rioja
+                $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00041')->first();
+            } else {
+                if ($ordencompra->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00041')->first();
+                } else {
+                    if ($ordencompra->COD_CENTRO == 'CEN0000000000002') { //bellavista
+                        $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00041')->first();
                     }
                 }
             }
-            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (".$item->ID_DOCUMENTO.")";
+            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (" . $item->ID_DOCUMENTO . ")";
 
-            $array  =        [
-                                    'ordencompra'       => $ordencompra,
-                                    'estado'            => 'POR APROBAR JEFE DE ACOPIO',
-                             ];
+            $array = [
+                'ordencompra' => $ordencompra,
+                'estado' => 'POR APROBAR JEFE DE ACOPIO',
+            ];
 
-            Mail::send('emails.emaildocumentointernocompragenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
-            {
-                $emailcopias        = explode(",", $email->correocopia);  
-                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA JEFE ACOPIO ('.$item->ID_DOCUMENTO.')');
+            Mail::send('emails.emaildocumentointernocompragenerado', $array, function ($message) use ($emailfrom, $item, $email, $subjectcorreo) {
+                $emailcopias = explode(",", $email->correocopia);
+                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA JEFE ACOPIO (' . $item->ID_DOCUMENTO . ')');
                 $message->to($email->correoprincipal)->cc($emailcopias);
                 $message->subject($subjectcorreo);
             });
 
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                                [
-                                    'IND_EMAIL_JEFE_ACOPIO'=>'1'
-                                ]);  
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_EMAIL_JEFE_ACOPIO' => '1'
+                    ]
+                );
 
         }
 
@@ -724,28 +727,29 @@ trait UserTraits
     }
 
 
-    private function envio_correo_admindic() {
+    private function envio_correo_admindic()
+    {
 
-        $listadocumentos          =   FeDocumento::where('OPERACION','=','DOCUMENTO_INTERNO_COMPRA')
-                                      ->where('COD_ESTADO','=','ETM0000000000004')
-                                      ->where('IND_EMAIL_ADMINISTRACION_ACOPIO','=',0)
-                                      ->get();
+        $listadocumentos = FeDocumento::where('OPERACION', '=', 'DOCUMENTO_INTERNO_COMPRA')
+            ->where('COD_ESTADO', '=', 'ETM0000000000004')
+            ->where('IND_EMAIL_ADMINISTRACION_ACOPIO', '=', 0)
+            ->get();
 
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $ordencompra         =      VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
-                                        })
-                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })                                                
-                                        ->WHERE('FE_REF_ASOC.LOTE','=',$item->ID_DOCUMENTO)                                                                                                
-                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
-                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
-                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+            $ordencompra = VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin) {
+                $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                    ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            })
+                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) {
+                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                })
+                ->WHERE('FE_REF_ASOC.LOTE', '=', $item->ID_DOCUMENTO)
+                ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO', '=', '1')
+                ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION', 'ASC')
+                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
                                                             TXT_EMPR_EMISOR,
@@ -760,92 +764,93 @@ trait UserTraits
                                                             FE_DOCUMENTO.TXT_ESTADO,
                                                             FE_REF_ASOC.TOTAL_MERGE
                                                         '))
-                                        ->first();
+                ->first();
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
-            if($ordencompra->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
-            }else{
-                if($ordencompra->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
-                }else{
-                    if($ordencompra->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00043')->first();
+            if ($ordencompra->COD_CENTRO == 'CEN0000000000004') { //rioja
+                $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00043')->first();
+            } else {
+                if ($ordencompra->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00043')->first();
+                } else {
+                    if ($ordencompra->COD_CENTRO == 'CEN0000000000002') { //bellavista
+                        $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00043')->first();
                     }
                 }
             }
-            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (".$item->ID_DOCUMENTO.")";
+            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (" . $item->ID_DOCUMENTO . ")";
 
-            $array  =        [
-                                    'ordencompra'       => $ordencompra,
-                                    'estado'            => 'POR APROBAR ADMINISTRACION',
-                             ];
+            $array = [
+                'ordencompra' => $ordencompra,
+                'estado' => 'POR APROBAR ADMINISTRACION',
+            ];
 
-            Mail::send('emails.emaildocumentointernocompragenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
-            {
-                $emailcopias        = explode(",", $email->correocopia);  
-                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
+            Mail::send('emails.emaildocumentointernocompragenerado', $array, function ($message) use ($emailfrom, $item, $email, $subjectcorreo) {
+                $emailcopias = explode(",", $email->correocopia);
+                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA ADMINISTRACION (' . $item->ID_DOCUMENTO . ')');
                 $message->to($email->correoprincipal)->cc($emailcopias);
                 $message->subject($subjectcorreo);
             });
 
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                                [
-                                    'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
-                                ]);  
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_EMAIL_ADMINISTRACION_ACOPIO' => '1'
+                    ]
+                );
 
         }
 
         print_r("Se envio correctamente el correo administracion");
     }
 
-    private function envio_correo_adminlqc() {
+    private function envio_correo_adminlqc()
+    {
 
-        $listadocumentos          =   FeDocumento::where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
-                                      ->where('COD_ESTADO','=','ETM0000000000004')
-                                      ->where('IND_EMAIL_ADMINISTRACION_ACOPIO','=',0)
-                                      ->get();
+        $listadocumentos = FeDocumento::where('OPERACION', '=', 'LIQUIDACION_COMPRA_ANTICIPO')
+            ->where('COD_ESTADO', '=', 'ETM0000000000004')
+            ->where('IND_EMAIL_ADMINISTRACION_ACOPIO', '=', 0)
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
-                                                ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
-                                                ->first();
+            $ordenpago = VMergeOP::where('COD_ESTADO', '=', '1')
+                ->where('COD_AUTORIZACION', '=', $item->ID_DOCUMENTO)
+                ->first();
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-            if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-            }else{
-                if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-                }else{
-                    if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00044')->first();
+            if ($ordenpago->COD_CENTRO == 'CEN0000000000004') { //rioja
+                $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00044')->first();
+            } else {
+                if ($ordenpago->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00044')->first();
+                } else {
+                    if ($ordenpago->COD_CENTRO == 'CEN0000000000002') { //bellavista
+                        $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00044')->first();
                     }
                 }
             }
-            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
-            $array  =        [
-                                    'ordenpago'       => $ordenpago,
-                                    'estado'            => 'POR APROBAR ADMINISTRACION',
-                             ];
+            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (" . $item->ID_DOCUMENTO . ")";
+            $array = [
+                'ordenpago' => $ordenpago,
+                'estado' => 'POR APROBAR ADMINISTRACION',
+            ];
 
-            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
-            {
-                $emailcopias        = explode(",", $email->correocopia);  
-                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
+            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function ($message) use ($emailfrom, $item, $email, $subjectcorreo) {
+                $emailcopias = explode(",", $email->correocopia);
+                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO ADMINISTRACION (' . $item->ID_DOCUMENTO . ')');
                 $message->to($email->correoprincipal)->cc($emailcopias);
                 $message->subject($subjectcorreo);
             });
 
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                                [
-                                    'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
-                                ]);  
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_EMAIL_ADMINISTRACION_ACOPIO' => '1'
+                    ]
+                );
 
         }
 
@@ -853,38 +858,39 @@ trait UserTraits
     }
 
 
-    private function envio_correo_aprobado() {
+    private function envio_correo_aprobado()
+    {
 
-        $listadocumentos          =   FeDocumento::where('COD_ESTADO','=','ETM0000000000005')
-                                      ->where('IND_EMAIL_APROBADO','=',0)
-                                      //->where('ID_DOCUMENTO','=','IILMCR0000033070')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('COD_ESTADO', '=', 'ETM0000000000005')
+            ->where('IND_EMAIL_APROBADO', '=', 0)
+            //->where('ID_DOCUMENTO','=','IILMCR0000033070')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00046')->first();
-            $fe_historial           =   DB::table('FE_DOCUMENTO_HISTORIAL')
-                                        ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-                                        ->where('TIPO', 'like', '%APROBADO POR%')
-                                        ->where('TIPO','<>','APROBADO POR ADMINISTRACION')
-                                        ->where('TIPO','<>','APROBADO POR CONTABILIDAD')
-                                        ->orderBy('FECHA', 'desc')
-                                        ->get();
-            $subjectcorreo          =   "COMPRA APROBADA ".$item->ID_DOCUMENTO." (".$item->OPERACION.")";
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00046')->first();
+            $fe_historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+                ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                ->where('TIPO', 'like', '%APROBADO POR%')
+                ->where('TIPO', '<>', 'APROBADO POR ADMINISTRACION')
+                ->where('TIPO', '<>', 'APROBADO POR CONTABILIDAD')
+                ->orderBy('FECHA', 'desc')
+                ->get();
+            $subjectcorreo = "COMPRA APROBADA " . $item->ID_DOCUMENTO . " (" . $item->OPERACION . ")";
 
             //correo de trabajadores
-            $correotrabajador         =    '';
-            foreach($fe_historial as $item3){
-                    $user = DB::table('users')->where('id', $item3->USUARIO_ID)->first();
-                    $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $user->usuarioosiris_id)->first();
+            $correotrabajador = '';
+            foreach ($fe_historial as $item3) {
+                $user = DB::table('users')->where('id', $item3->USUARIO_ID)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $user->usuarioosiris_id)->first();
 
-                    $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
-                    if(count($trabajadorcorreo)>0){
-                        if ($trabajadorcorreo->emailcorp !== null) {
-                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
-                        }
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni', '=', $trabajador->NRO_DOCUMENTO)->first();
+                if (count($trabajadorcorreo) > 0) {
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $correotrabajador . $trabajadorcorreo->emailcorp . ',';
                     }
+                }
             }
 
 
@@ -892,22 +898,22 @@ trait UserTraits
             $usuario_autoriza = '';
             $usuario_aprueba = '';
 
-            if($item->OPERACION == 'ORDEN_COMPRA'){
+            if ($item->OPERACION == 'ORDEN_COMPRA') {
 
-                $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+                $ordencompra = CMPOrden::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)->first();
 
 
 
 
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_SOLICITA)->first();
-                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
-                if(count($trabajadorcorreo)>0){
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni', '=', $trabajador->NRO_DOCUMENTO)->first();
+                if (count($trabajadorcorreo) > 0) {
 
-                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
+                    if ($trabajador->COD_TRAB != 'ISTR000000000033') {
 
-                        $usuario_solicita = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                        $usuario_solicita = $trabajadorcorreo->apellidopaterno . ' ' . $trabajadorcorreo->apellidomaterno . ' ' . $trabajadorcorreo->nombres;
                         if ($trabajadorcorreo->emailcorp !== null) {
-                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                            $correotrabajador = $correotrabajador . $trabajadorcorreo->emailcorp . ',';
                         }
 
                     }
@@ -917,25 +923,25 @@ trait UserTraits
 
 
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_ENCARGADO)->first();
-                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
-                if(count($trabajadorcorreo)>0){
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni', '=', $trabajador->NRO_DOCUMENTO)->first();
+                if (count($trabajadorcorreo) > 0) {
 
-                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
-                        $usuario_autoriza = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                    if ($trabajador->COD_TRAB != 'ISTR000000000033') {
+                        $usuario_autoriza = $trabajadorcorreo->apellidopaterno . ' ' . $trabajadorcorreo->apellidomaterno . ' ' . $trabajadorcorreo->nombres;
                         if ($trabajadorcorreo->emailcorp !== null) {
-                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                            $correotrabajador = $correotrabajador . $trabajadorcorreo->emailcorp . ',';
                         }
                     }
 
                 }
 
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_COMISIONISTA)->first();
-                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
-                if(count($trabajadorcorreo)>0){
-                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
-                        $usuario_aprueba = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni', '=', $trabajador->NRO_DOCUMENTO)->first();
+                if (count($trabajadorcorreo) > 0) {
+                    if ($trabajador->COD_TRAB != 'ISTR000000000033') {
+                        $usuario_aprueba = $trabajadorcorreo->apellidopaterno . ' ' . $trabajadorcorreo->apellidomaterno . ' ' . $trabajadorcorreo->nombres;
                         if ($trabajadorcorreo->emailcorp !== null) {
-                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                            $correotrabajador = $correotrabajador . $trabajadorcorreo->emailcorp . ',';
                         }
                     }
                 }
@@ -946,78 +952,79 @@ trait UserTraits
 
             // 1. Eliminar espacios en blanco al inicio y final
             $correotrabajador = trim($correotrabajador);
-            
+
             // 2. Eliminar coma final si existe
             $correotrabajador = rtrim($correotrabajador, ',');
-            
+
             // 3. Convertir a array
             $correotrabajador = explode(',', $correotrabajador);
-            
+
             // 4. Limpiar cada correo (eliminar espacios)
             $correotrabajador = array_map('trim', $correotrabajador);
-            
+
             // 5. Eliminar elementos vacíos
             $correotrabajador = array_filter($correotrabajador);
-            
+
             // 6. Eliminar duplicados manteniendo el orden
             $correotrabajador = array_unique($correotrabajador);
             $correosLimpios = implode(',', $correotrabajador);
 
-            $array  =        [
-                                    'item'       => $item,
-                                    'fe_historial'     => $fe_historial,
-                                    'usuario_solicita'     => $usuario_solicita,
-                                    'usuario_autoriza'     => $usuario_autoriza,
-                                    'usuario_aprueba'     => $usuario_aprueba,
-                             ];
+            $array = [
+                'item' => $item,
+                'fe_historial' => $fe_historial,
+                'usuario_solicita' => $usuario_solicita,
+                'usuario_autoriza' => $usuario_autoriza,
+                'usuario_aprueba' => $usuario_aprueba,
+            ];
 
 
-            Mail::send('emails.emailcompraaprobado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo,$correosLimpios)
-            {
+            Mail::send('emails.emailcompraaprobado', $array, function ($message) use ($emailfrom, $item, $email, $subjectcorreo, $correosLimpios) {
 
 
-                if($correosLimpios ==''){
-                    $emailcopias        = explode(",", $email->correocopia);  
-                }else{
-                    $emailcopias        = explode(",", $email->correocopia.','.$correosLimpios); 
+                if ($correosLimpios == '') {
+                    $emailcopias = explode(",", $email->correocopia);
+                } else {
+                    $emailcopias = explode(",", $email->correocopia . ',' . $correosLimpios);
                 }
 
-                $message->from($emailfrom->correoprincipal, 'COMPRA APROBADA ('.$item->ID_DOCUMENTO.')');
+                $message->from($emailfrom->correoprincipal, 'COMPRA APROBADA (' . $item->ID_DOCUMENTO . ')');
                 $message->to($email->correoprincipal)->cc($emailcopias);
                 $message->subject($subjectcorreo);
             });
 
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                                [
-                                    'IND_EMAIL_APROBADO'=>'1'
-                                ]);  
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_EMAIL_APROBADO' => '1'
+                    ]
+                );
 
         }
 
         print_r("Se envio correctamente el correo administracion");
     }
 
-    private function crear_excel_aporbado_admin() {
+    private function crear_excel_aporbado_admin()
+    {
 
         $ayer = Carbon::yesterday()->format('Y-m-d');
 
-        $listadocumentos =  FeDocumento::leftJoin('CMP.ORDEN', 'CMP.ORDEN.COD_ORDEN', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
-                            ->leftJoin('users', 'users.id', '=', 'FE_DOCUMENTO.usuario_uc')
-                            ->leftJoin('STD.TRABAJADOR', 'STD.TRABAJADOR.COD_TRAB', '=', 'CMP.ORDEN.COD_TRABAJADOR_ENCARGADO')
-                            ->leftJoin('users as uconta', 'uconta.id', '=', 'FE_DOCUMENTO.usuario_pr')
-                            ->leftJoin('users as uadmin', 'uadmin.id', '=', 'FE_DOCUMENTO.usuario_ap')
-                            ->select('FE_DOCUMENTO.*','CMP.ORDEN.*','users.*','STD.TRABAJADOR.*','uconta.nombre as nombreconta','uadmin.nombre as nombreadmin')
-                            //->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                            ->where(function($q) {
-                                $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
-                                  ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
-                            })
-                            ->whereDate('fecha_ap', $ayer)
-                            ->orderBy('fecha_ap','asc')
-                            ->get();
+        $listadocumentos = FeDocumento::leftJoin('CMP.ORDEN', 'CMP.ORDEN.COD_ORDEN', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            ->leftJoin('users', 'users.id', '=', 'FE_DOCUMENTO.usuario_uc')
+            ->leftJoin('STD.TRABAJADOR', 'STD.TRABAJADOR.COD_TRAB', '=', 'CMP.ORDEN.COD_TRABAJADOR_ENCARGADO')
+            ->leftJoin('users as uconta', 'uconta.id', '=', 'FE_DOCUMENTO.usuario_pr')
+            ->leftJoin('users as uadmin', 'uadmin.id', '=', 'FE_DOCUMENTO.usuario_ap')
+            ->select('FE_DOCUMENTO.*', 'CMP.ORDEN.*', 'users.*', 'STD.TRABAJADOR.*', 'uconta.nombre as nombreconta', 'uadmin.nombre as nombreadmin')
+            //->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+            ->where(function ($q) {
+                $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
+                    ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
+            })
+            ->whereDate('fecha_ap', $ayer)
+            ->orderBy('fecha_ap', 'asc')
+            ->get();
 
-        if(count($listadocumentos)>0){
+        if (count($listadocumentos) > 0) {
 
             $fecha_actual = date("Y-m-d");
             $titulo = 'Compras-Aprobadas-(' . $ayer . ')';
@@ -1031,11 +1038,11 @@ trait UserTraits
             }
 
             // Generar Excel localmente
-            Excel::create($titulo, function($excel) use ($listadocumentos, $titulo) {
-                $excel->sheet('OC', function($sheet) use ($listadocumentos, $titulo) {
+            Excel::create($titulo, function ($excel) use ($listadocumentos, $titulo) {
+                $excel->sheet('OC', function ($sheet) use ($listadocumentos, $titulo) {
                     $sheet->loadView('excel.listacomprasaprobadas')
-                          ->with('listadocumentos', $listadocumentos)
-                          ->with('titulo', $titulo);
+                        ->with('listadocumentos', $listadocumentos)
+                        ->with('titulo', $titulo);
                 });
             })->store('xls', $rutaLocal);
 
@@ -1045,7 +1052,7 @@ trait UserTraits
             // 2. Intentar copiar a la red
             $rutaRed = '\\\\10.1.50.2\\comprobantes\\EXCELOC\\';
 
-            $nombre_archivo     =   $titulo . '_' . date('His') . '.xls';
+            $nombre_archivo = $titulo . '_' . date('His') . '.xls';
 
             $archivoRed = $rutaRed . $nombre_archivo; // Agregar hora para evitar duplicados
 
@@ -1056,7 +1063,7 @@ trait UserTraits
             if (copy($archivoLocal, $archivoRed)) {
                 $copiado = true;
                 echo "✅ Archivo copiado exitosamente usando copy()<br>";
-            } 
+            }
             // Método 2: file_put_contents
             elseif (file_put_contents($archivoRed, file_get_contents($archivoLocal))) {
                 $copiado = true;
@@ -1067,7 +1074,7 @@ trait UserTraits
                 // Comando de Windows para copiar
                 $comando = 'copy "' . $archivoLocal . '" "' . $archivoRed . '"';
                 exec($comando, $output, $returnCode);
-                
+
                 if ($returnCode === 0) {
                     $copiado = true;
                     echo "✅ Archivo copiado usando comando Windows<br>";
@@ -1082,7 +1089,7 @@ trait UserTraits
                 echo "⚠️ <strong>No se pudo copiar a la red</strong><br>";
                 echo "📁 <strong>Archivo local:</strong> " . $archivoLocal . "<br>";
                 echo "🔗 <a href='" . url('descargar-excel/' . basename($archivoLocal)) . "' target='_blank'>Descargar aquí</a><br>";
-                
+
                 // También puedes moverlo a una carpeta pública
                 $rutaPublica = public_path('descargas/' . $titulo . '.xls');
                 if (copy($archivoLocal, $rutaPublica)) {
@@ -1092,15 +1099,15 @@ trait UserTraits
 
 
 
-            $emailfrom = WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email = WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00045')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00045')->first();
 
             $array = [
                 'fecha_actual' => $ayer,
             ];
 
             // 1. Ruta de red
-            $archivoRed               =   $archivoRed;
+            $archivoRed = $archivoRed;
 
             // 2. Ruta local temporal
             $rutaLocal = storage_path('app/temp_email/');
@@ -1133,47 +1140,48 @@ trait UserTraits
             // 4. Enviar email
             $nombre_archivo = basename($archivoRed);
 
-            Mail::send('emails.emailcompraaprobadoadmin', $array, function($message) use ($emailfrom, $email, $file, $nombre_archivo, $ayer, $archivoLocal) {
+            Mail::send('emails.emailcompraaprobadoadmin', $array, function ($message) use ($emailfrom, $email, $file, $nombre_archivo, $ayer, $archivoLocal) {
                 $emailprincipal = explode(",", $email->correoprincipal);
-                
-                $message->from($emailfrom->correoprincipal, 'Compras Masivas ' .$ayer );
-                
+
+                $message->from($emailfrom->correoprincipal, 'Compras Masivas ' . $ayer);
+
                 // Adjuntar archivo
                 $message->attach($file, [
                     'as' => $nombre_archivo,
                     'mime' => 'application/vnd.ms-excel',
                 ]);
-                
+
                 if (!empty($email->correocopia)) {
                     $emailcopias = explode(",", $email->correocopia);
                     $message->to($emailprincipal)->cc($emailcopias);
                 } else {
                     $message->to($emailprincipal);
                 }
-                
+
                 $message->subject($email->descripcion . ' - ' . $ayer);
-                
+
                 // 5. Limpiar archivo temporal después de enviar (opcional)
                 // Nota: No se puede eliminar aquí porque se envía async
             });
 
             // 6. Programar limpieza para después del envío
             // Podrías usar Jobs o programar limpieza manual
-            register_shutdown_function(function() use ($archivoLocal) {
+            register_shutdown_function(function () use ($archivoLocal) {
                 if (file_exists($archivoLocal)) {
                     unlink($archivoLocal);
                 }
             });
 
-            FeDocumento::where(function($q) {
-                            $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
-                              ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
-                        })
-                        ->whereDate('fecha_ap', $ayer)
-                        ->update(
-                                [
-                                    'IND_EMAIL_APROBADO_ADMIN'=>'1'
-                                ]);  
+            FeDocumento::where(function ($q) {
+                $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
+                    ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
+            })
+                ->whereDate('fecha_ap', $ayer)
+                ->update(
+                    [
+                        'IND_EMAIL_APROBADO_ADMIN' => '1'
+                    ]
+                );
 
 
         }
@@ -1184,51 +1192,52 @@ trait UserTraits
 
 
 
-    private function envio_correo_jefeacopiolqc() {
+    private function envio_correo_jefeacopiolqc()
+    {
 
-        $listadocumentos          =   FeDocumento::where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
-                                      ->where('COD_ESTADO','=','ETM0000000000012')
-                                      ->where('IND_EMAIL_JEFE_ACOPIO','=',0)
-                                      ->get();
+        $listadocumentos = FeDocumento::where('OPERACION', '=', 'LIQUIDACION_COMPRA_ANTICIPO')
+            ->where('COD_ESTADO', '=', 'ETM0000000000012')
+            ->where('IND_EMAIL_JEFE_ACOPIO', '=', 0)
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
-                                                ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
-                                                ->first();
+            $ordenpago = VMergeOP::where('COD_ESTADO', '=', '1')
+                ->where('COD_AUTORIZACION', '=', $item->ID_DOCUMENTO)
+                ->first();
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
-            if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
-            }else{
-                if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
-                }else{
-                    if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
+            $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00042')->first();
+            if ($ordenpago->COD_CENTRO == 'CEN0000000000004') { //rioja
+                $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00042')->first();
+            } else {
+                if ($ordenpago->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                    $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00042')->first();
+                } else {
+                    if ($ordenpago->COD_CENTRO == 'CEN0000000000002') { //bellavista
+                        $email = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00042')->first();
                     }
                 }
             }
-            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
-            $array  =        [
-                                    'ordenpago'       => $ordenpago,
-                                    'estado'            => 'POR APROBAR JEFE DE ACOPIO',
-                             ];
+            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (" . $item->ID_DOCUMENTO . ")";
+            $array = [
+                'ordenpago' => $ordenpago,
+                'estado' => 'POR APROBAR JEFE DE ACOPIO',
+            ];
 
-            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
-            {
-                $emailcopias        = explode(",", $email->correocopia);  
-                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO JEFE ACOPIO ('.$item->ID_DOCUMENTO.')');
+            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function ($message) use ($emailfrom, $item, $email, $subjectcorreo) {
+                $emailcopias = explode(",", $email->correocopia);
+                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO JEFE ACOPIO (' . $item->ID_DOCUMENTO . ')');
                 $message->to($email->correoprincipal)->cc($emailcopias);
                 $message->subject($subjectcorreo);
             });
 
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                                [
-                                    'IND_EMAIL_JEFE_ACOPIO'=>'1'
-                                ]);  
+            FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)
+                ->update(
+                    [
+                        'IND_EMAIL_JEFE_ACOPIO' => '1'
+                    ]
+                );
 
         }
 
@@ -1236,102 +1245,215 @@ trait UserTraits
     }
 
 
-    private function envio_correo_uc() {
+    private function envio_correo_uc()
+    {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_uc','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
-                                      ->get();
+        $listadocumentos = FeDocumento::where('ind_email_uc', '=', 0)->where('COD_ESTADO', '<>', 'ETM0000000000006')
+            ->get();
 
-        foreach($listadocumentos as $item){
+        foreach ($listadocumentos as $item) {
 
-            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
 
             //$usuario                =   User::where('id','=',$item->COD_CONTACTO)->first();
-            $usuario                =   STDTrabajador::where('COD_TRAB','=',$item->COD_CONTACTO)->first();
+            $usuario = STDTrabajador::where('COD_TRAB', '=', $item->COD_CONTACTO)->first();
 
             //dd($usuario);
 
-            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
-                                        ->groupBy('COD_ORDEN')
-                                        ->groupBy('FEC_ORDEN')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')
-                                        ->groupBy('TXT_EMPR_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
-                                        ->groupBy('NRO_DOCUMENTO')
-                                        ->groupBy('COD_EMPR')
-                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+            $oc = VMergeOC::where('COD_ORDEN', '=', $item->ID_DOCUMENTO)
+                ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                ->groupBy('COD_ORDEN')
+                ->groupBy('FEC_ORDEN')
+                ->groupBy('TXT_CATEGORIA_MONEDA')
+                ->groupBy('TXT_EMPR_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                ->groupBy('NRO_DOCUMENTO')
+                ->groupBy('COD_EMPR')
+                ->groupBy('TXT_CATEGORIA_MONEDA')->first();
 
             // correos principales y  copias
             //$email                  =   $item->email;
-            $array                  =   Array(
-                'item'                =>  $item,
-                'oc'                  =>  $oc,
+            $array = array(
+                'item' => $item,
+                'oc' => $oc,
             );
 
-            Mail::send('emails.uc', $array, function($message) use ($emailfrom,$item,$usuario)
-            {
-                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
+            Mail::send('emails.uc', $array, function ($message) use ($emailfrom, $item, $usuario) {
+                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra ' . $item->ID_DOCUMENTO . '(' . $item->TXT_ESTADO . ')');
                 $message->to($usuario->TXT_CORREO_ELECTRONICO);
-                $message->subject('Orden de Compra '.$item->TXT_ESTADO);
+                $message->subject('Orden de Compra ' . $item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-            $pedido->ind_email_uc               =   1;
+            $pedido = FeDocumento::where('ID_DOCUMENTO', '=', $item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM', '=', $item->DOCUMENTO_ITEM)->first();
+            $pedido->ind_email_uc = 1;
             $pedido->save();
 
         }
         print_r("Se envio correctamente el correo UC");
     }
 
-	private function envio_correo_confirmacion() {
+    private function envio_correo_confirmacion()
+    {
 
-        $listaproveedoress          =   User::where('email_confirmacion','=',0)
-        								->where('rol_id','=','1CIX00000024')
-                                        ->get();
+        $listaproveedoress = User::where('email_confirmacion', '=', 0)
+            ->where('rol_id', '=', '1CIX00000024')
+            ->get();
 
 
 
 
-        foreach($listaproveedoress as $item){
+        foreach ($listaproveedoress as $item) {
 
-            $token                  =   substr($item->id, -8);
+            $token = substr($item->id, -8);
             // correos from(de)
-            $emailfrom          =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
             // correos principales y  copias
-            $email              =   $item->email;
+            $email = $item->email;
 
-            if(1==0){
-                $url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
-            }else{
-                $url                =   "https://merge.grupoinduamerica.com/merge/activar-registro/".Hashids::encode($token);
-            }  
+            if (1 == 0) {
+                $url = "http://localhost:8080/merge/activar-registro/" . Hashids::encode($token);
+            } else {
+                $url = "https://merge.grupoinduamerica.com/merge/activar-registro/" . Hashids::encode($token);
+            }
 
-            $array      =  Array(
-                'PR'                =>  $item,
-                'token'             =>  $token,
-                'url'               =>  $url,
+            $array = array(
+                'PR' => $item,
+                'token' => $token,
+                'url' => $url,
             );
-            Mail::send('emails.confirmacion', $array, function($message) use ($emailfrom,$email)
-            {
+            Mail::send('emails.confirmacion', $array, function ($message) use ($emailfrom, $email) {
                 $message->from($emailfrom->correoprincipal, 'Induamerica registro proveedores');
                 $message->to($email);
                 $message->subject('Confirmación de registro');
 
             });
 
-            $pedido                         	=   User::where('id','=',$item->id)->first();
-            $pedido->email_confirmacion       	=   1;
+            $pedido = User::where('id', '=', $item->id)->first();
+            $pedido->email_confirmacion = 1;
             $pedido->save();
 
         }
 
         print_r("Se envio correctamente el correo CONFIRMACION");
 
-	}
+    }
 
 
 
 
 
+
+
+    public function update_serie_correlativo_cpe()
+    {
+        $listadocumentos = DB::table('FE_DOCUMENTO as FE')
+            ->join('ARCHIVOS as AR', 'FE.ID_DOCUMENTO', '=', 'AR.ID_DOCUMENTO')
+            ->where('FE.OPERACION', '=', 'COMISION')
+            ->whereIn('FE.COD_ESTADO', ['ETM0000000000008', 'ETM0000000000005'])
+            ->where('FE.OPERACION_DET', '=', 'SIN_XML')
+            ->where('AR.TIPO_ARCHIVO', '=', 'DCC0000000000048')
+            ->select('FE.ID_DOCUMENTO', 'FE.DOCUMENTO_ITEM', 'AR.URL_ARCHIVO', 'AR.TIPO_ARCHIVO', 'FE.RUC_PROVEEDOR')
+            ->get();
+
+        foreach ($listadocumentos as $item) {
+
+            $ruta_pdf = $item->URL_ARCHIVO;
+            $id_documento = $item->ID_DOCUMENTO;
+            $documento_item = $item->DOCUMENTO_ITEM;
+
+            if (file_exists($ruta_pdf)) {
+
+                $serie = '';
+                $correlativo = '';
+                $ruc_ext = '';
+                $nombre_archivo = basename($ruta_pdf);
+
+
+                // 1. Intentar extraer del nombre del archivo: RUC-SERIE-CORRELATIVO-...
+                // Ejemplo: 205402-FG01-0005100766-Comprobante de Pago.pdf
+                $partes = explode('-', $nombre_archivo);
+                foreach ($partes as $index => $parte) {
+                    $parte = trim($parte);
+                    // Si empieza con F, B, E y tiene 4 caracteres, es la serie
+                    if (preg_match('/^[FBE][A-Z0-9]{3}$/i', $parte)) {
+                        $serie = strtoupper($parte);
+                        // El siguiente suele ser el correlativo
+                        if (isset($partes[$index + 1]) && preg_match('/^\d+$/', trim($partes[$index + 1]))) {
+                            $correlativo = trim($partes[$index + 1]);
+                        }
+                    }
+                }
+
+                // 2. Extraer del contenido del PDF usando pdftotext
+                $texto_pdf = $this->extraer_texto_pdf($ruta_pdf);
+
+                if ($texto_pdf != '') {
+                    // Buscar RUC (11 dígitos, suele empezar con 10, 15, 17, 20)
+                    if (preg_match('/\b(10|15|17|20)\d{9}\b/', $texto_pdf, $ruc_matches)) {
+                        $ruc_ext = $ruc_matches[0];
+                    }
+
+                    // Buscar serie (F, B o E + 3 alfanum) y correlativo (separado por guion o espacio)
+                    // Ejemplos: F029-537165, F001 00000123
+                    if (preg_match('/([FBE][A-Z0-9]{3})[\s-]*(\d{1,10})/i', $texto_pdf, $matches)) {
+                        // Solo sobreescribir si lo que encontramos en el PDF parece una serie válida (4 caracteres)
+                        if (strlen($matches[1]) == 4) {
+                            $serie = strtoupper($matches[1]);
+                            $correlativo = $matches[2];
+                        }
+                    }
+                }
+
+                // Validación final antes de actualizar
+                if ($serie != '' && $correlativo != '' && strlen($serie) <= 5) {
+
+                    // Formatear correlativo a 10 dígitos con ceros iniciales para el campo NUMERO
+                    $correlativo_pad = str_pad($correlativo, 10, "0", STR_PAD_LEFT);
+
+                    $update_data = [
+                        'SERIE' => $serie,
+                        'NUMERO' => $correlativo_pad,
+                        'OPERACION_DET' => 'CON_PDF'
+                    ];
+
+                    // Si extrajimos un RUC y en el registro está vacío, lo actualizamos
+                    if ($ruc_ext != '' && (is_null($item->RUC_PROVEEDOR) || $item->RUC_PROVEEDOR == '')) {
+                        $update_data['RUC_PROVEEDOR'] = $ruc_ext;
+                    }
+
+                    // Actualizar el documento
+                    DB::table('FE_DOCUMENTO')
+                        ->where('ID_DOCUMENTO', $id_documento)
+                        ->where('DOCUMENTO_ITEM', $documento_item)
+                        ->update($update_data);
+
+                    echo "Documento $id_documento actualizado: $serie-$correlativo_pad <br>";
+                } else {
+                    echo "No se pudo extraer serie/correlativo de $id_documento <br>";
+                }
+
+            } else {
+                echo "Archivo no encontrado: $ruta_pdf <br>";
+            }
+        }
+    }
+
+    private function extraer_texto_pdf($ruta_archivo)
+    {
+        $output = '';
+        try {
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                // pdftotext.exe está en el path de Git Bash usualmente
+                $comando = 'pdftotext -layout "' . $ruta_archivo . '" -';
+                $output = shell_exec($comando);
+            } else {
+                $comando = 'pdftotext -layout ' . escapeshellarg($ruta_archivo) . ' -';
+                $output = shell_exec($comando);
+            }
+        } catch (\Exception $e) {
+            $output = '';
+        }
+        return $output;
+    }
 
 }

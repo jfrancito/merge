@@ -53,7 +53,7 @@
             </div>
           </div>
 
-      </div>
+    @include('comprobante.modal.mmodificararchivo')
     </div>
   </div>
 </div>
@@ -169,6 +169,14 @@
 
 
 
+        $(document).on('click', '.modificar-pdf', function(e) {
+            e.preventDefault();
+            var tipo = $(this).data('tipo');
+            var nombre = $(this).data('nombre');
+            $('#modal-tipo-archivo').val(tipo);
+            $('#modal-descripcion-archivo').val(nombre);
+            $('#modal-modificar-archivo').niftyModal('show');
+        });
 
     </script>
     <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>

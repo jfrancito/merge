@@ -26,6 +26,12 @@ $(document).ready(function(){
         validarrelleno(accion,name,estado,check);
     });
 
+    $(".be-content, .be-top-header").on('click','#cambiarclave', function(e) {
+        e.preventDefault();
+        var _token = $("#token").val();
+        ajax_modal({_token: _token}, "/ajax-modal-cambiar-clave", "modal-cambiar-clave", "modal-cambiar-clave-container");
+    });
+
 });
 
 

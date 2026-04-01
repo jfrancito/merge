@@ -2,7 +2,7 @@
     <div class="row">
 
 
-        <div class="col-xs-12 col-sm-6 col-md-3">
+        <div class="col-xs-12 col-sm-6 col-md-4">
             <div class="form-field">
                 <label class="form-label">EMPRESA <span class="text-danger">(*)</span></label>
                 <div class="input-group">
@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6 col-md-3">
+        <div class="col-xs-12 col-sm-6 col-md-4">
             <div class="form-field">
                 <label class="form-label">SEDE <span class="text-danger">(*)</span></label>
                 <div class="input-group">
@@ -21,20 +21,8 @@
             </div>
         </div>
 
-
-        <!-- N° CONTRATO -->
-        <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="form-field">
-                <label class="form-label">N° CONTRATO <span class="text-danger">(*)</span></label>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="mdi mdi-collection-text"></i></span>
-                    <input type="text" class="form-control" id='nro_contrato' name='nro_contrato' required="" value="" placeholder="Solo caracteres alfanuméricos" data-parsley-pattern="/^[a-zA-Z0-9]+$/" data-parsley-error-message="Solo se permiten letras y números">
-                </div>
-            </div>
-        </div>
-
         <!-- FECHA COSECHA -->
-        <div class="col-xs-12 col-sm-6 col-md-3">
+        <div class="col-xs-12 col-sm-6 col-md-4">
             <div class="form-field">
                 <label class="form-label">FECHA COSECHA <span class="text-danger">(*)</span></label>
                 <div data-min-view="2" data-date-format="dd-mm-yyyy" class="input-group date datetimepicker pickerfecha">

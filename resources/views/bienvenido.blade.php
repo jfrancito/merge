@@ -128,140 +128,55 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 950px;">
         <div class="modal-content shadow-premium border-0" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
             
-            <!-- Elegant Modern Header -->
-            <div class="modal-header border-0 p-0">
-                <div class="w-100 p-5 text-white header-gradient">
-
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="icon-box-header mr-3">
-                            <i class="fa fa-info-circle"></i>
-                        </div>
-                        <h1 class="modal-title font-weight-bolder m-0" id="modalAnuncioImportanteLabel" style="letter-spacing: -0.5px; font-size: 30px;">
-                            CONSIDERACIONES.
-                        </h1>
+            <!-- Professional Header -->
+            <div class="modal-header header-gradient text-white p-4" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: none;">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <h3 class="m-0 font-weight-bold" style="font-size: 20px; letter-spacing: -0.5px; color: #ffffff !important;">Nueva Funcionalidad: Planilla de Movilidad</h3>
+                        <p class="m-0 small opacity-80" style="color: #ffffff !important; opacity: 0.9 !important;">Integración con Liquidación de Gastos</p>
                     </div>
                 </div>
+                <button type="button" class="btn btn-confirm" data-dismiss="modal" aira-label="Close" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 700; padding: 10px 20px; font-size: 14px; outline: none; transition: all 0.3s; margin-top: -5px;">
+                    <span>ENTENDIDO, IR AL SISTEMA</span>
+                    <i class="fa fa-arrow-right ml-2"></i>
+                </button>
             </div>
 
-            <!-- Scrollable Body with EXACT User Text -->
-            <div class="modal-body p-0" style="max-height: 72vh; overflow-y: auto; background: #fafbfc;">
+            <!-- Video & Description Body -->
+            <div class="modal-body p-0" style="background: #fafbfc;">
                 
+                <!-- Video Container (16:9) -->
+                <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
+                    <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+                        <source src="{{ asset('public/videos/video_planilla.mp4') }}" type="video/mp4">
+                        Tu navegador no soporta la reproducción de videos.
+                    </video>
+                </div>
+
                 <div class="p-5">
-                    
-                    <!-- Card 1 -->
-                    <div class="premium-card mb-4 border-accent-blue">
-                        <div class="card-title-group">
-                            <div class="dot-indicator bg-blue"></div>
-                            <h5 class="m-0 font-weight-bold">1. Tiempos de Revisión</h5>
-                        </div>
-                        <div class="card-content mt-3">
-                            <p class="text-justify">
-                                El Tiempo de revisiones de las operaciones de compra, se inicia con la recepción por las áreas revisantes, 24 hr para el área de administración y luego 24 hr para el área de contabilidad. Hay excepciones de ciertas operaciones que amerita atención inmediata como son: Servicios de estiba y operaciones entre relacionadas.
-                            </p>
-                            <div class="status-tip mt-3 py-2 px-3 bg-light rounded-pill border">
-                                <i class="fa fa-info-circle mr-1 text-blue"></i>
-                                <span>Recordar que en Merge, opción: <b>"Seguimiento de documento"</b>, puede irse revisando el estado de las operaciones.</span>
-                            </div>
+                    <div class="premium-card border-accent-blue" style="border-top: 4px solid #3b82f6; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                        <h5 class="font-weight-bold text-dark mb-3" style="display: flex; align-items: center;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-right: 12px;"></span>
+                            ¿De qué trata esta actualización?
+                        </h5>
+                        <p class="text-muted text-justify" style="font-size: 15px; line-height: 1.7; color: #475569;">
+                            <b>COMUNICADO:</b> Las planillas de movilidad que se generen desde el 1ero de Abril del 2026 estarán bajo esta nueva forma de <b>integrar automáticamente la Planilla de Movilidad a tus Liquidaciones de Gastos</b>. Este proceso optimizado permite vincular los gastos por movilidad local de manera directa, asegurando mayor precisión y rapidez en tus registros administrativos. 
+                            Tomar en cuenta que las planillas de movilidad generadas al 31 de Marzo del 2026 se mantienen en cargar con la planilla de movilidad consolidada.
+                        </p>
+                        
+                        <div class="mt-4 p-3 rounded" style="background: #f0f4ff; border: 1px solid #d9e2ff; color: #3f51b5; font-size: 13.5px; display: flex; align-items: flex-start;">
+                            <i class="fa fa-lightbulb-o mr-2" style="font-size: 18px; margin-top: 2px;"></i>
+                            <span><b>Tip:</b> Mira el video completo para aprender a utilizar esta herramienta y optimizar tus tiempos de rendición.</span>
                         </div>
                     </div>
-
-                    <!-- Card 2 -->
-                    <div class="premium-card mb-4 border-accent-amber">
-                        <div class="card-title-group">
-                            <div class="dot-indicator bg-amber"></div>
-                            <h5 class="m-0 font-weight-bold">2. Operaciones Reparadas</h5>
-                        </div>
-                        <div class="card-content mt-3 text-justify">
-                            <p>
-                                Por las operaciones reparadas, que el usuario presenta documentos para levantar, serán revisadas por contabilidad los miércoles y sábados. Por la última semana del mes, se revisará hasta la fecha de corte del periodo.
-                            </p>
-                            <div class="bg-warning-light p-3 rounded mt-3 border">
-                                <b class="text-warning-dark d-block mb-1">Se considera como reparaciones de las operaciones:</b>
-                                <p class="m-0 small">
-                                    Por Informes de servicios que aún no culminan sus procesos (siendo anticipos), no adjuntar Guías de remisión Transportistas físicas y en IACM por no adjuntar Guías de remisión por envío a zonas. De ahí todas las operaciones deben tener el sustento completo en Merge, caso contrario se observará.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 3 -->
-                    <div class="premium-card mb-4 border-accent-emerald">
-                        <div class="card-title-group">
-                            <div class="dot-indicator bg-emerald"></div>
-                            <h5 class="m-0 font-weight-bold">3. Carga de Facturas y Gastos</h5>
-                        </div>
-                        <div class="card-content mt-3 text-justify">
-                            <p>
-                                Toda factura emitida debería ser cargada hasta el día siguiente, no se debe acumular operaciones, porque se acumula de forma indebida con otras que si corresponden. De los Últimos días del mes debe ser cargada en Merge hasta la fecha de corte de dicho periodo. Esto implica que coordinen con el proveedor el envío o registro de sus correos para la recepción automática. Tomar en cuenta que en el Merge, opción: Gestión Compras Sire, puede verse los comprobantes emitidos en el mes, por proveedor.
-                            </p>
-                            <div class="bg-danger-light p-3 rounded my-3 border-dashed-danger">
-                                <p class="m-0 text-danger small">
-                                    Todo gasto que genere la obligación de pagar debe ser cargado en el periodo que corresponde la operación, por lo tanto no se debe emitir el comprobante de pago, regularizando en los primeros días del mes siguiente. Adjunto Fecha de corte para el 2026.
-                                </p>
-                            </div>
-
-                            <!-- Cutoff Table Integration -->
-                            <div class="modern-table-container mt-4">
-                                <div class="bg-navy text-white text-center py-2 font-weight-bold small" style="background: #0f172a;">
-                                    FECHA DE CORTE POR PERIODO DEL EJERCICIO 2026
-                                </div>
-                                <table class="table table-custom m-0 table-sm">
-                                    <thead>
-                                        <tr style="background: #f1f5f9;">
-                                            <th class="border-right">Febrero</th>
-                                            <th class="border-right">Marzo</th>
-                                            <th class="border-right">Abril</th>
-                                            <th class="border-right">Mayo</th>
-                                            <th class="border-right">Junio</th>
-                                            <th class="border-right">Julio</th>
-                                            <th class="border-right">Agosto</th>
-                                            <th class="border-right">Setiembre</th>
-                                            <th class="border-right">Octubre</th>
-                                            <th class="border-right">Noviembre</th>
-                                            <th>Diciembre</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white">
-                                        <tr class="font-weight-bold">
-                                            <td class="border-right">2-Mar</td>
-                                            <td class="border-right">1-Abr</td>
-                                            <td class="border-right">2-May</td>
-                                            <td class="border-right">2-Jun</td>
-                                            <td class="border-right">2-Jul</td>
-                                            <td class="border-right">3-Ago</td>
-                                            <td class="border-right">2-Set</td>
-                                            <td class="border-right">2-Oct</td>
-                                            <td class="border-right">2-Nov</td>
-                                            <td class="border-right">2-Dic</td>
-                                            <td>2-Ene</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 4 -->
-                    <div class="premium-card mb-2 border-accent-indigo">
-                        <div class="card-title-group">
-                            <div class="dot-indicator bg-indigo"></div>
-                            <h5 class="m-0 font-weight-bold">4. Gestión de Documentación</h5>
-                        </div>
-                        <div class="card-content mt-3 text-justify">
-                            <p>
-                                Los informes firmados de forma manual, y su documentación correspondiente, escaneados y cargados en Merge, no debe ser entregada a contabilidad de forma física, pero sí debe ser archivada por el área correspondiente como respaldo de sus operaciones. Excepto las Guías de remisión Transportistas Físicas que deben ser entregadas de forma obligatoria dentro del mes o hasta la fecha del corte.
-                            </p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
-            <!-- Solid Minimal Footer -->
-            <div class="modal-footer border-top p-4 bg-white justify-content-center">
-                <button type="button" class="btn btn-confirm py-3 px-5" data-dismiss="modal">
-                    <span>CONFIRMAR LECTURA</span>
-                    <i class="fa fa-check-circle ml-2"></i>
+            <!-- Footer Action -->
+            <div class="modal-footer border-0 p-4 bg-white">
+                <button type="button" class="btn btn-confirm w-100 py-3" data-dismiss="modal" style="background: #1e293b; color: white; border-radius: 12px; font-weight: 700; letter-spacing: 0.5px; transition: all 0.3s;">
+                    <span>ENTENDIDO, CONTINUAR AL SISTEMA</span>
+                    <i class="fa fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </div>
@@ -617,6 +532,20 @@
                 $('#noResultados').hide();
             }
         });
+        // Forzar cierre de modalAnuncioImportante
+        $(document).on('click', '#modalAnuncioImportante .close, #modalAnuncioImportante .btn-confirm', function() {
+            $('#modalAnuncioImportante').modal('hide');
+        });
+
+        // Detener video al cerrar el modal
+        $('#modalAnuncioImportante').on('hidden.bs.modal', function () {
+            var video = $(this).find('video')[0];
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
+            }
+        });
+
     });
 </script>
 
