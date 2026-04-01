@@ -61,7 +61,7 @@ trait ContratoAcopioTraits
         }else{
 
             $lista  =   ContratoAnticipo::where('ACTIVO','=','1')->where('COD_ESTADO','=','ETM0000000000012')
-                                        ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                        //->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                         ->orderby('FECHA_CREA','DESC')->get();
 
 
