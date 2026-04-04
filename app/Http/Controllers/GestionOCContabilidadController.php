@@ -944,7 +944,9 @@ class GestionOCContabilidadController extends Controller
 
         $fecha_entrega_c = '';
         $peso_entrega_c = 0;
-
+        $contrato_anticipo = array();
+        $detalles_contrato = array();
+        $pagos_contrato = array(); 
         if ($contrato_pago) {
             if ($contrato_pago->IND_CONTRATO == 'C') {
                 $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', trim($contrato_pago->ID_DOCUMENTO))->first();
