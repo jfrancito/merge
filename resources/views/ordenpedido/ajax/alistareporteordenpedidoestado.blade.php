@@ -10,6 +10,7 @@
         <th>PERIODO</th>
         <th>CENTRO</th>
         <th>ESTADO</th>
+        <th>APRUEBA JEFE COMPRAS</th>
         <th>CONSOLIDADO SEDE</th>
         <th>CONSOLIDADO GENERAL</th>
         <th>ARCHIVO</th>
@@ -28,6 +29,7 @@
             <td>{{$item->NOM_PERIODO}}</td>
             <td>{{$item->NOM_CENTRO}}</td>
             <td>{{$item->TXT_ESTADO}}</td>
+            <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO_GENERAL}}</td>
             <td class="align-center-tb">

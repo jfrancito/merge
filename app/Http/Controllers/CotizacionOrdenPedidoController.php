@@ -57,12 +57,11 @@ class CotizacionOrdenPedidoController extends Controller
             ->max('ID_COTIZACION');
 
         if ($max_id) {
-            $number = (int)substr($max_id, strlen($prefijo));
+            $number = (int) substr($max_id, strlen($prefijo));
             $new_number = $number + 1;
             // Asumiendo longitud total de 16 caracteres como en el ejemplo IICOT00000000001
             $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
-        }
-        else {
+        } else {
             $nro_cotizacion = $prefijo . str_pad(1, 11, '0', STR_PAD_LEFT);
         }
 
@@ -71,7 +70,7 @@ class CotizacionOrdenPedidoController extends Controller
             ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
             ->where('COD_ESTADO', 1)
             ->first();
-        
+
         $valor_tipo_cambio = 0;
         if ($tipo_cambio) {
             $valor_tipo_cambio = $tipo_cambio->CAN_COMPRA;
@@ -82,13 +81,15 @@ class CotizacionOrdenPedidoController extends Controller
         }
 
         $listacotizaciones = DB::table('WEB.ORDEN_COTIZACION as C')
-            ->leftJoin('dbo.ARCHIVOS as A', function ($join) {
-            $join->on('A.ID_DOCUMENTO', '=', 'C.ID_COTIZACION')
-                ->where('A.ACTIVO', '=', 1);
-        })
-            ->where('C.COD_EMPR', $empresa_sesion->COD_EMR ?? $empresa_sesion->COD_EMPR)
+            ->select('C.*', DB::raw("(SELECT STUFF((
+                SELECT '|' + A.URL_ARCHIVO + '*' + ISNULL(A.NOMBRE_ARCHIVO, 'Archivo')
+                FROM dbo.ARCHIVOS A
+                WHERE A.ID_DOCUMENTO = C.ID_COTIZACION
+                AND A.ACTIVO = 1
+                FOR XML PATH('')
+            ), 1, 1, '')) as RUTAS_ARCHIVOS"))
+            ->where('C.COD_EMPR', isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : ''))
             ->where('C.ACTIVO', 1)
-            ->select('C.*', 'A.URL_ARCHIVO as RUTA_ARCHIVO')
             ->orderBy('C.ID_COTIZACION', 'DESC')
             ->get();
 
@@ -119,27 +120,43 @@ class CotizacionOrdenPedidoController extends Controller
 
     public function actionAjaxEditarCotizacion(Request $request)
     {
-        $id_cotizacion = $request->input('id_cotizacion');
+        $id_cotizacion = trim($request->input('id_cotizacion'));
 
         $cotizacion = DB::table('WEB.ORDEN_COTIZACION')
             ->where('ID_COTIZACION', $id_cotizacion)
             ->first();
 
+        if (!$cotizacion) {
+            return response()->json(['success' => false, 'message' => 'Cotización ' . $id_cotizacion . ' no encontrada.']);
+        }
+
+        // Limpiar espacios en blanco de las propiedades (SQL Server char sometimes pads)
+        $cot_data = [];
+        foreach ((array) $cotizacion as $key => $value) {
+            $cot_data[trim($key)] = is_string($value) ? trim($value) : $value;
+        }
+
+        // Obtener detalles 
         $detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
             ->where('ID_COTIZACION', $id_cotizacion)
             ->where('ACTIVO', 1)
             ->get();
 
-        // Obtener el HTML de los productos para refrescar el panel
-        $prouctos_html = view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
+        $productos_html = view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
             'lista_detalle' => $detalles,
             'es_edicion' => true
         ])->render();
 
+        $archivos = DB::table('dbo.ARCHIVOS')
+            ->where('ID_DOCUMENTO', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
         return response()->json([
             'success' => true,
-            'cotizacion' => $cotizacion,
-            'productos_html' => $prouctos_html
+            'cotizacion' => $cot_data, // Enviamos el array limpio
+            'productos_html' => $productos_html,
+            'archivos' => $archivos
         ]);
     }
 
@@ -171,12 +188,21 @@ class CotizacionOrdenPedidoController extends Controller
         return response()->json(['success' => false, 'message' => 'Proveedor no encontrado']);
     }
 
-    public function actionAjaxListarConsolidadoGeneralAprobado(Request $request)
+      public function actionAjaxListarConsolidadoGeneralAprobado(Request $request)
     {
         $empresa_sesion = Session::get('empresas');
-        $cod_empr = $empresa_sesion->COD_EMR ?? $empresa_sesion->COD_EMPR;
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
 
         $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL as C')
+            ->select('C.*', DB::raw("(SELECT STUFF((
+                SELECT ' - ' + R2.COD_TABLA
+                FROM CMP.REFERENCIA_ASOC R1
+                INNER JOIN CMP.REFERENCIA_ASOC R2 ON R1.COD_TABLA = R2.COD_TABLA_ASOC
+                WHERE R1.COD_TABLA_ASOC = C.ID_PEDIDO_CONSOLIDADO_GENERAL
+                AND R1.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+                AND R2.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                FOR XML PATH('')
+            ), 1, 3, '')) as ID_PEDIDOS"))
             ->where('C.COD_EMPR', $cod_empr)
             ->where('C.COD_ESTADO', 'ETM0000000000005')
             ->where('C.ACTIVO', 1)
@@ -185,12 +211,15 @@ class CotizacionOrdenPedidoController extends Controller
                     ->from('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
                     ->whereColumn('D.ID_PEDIDO_CONSOLIDADO_GENERAL', 'C.ID_PEDIDO_CONSOLIDADO_GENERAL')
                     ->where('D.ACTIVO', 1)
-                    ->where(function($q) {
-                        $q->whereNull('D.TXT_COTIZACION')
-                          ->orWhere('D.TXT_COTIZACION', '<>', 'SI');
-                    });
+                    ->whereRaw("D.CAN_COMPRADA - ISNULL((
+                        SELECT SUM(CD.CANTIDAD) 
+                        FROM WEB.ORDEN_COTIZACION_DETALLE CD 
+                        WHERE CD.ID_PEDIDO_CONSOLIDADO_GENERAL = D.ID_PEDIDO_CONSOLIDADO_GENERAL 
+                        AND CD.COD_PRODUCTO = D.COD_PRODUCTO 
+                        AND CD.ACTIVO = 1
+                    ), 0) > 0");
             })
-            ->orderBy('C.FEC_PEDIDO', 'DESC')
+            ->orderBy('C.ID_PEDIDO_CONSOLIDADO_GENERAL', 'DESC')
             ->get();
 
         return view('ordenpedido.modal.ajax.lista_consolidado_general', [
@@ -202,20 +231,29 @@ class CotizacionOrdenPedidoController extends Controller
     {
         $id_consolidado_generals = $request->input('selected_ids');
 
-        $lista_detalle = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
-            ->whereIn('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_generals)
-            ->where('ACTIVO', 1)
-            ->where(function($q) {
-                $q->where('TXT_COTIZACION', '<>', 'SI')
-                  ->orWhereNull('TXT_COTIZACION');
-            })
+        $lista_detalle = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
+            ->select('D.*', DB::raw("D.CAN_COMPRADA - ISNULL((
+                SELECT SUM(CD.CANTIDAD) 
+                FROM WEB.ORDEN_COTIZACION_DETALLE CD 
+                WHERE CD.ID_PEDIDO_CONSOLIDADO_GENERAL = D.ID_PEDIDO_CONSOLIDADO_GENERAL 
+                AND CD.COD_PRODUCTO = D.COD_PRODUCTO 
+                AND CD.ACTIVO = 1
+            ), 0) as SALDO_PENDIENTE"))
+            ->whereIn('D.ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_generals)
+            ->where('D.ACTIVO', 1)
+            ->whereRaw("D.CAN_COMPRADA - ISNULL((
+                SELECT SUM(CD.CANTIDAD) 
+                FROM WEB.ORDEN_COTIZACION_DETALLE CD 
+                WHERE CD.ID_PEDIDO_CONSOLIDADO_GENERAL = D.ID_PEDIDO_CONSOLIDADO_GENERAL 
+                AND CD.COD_PRODUCTO = D.COD_PRODUCTO 
+                AND CD.ACTIVO = 1
+            ), 0) > 0")
             ->get();
 
         return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
             'lista_detalle' => $lista_detalle
         ]);
     }
-
     public function actionGuardarCotizacion(Request $request)
     {
         try {
@@ -257,7 +295,7 @@ class CotizacionOrdenPedidoController extends Controller
             $accion = 'I';
             $id_cotizacion = '';
 
-            if(!empty($id_cotizacion_edit)){
+            if (!empty($id_cotizacion_edit)) {
                 $accion = 'U';
                 $id_cotizacion = $id_cotizacion_edit;
             }
@@ -265,7 +303,7 @@ class CotizacionOrdenPedidoController extends Controller
             // 4. Inserción/Actualización de cabecera usando el Trait
             $id_cotizacion = $this->insertOrdenCotizacion(
                 $accion,
-                $id_cotizacion, 
+                $id_cotizacion,
                 $request->input('fec_cotizacion'),
                 $request->input('nro_serie'),
                 $request->input('nro_doc'),
@@ -285,6 +323,7 @@ class CotizacionOrdenPedidoController extends Controller
                 $request->input('txt_categoria_tipo_pago'),
                 $request->input('txt_observacion'),
                 $request->input('can_total'),
+                $request->input('ind_igv'), // @IND_IGV
                 'ETM0000000000001',
                 'GENERADO',
                 1,
@@ -293,14 +332,14 @@ class CotizacionOrdenPedidoController extends Controller
 
             // 5. Inserción de detalles
             // Si es edición, primero desactivamos los detalles anteriores y liberamos el estado 'Cotizado'
-            if($accion == 'U'){
+            if ($accion == 'U') {
                 // Obtener detalles previos para resetear su estado en consolidados
                 $detalles_previos = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
                     ->where('ID_COTIZACION', $id_cotizacion)
                     ->where('ACTIVO', 1)
                     ->get();
 
-                foreach($detalles_previos as $dp){
+                foreach ($detalles_previos as $dp) {
                     DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
                         ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $dp->ID_PEDIDO_CONSOLIDADO_GENERAL)
                         ->where('COD_PRODUCTO', $dp->COD_PRODUCTO)
@@ -321,7 +360,7 @@ class CotizacionOrdenPedidoController extends Controller
                         'I',
                         $id_cotizacion,
                         $det['id_consolidado'],
-                        '', 
+                        '',
                         $cod_centro,
                         $det['cod_producto'],
                         $det['nom_producto'],
@@ -329,60 +368,162 @@ class CotizacionOrdenPedidoController extends Controller
                         $det['nom_medida'],
                         $det['cantidad'],
                         $det['precio'],
-                        $det['precio_igv'] ?? 0,
                         $det['cod_familia'],
                         $det['nom_familia'],
                         1,
                         ''
                     );
 
-                    // Marcar como cotizado en el consolidado general
+                    // Marcar como cotizado en el consolidado general solo si ya no queda saldo pendiente
                     if (isset($det['id_consolidado'])) {
-                        DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+
+                        // Recalcular saldo agrupado para este producto en consolidados
+                        $total_registrado = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
                             ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det['id_consolidado'])
                             ->where('COD_PRODUCTO', $det['cod_producto'])
-                            ->update(['TXT_COTIZACION' => 'SI']);
+                            ->where('ACTIVO', 1)
+                            ->sum('CANTIDAD');
+
+                        $consolidado_det = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                            ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det['id_consolidado'])
+                            ->where('COD_PRODUCTO', $det['cod_producto'])
+                            ->first();
+
+                        if ($consolidado_det && $total_registrado >= $consolidado_det->CAN_COMPRADA) {
+                            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det['id_consolidado'])
+                                ->where('COD_PRODUCTO', $det['cod_producto'])
+                                ->update(['TXT_COTIZACION' => 'SI']);
+                        } else {
+                            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det['id_consolidado'])
+                                ->where('COD_PRODUCTO', $det['cod_producto'])
+                                ->update(['TXT_COTIZACION' => null]);
+                        }
                     }
                 }
             }
 
-            // 6. Manejo de archivo adjunto si existe (Subida inmediata en creación)
+            // 6. Manejo de archivos adjuntos (Eliminación selectiva y adición)
+            $archivos_a_eliminar_json = $request->input('archivos_a_eliminar');
+            $archivos_a_eliminar = json_decode($archivos_a_eliminar_json, true);
+
+            if (is_array($archivos_a_eliminar) && count($archivos_a_eliminar) > 0) {
+                DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->whereIn('DOCUMENTO_ITEM', $archivos_a_eliminar)
+                    ->update(['ACTIVO' => 0]);
+            }
+
+            // Limpieza de archivos huérfanos solo en INSERT
+            // Cambiamos update a delete para asegurar que no queden registros residuales si no se sube nada
+            if ($accion == 'I') {
+                DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->delete();
+            }
+
+            // Procesar nuevos archivos
             if ($request->hasFile('archivo')) {
-                $archivo = $request->file('archivo');
-                $nombre_original = $archivo->getClientOriginalName();
-                $extension = $archivo->getClientOriginalExtension();
-                $size = $archivo->getSize();
-                $mime = $archivo->getMimeType();
-                $nombre_guardado = time() . '_' . $nombre_original;
+                $archivos_raw = $request->file('archivo');
+                // Asegurar que siempre sea un array para el foreach
+                $archivos = is_array($archivos_raw) ? $archivos_raw : [$archivos_raw];
 
                 $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
-                $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
 
-                // Copia al servidor remoto UNC
-                if (copy($archivo->getRealPath(), $ruta_final)) {
-                    DB::table('dbo.ARCHIVOS')->insert([
-                        'ID_DOCUMENTO' => $id_cotizacion,
-                        'DOCUMENTO_ITEM' => 1,
-                        'TIPO_ARCHIVO' => $mime,
-                        'NOMBRE_ARCHIVO' => pathinfo($nombre_original, PATHINFO_FILENAME),
-                        'DESCRIPCION_ARCHIVO' => $nombre_original,
-                        'URL_ARCHIVO' => $ruta_final,
-                        'EXTENSION' => $extension,
-                        'SIZE' => $size,
-                        'ACTIVO' => 1,
-                        'FECHA_CREA' => DB::raw('GETDATE()'),
-                        'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
-                    ]);
+                // Obtener el último DOCUMENTO_ITEM para no colisionar si ya existen archivos
+                $ultimo_item = DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->max('DOCUMENTO_ITEM');
+                $ultimo_item = isset($ultimo_item) ? $ultimo_item : 0;
+
+                foreach ($archivos as $index => $archivo) {
+                    $nombre_original = $archivo->getClientOriginalName();
+                    $extension = $archivo->getClientOriginalExtension();
+                    $size = $archivo->getSize();
+                    $mime = $archivo->getMimeType();
+                    $nombre_guardado = time() . '_' . $index . '_' . $nombre_original;
+
+                    $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+                    // Copia al servidor remoto UNC
+                    if (copy($archivo->getRealPath(), $ruta_final)) {
+                        DB::table('dbo.ARCHIVOS')->insert([
+                            'ID_DOCUMENTO' => $id_cotizacion,
+                            'DOCUMENTO_ITEM' => $ultimo_item + $index + 1,
+                            'TIPO_ARCHIVO' => $mime,
+                            'NOMBRE_ARCHIVO' => pathinfo($nombre_original, PATHINFO_FILENAME),
+                            'DESCRIPCION_ARCHIVO' => $nombre_original,
+                            'URL_ARCHIVO' => $ruta_final,
+                            'EXTENSION' => $extension,
+                            'SIZE' => $size,
+                            'ACTIVO' => 1,
+                            'FECHA_CREA' => DB::raw('GETDATE()'),
+                            'USUARIO_CREA' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
+                        ]);
+                    }
                 }
             }
 
             DB::commit();
             return response()->json(['success' => true, 'id_cotizacion' => $id_cotizacion, 'mensaje' => 'Cotización guardada correctamente con ID: ' . $id_cotizacion]);
 
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'message' => 'Error al guardar cotización: ' . $e->getMessage()]);
+        }
+    }
+
+    public function actionAjaxEliminarCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Desactivar Cabecera y Cambiar Estado a ANULADO con Auditoría
+            DB::table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update([
+                    'ACTIVO' => 0,
+                    'COD_ESTADO' => 'ETM0000000000014',
+                    'TXT_ESTADO' => 'ANULADO',
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                ]);
+
+            // 2. Desactivar Detalle (aunque ya se filtran por cabecera, mejor ser explícitos)
+            DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update(['ACTIVO' => 0]);
+
+            // 3. Desactivar Archivos
+            DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_cotizacion)
+                ->update(['ACTIVO' => 0]);
+
+            // 4. Restaurar TXT_COTIZACION en Consolidados
+            $detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->get();
+
+            foreach ($detalles as $det) {
+                if ($det->ID_PEDIDO_CONSOLIDADO_GENERAL) {
+                    // Al desactivar esta cotización, el TXT_COTIZACION del consolidado debe volver a NULL 
+                    // para que el saldo pendiente sea recalculado correctamente en las consultas
+                    DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det->ID_PEDIDO_CONSOLIDADO_GENERAL)
+                        ->where('COD_PRODUCTO', $det->COD_PRODUCTO)
+                        ->update(['TXT_COTIZACION' => null]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Cotización eliminada correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar: ' . $e->getMessage()]);
         }
     }
 
@@ -391,53 +532,81 @@ class CotizacionOrdenPedidoController extends Controller
         $id_cotizacion = $request->input('id_cotizacion');
 
         if ($request->hasFile('archivo')) {
-
-            $archivo = $request->file('archivo');
-
-            $nombre_original = $archivo->getClientOriginalName();
-            $extension = $archivo->getClientOriginalExtension();
-            $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
-            $size = $archivo->getSize();
-            $mime = $archivo->getMimeType();
-
-            $nombre_guardado = time() . '_' . $nombre_original;
-
-            // Ruta remota para Cotizaciones
+            $archivos = $request->file('archivo');
             $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
 
-            // Verificar si el directorio existe (opcional, path UNC puede dar problemas con is_dir en algunos entornos)
-            // if (!is_dir($destino_remoto)) { mkdir($destino_remoto, 0777, true); }
+            // Obtener el último DOCUMENTO_ITEM para este documento
+            $ultimo_item = DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_cotizacion)
+                ->max('DOCUMENTO_ITEM');
+            $ultimo_item = isset($ultimo_item) ? $ultimo_item : 0;
 
-            $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+            foreach ($archivos as $index => $archivo) {
+                $nombre_original = $archivo->getClientOriginalName();
+                $extension = $archivo->getClientOriginalExtension();
+                $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+                $size = $archivo->getSize();
+                $mime = $archivo->getMimeType();
 
-            // Copia al servidor remoto UNC
-            try {
-                if (!copy($archivo->getRealPath(), $ruta_final)) {
-                    return response()->json(['ok' => false, 'mensaje' => 'No se pudo copiar el archivo al servidor remoto.']);
+                $nombre_guardado = time() . '_' . $index . '_' . $nombre_original;
+                $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+                // Copia al servidor remoto UNC
+                try {
+                    if (copy($archivo->getRealPath(), $ruta_final)) {
+                        // Registro en la tabla ARCHIVOS
+                        DB::table('dbo.ARCHIVOS')->insert([
+                            'ID_DOCUMENTO' => $id_cotizacion,
+                            'DOCUMENTO_ITEM' => $ultimo_item + $index + 1,
+                            'TIPO_ARCHIVO' => $mime,
+                            'NOMBRE_ARCHIVO' => $nombre_sin_extension,
+                            'DESCRIPCION_ARCHIVO' => $nombre_original,
+                            'URL_ARCHIVO' => $ruta_final,
+                            'EXTENSION' => $extension,
+                            'SIZE' => $size,
+                            'ACTIVO' => 1,
+                            'FECHA_CREA' => DB::raw('GETDATE()'),
+                            'USUARIO_CREA' => isset(Session::get('usuario')->usuario) ? Session::get('usuario')->usuario : 'SISTEMA',
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but continue with other files if any
+                    \Log::error("Error subiendo archivo de cotización: " . $e->getMessage());
                 }
             }
-            catch (\Exception $e) {
-                return response()->json(['ok' => false, 'mensaje' => 'Error al escribir en la ruta remota: ' . $e->getMessage()]);
-            }
-
-            // Registro en la tabla ARCHIVOS
-            DB::table('dbo.ARCHIVOS')->insert([
-                'ID_DOCUMENTO' => $id_cotizacion,
-                'DOCUMENTO_ITEM' => 1,
-                'TIPO_ARCHIVO' => $mime,
-                'NOMBRE_ARCHIVO' => $nombre_sin_extension,
-                'DESCRIPCION_ARCHIVO' => $nombre_original,
-                'URL_ARCHIVO' => $ruta_final,
-                'EXTENSION' => $extension,
-                'SIZE' => $size,
-                'ACTIVO' => 1,
-                'FECHA_CREA' => DB::raw('GETDATE()'),
-                'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
-            ]);
 
             return response()->json(['ok' => true]);
         }
 
         return response()->json(['ok' => false, 'mensaje' => 'No se recibió ningún archivo.']);
+    }
+
+    public function actionAjaxAprobarCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+        \Log::info("Intentando aprobar cotización: " . $id_cotizacion);
+
+        try {
+            DB::table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update([
+                    'COD_ESTADO' => 'ETM0000000000005',
+                    'TXT_ESTADO' => 'APROBADO',
+                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                    'COD_USUARIO_MODIF_AUD' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.'
+            ]);
+
+        } catch (\Throwable $e) {
+            \Log::error("Error en aprobación de cotización: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Ocurrió un error al intentar aprobar la cotización: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

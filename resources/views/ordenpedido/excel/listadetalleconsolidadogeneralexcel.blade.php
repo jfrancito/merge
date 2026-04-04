@@ -51,9 +51,10 @@
             <td>{{ number_format($item->STOCK, 2) }}</td>
             <td>{{ number_format($item->RESERVADO, 2) }}</td>
             <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
-            <td>
+         {{--   <td>
                 {{ (isset($item->CAN_COMPRADA_CALCULADA) && !is_null($item->CAN_COMPRADA_CALCULADA)) ? intval($item->CAN_COMPRADA_CALCULADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}
-            </td>
+            </td> --}}
+             <td>{{ number_format($item->CAN_COMPRADA_CALCULADA, 2) }} </td>
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
             <td>{{ $item->NOM_CENTRO }}</td>
             <td>{{ $item->DETALLE_POR_AREA }}</td>

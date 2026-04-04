@@ -109,13 +109,19 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Validez Cotización</label>
-                                <input type="text" class="form-control premium-input" id="validez" placeholder="Ej: 15 días...">
+                                <div class="input-group">
+                                    <input type="number" class="form-control premium-input text-center" id="validez" placeholder="0" min="1" oninput="if(this.value<0) this.value=Math.abs(this.value)">
+                                    <span class="input-group-addon addon-premium">día(s)</span>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Tiempo de Entrega</label>
-                                <input type="text" class="form-control premium-input" id="entrega" placeholder="Ej: 3 días hábiles...">
+                                <div class="input-group">
+                                    <input type="number" class="form-control premium-input text-center" id="entrega" placeholder="0" min="1" oninput="if(this.value<0) this.value=Math.abs(this.value)">
+                                    <span class="input-group-addon addon-premium">día(s)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,9 +144,15 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Total Estimado</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon addon-premium moneda-simbolo">S/</span>
-                                    <input type="number" class="form-control premium-input text-right font-bold" id="total" value="0.00" step="0.01" readonly style="background-color: #f8f9fa; cursor: not-allowed; color: #1d3a6d;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="input-group" style="flex: 1;">
+                                        <span class="input-group-addon addon-premium moneda-simbolo">S/</span>
+                                        <input type="number" class="form-control premium-input text-right font-bold" id="total" value="0.00" step="0.01" readonly style="background-color: #f8f9fa; cursor: not-allowed; color: #1d3a6d;">
+                                    </div>
+                                    <div class="be-checkbox be-checkbox-sm inline" style="margin: 0; min-width: 80px;">
+                                        <input type="checkbox" id="incluir_igv">
+                                        <label for="incluir_igv" style="font-size: 11px; font-weight: 700; color: #1e3a6d; white-space: nowrap;">+ IGV</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -154,6 +166,8 @@
             </div>
 
            
+
+
 
             <!-- TABLA DE PRODUCTOS -->
             <div id="lista-productos-cotizacion" class="mt-4">
@@ -173,12 +187,29 @@
                         <div class="col-md-12">
                             <div class="form-group mb-0">
                                 <label class="text-primary"><i class="fa fa-file-pdf-o"></i> Seleccionar Cotización Firmada / PDF</label>
-                                <input type="file" id="archivo_cotizacion_crear" class="form-control premium-input" accept=".pdf" style="padding: 7px;">
+                                <input type="file" id="archivo_cotizacion_crear" class="form-control premium-input" accept=".pdf" style="padding: 7px;" multiple>
                                 <p class="help-block" style="font-size: 12px; margin-top: 5px; color: #777;">
                                     <i class="fa fa-info-circle"></i> El archivo se subirá automáticamente al servidor remoto al momento de "Generar Cotización".
                                 </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: ARCHIVOS EXISTENTES (AL EDITAR) -->
+            <div id="archivos-existentes-contenedor" style="display: none; margin-bottom: 20px;">
+                <div class="panel panel-default box-seccion shadow-soft" style="border-left: 5px solid #f39c12;">
+                    <div class="panel-heading subheader-seccion">
+                        <i class="mdi mdi-attachment"></i> Archivos Adjuntos Actuales
+                    </div>
+                    <div class="panel-body">
+                        <div class="alert alert-info" style="font-size: 13px; margin-bottom: 10px;">
+                            <i class="fa fa-info-circle"></i> Los archivos marcados con el ícono de basura <i class="fa fa-trash text-danger"></i> se desactivarán al guardar.
+                        </div>
+                        <ul id="lista-archivos-existentes" class="list-group" style="margin-bottom: 0;">
+                            <!-- Dinámico -->
+                        </ul>
                     </div>
                 </div>
             </div>
