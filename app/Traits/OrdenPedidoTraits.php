@@ -1003,7 +1003,7 @@ trait OrdenPedidoTraits
 
                 // 🔹 CAN_COMPRADA SIN DUPLICAR
                 DB::raw("(
-                    SELECT ISNULL(SUM(OCD.CAN_COMPRADA),0)
+                    SELECT ISNULL(SUM(ISNULL(OCD.CAN_COMPRADA, CASE WHEN OCD.DIFERENCIA < 0 THEN 0 ELSE OCD.DIFERENCIA END)), 0)
                     FROM CMP.REFERENCIA_ASOC RA_CONS
                     INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
                         ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
@@ -1115,7 +1115,7 @@ trait OrdenPedidoTraits
         return $query;
     }
 
-    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
+     public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
     {
         $sql = "
         SELECT OPCD.COD_PRODUCTO,
@@ -1125,7 +1125,7 @@ trait OrdenPedidoTraits
                SUM(OPCD.STOCK) AS STOCK,
                SUM(OPCD.RESERVADO) AS RESERVADO,
                SUM(OPCD.DIFERENCIA) AS DIFERENCIA,
-               COALESCE(MAX(OPCDGD.CAN_COMPRADA), SUM(OPCD.CAN_COMPRADA)) AS CAN_COMPRADA_CALCULADA,
+               SUM(ISNULL(OPCD.CAN_COMPRADA, CASE WHEN OPCD.DIFERENCIA < 0 THEN 0 ELSE OPCD.DIFERENCIA END)) AS CAN_COMPRADA_CALCULADA,
                OPCD.COD_CATEGORIA_FAMILIA,
                OPCD.NOM_CATEGORIA_FAMILIA,
                C.COD_CENTRO,
@@ -1233,6 +1233,7 @@ trait OrdenPedidoTraits
         return DB::connection('sqlsrv')->select($sql, $params);
     }
 
+   
     public function lg_lista_detalle_consolidado_general_excel_area($id_consolidado_general, $familia_id)
     {
         $sql = "
@@ -1384,6 +1385,7 @@ WHERE OP.CONSOLIDADO = 'SI'
                 C.NOM_CENTRO,
                 OP.COD_ESTADO,
                 OP.TXT_ESTADO,
+                OP.TXT_TRABAJADOR_APRUEBA_ADM,
                 ISNULL(ARCH.URL_ARCHIVO,'') AS URL_ARCHIVO,
                 COALESCE(CS.CONSOLIDADO_SEDE, '')    AS ID_PEDIDO_CONSOLIDADO,
                 COALESCE(CG.CONSOLIDADO_GENERAL, '') AS ID_PEDIDO_CONSOLIDADO_GENERAL

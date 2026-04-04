@@ -23,6 +23,7 @@
                     </div>
                 </th>
                 <th>ID CONSOLIDADO</th>
+                <th>ID PEDIDO</th>
                 <th>FECHA</th>
                 <th>CATEGORÍA FAMILIA</th>
                 <th>ESTADO</th>
@@ -43,6 +44,7 @@
                     </div>
                 </td>
                 <td class="font-bold">{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}</td>
+                <td style="color: #666; font-size: 11px;">{{ $item->ID_PEDIDOS }}</td>
                 <td>{{ date('d-m-Y', strtotime($item->FEC_PEDIDO)) }}</td>
                 <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
                 <td>

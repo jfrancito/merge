@@ -16,7 +16,7 @@ trait OrdenPedidoCotizacionTraits
 {
 	public function insertOrdenCotizacion($ind_tipo_operacion,$id_cotizacion,$fec_cotizacion,$nro_serie,$nro_doc,$cod_empr,$cod_centro,$nro_ruc,
     $cod_empr_proveedor,$nom_empr_proveedor,$txt_telefono,$cod_direccion,$nom_direccion,$fec_validez,$fec_entrega,$cod_categoria_moneda,
-    $txt_categoria_moneda,$cod_categoria_tipo_pago,$txt_categoria_tipo_pago,$txt_observacion,$can_total,$cod_estado,$txt_estado,$activo,
+    $txt_categoria_moneda,$cod_categoria_tipo_pago,$txt_categoria_tipo_pago,$txt_observacion,$can_total, $ind_igv, $cod_estado,$txt_estado,$activo,
     $cod_usuario_registro)
 	{
 	    try {
@@ -45,6 +45,7 @@ trait OrdenPedidoCotizacionTraits
 	                @TXT_CATEGORIA_TIPO_PAGO = ?,
 	                @TXT_OBSERVACION = ?,
 	                @CAN_TOTAL = ?,
+	                @IND_IGV = ?,
 	                @COD_ESTADO = ?,
 	                @TXT_ESTADO = ?,
 	                @ACTIVO = ?,
@@ -77,10 +78,11 @@ trait OrdenPedidoCotizacionTraits
 	        $stmt->bindParam(19, $txt_categoria_tipo_pago, PDO::PARAM_STR);
 	        $stmt->bindParam(20, $txt_observacion, PDO::PARAM_STR);
 	        $stmt->bindParam(21, $can_total); // decimal
-	        $stmt->bindParam(22, $cod_estado, PDO::PARAM_STR);
-	        $stmt->bindParam(23, $txt_estado, PDO::PARAM_STR);
-	        $stmt->bindParam(24, $activo, PDO::PARAM_INT);
-	        $stmt->bindParam(25, $cod_usuario_registro, PDO::PARAM_STR);
+	        $stmt->bindParam(22, $ind_igv, PDO::PARAM_INT);
+	        $stmt->bindParam(23, $cod_estado, PDO::PARAM_STR);
+	        $stmt->bindParam(24, $txt_estado, PDO::PARAM_STR);
+	        $stmt->bindParam(25, $activo, PDO::PARAM_INT);
+	        $stmt->bindParam(26, $cod_usuario_registro, PDO::PARAM_STR);
 
 	        $stmt->execute();
 
@@ -96,7 +98,7 @@ trait OrdenPedidoCotizacionTraits
 	}
 
 	public function insertOrdenCotizacionDetalle($ind_tipo_operacion,$id_cotizacion,$id_consolidado, $cod_empr,$cod_centro,$cod_producto,$nom_producto,
-		$cod_categoria_medida,$nom_categoria_medida,$cantidad,$precio, $precio_igv,$cod_categoria_familia,$nom_categoria_familia,$activo,
+		$cod_categoria_medida,$nom_categoria_medida,$cantidad,$precio, $cod_categoria_familia,$nom_categoria_familia,$activo,
 	    $cod_usuario_registro)
 	{
 	    try {
@@ -115,7 +117,6 @@ trait OrdenPedidoCotizacionTraits
 	                @NOM_CATEGORIA_MEDIDA = ?,
 	                @CANTIDAD = ?,
 	                @CAN_PRECIO = ?,
-	                @CAN_PRECIO_IGV = ?,
 	                @COD_CATEGORIA_FAMILIA = ?,
 	                @NOM_CATEGORIA_FAMILIA = ?,
 	                @ACTIVO = ?,
@@ -138,11 +139,10 @@ trait OrdenPedidoCotizacionTraits
 	        $stmt->bindParam(9, $nom_categoria_medida, PDO::PARAM_STR);
 	        $stmt->bindParam(10, $cantidad, PDO::PARAM_STR);
 	        $stmt->bindParam(11, $precio, PDO::PARAM_STR); // CAN_PRECIO
-	        $stmt->bindParam(12, $precio_igv, PDO::PARAM_STR); // CAN_PRECIO
-	        $stmt->bindParam(13, $cod_categoria_familia, PDO::PARAM_STR);
-	        $stmt->bindParam(14, $nom_categoria_familia, PDO::PARAM_STR);
-	        $stmt->bindParam(15, $activo, PDO::PARAM_INT);
-	        $stmt->bindParam(16, $cod_usuario_registro, PDO::PARAM_STR);
+	        $stmt->bindParam(12, $cod_categoria_familia, PDO::PARAM_STR);
+	        $stmt->bindParam(13, $nom_categoria_familia, PDO::PARAM_STR);
+	        $stmt->bindParam(14, $activo, PDO::PARAM_INT);
+	        $stmt->bindParam(15, $cod_usuario_registro, PDO::PARAM_STR);
 
 	        $stmt->execute();
 

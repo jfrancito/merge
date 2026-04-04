@@ -24,23 +24,28 @@
                     <th class="text-center">U.M.</th>
                     <th class="text-center">CANTIDAD</th>
                     <th class="text-center" width="120">PRECIO</th>
-                    <th class="text-center" width="120">PRECIO IGV</th>
                     <th>FAMILIA</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($lista_detalle as $index => $item)
                 @php
-                    $id_pedido_consolidado = $item->ID_PEDIDO_CONSOLIDADO_GENERAL ?? ($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE ?? '');
+                    $id_pedido_consolidado = isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL : (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE : '');
                     $cod_producto = $item->COD_PRODUCTO;
                     $nom_producto = $item->NOM_PRODUCTO;
-                    $nom_medida = $item->NOM_CATEGORIA_MEDIDA;
-                    $cod_medida = $item->COD_CATEGORIA_MEDIDA;
-                    $cantidad = $item->CANTIDAD ?? ($item->CAN_COTIZACION ?? 0);
-                    $precio = $item->CAN_PRECIO ?? ($item->CAN_PRECIO_UNITARIO ?? 0);
-                    $precio_igv = $item->CAN_PRECIO_IGV ?? 0;
-                    $cod_familia = $item->COD_CATEGORIA_FAMILIA;
-                    $nom_familia = $item->NOM_CATEGORIA_FAMILIA;
+                    
+                    // Nombres de columnas varían entre Consolidado y Detalle Cotización
+                    $nom_medida = isset($item->NOM_CATEGORIA_MEDIDA) ? $item->NOM_CATEGORIA_MEDIDA : (isset($item->NOM_MEDIDA) ? $item->NOM_MEDIDA : '');
+                    $cod_medida = isset($item->COD_CATEGORIA_MEDIDA) ? $item->COD_CATEGORIA_MEDIDA : (isset($item->COD_MEDIDA) ? $item->COD_MEDIDA : '');
+                    $cod_familia = isset($item->COD_CATEGORIA_FAMILIA) ? $item->COD_CATEGORIA_FAMILIA : (isset($item->COD_FAMILIA) ? $item->COD_FAMILIA : '');
+                    $nom_familia = isset($item->NOM_CATEGORIA_FAMILIA) ? $item->NOM_CATEGORIA_FAMILIA : (isset($item->NOM_FAMILIA) ? $item->NOM_FAMILIA : '');
+
+                    $modo_edicion = isset($es_edicion) ? $es_edicion : false;
+                    $cantidad = $modo_edicion ? $item->CANTIDAD : (isset($item->SALDO_PENDIENTE) ? $item->SALDO_PENDIENTE : 0);
+                    $sin_cantidad = !$modo_edicion && ($cantidad <= 0);
+                    $cantidad_val = isset($cantidad) ? $cantidad : 0;
+
+                    $precio = isset($item->CAN_PRECIO) ? $item->CAN_PRECIO : (isset($item->CAN_PRECIO_UNITARIO) ? $item->CAN_PRECIO_UNITARIO : 0);
                 @endphp
                 <tr>
                     <td class="text-center">
@@ -55,12 +60,18 @@
                     <td>{{ $nom_producto }}</td>
                     <td class="text-center">{{ $nom_medida }}</td>
                     <td class="text-center">
-                        <input type="number" 
-                               class="form-control input-sm text-center cantidad-producto premium-input" 
-                               value="{{ number_format($cantidad, 2, '.', '') }}" 
-                               step="0.01" 
-                               min="0.01"
-                               style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
+                        @if($sin_cantidad)
+                            <div class="alert alert-danger" style="font-size: 11px; margin: 0; padding: 4px; line-height: 1.2;">
+                                <i class="fa fa-warning"></i> El consolidado no tiene cantidad a comprar
+                            </div>
+                        @else
+                            <input type="number" 
+                                   class="form-control input-sm text-center cantidad-producto premium-input" 
+                                   value="{{ number_format($cantidad_val, 2, '.', '') }}" 
+                                   step="0.01" 
+                                   min="0.01"
+                                   style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
+                        @endif
                     </td>
                     <td class="text-center">
                         <div class="input-group" style="width: 110px; margin: 0 auto;">
@@ -71,7 +82,7 @@
                                    step="0.01" 
                                    min="0"
                                    style="height: 32px !important; font-weight: 700;"
-                                   data-cantidad="{{ $cantidad }}"
+                                   data-cantidad="{{ $cantidad_val }}"
                                    data-id-consolidado="{{ $id_pedido_consolidado }}"
                                    data-cod-producto="{{ $cod_producto }}"
                                    data-nom-producto="{{ $nom_producto }}"
@@ -81,17 +92,7 @@
                                    data-nom-familia="{{ $nom_familia }}">
                         </div>
                     </td>
-                    <td class="text-center">
-                        <div class="input-group" style="width: 110px; margin: 0 auto;">
-                            <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
-                            <input type="number" 
-                                   class="form-control input-sm text-right precio-igv-producto premium-input" 
-                                   value="{{ number_format($precio_igv, 2, '.', '') }}" 
-                                   step="0.01" 
-                                   min="0"
-                                   style="height: 32px !important; font-weight: 700; color: #1d3a6d;">
-                        </div>
-                    </td>
+
                     <td>{{ $nom_familia }}</td>
                 </tr>
                 @endforeach

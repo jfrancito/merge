@@ -1,28 +1,37 @@
 $(document).ready(function () {
     var carpeta = $("#carpeta").val();
     var _token = $("#token").val();
+    var archivos_a_eliminar = [];
+    var cargando_edicion = false;
 
     /* ===============================
        FUNCIÓN MODAL BONITO (ÚNICA)
        =============================== */
-    function modalBonito({ tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null }) {
+    function modalBonito(opciones) {
+        var tipo = opciones.tipo || 'info';
+        var icono = opciones.icono || 'ℹ️';
+        var titulo = opciones.titulo || 'Información';
+        var mensaje = opciones.mensaje || '';
+        var ancho = opciones.ancho || '360px';
+        var confirmar = opciones.confirmar || false;
+        var onConfirm = opciones.onConfirm || null;
 
-        const colores = {
+        var colores = {
             error: ['#ff416c', '#ff4b2b'],
             warn: ['#f7971e', '#ffd200'],
             info: ['#4facfe', '#00f2fe'],
             success: ['#00b09b', '#96c93d']
         };
 
-        const botonesPorTipo = {
+        var botonesPorTipo = {
             error: 'btn-red',
             warn: 'btn-orange',
             success: 'btn-green',
             info: 'btn-blue'
         };
 
-        const grad = colores[tipo] || colores.info;
-        const claseBoton = botonesPorTipo[tipo] || 'btn-blue';
+        var grad = colores[tipo] || colores.info;
+        var claseBoton = botonesPorTipo[tipo] || 'btn-blue';
 
         const contenido = `
             <div style="position:relative;text-align:center;padding:40px 20px 25px;">
@@ -174,7 +183,8 @@ $(document).ready(function () {
             type: 'POST',
             url: carpeta + '/ajax-listar-consolidado-general-aprobado',
             data: {
-                _token: _token
+                _token: _token,
+                id_cotizacion_edit: $('#id_cotizacion_edit').val()
             },
             success: function (data) {
                 cerrarcargando();
@@ -247,7 +257,8 @@ $(document).ready(function () {
             url: carpeta + '/ajax-listar-detalle-consolidado-general-seleccionado',
             data: {
                 _token: _token,
-                selected_ids: selected
+                selected_ids: selected,
+                id_cotizacion_edit: $('#id_cotizacion_edit').val()
             },
             success: function (data) {
                 cerrarcargando();
@@ -311,8 +322,9 @@ $(document).ready(function () {
        ACTUALIZAR TOTAL DINÁMICO
        =============================== */
     function calcularTotal() {
-        var totalSoles = 0;
+        var totalNeto = 0;
         var moneda = $('#moneda_id').val();
+        var incluirIGV = $('#incluir_igv').is(':checked');
 
         // Manejar posibles comas decimales desde el servidor
         var tc_val = $('#tipo_cambio_actual').val() ? $('#tipo_cambio_actual').val().toString().replace(',', '.') : '0';
@@ -320,37 +332,41 @@ $(document).ready(function () {
 
         // Log para depuración
         console.log('--- Calculando Total ---');
-        console.log('Moneda seleccionada: ', moneda);
-        console.log('Tipo de Cambio Hoy: ', tipoCambio);
+        console.log('IGV Seleccionado: ', incluirIGV);
 
         $('.precio-producto').each(function () {
             var $row = $(this).closest('tr');
             var cantidad = parseFloat($row.find('.cantidad-producto').val()) || 0;
             var precio = parseFloat($(this).val()) || 0;
-            var precio_igv = parseFloat($row.find('.precio-igv-producto').val()) || 0;
             
-            // PRECIO se trata como precio sin IGV (exonerado)
-            // PRECIO IGV se trata como base a la que se le suma el 18%
-            totalSoles += (cantidad * precio) + (cantidad * precio_igv * 1.18);
+            totalNeto += (cantidad * precio);
         });
 
-        console.log('Total en Soles acumulado: ', totalSoles);
+        var totalFinal = totalNeto;
 
-        var totalFinal = totalSoles;
+        // Si incluye IGV, sumar 18%
+        if (incluirIGV) {
+            totalFinal = totalNeto * 1.18;
+        }
 
+        // Conversión a Dólares si aplica (sobre el total con o sin IGV)
         if (moneda === 'MOM0000000000002') { // Dólares
             if (tipoCambio > 0) {
-                totalFinal = totalSoles / tipoCambio;
+                totalFinal = totalFinal / tipoCambio;
             } else {
                 console.warn('Conversión fallida: Tipo de cambio es 0 o no disponible para hoy.');
             }
         }
 
-        console.log('Cálculo final: ', totalFinal);
+        console.log('Total Final calculado: ', totalFinal);
         $('#total').val(totalFinal.toFixed(2));
     }
 
-    $(document).on('change keyup', '.precio-producto, .precio-igv-producto, .cantidad-producto', function (e) {
+    $(document).on('change', '#incluir_igv', function() {
+        calcularTotal();
+    });
+
+    $(document).on('change keyup', '.precio-producto, .cantidad-producto', function (e) {
         calcularTotal();
     });
 
@@ -433,53 +449,50 @@ $(document).ready(function () {
        =============================== */
     $(document).on('click', '.btn-guardar-cotizacion', function (e) {
 
-        // 1. Validaciones básicas
-        var ruc = $('#ruc_proveedor').val();
-        var nombre = $('#nombre_proveedor').val();
-        var numero = $('#numero').val();
-
-        if (ruc.trim().length === 0 || nombre.trim().length === 0) {
-            modalBonito({
-                tipo: 'warn',
-                icono: '⚠️',
-                titulo: 'Datos Faltantes',
-                mensaje: 'Debe ingresar la información del proveedor (RUC y Razón Social).',
-                ancho: '400px'
-            });
-            return;
-        }
-
-        if (numero.trim().length === 0) {
-            modalBonito({
-                tipo: 'warn',
-                icono: '⚠️',
-                titulo: 'Datos Faltantes',
-                mensaje: 'Debe ingresar el número de la cotización.',
-                ancho: '400px'
-            });
-            return;
-        }
-
+        // 1. Validaciones básicas de cabecera
+        var ruc       = $('#ruc_proveedor').val();
+        var nombre    = $('#nombre_proveedor').val();
+        var numero    = $('#numero').val();
+        var serie     = $('#serie').val();
+        var fecha     = $('#fecha_cotizacion').val();
+        var direccion = $('#direccion').val();
+        var telefono  = $('#telefono').val();
+        var validez   = $('#validez').val();
+        var entrega   = $('#entrega').val();
         var tipo_pago = $('#tipo_pago_id').val();
-        var moneda = $('#moneda_id').val();
+        var moneda    = $('#moneda_id').val();
 
-        if (!tipo_pago) {
+        if (serie.trim().length === 0 || numero.trim().length === 0 || !fecha) {
             modalBonito({
-                tipo: 'warn',
-                icono: '⚠️',
-                titulo: 'Dato Faltante',
-                mensaje: 'Debe seleccionar un tipo de pago.',
-                ancho: '400px'
+                tipo: 'warn', icono: '⚠️', titulo: 'Datos Generales Incompletos',
+                mensaje: 'Por favor, complete la <b>Serie, Número y Fecha</b> de la cotización.',
+                ancho: '420px'
             });
             return;
         }
 
-        if (!moneda) {
+        if (ruc.trim().length === 0 || nombre.trim().length === 0 || direccion.trim().length === 0 || telefono.trim().length === 0) {
             modalBonito({
-                tipo: 'warn',
-                icono: '⚠️',
-                titulo: 'Dato Faltante',
-                mensaje: 'Debe seleccionar una moneda.',
+                tipo: 'warn', icono: '⚠️', titulo: 'Información del Proveedor',
+                mensaje: 'Debe completar el <b>RUC, Razón Social, Dirección y Teléfono</b> del proveedor.',
+                ancho: '450px'
+            });
+            return;
+        }
+
+        if (!validez || parseInt(validez) <= 0 || !entrega || parseInt(entrega) <= 0) {
+            modalBonito({
+                tipo: 'warn', icono: '⚠️', titulo: 'Vigencia y Entrega',
+                mensaje: 'Los campos <b>Validez y Tiempo de Entrega</b> deben tener valores mayores a 0.',
+                ancho: '420px'
+            });
+            return;
+        }
+
+        if (!tipo_pago || !moneda) {
+            modalBonito({
+                tipo: 'warn', icono: '⚠️', titulo: 'Pago y Moneda',
+                mensaje: 'Debe seleccionar el <b>Tipo de Pago</b> y la <b>Moneda</b>.',
                 ancho: '400px'
             });
             return;
@@ -498,7 +511,7 @@ $(document).ready(function () {
                 nom_medida: $el.data('nom-medida'),
                 cantidad: $row.find('.cantidad-producto').val(),
                 precio: $el.val(),
-                precio_igv: $row.find('.precio-igv-producto').val(),
+                precio_igv: 0,
                 cod_familia: $el.data('cod-familia'),
                 nom_familia: $el.data('nom-familia')
             });
@@ -522,9 +535,8 @@ $(document).ready(function () {
         $('.precio-producto').each(function () {
             var $row = $(this).closest('tr');
             var precio = parseFloat($(this).val()) || 0;
-            var precio_igv = parseFloat($row.find('.precio-igv-producto').val()) || 0;
             
-            if (precio <= 0 && precio_igv <= 0) {
+            if (precio <= 0) {
                 precioInvalido = true;
                 nombreProductoInvalido = $row.find('td:nth-child(5)').text(); // PRODUCTO (índice 1-based para td:nth-child)
                 return false;
@@ -536,7 +548,7 @@ $(document).ready(function () {
                 tipo: 'warn',
                 icono: '💰',
                 titulo: 'Precio Requerido',
-                mensaje: 'El producto <b>' + nombreProductoInvalido + '</b> no tiene un precio asignado. Por favor, ingrese un monto mayor a 0 en PRECIO o PRECIO IGV.',
+                mensaje: 'El producto <b>' + nombreProductoInvalido + '</b> no tiene un precio asignado. Por favor, ingrese un monto mayor a 0 en PRECIO.',
                 ancho: '450px'
             });
             return;
@@ -562,12 +574,16 @@ $(document).ready(function () {
         formData.append('txt_categoria_tipo_pago', $('#tipo_pago_id option:selected').text());
         formData.append('txt_observacion', $('#observacion').val());
         formData.append('can_total', $('#total').val());
+        formData.append('ind_igv', $('#incluir_igv').is(':checked') ? 1 : 0);
         formData.append('detalles', JSON.stringify(detalles));
+        formData.append('archivos_a_eliminar', JSON.stringify(archivos_a_eliminar));
 
         // Adjuntar el archivo si existe
         var fileInput = $('#archivo_cotizacion_crear')[0];
         if (fileInput && fileInput.files.length > 0) {
-            formData.append('archivo', fileInput.files[0]);
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('archivo[]', fileInput.files[i]);
+            }
         }
 
         // 3. Confirmación
@@ -694,54 +710,118 @@ $(document).ready(function () {
             },
             success: function (res) {
                 cerrarcargando();
-                if (res.success) {
-                    var cot = res.cotizacion;
+                try {
+                    if (res.success) {
+                        var cot = res.cotizacion;
+                        cargando_edicion = true; // Activar flag para evitar reset
 
-                    // 1. Llenar campos de cabecera
-                    $('#id_cotizacion_edit').val(cot.ID_COTIZACION);
-                    $('#nro_cotizacion').val(cot.ID_COTIZACION);
-                    $('#fecha_cotizacion').val(cot.FEC_COTIZACION.substring(0, 10));
-                    $('#serie').val(cot.NRO_SERIE);
-                    $('#numero').val(cot.NRO_DOC);
-                    $('#ruc_proveedor').val(cot.NRO_RUC);
-                    $('#nombre_proveedor').val(cot.NOM_EMPR_PROVEEDOR);
-                    $('#direccion').val(cot.NOM_DIRECCION);
-                    $('#telefono').val(cot.TXT_TELEFONO);
-                    $('#validez').val(cot.FEC_VALIDEZ);
-                    $('#entrega').val(cot.FEC_ENTREGA);
-                    $('#observacion').val(cot.TXT_OBSERVACION);
-                    $('#total').val(parseFloat(cot.CAN_TOTAL).toFixed(2));
+                        // Función auxiliar para obtener propiedades sin importar el caso
+                        var getVal = function (obj, prop) {
+                            if (!obj) return '';
+                            var val = obj[prop] !== undefined && obj[prop] !== null ? obj[prop] :
+                                     (obj[prop.toUpperCase()] !== undefined && obj[prop.toUpperCase()] !== null ? obj[prop.toUpperCase()] :
+                                     (obj[prop.toLowerCase()] !== undefined && obj[prop.toLowerCase()] !== null ? obj[prop.toLowerCase()] : ''));
+                            return String(val).trim();
+                        };
 
-                    // 2. Llenar Select2
-                    $('#tipo_pago_id').val(cot.COD_CATEGORIA_TIPO_PAGO).trigger('change');
-                    $('#moneda_id').val(cot.COD_CATEGORIA_MONEDA).trigger('change');
+                        // 1. Llenar campos de cabecera
+                        var id_cot = getVal(cot, 'ID_COTIZACION');
+                        $('#id_cotizacion_edit').val(id_cot);
+                        $('#nro_cotizacion').val(id_cot);
+                        
+                        var fec_cot = getVal(cot, 'FEC_COTIZACION');
+                        if (fec_cot && typeof fec_cot === 'string') {
+                            $('#fecha_cotizacion').val(fec_cot.substring(0, 10));
+                        }
+                        
+                        $('#serie').val(getVal(cot, 'NRO_SERIE'));
+                        $('#numero').val(getVal(cot, 'NRO_DOC'));
+                        
+                        $('#ruc_proveedor').val(getVal(cot, 'NRO_RUC'));
+                        $('#nombre_proveedor').val(getVal(cot, 'NOM_EMPR_PROVEEDOR'));
+                        $('#direccion').val(getVal(cot, 'NOM_DIRECCION'));
+                        $('#telefono').val(getVal(cot, 'TXT_TELEFONO'));
+                        
+                        $('#validez').val(getVal(cot, 'FEC_VALIDEZ') || getVal(cot, 'CAN_VALIDEZ'));
+                        $('#entrega').val(getVal(cot, 'FEC_ENTREGA') || getVal(cot, 'CAN_ENTREGA'));
+                        
+                        $('#observacion').val(getVal(cot, 'TXT_OBSERVACION'));
+                        
+                        // Restaurar estado de IGV
+                        var ind_igv = getVal(cot, 'IND_IGV');
+                        $('#incluir_igv').prop('checked', ind_igv == '1' || ind_igv == 1);
 
-                    // 3. Cargar Detalle de Productos
-                    $('#lista-productos-cotizacion').html(res.productos_html);
+                        var total_db = parseFloat(getVal(cot, 'CAN_TOTAL') || 0);
+                        $('#total').val(total_db.toFixed(2));
 
-                    // 4. Cambiar interfaz a modo edición
-                    $('.btn-guardar-cotizacion').html('<i class="mdi mdi-content-save"></i> Actualizar Cotización');
-                    $('.header-principal').html('<i class="mdi mdi-receipt"></i> EDITAR COTIZACIÓN: ' + cot.ID_COTIZACION);
+                        // 2. Llenar Select2
+                        var cod_pago = getVal(cot, 'COD_CATEGORIA_TIPO_PAGO');
+                        if (cod_pago) { $('#tipo_pago_id').val(cod_pago).trigger('change'); }
+                        
+                        var cod_moneda = getVal(cot, 'COD_CATEGORIA_MONEDA');
+                        if (cod_moneda) { $('#moneda_id').val(cod_moneda).trigger('change'); }
 
-                    // 5. Cambiar de pestaña
-                    $('a[href="#crearcotizacionpedido"]').tab('show');
+                        // 3. Cargar Detalle de Productos
+                        if (res.productos_html) {
+                            $('#lista-productos-cotizacion').html(res.productos_html);
+                            setTimeout(function(){
+                                $('.check-producto').prop('checked', true);
+                                calcularTotal();
+                            }, 500);
+                        }
 
-                    modalBonito({
-                        tipo: 'info',
-                        icono: '📝',
-                        titulo: 'Modo Edición',
-                        mensaje: 'Se han cargado los datos de la cotización <b>' + cot.ID_COTIZACION + '</b> para su modificación.',
-                        ancho: '400px'
-                    });
+                        // 4. Cambiar interfaz a modo edición
+                        $('.btn-guardar-cotizacion').html('<i class="mdi mdi-content-save"></i> Actualizar Cotización');
+                        $('.header-principal').html('<i class="mdi mdi-receipt"></i> EDITAR COTIZACIÓN: ' + (id_cot || ''));
 
-                } else {
-                    modalBonito({
-                        tipo: 'error',
-                        icono: '❌',
-                        titulo: 'Error',
-                        mensaje: res.message,
-                        ancho: '400px'
-                    });
+                        // 5. Cambiar de pestaña
+                        $('a[href="#crearcotizacionpedido"]').tab('show');
+
+                        // 6. Cargar Archivos Adjuntos Actuales
+                        var $listaArchivos = $('#lista-archivos-existentes');
+                        $listaArchivos.empty();
+                        archivos_a_eliminar = []; 
+
+                        if (res.archivos && res.archivos.length > 0) {
+                            $('#archivos-existentes-contenedor').show();
+                            res.archivos.forEach(function (archivo) {
+                                var nom = getVal(archivo, 'NOMBRE_ARCHIVO');
+                                var ext = getVal(archivo, 'EXTENSION');
+                                var item_id = getVal(archivo, 'DOCUMENTO_ITEM');
+                                var item = `
+                                    <li class="list-group-item" style="display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 5px;">
+                                        <div>
+                                            <i class="fa fa-file-pdf-o text-danger"></i> 
+                                            <span class="nombre-archivo">${nom}.${ext}</span>
+                                        </div>
+                                        <button type="button" class="btn btn-xs btn-danger btn-eliminar-archivo-existente" 
+                                                data-id="${item_id}" title="Eliminar archivo">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </li>`;
+                                $listaArchivos.append(item);
+                            });
+                        } else {
+                            $('#archivos-existentes-contenedor').hide();
+                        }
+
+                        modalBonito({
+                            tipo: 'info',
+                            icono: '📝',
+                            titulo: 'Modo Edición',
+                            mensaje: 'Se han cargado los datos de la cotización <b>' + (id_cot || '') + '</b>',
+                            ancho: '400px'
+                        });
+
+                        // Desactivar flag después de que la pestaña se haya mostrado
+                        setTimeout(function() { cargando_edicion = false; }, 1000);
+
+                    } else {
+                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: res.message, ancho: '400px' });
+                    }
+                } catch (e) {
+                    console.error("Error en el procesamiento de edición:", e);
+                    modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error JS', mensaje: 'Error al cargar datos: ' + e.message, ancho: '400px' });
                 }
             },
             error: function () {
@@ -757,6 +837,37 @@ $(document).ready(function () {
         });
     });
 
+    /* =================================
+    MARCAR ARCHIVOS EXISTENTES PARA ELIMINAR
+    ================================= */
+    $(document).on('click', '.btn-eliminar-archivo-existente', function () {
+        var $btn = $(this);
+        var idItem = $btn.data('id');
+        var $li = $btn.closest('li');
+
+        if ($li.hasClass('a-eliminar')) {
+            // Desmarcar
+            $li.removeClass('a-eliminar').css({
+                'text-decoration': 'none',
+                'opacity': '1',
+                'background-color': '#fff'
+            });
+            $btn.find('i').attr('class', 'fa fa-trash');
+            $btn.removeClass('btn-info').addClass('btn-danger');
+            archivos_a_eliminar = archivos_a_eliminar.filter(id => id !== idItem);
+        } else {
+            // Marcar para eliminar
+            $li.addClass('a-eliminar').css({
+                'text-decoration': 'line-through',
+                'opacity': '0.5',
+                'background-color': '#f8d7da'
+            });
+            $btn.find('i').attr('class', 'fa fa-undo'); // Cambiar a deshacer
+            $btn.removeClass('btn-danger').addClass('btn-info');
+            archivos_a_eliminar.push(idItem);
+        }
+    });
+
     function resetearFormularioCotizacion() {
         $('#id_cotizacion_edit').val('');
         $('#serie').val('');
@@ -769,10 +880,16 @@ $(document).ready(function () {
         $('#entrega').val('');
         $('#observacion').val('');
         $('#total').val('0.00');
+        $('#incluir_igv').prop('checked', false);
         $('#lista-productos-cotizacion').html('<div class="text-center p-5 message-empty"><i class="mdi mdi-cart-outline icon-large"></i><p>Seleccione los consolidados para cargar los productos a cotizar.</p></div>');
         
         $('.btn-guardar-cotizacion').html('<i class="mdi mdi-content-save"></i> Generar Cotización');
         $('.header-principal').html('<i class="mdi mdi-receipt"></i> COTIZACIÓN ORDEN PEDIDO');
+ 
+        $('#archivos-existentes-contenedor').hide();
+        $('#lista-archivos-existentes').empty();
+        $('#archivo_cotizacion_crear').val('');
+        archivos_a_eliminar = [];
     }
 
     $(document).on('click', '.btn-cancelar', function (e) {
@@ -792,8 +909,54 @@ $(document).ready(function () {
             mensaje: '¿Está seguro de que desea aprobar la cotización <b>' + id_cotizacion + '</b>?',
             confirmar: true,
             onConfirm: function () {
-                // Aquí iría la lógica de aprobación (AJAX)
-                $.alert('Lógica de aprobación pendiente de implementar.');
+                
+                abrircargando();
+
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/ajax-aprobar-cotizacion',
+                    data: {
+                        _token: _token,
+                        id_cotizacion: id_cotizacion
+                    },
+                    success: function (res) {
+                        cerrarcargando();
+                        if (res.success) {
+                            modalBonito({
+                                tipo: 'success',
+                                icono: '✅',
+                                titulo: 'Aprobado',
+                                mensaje: res.mensaje,
+                                ancho: '400px'
+                            });
+
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            modalBonito({
+                                tipo: 'error',
+                                icono: '❌',
+                                titulo: 'Error',
+                                mensaje: res.mensaje,
+                                ancho: '400px'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        cerrarcargando();
+                        var res = xhr.responseJSON;
+                        var errorMsg = res && res.mensaje ? res.mensaje : ('Error en el servidor (' + xhr.status + ')');
+                        
+                        modalBonito({
+                            tipo: 'error',
+                            icono: '❌',
+                            titulo: 'Error en Servidor',
+                            mensaje: '<b>No se pudo completar la aprobación:</b><br>' + errorMsg,
+                            ancho: '450px'
+                        });
+                    }
+                });
             }
         });
     });
@@ -860,6 +1023,79 @@ $(document).ready(function () {
             }
         });
         $(this).val('');
+    });
+
+    /* ===============================
+       BUSCADOR PRINCIPAL DE COTIZACIONES
+       =============================== */
+    $(document).on('keyup', '#buscar_cotizacion_principal', function () {
+        var valor = $(this).val().toLowerCase();
+        $("#tabla_cotizaciones tbody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1);
+        });
+    });
+
+    /* =================================
+       RESET AL CAMBIAR DE PESTAÑA SI VENIMOS DE EDICIÓN
+       ================================= */
+    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+        var target = $(e.target).attr("href");
+        if (target === "#crearcotizacionpedido") {
+            // Si hay un ID de edición Y NO estamos cargándola activamente, significa que el usuario cambió manualmente
+            if ($('#id_cotizacion_edit').val() !== "" && !cargando_edicion) {
+                resetearFormularioCotizacion();
+            }
+        }
+    });
+
+    /* =================================
+       ELIMINAR COTIZACIÓN
+       ================================= */
+    $(document).on('click', '.eliminar-cotizacion', function (e) {
+        var id_cotizacion = $(this).data('id');
+        var _token = $('#token').val();
+
+        modalBonito({
+            tipo: 'warning',
+            icono: '⚠️',
+            titulo: '¿Eliminar Cotización?',
+            mensaje: "¿Desea eliminar la cotización (" + id_cotizacion + ")? Esta acción liberará los productos para cotizar de nuevo.",
+            confirmar: true,
+            ancho: '450px',
+            onConfirm: function () {
+                abrircargando();
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-eliminar-cotizacion",
+                    data: {
+                        _token: _token,
+                        id_cotizacion: id_cotizacion
+                    },
+                    success: function (res) {
+                        cerrarcargando();
+                        if (res.success) {
+                            modalBonito({
+                                tipo: 'success', icono: '✅', titulo: 'Éxito',
+                                mensaje: res.message, ancho: '400px'
+                            });
+                            setTimeout(function () { location.reload(); }, 1500);
+                        } else {
+                            modalBonito({
+                                tipo: 'error', icono: '❌', titulo: 'Error',
+                                mensaje: res.message, ancho: '400px'
+                            });
+                        }
+                    },
+                    error: function () {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'error', icono: '❌', titulo: 'Error de Red',
+                            mensaje: 'Ocurrió un error al intentar eliminar la cotización.', ancho: '400px'
+                        });
+                    }
+                });
+            }
+        });
     });
 
 });
