@@ -6021,6 +6021,8 @@ class GestionLiquidacionGastosController extends Controller
                 ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                 ->first();
 
+
+
             $dni = '';
             if (count($trabajador) > 0) {
                 $dni = $trabajador->NRO_DOCUMENTO;
@@ -6087,6 +6089,8 @@ class GestionLiquidacionGastosController extends Controller
             $combo_subcuenta = array();
             $cod_contrato = "";
             if (count($empresa) > 0) {
+
+
                 $empresa_id = $empresa->COD_EMPR;
                 $combo_empresa = array($empresa->COD_EMPR => $empresa->NOM_EMPR);
 
@@ -6131,7 +6135,7 @@ class GestionLiquidacionGastosController extends Controller
             $moneda_sel_id = '';
             $combo_moneda_sel = $this->gn_generacion_combo_categoria('MONEDA', "SELECCIONE MONEDA", '');
 
-
+            //dd($combo_empresa);
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                 [
                     'combo_empresa' => $combo_empresa,
