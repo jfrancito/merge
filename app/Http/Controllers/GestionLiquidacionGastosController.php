@@ -6048,7 +6048,7 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                     ->where('TXT_NOMBRE', '=', $area_planilla)
                     ->where('IND_MOVIMIENTO', 1)->first();
-
+//dd($centrocosto);
 
             } else {
                 $area_planilla = $trabajadorespla->cadarea;

@@ -166,6 +166,12 @@
 
 </table>
 </div>
+    @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))
+      <div class="alert alert-danger mx-3 my-3" style="border-left: 5px solid #d9534f; background-color: #fdf2f2; border-radius: 8px; box-shadow: 0 2px 8px rgba(217, 83, 79, 0.1);">
+          <h5 class="fw-bold mb-1" style="color: #d9534f; font-size: 1.1rem;"><i class="fa fa-times-circle"></i> MOTIVO DEL RECHAZO:</h5>
+          <p class="mb-0" style="font-size: 1rem; font-weight: 500; color: #000 !important;">{{ $pedido->TXT_GLOSA_RECHAZO }}</p>
+      </div>
+    @endif
 </div>
 
 <!-- FOOTER -->

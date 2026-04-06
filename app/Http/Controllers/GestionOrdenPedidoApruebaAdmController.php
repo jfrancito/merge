@@ -157,6 +157,11 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             ""
         );
 
+        // Guardar motivo de rechazo
+        DB::table('WEB.ORDEN_PEDIDO')
+            ->where('ID_PEDIDO', $orden_pedido_id)
+            ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
+
         return response()->json([
             'success' => true
         ]);
