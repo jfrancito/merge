@@ -15,7 +15,6 @@
                         <th>MES</th>
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
-                        <th>FRECUENCIA</th>
                         <th>SOLICITA</th>
                         <th>AREA</th>
                         <th>AUTORIZA</th>

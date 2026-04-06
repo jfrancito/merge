@@ -1521,9 +1521,19 @@ $(document).ready(function () {
             tipo: 'error',
             icono: '❌',
             titulo: 'Rechazar Orden',
-            mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?',
+            mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
+                     '<div class="form-group">' +
+                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo:</label>' +
+                        '<textarea id="motivo_rechazo" class="form-control" rows="3" placeholder="Escriba aquí el motivo por el cual rechaza el pedido..." style="border:1px solid #d9534f;"></textarea>' +
+                     '</div>',
             confirmar: true,
             onConfirm: function () {
+
+                let motivo = $('#motivo_rechazo').val();
+                if(!motivo || motivo.trim() === ""){
+                    alerterrorajax("Debe ingresar un motivo de rechazo.");
+                    return false;
+                }
 
                 abrircargando();
 
@@ -1532,7 +1542,8 @@ $(document).ready(function () {
                     url: carpeta + '/rechazar_orden_pedido',
                     data: {
                         _token: _token,
-                        orden_pedido_id: orden_pedido_id
+                        orden_pedido_id: orden_pedido_id,
+                        motivo: motivo
                     },
                     success: function (resp) {
 
@@ -1556,7 +1567,7 @@ $(document).ready(function () {
                             tipo: 'error',
                             icono: '❌',
                             titulo: 'Error',
-                            mensaje: 'No se pudo aprobar la orden.'
+                            mensaje: 'No se pudo rechazar la orden.'
                         });
                     }
                 });
