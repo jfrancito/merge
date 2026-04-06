@@ -8387,7 +8387,8 @@ trait ComprobanteTraits
                                         'TDO0000000000001',
                                         'TDO0000000000003',
                                         'TDO0000000000002',
-                                        'TDO0000000000034'
+                                        'TDO0000000000034',
+                                        'TDO0000000000010'
                                     ]);
 
         $oi                     =   DB::table('CMP.ORDEN')
@@ -9729,7 +9730,7 @@ trait ComprobanteTraits
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
-                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->whereIn('COD_CATEGORIA_TIPO_DOC', ['TDO0000000000004', 'TDO0000000000001'])
                                         ->select(DB::raw('  COD_AUTORIZACION,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
@@ -9744,6 +9745,7 @@ trait ComprobanteTraits
                                                         '))
                                         ->get();
 
+
         }else{
 
             $listadatos         =       VMergeOP::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
@@ -9756,7 +9758,7 @@ trait ComprobanteTraits
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
-                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->whereIn('COD_CATEGORIA_TIPO_DOC', ['TDO0000000000004', 'TDO0000000000001'])
                                         ->where('COD_CENTRO','=',$centro_id)
                                         ->select(DB::raw('  COD_AUTORIZACION,
                                                             FEC_EMISION,
