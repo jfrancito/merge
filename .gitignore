@@ -17,3 +17,4 @@ yarn-error.log
 /storage/app
 app/Http/Controllers/DocumentoApiController.php
 /public/firmas
+/config/database.php
