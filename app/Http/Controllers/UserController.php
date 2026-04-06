@@ -1702,6 +1702,58 @@ class UserController extends Controller
 		}
 	}
 
+
+	public function actionImpostarUsuario($idusuario)
+	{
+
+		if (Session::get('usuario')->id != '1CIX00000001' && !Session::has('usuario_original')) {
+			return Redirect::back()->with('errorbd', 'No tiene permisos para realizar esta acción');
+		}
+
+		if (!Session::has('usuario_original')) {
+			Session::put('usuario_original', Session::get('usuario'));
+		}
+
+		$tusuario = User::where('id', '=', $idusuario)
+			->where('activo', '=', 1)
+			->first();
+
+		if (count($tusuario) > 0) {
+
+			$listamenu = WEBGrupoopcion::join('web.opciones', 'web.opciones.grupoopcion_id', '=', 'web.grupoopciones.id')
+				->join('web.rolopciones', 'web.rolopciones.opcion_id', '=', 'web.opciones.id')
+				->where('web.grupoopciones.activo', '=', 1)
+				->where('web.rolopciones.rol_id', '=', $tusuario->rol_id)
+				->where('web.rolopciones.ver', '=', 1)
+				->where('web.opciones.ind_merge', '=', 1)
+				->groupBy('web.grupoopciones.id')
+				->groupBy('web.grupoopciones.nombre')
+				->groupBy('web.grupoopciones.icono')
+				->groupBy('web.grupoopciones.orden')
+				->select('web.grupoopciones.id', 'web.grupoopciones.nombre', 'web.grupoopciones.icono', 'web.grupoopciones.orden')
+				->orderBy('web.grupoopciones.orden', 'asc')
+				->get();
+
+
+			$listaopciones = WEBRolOpcion::join('web.opciones', 'web.rolopciones.opcion_id', '=', 'web.opciones.id')
+				->where('web.opciones.ind_merge', '=', 1)
+				->where('rol_id', '=', $tusuario->rol_id)
+				->where('ver', '=', 1)
+				->orderBy('WEB.rolopciones.orden', 'asc')
+				->pluck('opcion_id')
+				->toArray();
+
+			Session::put('usuario', $tusuario);
+			Session::put('listamenu', $listamenu);
+			Session::put('listaopciones', $listaopciones);
+
+			return Redirect::to('acceso');
+
+		} else {
+			return Redirect::back()->with('errorbd', 'Usuario no encontrado o inactivo');
+		}
+	}
+
 	public function actionAcceso()
 	{
 
@@ -1774,6 +1826,7 @@ class UserController extends Controller
 		Session::forget('listamenu');
 		Session::forget('listaopciones');
 		Session::forget('empresas');
+		Session::forget('usuario_original');
 		return Redirect::to('/login');
 	}
 

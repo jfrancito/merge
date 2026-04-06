@@ -7,6 +7,29 @@
 
     <div class="be-right-navbar {{Session::get('color_meta')}}">
       <ul class="nav navbar-nav navbar-right be-user-nav">
+        @if(Session::get('usuario')->id == '1CIX00000001' || Session::has('usuario_original'))
+          <li class="dropdown">
+            <div class="row" style="margin-top: 10px; margin-right: 15px;">
+              <select name="user_imposter" id="user_imposter" class="form-control input-sm select2" onchange="location = this.value;">
+                  @if(Session::has('usuario_original'))
+                    <option value="{{ url('/impostar-usuario/'.Session::get('usuario_original')->id) }}">VOLVER A: {{ Session::get('usuario_original')->nombre }}</option>
+                  @else
+                    <option value="">IMPOSTAR USUARIO</option>
+                  @endif
+                  
+                  @php
+                    $usuarios_impostar = App\User::where('activo', 1)->orderBy('nombre', 'asc')->get();
+                  @endphp
+                  @foreach($usuarios_impostar as $item)
+                    <option value="{{ url('/impostar-usuario/'.$item->id) }}" {{ Session::get('usuario')->id == $item->id ? 'selected' : '' }}>
+                      {{ $item->nombre }}
+                    </option>
+                  @endforeach
+              </select>
+            </div>
+          </li>
+        @endif
+
         <li><div class="page-title"><span>{{Session::get('usuario')->nombre}}</span></div></li>
 
         <li class="dropdown">
