@@ -101,6 +101,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/actualizar-data/{zona}', 'UserController@actionActualizarData');
 	Route::any('/ajax-modal-cambiar-clave', 'UserController@actionAjaxModalCambiarClave');
 	Route::any('/ajax-cambiar-clave', 'UserController@actionAjaxCambiarClave');
+	Route::any('/impostar-usuario/{idusuario}', 'UserController@actionImpostarUsuario');
 
 
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
