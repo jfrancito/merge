@@ -975,7 +975,10 @@ trait ComprobanteTraits
             $listadatos                 = DB::table('FE_DOCUMENTO')
                                         ->join('TES.AUTORIZACION_DETALLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION_DETALLE.COD_AUTORIZACION')
                                         ->where('TES.AUTORIZACION_DETALLE.COD_EMPR','=',$empresa_id)
-                                        ->where('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO','=','TDO0000000000004')
+                                        ->whereIn('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO', [
+                                            'TDO0000000000004',
+                                            'TDO0000000000001'
+                                        ])
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         //->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
@@ -995,9 +998,13 @@ trait ComprobanteTraits
             $listadatos                 = DB::table('FE_DOCUMENTO')
                                         ->join('TES.AUTORIZACION_DETALLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION_DETALLE.COD_AUTORIZACION')
                                         ->where('TES.AUTORIZACION_DETALLE.COD_EMPR','=',$empresa_id)
-                                        ->where('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO','=','TDO0000000000004')
+                                        //->where('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO','=','TDO0000000000004')
+                                        ->whereIn('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO', [
+                                            'TDO0000000000004',
+                                            'TDO0000000000001'
+                                        ])
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
-                                        //->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','ISBEAU0000018891')
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->where(function ($query) {
@@ -1007,7 +1014,7 @@ trait ComprobanteTraits
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, TES.AUTORIZACION_DETALLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
 
-            //dd($listadatos);
+
 
 
         }
