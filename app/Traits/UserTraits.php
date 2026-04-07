@@ -347,7 +347,7 @@ trait UserTraits
             Mail::send('emails.consolidadoplanilla', $array, function ($message) use ($emailfrom, $item, $correocc) {
                 $message->from($emailfrom->correoprincipal, 'Planilla de Movilidad – Pendiente de Consolidación  2026 - ' . $item->trabajador);
                 //$message->to($correocc);
-                $message->to($correocc)->cc('alertassys@induamerica.com.pe');
+                $message->to($correocc)->cc('avisos.ia@induamerica.com.pe');
                 $message->subject('Planilla de Movilidad Pendientes consolidar');
             });
 
@@ -384,7 +384,7 @@ trait UserTraits
             Mail::send('emails.consolidadoplanilladet', $array, function ($message) use ($emailfrom, $item, $correocc) {
                 $message->from($emailfrom->correoprincipal, 'SU ATENCION INMEDIATA: CARGAR PLANILLAS DE MOVILIDAD A FEBRERO 2026');
                 //$message->to($correocc);
-                $message->to($correocc)->cc('alertassys@induamerica.com.pe');
+                $message->to($correocc)->cc('avisos.ia@induamerica.com.pe');
                 $message->subject('Planilla de Movilidad Pendientes consolidar');
             });
 

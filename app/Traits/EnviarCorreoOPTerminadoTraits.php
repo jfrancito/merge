@@ -50,7 +50,7 @@ trait EnviarCorreoOPTerminadoTraits
             Mail::send('emails.emailordenpedidoterminado',
             ['pedido' => $pedido],
                 function ($message) use ($correos, $subject) {
-                $message->from('alertassys@induamerica.com.pe', 'RECOJO ORDEN DE PEDIDO')
+                $message->from('avisos.ia@induamerica.com.pe', 'RECOJO ORDEN DE PEDIDO')
                     ->to($correos)
                     ->cc('alertacix@induamerica.com.pe')
                     ->subject($subject);
