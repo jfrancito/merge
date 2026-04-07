@@ -18,3 +18,4 @@ yarn-error.log
 app/Http/Controllers/DocumentoApiController.php
 /public/firmas
 /config/database.php
+/config/mail.php
