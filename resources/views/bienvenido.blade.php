@@ -124,11 +124,10 @@
 
 @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
 <!-- Modal de Aviso Importante - Ultra Professional Edition (EXACT TEXT) -->
-<div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
+<!-- <div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 950px;">
         <div class="modal-content shadow-premium border-0" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
             
-            <!-- Professional Header -->
             <div class="modal-header header-gradient text-white p-4" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: none;">
                 <div class="d-flex align-items-center">
                     <div>
@@ -142,10 +141,10 @@
                 </button>
             </div>
 
-            <!-- Video & Description Body -->
+
             <div class="modal-body p-0" style="background: #fafbfc;">
                 
-                <!-- Video Container (16:9) -->
+
                 <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
                     <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
                         <source src="{{ asset('public/videos/video_planilla.mp4') }}" type="video/mp4">
@@ -172,7 +171,6 @@
                 </div>
             </div>
 
-            <!-- Footer Action -->
             <div class="modal-footer border-0 p-4 bg-white">
                 <button type="button" class="btn btn-confirm w-100 py-3" data-dismiss="modal" style="background: #1e293b; color: white; border-radius: 12px; font-weight: 700; letter-spacing: 0.5px; transition: all 0.3s;">
                     <span>ENTENDIDO, CONTINUAR AL SISTEMA</span>
@@ -181,7 +179,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
 <style>
