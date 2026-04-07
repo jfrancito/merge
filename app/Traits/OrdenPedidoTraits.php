@@ -1015,7 +1015,7 @@ trait OrdenPedidoTraits
                       AND RA_CONS.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
                       AND OCD.COD_PRODUCTO = D.COD_PRODUCTO
                 ) AS CAN_COMPRADA_CALCULADA"),
-
+                // AND RA_CONS.COD_TABLA = OCD.ID_PEDIDO_CONSOLIDADO
                 // 🔹 TU LÓGICA ORIGINAL STUFF (NO TOCADA)
                 DB::raw("
                     STUFF((
@@ -1117,6 +1117,7 @@ trait OrdenPedidoTraits
 
      public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
     {
+        //DD("HOLA");
         $sql = "
         SELECT OPCD.COD_PRODUCTO,
                OPCD.NOM_PRODUCTO,
@@ -1125,7 +1126,7 @@ trait OrdenPedidoTraits
                SUM(OPCD.STOCK) AS STOCK,
                SUM(OPCD.RESERVADO) AS RESERVADO,
                SUM(OPCD.DIFERENCIA) AS DIFERENCIA,
-               SUM(ISNULL(OPCD.CAN_COMPRADA, CASE WHEN OPCD.DIFERENCIA < 0 THEN 0 ELSE OPCD.DIFERENCIA END)) AS CAN_COMPRADA_CALCULADA,
+               ISNULL(OPCD.CAN_COMPRADA,0) AS CAN_COMPRADA_CALCULADA,
                OPCD.COD_CATEGORIA_FAMILIA,
                OPCD.NOM_CATEGORIA_FAMILIA,
                C.COD_CENTRO,
@@ -1217,7 +1218,8 @@ trait OrdenPedidoTraits
                         E.COD_EMPR, 
                         E.NOM_EMPR,
                         CA.DETALLE_POR_AREA,
-                        CO.OBSERVACION_POR_AREA
+                        CO.OBSERVACION_POR_AREA,
+                        OPCD.CAN_COMPRADA
                   ORDER BY OPCD.NOM_PRODUCTO ASC;";
 
         // Preparar parámetros

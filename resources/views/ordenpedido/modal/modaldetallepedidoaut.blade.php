@@ -30,9 +30,10 @@
           <th style="width:5%" class="text-center">#</th>
           <th style="width:25%">Producto</th>
           <th style="width:15%">Categoría</th>
-          <th style="width:10%" class="text-center">Cant.</th>
-          <th style="width:15%" class="text-right">Precio</th>
-          <th style="width:15%" class="text-right">Total</th>
+          <th style="width:10%" class="text-center">CANT ORIGEN</th>
+          <th style="width:10%" class="text-center">CANT A MODIF</th>
+          <th style="width:10%" class="text-right">Precio</th>
+          <th style="width:10%" class="text-right">Total</th>
           <th style="width:15%">Observación</th>
         </tr>
       </thead>
@@ -64,6 +65,12 @@
           <td class="text-truncate text-secondary"
               title="{{ $detalle->NOM_CATEGORIA }}">
             {{ $detalle->NOM_CATEGORIA }}
+          </td>
+
+          <td class="text-center">
+            <span class="badge badge-cantidad" style="background: #e9ecef; color: #495057;">
+              {{ (int)$detalle->CANTIDAD }}
+            </span>
           </td>
 
           <td class="text-center">
@@ -109,7 +116,7 @@
       </tbody>
       <tfoot>
         <tr style="background-color: #f8f9fa;">
-            <td colspan="5" class="text-right fw-bold" style="font-size: 1.1rem; color: #1f2a50;">TOTAL GENERAL:</td>
+            <td colspan="6" class="text-right fw-bold" style="font-size: 1.1rem; color: #1f2a50;">TOTAL GENERAL:</td>
             <td class="text-right fw-bold" style="font-size: 1.2rem; color: #d9534f;">
                 S/ {{ number_format($suma_total_general, 2, '.', ',') }}
             </td>
