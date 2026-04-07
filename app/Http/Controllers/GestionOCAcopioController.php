@@ -573,6 +573,7 @@ class GestionOCAcopioController extends Controller
             try {
 
                 DB::beginTransaction();
+                $idoc = $idop;
                 $pedido_id = $idop;
                 $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
                 $descripcion = $request['descripcionextorno'];
