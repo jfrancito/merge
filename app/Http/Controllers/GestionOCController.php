@@ -2885,10 +2885,17 @@ class GestionOCController extends Controller
         // Nombre del archivo que estás buscando
         $nombreArchivoBuscado = $idop . '.xml';
         $liquidacion = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+
         $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR . '-04-' . $liquidacion->NRO_SERIE . '-' . $liquidacion->NRO_DOC . '.xml';
+
+
         if ($ordenpago->COD_CENTRO == 'CEN0000000000004' or $ordenpago->COD_CENTRO == 'CEN0000000000006') {
             if ($ordenpago->COD_CENTRO == 'CEN0000000000006') {
                 $sourceFile = '\\\\10.1.9.43\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
+            }
+            if ($ordenpago->COD_CENTRO == 'CEN0000000000004') {
+                //dd($nombreArchivoBuscado);
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
             }
             if ($ordenpago->COD_CENTRO == 'CEN0000000000002') {
                 $sourceFile = '\\\\10.1.4.201\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
@@ -2929,6 +2936,7 @@ class GestionOCController extends Controller
             ->first();
 
         //DD($contrato_pago);
+        $ingresoliq_id = "NO";
         if(count($contrato_pago)>0){
             if($contrato_pago->PESO_ENTREGA>0){
                 $ingresoliq_id = "SI";

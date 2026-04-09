@@ -721,6 +721,41 @@ class GestionUsuarioContactoController extends Controller
                          ]);
     }
 
+    public function actionListarComprobantesEnReparacion($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Documentos Reparable');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        $anio_id            =   date("Y");
+        $combo_anio         =   $this->gn_combo_anio_reparable('TODO', 'TODO');
+
+        if(isset($request['anio_id'])){
+            $anio_id       =   $request['anio_id'];
+        }
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
+
+        //dd($listadatos);
+
+
+        $funcion        =   $this;
+        return View::make('reporte/comprobante/listaocenreparacion',
+                         [
+                            'listadatos'        =>  $listadatos,
+
+                            'anio_id'           =>  $anio_id,
+                            'combo_anio'        =>  $combo_anio,
+
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
     public function actionListarComprobantesReparableAdmin($idopcion,Request $request)
     {
         /******************* validar url **********************/

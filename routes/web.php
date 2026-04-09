@@ -690,6 +690,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
 
 
+	Route::any('/gestion-de-comprobantes-en-reparacion/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesEnReparacion');
+
+
+
+
 
 	Route::any('/gestion-de-reparable-admin/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparableAdmin');
 	Route::any('/reparable-comprobante-uc-admin/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUCAdmin');

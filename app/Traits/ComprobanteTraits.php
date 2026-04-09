@@ -7101,6 +7101,23 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cliente_id,$anio_id='') {
+
+            $listadatos     =   FeDocumento::Join('STD.TRABAJADOR', 'STD.TRABAJADOR.COD_TRAB', '=', 'FE_DOCUMENTO.COD_CONTACTO')
+                                ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->whereIn('FE_DOCUMENTO.MODO_REPARABLE',['ARCHIVO_FISICO','ARCHIVO_VIRTUAL'])
+                                ->whereIn('FE_DOCUMENTO.IND_REPARABLE',['1'])
+                                ->Anio($anio_id)
+                                ->select(DB::raw("OPERACION,ID_DOCUMENTO,RUC_PROVEEDOR,RZ_PROVEEDOR,SERIE,NUMERO,MONEDA,TOTAL_VENTA_ORIG,TXT_ESTADO,COD_CONTACTO,MODO_REPARABLE,MODO_REPARABLE_HIBRIDO,(TXT_APE_PATERNO + ' ' + TXT_APE_MATERNO + ' ' + TXT_NOMBRES) NOMBRES"))
+                                ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                                ->get();
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
