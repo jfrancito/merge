@@ -4122,7 +4122,14 @@ class GestionLiquidacionGastosController extends Controller
                         ->first();
                     $diasarendir = 1;
                     if (count($arendri) > 0) {
-                        $diasarendir = $arendri->AUMENTO_DIAS ?? 0;;
+                        $diasarendir = $arendri->AUMENTO_DIAS ?? 0;
+                    }
+                    //lista negra
+                    $listanegra = DB::table('LISTA_NEGRA')
+                        ->where('ID_DOCUMENTO', $trabajadorap->NRO_DOCUMENTO)
+                        ->first();
+                    if (count($listanegra) > 0) {
+                        $diasarendir = $diasarendir + 3;
                     }
 
                     //solo 2 dias
