@@ -77,16 +77,19 @@
 
     <body>
         <section>
-            <p>Estimado(a): <b>{{$item->TXT_TRABAJADOR}}</b></p>
-            <p>De los Periodo Enero y Febrero 2026.</p>
-            <p>Se verifica que tiene planillas de movilidad que aún no ha sido cargado al Merge, 
-                firmada de forma manual. <b>Se le reitera por segunda vez su atención inmediata, ya que es la empresa 
-                que debe rendir como gasto ante SUNAT con los documentos que va a cargar al Sistema.</b></p>
+            <p>Por los periodos Enero , Febrero y Marzo, del 2026.</p>
+            <p>De forma reiterativa,  se les comunica que tiene planillas de movilidad del ejercicio 2026 que a la fecha no han sido cargadas al Merge con su firma correspondiente. <br>
+                Se le solicita regularizar hasta el <b>10/04/2026</b>,  caso contrario se procederá bloquear permisos para generar planillas de movilidad, y a su vez se comunicará al área de Gestión de Talento Humano para que evalúen cómo proceder.
+            </p>
+
             <p>Adjunto detalle:</p>
             <table  class="table" >
                 <tr>
                     <th class="label">
                         Periodo
+                    </th>
+                    <th class="label">
+                        Trabajador
                     </th>
                     <th class="label">
                         Nro Planilla
@@ -107,6 +110,7 @@
                 @foreach($listadocumentosdet as $index => $item2)
                     <tr>
                         <td>{{$item2->TXT_PERIODO}}</td>
+                        <td>{{$item2->TRABAJADOR}}</td>
                         <td>{{$item2->SERIE}}-{{$item2->NUMERO}}</td>
                         <td>{{$item2->FECHA_EMI}}</td>
                         <td>{{$item2->cadcargo}}</td>
@@ -116,7 +120,7 @@
                 @endforeach
             </table>
 
-            <p>Recomendable que dentro del mes, semanal o quincenal se regularice la carga de la documentación, y no se acumule.</p>
+            <p>Tomar en cuenta que, desde el 1ero de Abril ya no existe planilla de movilidad consolidado. En el Merge se ha cargado un video instructivo de como deben generar la planilla.</p>
             <p><b>Saludos.</b></p>
 
         </section>
