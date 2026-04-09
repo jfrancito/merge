@@ -2757,9 +2757,11 @@ class GestionOCAdministracionController extends Controller
 
 
                 DB::commit();
+                Session::flash('operacion_id', 'ORDEN_COMPRA_ANTICIPO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback();
+                Session::flash('operacion_id', 'ORDEN_COMPRA_ANTICIPO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -4657,13 +4659,14 @@ class GestionOCAdministracionController extends Controller
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc_actual($idop);
 
         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
-
         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
 
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Observar Comprobante');
+
+        //dd($fedocumento);
 
         if($_POST)
         {
@@ -4753,22 +4756,6 @@ class GestionOCAdministracionController extends Controller
                                 ]
                             );
 
-                //LE LLEGA AL USUARIO DE CONTACTO
-               // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-               //  $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-               //  $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
-               //                          .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-               //                          .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-               //                          .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-               //                          .'MENSAJE : '.$descripcion.'%0D%0A';
-
-                //dd($trabajador);
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }
 
                 DB::commit();
 
