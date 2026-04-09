@@ -2936,7 +2936,7 @@ class GestionOCController extends Controller
             ->first();
 
         //DD($contrato_pago);
-        $ingresoliq_id = "NO";
+        //$ingresoliq_id = "NO";
         if(count($contrato_pago)>0){
             if($contrato_pago->PESO_ENTREGA>0){
                 $ingresoliq_id = "SI";
@@ -2975,7 +2975,7 @@ class GestionOCController extends Controller
                 } else {
                     if ($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006') { //rioja o bellavista
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
-                            ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
+                            ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049', 'DCC0000000000046'])->get();
                     } else {
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                             ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
