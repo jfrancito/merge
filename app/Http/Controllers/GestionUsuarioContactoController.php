@@ -721,6 +721,7 @@ class GestionUsuarioContactoController extends Controller
                          ]);
     }
 
+
     public function actionListarComprobantesEnReparacion($idopcion,Request $request)
     {
         /******************* validar url **********************/
@@ -752,6 +753,25 @@ class GestionUsuarioContactoController extends Controller
 
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+    public function actionListarAjaxBuscarDocumentoReparableReporte(Request $request) {
+
+        $anio_id            =   $request['anio_id'];
+        $idopcion           =   $request['idopcion'];
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
+
+        $funcion                =   $this;
+        return View::make('reporte/comprobante/ajax/alistaocenreparacion',
+                         [
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
                          ]);
     }
 

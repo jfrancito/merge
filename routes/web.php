@@ -691,6 +691,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::any('/gestion-de-comprobantes-en-reparacion/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesEnReparacion');
+	Route::any('/ajax-buscar-documento-gestion-reparable-reporte', 'GestionUsuarioContactoController@actionListarAjaxBuscarDocumentoReparableReporte');
+	Route::any('/comprobante-reparacion-excel/{anio_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteEnReparacionExcel');
 
 
 

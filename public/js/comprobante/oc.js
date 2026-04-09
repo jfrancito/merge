@@ -635,6 +635,34 @@ $(document).ready(function(){
 
     });
 
+    $(".agestioncomprobante").on('click','.buscardocumentoreparablereporte', function(event) {
+
+        event.preventDefault();
+
+        var anio_id                 =   $('#anio_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        data            =   {
+                                _token                  : _token,
+                                anio_id                 : anio_id,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-gestion-reparable-reporte");
+
+    });
+
+    $(".agestioncomprobante").on('click','.descargardocumentoreparablereporte', function(event) {
+
+        var anio_id              =   $('#anio_id').val();
+        var idopcion             =   $('#idopcion').val();
+
+        href = $(this).attr('data-href')+'/'+anio_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+    });
+
 });
 
 
