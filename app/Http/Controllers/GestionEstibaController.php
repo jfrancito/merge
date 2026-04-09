@@ -2366,15 +2366,15 @@ class GestionEstibaController extends Controller
                         if($documento_top->IND_VARIAS_ENTREGAS==1){
 
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009','DCC0000000000015'])->get();
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009','DCC0000000000015','DCC0000000000012'])->get();
 
                         }else{
 
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009'])->get();
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009','DCC0000000000012'])->get();
 
                         }
-
+                        //dd($archivosdelfe);
                         //ARCHIVOS
                         DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$idoc)->delete();
                         foreach($archivosdelfe as $index=>$item){
@@ -2733,7 +2733,7 @@ class GestionEstibaController extends Controller
 
                             //FRANK
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000009'])->get();
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000009','DCC0000000000012'])->get();
 
 
                             //ARCHIVOS
