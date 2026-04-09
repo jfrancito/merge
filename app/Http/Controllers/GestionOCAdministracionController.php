@@ -4675,7 +4675,6 @@ class GestionOCAdministracionController extends Controller
 
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
-                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
 
