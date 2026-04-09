@@ -4657,11 +4657,10 @@ class GestionOCAdministracionController extends Controller
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc_actual($idop);
 
         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
-
         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
 
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Observar Comprobante');
 
@@ -4672,7 +4671,6 @@ class GestionOCAdministracionController extends Controller
 
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
-                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
 
@@ -4769,7 +4767,7 @@ class GestionOCAdministracionController extends Controller
                 //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }
-
+                //dd($fedocumento);
                 DB::commit();
 
                 Session::flash('operacion_id', 'LIQUIDACION_COMPRA_ANTICIPO');
