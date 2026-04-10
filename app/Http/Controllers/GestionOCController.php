@@ -2976,6 +2976,19 @@ class GestionOCController extends Controller
                     if ($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006') { //rioja o bellavista
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                             ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049', 'DCC0000000000046'])->get();
+                        if(count($contrato_pago)>0){
+                            if($contrato_pago->ID_DOCUMENTO == ''){
+                                $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
+
+                            }else{
+                                $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049', 'DCC0000000000046'])->get();
+                            }
+
+                        }
+
+
                     } else {
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                             ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
