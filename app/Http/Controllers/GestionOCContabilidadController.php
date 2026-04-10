@@ -1357,6 +1357,8 @@ class GestionOCContabilidadController extends Controller
             $detalleordencompra = $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
             $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idop)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
 
+
+
             $tp = CMPCategoria::where('COD_CATEGORIA', '=', $ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idop)->where('COD_ESTADO', '=', 1)
                 //->where('IND_OBLIGATORIO','=',1)
