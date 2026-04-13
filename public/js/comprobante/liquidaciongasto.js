@@ -1414,6 +1414,7 @@ $(document).ready(function () {
         }
     });
 
+    /*
     $('#tipo_documento_asiento').on('change', function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
@@ -1428,6 +1429,7 @@ $(document).ready(function () {
                 break;
         }
     });
+     */
 
     $("#tipo_cambio_asiento").on('change', function (e) {
 
@@ -1790,7 +1792,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -2109,7 +2111,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -2367,7 +2369,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -2598,7 +2600,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
