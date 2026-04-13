@@ -2919,7 +2919,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $combo_tipo_igv = $this->gn_generacion_combo_categoria('CONTABILIDAD_IGV', 'Seleccione tipo igv', '');
 
-            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '18' => '18%');
+            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '10.5' => '10.5%', '18' => '18%');
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
@@ -3009,6 +3009,16 @@ class GestionLiquidacionGastosController extends Controller
             $cabeceras = json_decode($request['cabecera'], true);
             $detalle_asiento = json_decode($request['detalle'], true);
             $generar = true;
+
+            return response()->json([
+                'status' => 'success',
+                'titulo' => 'ÉXITO',
+                'tipo' => 'green',
+                'boton' => 'btn-green',
+                'mensaje' => $mensaje,
+                'cabecera' => $cabeceras,
+                'detalle' => $detalle_asiento
+            ]);
 
             foreach ($cabeceras as $cabecera) {
 

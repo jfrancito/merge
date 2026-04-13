@@ -761,7 +761,7 @@ class GestionUsuarioContactoController extends Controller
         $anio_id            =   $request['anio_id'];
         $idopcion           =   $request['idopcion'];
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
-        
+
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
 
         $funcion                =   $this;
@@ -1572,6 +1572,7 @@ class GestionUsuarioContactoController extends Controller
 
                         foreach ($cabeceras as $cabecera) {
 
+                            /*
                             if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
                                 $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
@@ -1627,6 +1628,7 @@ class GestionUsuarioContactoController extends Controller
                             } else {
                                 break;
                             }
+                            */
 
                             $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                             $COD_EMPR = $cabecera['COD_EMPR'];
@@ -2097,7 +2099,7 @@ class GestionUsuarioContactoController extends Controller
 
             $combo_tipo_igv = $this->gn_generacion_combo_categoria('CONTABILIDAD_IGV', 'Seleccione tipo igv', '');
 
-            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '18' => '18%');
+            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '10.5' => '10.5%', '18' => '18%');
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
@@ -5324,7 +5326,7 @@ class GestionUsuarioContactoController extends Controller
             $usuario_mkt    = DB::table('SGD.USUARIO')
                         ->where('COD_USUARIO', $ordencompra->COD_USUARIO_CREA_AUD)
                         ->first();
-            
+
             if($usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
                 $area_mkt    = DB::table('CMP.CATEGORIA')
                             ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)
