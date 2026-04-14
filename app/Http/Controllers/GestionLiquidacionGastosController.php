@@ -3010,16 +3010,6 @@ class GestionLiquidacionGastosController extends Controller
             $detalle_asiento = json_decode($request['detalle'], true);
             $generar = true;
 
-            return response()->json([
-                'status' => 'success',
-                'titulo' => 'ÉXITO',
-                'tipo' => 'green',
-                'boton' => 'btn-green',
-                'mensaje' => $mensaje,
-                'cabecera' => $cabeceras,
-                'detalle' => $detalle_asiento
-            ]);
-
             foreach ($cabeceras as $cabecera) {
 
                 $COD_ASIENTO = $cabecera['COD_ASIENTO'];
