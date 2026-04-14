@@ -46,8 +46,7 @@
                 </div>
 			</div>
 		</div>
-
-
+	</div>
 
 @if(Session::has('listanegra'))
 <div class="modal fade" id="modalListaNegra" tabindex="-1" role="dialog" aria-labelledby="modalListaNegraLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -125,20 +124,19 @@
 @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
 <!-- Modal de Aviso Importante - Ultra Professional Edition (EXACT TEXT) -->
 <div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 950px;">
+    <div class="modal-dialog modal-lg modal-dialog-centered responsive-modal-width" role="document">
         <div class="modal-content shadow-premium border-0" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
             
             <div class="modal-header header-gradient text-white p-4" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: none;">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center w-100 justify-content-between">
                     <div>
-                        <h3 class="m-0 font-weight-bold" style="font-size: 20px; letter-spacing: -0.5px; color: #ffffff !important;">Nueva Funcionalidad: Planilla de Movilidad</h3>
+                        <h3 class="m-0 font-weight-bold" style="font-size: 18px; letter-spacing: -0.5px; color: #ffffff !important;">Nueva Funcionalidad: Planilla de Movilidad</h3>
                         <p class="m-0 small opacity-80" style="color: #ffffff !important; opacity: 0.9 !important;">Integración con Liquidación de Gastos</p>
                     </div>
+                    <button type="button" class="btn btn-warning btn-sm font-weight-bold d-none d-sm-block" data-dismiss="modal" style="border-radius: 8px; padding: 8px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        ENTENDIDO <i class="fa fa-times ml-1"></i>
+                    </button>
                 </div>
-                <button type="button" class="btn btn-confirm" data-dismiss="modal" aira-label="Close" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 700; padding: 10px 20px; font-size: 14px; outline: none; transition: all 0.3s; margin-top: -5px;">
-                    <span>ENTENDIDO, IR AL SISTEMA</span>
-                    <i class="fa fa-arrow-right ml-2"></i>
-                </button>
             </div>
 
 
@@ -146,35 +144,34 @@
                 
 
                 <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
-                    <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+                    <video id="videoAnuncio" controls playsinline webkit-playsinline preload="metadata" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
                         <source src="{{ asset('public/videos/video_planilla.mp4') }}" type="video/mp4">
                         Tu navegador no soporta la reproducción de videos.
                     </video>
                 </div>
 
-                <div class="p-5">
-                    <div class="premium-card border-accent-blue" style="border-top: 4px solid #3b82f6; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                        <h5 class="font-weight-bold text-dark mb-3" style="display: flex; align-items: center;">
+                <div class="px-5 py-4 responsive-px">
+                    <div class="premium-card border-accent-blue" style="border-top: 4px solid #3b82f6; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                        <h5 class="font-weight-bold text-dark mb-2" style="display: flex; align-items: center; font-size: 16px;">
                             <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-right: 12px;"></span>
                             ¿De qué trata esta actualización?
                         </h5>
-                        <p class="text-muted text-justify" style="font-size: 15px; line-height: 1.7; color: #475569;">
-                            <b>COMUNICADO:</b> Las planillas de movilidad que se generen desde el 1ero de Abril del 2026 estarán bajo esta nueva forma de <b>integrar automáticamente la Planilla de Movilidad a tus Liquidaciones de Gastos</b>. Este proceso optimizado permite vincular los gastos por movilidad local de manera directa, asegurando mayor precisión y rapidez en tus registros administrativos. 
-                            Tomar en cuenta que las planillas de movilidad generadas al 31 de Marzo del 2026 se mantienen en cargar con la planilla de movilidad consolidada.
+                        <p class="text-muted text-justify" style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 0;">
+                            <b>COMUNICADO:</b> Las planillas de movilidad generadas desde el <b>1ero de Abril del 2026</b> se integrarán automáticamente a tus <b>Liquidaciones de Gastos</b>. Este proceso brinda mayor precisión y rapidez en tus trámites.
                         </p>
                         
-                        <div class="mt-4 p-3 rounded" style="background: #f0f4ff; border: 1px solid #d9e2ff; color: #3f51b5; font-size: 13.5px; display: flex; align-items: flex-start;">
-                            <i class="fa fa-lightbulb-o mr-2" style="font-size: 18px; margin-top: 2px;"></i>
-                            <span><b>Tip:</b> Mira el video completo para aprender a utilizar esta herramienta y optimizar tus tiempos de rendición.</span>
+                        <div class="mt-3 p-3 rounded" style="background: #fff9c4; border: 1px solid #fff59d; color: #827717; font-size: 13px; display: flex; align-items: center;">
+                            <i class="fa fa-lightbulb-o mr-2" style="font-size: 18px;"></i>
+                            <span><b>Tip:</b> Mira el video completo para aprender a utilizar esta herramienta.</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer border-0 p-4 bg-white">
-                <button type="button" class="btn btn-confirm w-100 py-3" data-dismiss="modal" style="background: #1e293b; color: white; border-radius: 12px; font-weight: 700; letter-spacing: 0.5px; transition: all 0.3s;">
-                    <span>ENTENDIDO, CONTINUAR AL SISTEMA</span>
-                    <i class="fa fa-arrow-right ml-2"></i>
+                <button type="button" class="btn btn-warning-premium w-100 py-3" data-dismiss="modal">
+                    <span>ENTENDIDO, IR AL SISTEMA</span>
+                    <i class="fa fa-arrow-right ml-2 animate-bounce-right"></i>
                 </button>
             </div>
         </div>
@@ -390,6 +387,65 @@
     .opacity-60 { opacity: 0.6; }
     .opacity-80 { opacity: 0.8; }
     
+    .btn-warning-premium {
+        background: linear-gradient(135deg, #ffca28 0%, #ffa000 100%);
+        color: #1e293b !important;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        font-size: 18px;
+        box-shadow: 0 10px 20px -5px rgba(255, 160, 0, 0.5);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-transform: uppercase;
+    }
+    .btn-warning-premium:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -5px rgba(255, 160, 0, 0.6);
+        filter: brightness(1.05);
+        color: #000 !important;
+    }
+    .btn-warning-premium:active {
+        transform: translateY(-1px);
+    }
+    
+    .animate-bounce-right {
+        display: inline-block;
+        animation: bounce-right 1s infinite;
+    }
+    
+    @keyframes bounce-right {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(5px); }
+    }
+
+    /* Responsive Improvements for iPhone/Mobile */
+    .responsive-modal-width {
+        max-width: 750px;
+        margin: 1.75rem auto;
+    }
+
+    @media (max-width: 768px) {
+        .responsive-modal-width {
+            max-width: 95% !important;
+            margin: 10px auto !important;
+        }
+        .responsive-px {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+        .modal-header h3 {
+            font-size: 15px !important;
+        }
+        .btn-warning-premium {
+            font-size: 15px !important;
+            padding: 12px !important;
+        }
+        .premium-card {
+            padding: 15px !important;
+        }
+    }
+
     /* Scrollbar Styling */
     #modalAnuncioImportante .modal-body::-webkit-scrollbar { width: 6px; }
     #modalAnuncioImportante .modal-body::-webkit-scrollbar-track { background: #fafbfc; }
@@ -399,9 +455,6 @@
 @endif
 
 
-
-
-	</div>
 @stop 
 @section('script')
 
@@ -531,7 +584,7 @@
             }
         });
         // Forzar cierre de modalAnuncioImportante
-        $(document).on('click', '#modalAnuncioImportante .close, #modalAnuncioImportante .btn-confirm', function() {
+        $(document).on('click', '#modalAnuncioImportante [data-dismiss="modal"]', function() {
             $('#modalAnuncioImportante').modal('hide');
         });
 
