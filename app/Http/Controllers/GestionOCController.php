@@ -5157,7 +5157,7 @@ class GestionOCController extends Controller
 
 
                         $tiposerie = substr($factura->getserie(), 0, 1);
-                        if ($ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000007') {
+                        if ($ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000004') {
 
                             if ($tiposerie == 'E') {
                                 $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')

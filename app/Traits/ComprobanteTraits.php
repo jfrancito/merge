@@ -9690,6 +9690,8 @@ trait ComprobanteTraits
 
         }else{
 
+            //dd($centro_id);
+
             $listadatos         =       VMergeDocumentoPg::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
                                             $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOSPG.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
