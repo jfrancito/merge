@@ -1997,6 +1997,14 @@ class UserController extends Controller
 
 
 
+		//contrato anticipo
+		$url_obs_contratoa = '';
+		$urlcontratoa = '';
+		$count_x_aprobar_contratoa = 0;
+		$count_observados_contratoa = 0;
+		$count_observadoscontratoa_le = 0;
+
+
 		if ($trol->ind_uc == 1) {
 
 			$listadatos = $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
@@ -2122,9 +2130,13 @@ class UserController extends Controller
 				$urlnod = '/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_DEBITO';
 				$urloca = '/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA_ANTICIPO';
 				$urlcom = '/gestion-de-contabilidad-aprobar/g56?operacion_id=COMISION';
-
+				$urlcontratoa = '/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO_ANTICIPO';
 				$urllg = '/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
 				$urlrenta = '/gestion-de-aprobar-cuarta-categoria/YWp';
+
+
+
+
 				$listadatos = $this->pla_lista_renta_cuarta_categoria_contabilidad();
 				$count_x_aprobar_renta = count($listadatos);
 
@@ -2287,6 +2299,20 @@ class UserController extends Controller
 				$count_observadosoca_le = count($listadatosob);
 
 
+				//ORDEN_COMPRA_ANTICIPO
+				$operacion_id = 'CONTRATO_ANTICIPO';
+				$listadatos = $this->con_lista_cabecera_comprobante_contrato_total_cont($cod_empresa, $operacion_id);
+				$count_x_aprobar_contratoa = count($listadatos);
+
+				$lisadatosob = $this->con_lista_cabecera_comprobante_contratoa_total_cont_obs($cod_empresa, $operacion_id);
+				$count_observados_contratoa = count($lisadatosob);
+
+				$listadatosob = $this->con_lista_cabecera_comprobante_contratoa_total_cont_obs_levantadas($cod_empresa, $operacion_id);
+				$count_observadoscontratoa_le = count($listadatosob);
+
+
+
+
 				//COMISION
 				$operacion_id = 'COMISION';
 				$listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
@@ -2334,6 +2360,8 @@ class UserController extends Controller
 					$urlnoc = '/gestion-de-administracion-aprobar/j25?operacion_id=NOTA_CREDITO';
 					$urlnod = '/gestion-de-administracion-aprobar/j25?operacion_id=NOTA_DEBITO';
 					$urloca = '/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA_ANTICIPO';
+					$urlcontratoa = '/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO_ANTICIPO';
+
 
 
 					//documento interno compra
@@ -2476,6 +2504,18 @@ class UserController extends Controller
 					$listadatosob = $this->con_lista_cabecera_comprobante_oca_total_adm_obs_levantadas($cod_empresa, $operacion_id);
 					$count_observadosoca_le = count($listadatosob);
 
+					//CONTRATO_ANTICIPO
+					$operacion_id = 'CONTRATO_ANTICIPO';
+					$listadatos = $this->con_lista_cabecera_comprobante_contratoa_total_adm($cod_empresa, $operacion_id);
+					$count_x_aprobar_contratoa = count($listadatos);
+
+					$lisadatosob = $this->con_lista_cabecera_comprobante_contratoa_total_adm_obs($cod_empresa, $operacion_id);
+					$count_observados_contratoa = count($lisadatosob);
+
+					$listadatosob = $this->con_lista_cabecera_comprobante_contratoa_total_adm_obs_levantadas($cod_empresa, $operacion_id);
+					$count_observadoscontratoa_le = count($listadatosob);
+
+
 					//LIQUIDACION DE OMPRA ANTIPIO
 					$operacion_id = 'LIQUIDACION_COMPRA_ANTICIPO';
 					$listadatos = $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa, $operacion_id);
@@ -2543,6 +2583,7 @@ class UserController extends Controller
 		if (count($trabajador) > 0) {
 			$centro = $trabajador->COD_ZONA_TIPO;
 		}
+
 		return View::make(
 			'bienvenido',
 			[
@@ -2577,6 +2618,13 @@ class UserController extends Controller
 				'count_observados_oca' => $count_observados_oca,
 				'count_observadosoca_le' => $count_observadosoca_le,
 				'urloca' => $urloca,
+
+				'count_x_aprobar_contratoa' => $count_x_aprobar_contratoa,
+				'count_observados_contratoa' => $count_observados_contratoa,
+				'count_observadoscontratoa_le' => $count_observadoscontratoa_le,
+				'urlcontratoa' => $urlcontratoa,
+
+
 
 				'urlcom' => $urlcom,
 				'count_x_aprobar_com' => $count_x_aprobar_com,

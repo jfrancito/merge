@@ -251,7 +251,7 @@ $(document).ready(function(){
                     var item = { data_requerimiento_id: data_requerimiento_id };
 
                     // Solo para DOCUMENTO_INTERNO_COMPRA agregamos input_mergetotal
-                    if(operacion === 'DOCUMENTO_INTERNO_COMPRA' || operacion === 'ORDEN_COMPRA_ANTICIPO' ){
+                    if(operacion === 'DOCUMENTO_INTERNO_COMPRA' || operacion === 'ORDEN_COMPRA_ANTICIPO'  || operacion === 'CONTRATO_ANTICIPO'){
                         var total                       = parseFloat($(this).attr('data_total'));
                         var totalmerge                  = parseFloat($(this).attr('data_mergetotal'));
                         var totalmax                    = total-totalmerge;
@@ -283,7 +283,7 @@ $(document).ready(function(){
                 total                       = parseFloat($(this).attr('data_total'));
                 if($(check).is(':checked')){
 
-                    if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA' || $('#operacion_sel').val() === 'ORDEN_COMPRA_ANTICIPO'){
+                    if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA' || $('#operacion_sel').val() === 'ORDEN_COMPRA_ANTICIPO' || $('#operacion_sel').val() === 'CONTRATO_ANTICIPO'){
                         var input_mergetotal                       = parseFloat($(this).find('.input_mergetotal').val()) || 0;
                         data_total = input_mergetotal;
                     }

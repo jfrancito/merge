@@ -541,6 +541,7 @@ class GestionUsuarioContactoController extends Controller
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO',
                                         'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
 
                                     );
 
@@ -588,6 +589,10 @@ class GestionUsuarioContactoController extends Controller
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_observados_moca($cod_empresa);
             }else{
+
+            if($operacion_id=='CONTRATO_ANTICIPO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_observados_mcontratoa($cod_empresa);
+            }else{
                 if($operacion_id=='CONTRATO'){
                     $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_contrato($cod_empresa);
                 }else{
@@ -610,7 +615,10 @@ class GestionUsuarioContactoController extends Controller
                             }
                         }
                     }
-                }
+                } 
+            }
+
+
             }
 
         }
@@ -3119,7 +3127,7 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $empresa                =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-
+            //dd($empresa);
             $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
             $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();

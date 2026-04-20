@@ -429,7 +429,8 @@ class GestionOCValidadoController extends Controller
                                         'PROVISION_GASTO' => 'PROVISION DE GASTO',
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO',
-                                        'ORDEN_COMPRA_ANTICIPO'         => 'ORDEN COMPRA ANTICIPO',
+                                        'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
 
                                     );
 
@@ -492,6 +493,9 @@ class GestionOCValidadoController extends Controller
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
             }else{
+                if($operacion_id=='CONTRATO_ANTICIPO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                }else{
                 if($operacion_id=='CONTRATO'){
                     $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
                 }else{
@@ -513,7 +517,13 @@ class GestionOCValidadoController extends Controller
                             }
                         }
                     }
-                }              
+                }    
+                }
+
+
+
+
+
             }
         }
 

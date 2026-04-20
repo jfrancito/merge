@@ -4,6 +4,10 @@
   @if($operacion_id == 'ORDEN_COMPRA_ANTICIPO')
     @include('comprobante.ajax.alistacontabilidadestibaoca')
   @else
+  @if($operacion_id == 'CONTRATO_ANTICIPO')
+    @include('comprobante.ajax.alistacontabilidadestibacontratoa')
+  @else
+
     @if($operacion_id == 'CONTRATO')
       @include('comprobante.ajax.alistacontabilidadcontrato')
     @else
@@ -37,8 +41,13 @@
           @endif
         @endif
       @endif
-
     @endif
+
+
+  @endif
+
+
+
   @endif
 
 @endif
