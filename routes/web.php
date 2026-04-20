@@ -555,13 +555,24 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');
 	Route::any('/select-xml-estiba-documento-interno-compra/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstibaDocumentoInternoCompra');
 	Route::any('/select-xml-estiba-orden-compra-anticipo/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstibaOrdenCompraAnticipo');
+
+	Route::any('/select-xml-estiba-contrato-anticipo/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstibaContratoAnticipo');
+
+
 	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');
 	Route::any('/detalle-comprobante-estiba-administrator-compra-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministratorCompraAnticipo');
+
+	Route::any('/detalle-comprobante-estiba-administrator-contrato-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministratorContratoAnticipo');
+
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	Route::any('/subir-xml-cargar-datos-estiba-administrator-orden-compra-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministratorOrdenCompraAnticipo');
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
 	Route::any('/validar-xml-oc-estiba-administrator-oca/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministratorOCA');
+	Route::any('/validar-xml-oc-estiba-administrator-contratoa/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministratorCONTRATOA');	
 
+
+
+	Route::any('/subir-xml-cargar-datos-estiba-administrator-contrato-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministratorContratoAnticipo');
 
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
 	Route::any('/ajax-eliminar-lote-estiba', 'GestionEstibaController@actionEliminacionLoteEstiba');
@@ -768,6 +779,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');
 	Route::any('/aprobar-comprobante-contabilidad-estiba-oca/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaOca');
+	Route::any('/aprobar-comprobante-contabilidad-estiba-contratoa/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaContratoa');
+
+	Route::any('/aprobar-comprobante-contabilidad-estiba-contratoa/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaContratoa');
+
 
 	Route::any('/ajax-modal-activo-fijo-categoria', 'GestionOCContabilidadController@actionAjaxModalActivoFijoCategoria');
 	Route::any('/registrar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}', 'GestionOCContabilidadController@actionRegistrarActivoFijoCategoria');
@@ -828,12 +843,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-estiba-acopio/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarExtornoEstibaAcopio');
 
 	Route::any('/aprobar-comprobante-administracion-oca/{idopcion}/{linea}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionOCA');
+	Route::any('/aprobar-comprobante-administracion-contratoa/{idopcion}/{linea}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionCONTRATOA');
+
 
 	Route::any('/agregar-extorno-administracion-oc-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionOCMoca');
 	Route::any('/agregar-observacion-administracion-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionMoca');
 	Route::any('/observacion-comprobante-uc-estiba-oca/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstibaMoca');
 
-
+	Route::any('/agregar-observacion-administracion-mcontratoa/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionMContratoa');
+	Route::any('/agregar-extorno-administracion-oc-mcontratoa/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionContratooca');
 
 
 	Route::any('/agregar-observacion-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracion');
