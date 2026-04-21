@@ -25,7 +25,7 @@
                           </div>
 
 
-                          <div class="form-group">
+                          <div class="form-group" style="display:none;">
                             <label class="col-sm-12 control-label labelleft" >Documento :</label>
                             <div class="col-sm-12 abajocaja" >
                               {!! Form::select( 'documento_id', $combodocumento, array($documento_id),
@@ -42,7 +42,7 @@
                       <div class="col-sm-12">
                           <div class="form-group">
                               <label class="col-sm-12 control-label labelleft" >Archivo :</label>
-                              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
+                              <div style="display:none;" class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
                                   <input name="inputxml" id='inputxml' class="form-control inputxml" type="file" accept="text/xml" />
                               </div>
                               <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">

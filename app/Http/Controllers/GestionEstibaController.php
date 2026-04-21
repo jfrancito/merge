@@ -2439,7 +2439,9 @@ class GestionEstibaController extends Controller
         $documento_id           =   'DCC0000000000002';
 
         $combotipodocumento     =   array('CON_CPE' => 'CON CPE','SIN_CPE' => 'SIN_CPE');
-        $tipodocumento_id       =   'CON_CPE';
+        $combotipodocumento     =   array('SIN_CPE' => 'SIN_CPE');
+
+        $tipodocumento_id       =   'SIN_CPE';
 
         $funcion                =   $this;
 
@@ -3658,6 +3660,15 @@ class GestionEstibaController extends Controller
                         $fereftop1                          =   FeRefAsoc::where('lote','=',$idoc)->first();
                         $monto_detraccion                   =   0;
                         $cant_rentencion                    =   0;
+
+                        if($ordencompra->CAN_DETRACCION>0){
+                            $monto_detraccion                   =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                        }
+                        if($ordencompra->CAN_RETENCION>0){
+                            $cant_rentencion                    =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                        }
+
+
                         $empresa_sel                        =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
                         $codigo = $ordencompra->COD_DOCUMENTO_CTBLE;
@@ -3738,7 +3749,7 @@ class GestionEstibaController extends Controller
                         $documento_top                      =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
                         $archivosdelfe                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000012','DCC0000000000009'])->get();
+                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000026'])->get();
 
 
                         DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$idoc)->delete();
@@ -3821,6 +3832,14 @@ class GestionEstibaController extends Controller
                             $fereftop1                          =   FeRefAsoc::where('lote','=',$idoc)->first();
                             $monto_detraccion                   =   0;
                             $cant_rentencion                    =   0;
+
+                            if($ordencompra->CAN_DETRACCION>0){
+                                $monto_detraccion                   =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                            }
+                            if($ordencompra->CAN_RETENCION>0){
+                                $cant_rentencion                    =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                            }
+
 
 
                             //REGISTRO DEL XML LEIDO

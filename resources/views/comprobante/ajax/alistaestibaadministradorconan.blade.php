@@ -31,7 +31,7 @@
       <span class="tooltiptext">Lotes</span>
       <span class="icon mdi mdi-eye"></span>
     </a>
-    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones migrarestibaadmin">
+    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones migrarestibaadmincont">
       <span class="tooltiptext">Registrar</span>
       <span class="icon mdi mdi-collection-image"></span>
     </a>
