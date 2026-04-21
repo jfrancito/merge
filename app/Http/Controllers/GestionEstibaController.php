@@ -2634,7 +2634,7 @@ class GestionEstibaController extends Controller
                 $rutaorden           =  $rutafila;
             } 
         }
-
+        $rutaorden                  =   "";
         //dd($rutaorden);
 
 
