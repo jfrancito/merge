@@ -210,6 +210,61 @@ $(document).ready(function(){
     });
 
 
+    $(".agestioncomprobante").on('click','.migrarestibaadmincont', function() {
+        event.preventDefault();
+        $('input[type=search]').val('').change();
+        $("#nso").DataTable().search("").draw();
+        data = dataenviar();
+        data55 = dataenviar55des();
+        if(data55>0){alerterrorajax('El monto maximo para integrar es '+data55); return false;}
+        debugger;
+
+        if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        debugger;
+        if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA' || $('#operacion_sel').val() === 'ORDEN_COMPRA_ANTICIPO'){
+            if(data[0].data_mergetotal>data[0].data_totalmax){alerterrorajax('TOTAL MERGE debe ser menor o igual q el TOTAL: '+data[0].data_totalmax); return false;}    
+        }
+
+        var datastring = JSON.stringify(data);
+
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+        $('#jsondocumenos').val(datastring);
+        $('#formre').submit();
+
+    });
+
+
+    function dataenviar55des(){
+        var ind = 0;
+        var operacion = $('#operacion_sel').val(); // obtenemos el tipo de operación
+
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check                       = $(this).find('.input_asignar');
+                data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+                data_lote                   = $(this).attr('data_lote');                
+                if($(check).is(':checked')){
+                    // objeto base
+                    var item = { data_requerimiento_id: data_requerimiento_id };
+
+                        var totalmerge = parseFloat($(this).attr('data_total'));
+                        var input_mergetotal = parseFloat($(this).find('.input_mergetotal').val()) || 0;    
+
+                        var porcentaje = 55;
+                        var total_50 = (100*input_mergetotal)/totalmerge;
+                        var total_50_max = (porcentaje*totalmerge)/100;
+                        debugger;
+                        if(total_50>porcentaje){
+                            ind = total_50_max;
+                        }
+                }
+            }
+        });
+        return ind;
+    }
+
     $(".agestioncomprobante").on('click','.migrarestibaadmin', function() {
         event.preventDefault();
         $('input[type=search]').val('').change();
