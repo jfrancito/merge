@@ -9138,12 +9138,11 @@ trait ComprobanteTraits
                                             $query->where('FOLIO', '=', '');
                                             $query->orWhereNull('FOLIO');
                                         })
-                                        //->where('CMP.Orden.COD_ORDEN','=','IIRJCE0000001231')
+                                        ->where('CMP.Orden.COD_ORDEN','=','IILMIX0000000072')
                                         ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                         ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                                         ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.Orden.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                        //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
                                         ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)

@@ -72,14 +72,29 @@
           </tr>
 
           <tr>
+            <td><b>IMPORTE</b></td>
+            <td><p class='subtitulomerge'>{{number_format($fedocumento->TOTAL_VENTA_SOLES, 4, '.', ',')}}</p></td>
+          </tr>
+
+          <tr>
             <td><b>DETRACCION</b></td>
-            <td  colspan="2" class=""><b>{{$fedocumento->MONTO_DETRACCION_RED}}</b></td>
+            <td  colspan="2" class=""><p class='subtitulomerge' style="font-weight: bold;">
+              <b>{{$fedocumento->MONTO_DETRACCION_RED}}</b></p></td>
           </tr>
 
           <tr>
             <td><b>RETENCION IGV</b></td>
-            <td  colspan="2" class=""><b>{{$fedocumento->MONTO_RETENCION}}</b></td>
+            <td  colspan="2" class=""><p class='subtitulomerge' style="font-weight: bold;"><b>{{$fedocumento->MONTO_RETENCION}}</b></p></td>
           </tr>
+      
+          <tr>
+            <td><b>TOTAL A PAGAR</b></td>
+            <td><p class='subtitulomerge' style="font-size:18px;font-weight: bold;color: #4285f4;">
+              {{number_format($fedocumento->TOTAL_VENTA_SOLES - $fedocumento->MONTO_DETRACCION_RED-$fedocumento->MONTO_RETENCION, 4, '.', ',')}}
+            </p></td>
+          </tr>
+
+
       </tbody>
     </table>
   </div>

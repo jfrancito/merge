@@ -3126,12 +3126,14 @@ class GestionEstibaController extends Controller
 
                         $monto_detraccion                   =   0;
                         $cant_rentencion                    =   0;
-                        // if($ordencompra->CAN_DETRACCION>0){
-                        //     $monto_detraccion                   =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
-                        // }
-                        // if($ordencompra->CAN_RETENCION>0){
-                        //     $cant_rentencion                    =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
-                        // }
+
+                        if($ordencompra->CAN_DETRACCION>0){
+                            $monto_detraccion                   =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                        }
+                        if($ordencompra->CAN_RETENCION>0){
+                            $cant_rentencion                    =   $fereftop1->TOTAL_MERGE * ($ordencompra->CAN_DSCTO/100); 
+                        }
+
                         $empresa_sel          =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_CLIENTE)->first();
 
                         //dd($ordencompra);
