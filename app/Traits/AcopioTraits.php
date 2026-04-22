@@ -68,6 +68,7 @@ trait AcopioTraits
                             ->leftJoin('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                             ->select(DB::raw('FE_DOCUMENTO.*,ALM.CENTRO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                            ->where('STD.EMPRESA.COD_ESTADO','=',1)
                             ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -81,7 +82,6 @@ trait AcopioTraits
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
                             ->get();
-
 
 
         return  $listadatos;
