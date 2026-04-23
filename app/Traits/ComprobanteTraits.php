@@ -3152,7 +3152,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_ap','asc')
 
                             ->get();
 
