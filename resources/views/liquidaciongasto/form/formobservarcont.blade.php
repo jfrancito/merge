@@ -120,11 +120,11 @@
                 data-aw="2"></textarea>
     </div>
 </div>
-
+{{--
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     @include('comprobante.asiento.contenedorasientoreparablelg')
 </div>
-
+--}}
 <input type="hidden" id="tipo_operacion_reparable" name="tipo_operacion_reparable" value=""/>
 <input type="hidden" id="operacion_reparable" name="operacion_reparable" value=""/>
 
