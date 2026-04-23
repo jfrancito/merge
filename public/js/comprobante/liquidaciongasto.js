@@ -1696,7 +1696,8 @@ $(document).ready(function () {
     });
 
     $(".btn-guardar-asiento").on('click', function (e) {
-
+        abrircargando();
+        debugger;
         e.preventDefault();
         let _token = $('#token').val();
         let operacion = $('#operacion').val();
@@ -1905,6 +1906,8 @@ $(document).ready(function () {
 
         $('.pnlasientos').hide();
         $('.pnldetallesdocumentos').focus();
+
+        cerrarcargando();
     })
 
     $("#porcentaje_detraccion").on('keypress keyup keydown change', function (e) {
@@ -3936,7 +3939,7 @@ $(document).ready(function () {
         let _token = $('#token').val();
 
         debugger;
-
+        /*
         if ($checkbox.is(':checked')) {
             // Obtenemos los datos de la fila seleccionada
             let idDocumento = $fila.attr('data_id');
@@ -3987,7 +3990,7 @@ $(document).ready(function () {
             // Si se desmarca, ocultamos el formulario
             $contenedorForm.hide();
             $('#tblobservacionesreparable').focus();
-        }
+        }*/
     });
 
     $('.btnobservarcomporbatnte').on('click', function (event) {
