@@ -3061,6 +3061,25 @@ class GestionOCContabilidadController extends Controller
 
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
             $funciones = $this;
+
+
+
+            ///////////////////ANTICIPO MERGE
+            $ocas =     DB::table('FE_REF_ASOC')
+                        ->where('ID_DOCUMENTO', $idoc)
+                        ->where('COD_ESTADO', 1)
+                        ->pluck('LOTE')
+                        ->toArray();
+            //ANTICIPO
+            $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+                ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                ->get();
+            ///////////////////ANTICIPO MERGE
+
+
             return View::make('comprobante/aprobarcon',
                 [
                     'fedocumento' => $fedocumento,
@@ -3069,7 +3088,7 @@ class GestionOCContabilidadController extends Controller
                     'trabajador' => $trabajador,
                     'documentoscompra' => $documentoscompra,
                     'ordencompra_f' => $ordencompra_f,
-
+                    'lista_anticipo_merge' => $lista_anticipo_merge,
                     'documentoscomprarepable' => $documentoscomprarepable,
                     'comboreparable' => $comboreparable,
 
@@ -8449,6 +8468,23 @@ class GestionOCContabilidadController extends Controller
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
             $funciones = $this;
 
+
+            
+            ///////////////////ANTICIPO MERGE
+            $ocas =     DB::table('FE_REF_ASOC')
+                        ->where('ID_DOCUMENTO', $idoc)
+                        ->where('COD_ESTADO', 1)
+                        ->pluck('LOTE')
+                        ->toArray();
+            //ANTICIPO
+            $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+                ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                ->get();
+            ///////////////////ANTICIPO MERGE
+
             return View::make('comprobante/aprobarconcontrato',
                 [
                     'fedocumento' => $fedocumento,
@@ -8457,7 +8493,7 @@ class GestionOCContabilidadController extends Controller
 
                     'detalleordencompra' => $detalleordencompra,
                     'archivospdf' => $archivospdf,
-
+                    'lista_anticipo_merge' => $lista_anticipo_merge,
                     'trabajador' => $trabajador,
                     'documentoscompra' => $documentoscompra,
                     'totalarchivos' => $totalarchivos,

@@ -70,124 +70,8 @@
                   @include('comprobante.form.ordencompra.comparar')
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                  <div class="panel panel-default panel-contrast">
-                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INFORMACION DEL DOCUMENTO
-                    </div>
-                    <div class="panel-body panel-body-contrast">
+                  @include('comprobante.form.ordencompra.informacion')
 
-                                        <div class="tab-container">
-                                          <ul class="nav nav-tabs">
-                                            <li class="active"><a href="#oc" data-toggle="tab">ORDEN COMPRA</a></li>
-                                            <li><a href="#xml" data-toggle="tab">XML</a></li>
-                                          </ul>
-                                          <div class="tab-content">
-                                            <div id="oc" class="tab-pane active cont">
-
-                                                  <table class="table table-condensed table-striped">
-                                                    <thead>
-                                                      <tr>
-                                                        <th>Codigo Orden</th>
-                                                        <th>Fecha Orden</th>      
-                                                        <th>Proveedor</th>       
-                                                        <th>Total</th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                          <td>{{$ordencompra->COD_ORDEN}}</td>
-                                                          <td>{{$ordencompra->FEC_ORDEN}}</td>
-                                                          <td>{{$ordencompra->TXT_EMPR_CLIENTE}}</td>
-                                                          <td>{{$ordencompra->CAN_TOTAL}}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                  </table>
-
-
-                                                
-                                                <table class="table table-condensed table-striped">
-                                                    <thead>
-                                                      <tr>
-                                                        <th>Codigo Producto</th>
-                                                        <th>Nombre Producto</th>
-                                                        <th>Unidad</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Precio</th>
-                                                        <th>Total</th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-
-                                                       @foreach($detalleordencompra as $index => $item)  
-                                                          <tr>
-                                                            <td>{{$item->COD_PRODUCTO}}</td>
-                                                            <td>{{$item->TXT_NOMBRE_PRODUCTO}}</td>
-                                                            <td>{{$item->UNID_MED}}</td>
-
-                                                            <td>{{number_format($item->CAN_PRODUCTO, 4, '.', ',')}}</td>
-                                                            <td>{{number_format($item->CAN_PRECIO_UNIT_IGV, 4, '.', ',')}}</td>
-                                                            <td>{{number_format($item->CAN_VALOR_VENTA_IGV, 4, '.', ',')}}</td>
-
-                                                          </tr>
-                                                        @endforeach
-
-                                                    </tbody>
-                                                </table>
-
-                                            </div>
-                                            <div id="xml" class="tab-pane cont">
-
-                                                  <table class="table table-condensed table-striped">
-                                                    <thead>
-                                                      <tr>
-                                                        <th>Serie</th>
-                                                        <th>Numero</th>      
-                                                        <th>Fecha Emision</th>       
-                                                        <th>Forma Pago</th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                          <td>{{$fedocumento->SERIE}}</td>
-                                                          <td>{{$fedocumento->NUMERO}}</td>
-                                                          <td>{{$fedocumento->FEC_VENTA}}</td>
-                                                          <td>{{$fedocumento->FORMA_PAGO}}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                  </table>
-
-
-                                                <table class="table table-condensed table-striped">
-                                                    <thead>
-                                                      <tr>
-                                                        <th>Codigo Producto</th>
-                                                        <th>Nombre Producto</th>
-                                                        <th>Unidad</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Precio</th>
-                                                        <th>Total</th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                       @foreach($detallefedocumento as $index => $item)  
-                                                          <tr>
-                                                            <td>{{$item->CODPROD}}</td>
-                                                            <td>{{$item->PRODUCTO}}</td>
-                                                            <td>{{$item->UND_PROD}}</td>
-                                                            <td>{{number_format($item->CANTIDAD, 4, '.', ',')}}</td>
-                                                            <td>{{number_format($item->PRECIO_ORIG, 4, '.', ',')}}</td>
-                                                            <td>{{number_format($item->VAL_VENTA_ORIG, 4, '.', ',')}}</td>
-                                                          </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-
-
-                                            </div>
-
-                                          </div>
-                                        </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -368,7 +252,7 @@
                                       @if($rutaorden != '')
                                         <div><b>LA ORDEN DE COMPRA SE CARGARA DESPUES DE GUARDAR</b></div><br>
                                       @else
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
                                               @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
@@ -388,7 +272,7 @@
                                       @endif
                                     @else
                                       @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion">
+                                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 autodetraccion">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;">
                                               <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
@@ -408,7 +292,7 @@
                                           </div>
                                         </div>
                                       @ELSE
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
                                               @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
@@ -460,7 +344,11 @@
                                       </div>
 
 
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte 
+                                                    @if((float)$monto_anticipo<=0) ocultar @endif
+                                                    @if(count($lista_anticipo_merge)>0) ocultar @endif
+                                                    ">
                                           <div class="form-group">
                                             <label class="col-sm-12 control-label labelleft" >
                                               <div class="tooltipfr"><b>Aplicar Anticipo </b>
