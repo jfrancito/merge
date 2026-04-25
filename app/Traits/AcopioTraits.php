@@ -70,7 +70,7 @@ trait AcopioTraits
                             ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                             //->where('STD.EMPRESA.COD_ESTADO','=',1)
                             ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
-                            ->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00008272')
+                            //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00008272')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
                                 $query->where('ind_observacion', '<>', 1)
