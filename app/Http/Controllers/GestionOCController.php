@@ -6271,7 +6271,7 @@ class GestionOCController extends Controller
                 }
 
 
-                $MONTO_ANTICIPO_DESC = $MONTO_ANTICIPO_DESC + $total_anticipo_t;
+                //$MONTO_ANTICIPO_DESC = $MONTO_ANTICIPO_DESC + $total_anticipo_t;
 
                 FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
@@ -6282,7 +6282,7 @@ class GestionOCController extends Controller
                             'ARCHIVO_CDR' => '',
                             'ARCHIVO_PDF' => '',
 
-                            'MONTO_ANTICIPO_DESC' => $MONTO_ANTICIPO_DESC,
+                            //'MONTO_ANTICIPO_DESC' => $MONTO_ANTICIPO_DESC,
                             'COD_ANTICIPO' => $COD_ANTICIPO,
                             'SERIE_ANTICIPO' => $SERIE_ANTICIPO,
                             'NRO_ANTICIPO' => $NRO_ANTICIPO,
