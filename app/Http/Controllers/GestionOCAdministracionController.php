@@ -2805,13 +2805,29 @@ class GestionOCAdministracionController extends Controller
             $funciones = $this;
 
 
+            ///////////////////ANTICIPO MERGE
+            $ocas =     DB::table('FE_REF_ASOC')
+                        ->where('ID_DOCUMENTO', $idoc)
+                        ->where('COD_ESTADO', 1)
+                        ->pluck('LOTE')
+                        ->toArray();
+            //ANTICIPO
+            $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+                ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                ->get();
+            ///////////////////ANTICIPO MERGE
+
+
             return View::make('comprobante/aprobaradm',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'empresa_relacionada'   =>  $empresa_relacionada,
                                 'ordensalida'           =>  $ordensalida,
-
+                                'lista_anticipo_merge'  =>  $lista_anticipo_merge,
 
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),
@@ -3847,7 +3863,20 @@ class GestionOCAdministracionController extends Controller
                 ];
             }
 
-
+            ///////////////////ANTICIPO MERGE
+            $ocas =     DB::table('FE_REF_ASOC')
+                        ->where('ID_DOCUMENTO', $idoc)
+                        ->where('COD_ESTADO', 1)
+                        ->pluck('LOTE')
+                        ->toArray();
+            //ANTICIPO
+            $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+                ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                ->get();
+            ///////////////////ANTICIPO MERGE
 
             $funciones = $this;
 
@@ -3858,7 +3887,7 @@ class GestionOCAdministracionController extends Controller
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),
 
-
+                                'lista_anticipo_merge'                 =>  $lista_anticipo_merge,
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,

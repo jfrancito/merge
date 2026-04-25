@@ -23,6 +23,10 @@
 
             <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
               @include('comprobante.form.ordencompra.informacion')
+                  @if(count($lista_anticipo_merge)>0)
+                    @include('comprobante.form.ordencompra.anticipomerge')
+                  @endif
+              
             </div>
           </div>
 

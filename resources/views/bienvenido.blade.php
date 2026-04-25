@@ -539,18 +539,26 @@
     $(document).ready(function() {
         // Abrir modal automáticamente
         setTimeout(function() {
+            var anuncioVisto = sessionStorage.getItem('anuncio_importante_visto');
+
             if ($('#modalListaNegra').length > 0) {
                 $('#modalListaNegra').modal('show');
                 
                 @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
-                    // Esperar a que se cierre el primero para mostrar el segundo
-                    $('#modalListaNegra').on('hidden.bs.modal', function () {
-                        $('#modalAnuncioImportante').modal('show');
-                    });
+                    if (!anuncioVisto) {
+                        // Esperar a que se cierre el primero para mostrar el segundo
+                        $('#modalListaNegra').on('hidden.bs.modal', function () {
+                            $('#modalAnuncioImportante').modal('show');
+                            sessionStorage.setItem('anuncio_importante_visto', 'true');
+                        });
+                    }
                 @endif
             } else {
                 @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
-                    $('#modalAnuncioImportante').modal('show');
+                    if (!anuncioVisto) {
+                        $('#modalAnuncioImportante').modal('show');
+                        sessionStorage.setItem('anuncio_importante_visto', 'true');
+                    }
                 @endif
             }
         }, 1000);

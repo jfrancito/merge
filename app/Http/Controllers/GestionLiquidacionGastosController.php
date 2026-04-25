@@ -582,9 +582,15 @@ class GestionLiquidacionGastosController extends Controller
         $departamento = $response_array['departamento'] ?? 'LAMBAYEQUE';
         $provincia = $response_array['departamento'] ?? 'CHICLAYO';
         $distrito = $response_array['departamento'] ?? 'CHICLAYO';
-
         $direccion = $response_array['direccion'] ?? 'CHICLAYO';
+        $distrito = '';
 
+
+        if($distrito==''){
+            $provincias = CMPCategoria::where('TXT_GRUPO', '=', 'PROVINCIA')->where('NOM_CATEGORIA', '=', $provincia)->first();
+            $distritos = CMPCategoria::where('TXT_GRUPO', '=', 'DISTRITO')->where('COD_CATEGORIA_SUP', '=', $provincias->COD_CATEGORIA)->first();
+            $distrito = $distritos->NOM_CATEGORIA;
+        }
 
         if (isset($response_array['success'])) {
             return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No se encontraron resultados.');

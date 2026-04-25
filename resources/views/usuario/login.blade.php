@@ -199,6 +199,8 @@
       $(document).ready(function(){
         App.init();
         $('form').parsley();
+        // Limpiar flag de anuncio al cargar el login para que se muestre en la nueva sesión
+        sessionStorage.removeItem('anuncio_importante_visto');
       });
     </script>
 
