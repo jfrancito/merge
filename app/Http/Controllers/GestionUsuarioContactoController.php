@@ -4462,6 +4462,36 @@ class GestionUsuarioContactoController extends Controller
                          ]);
     }
 
+    public function actionListarAjaxBuscarDocumentoUC(Request $request)
+    {
+
+        $operacion_id = $request['operacion_id'];
+        $idopcion = $request['idopcion'];
+
+        $tab_id = 'oc';
+
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
+        }else{
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_contrato_uc($cod_empresa);
+        }
+        //dd($listadatos);
+        $procedencia = 'ADM';
+        $funcion = $this;
+        return View::make('comprobante/ajax/mergelistausuariocontacto',
+            [
+                'operacion_id' => $operacion_id,
+                'idopcion' => $idopcion,
+                'tab_id' => $tab_id,
+                'cod_empresa' => $cod_empresa,
+                'listadatos' => $listadatos,
+                'procedencia' => $procedencia,
+                'ajax' => true,
+                'funcion' => $funcion
+            ]);
+    }
+
     public function actionListarPreAprobarUsuarioContacto($idopcion,Request $request)
     {
 

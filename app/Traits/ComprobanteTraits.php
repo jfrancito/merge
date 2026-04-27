@@ -8452,7 +8452,7 @@ trait ComprobanteTraits
     }
 
     private function array_rol_contrato() {
-        $array = ['1CIX00000003','1CIX00000008','1CIX00000005'];
+        $array = ['1CIX00000003','1CIX00000008','1CIX00000005','1CIX00000045'];
         return $array;
     }
 
