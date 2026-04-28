@@ -382,7 +382,7 @@
                                           <label class="col-sm-12 control-label labelleft" ><b>Monto de Detracion (*):</b></label>
                                           <div class="col-sm-12 abajocaja" >
                                               <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" 
-                                              value = '0'>
+                                              value = '{{$fedocumento->MONTO_DETRACCION}}'>
                                           </div>
                                         </div>
                                       </div>
