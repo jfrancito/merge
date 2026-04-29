@@ -27,6 +27,17 @@ var App = (function () {
             }]
         });
 
+
+        $("#divsaldos").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "250px",
+            ordering: false,
+        });
+
+
         $("#nsovales").dataTable({
             dom: 'Bfrtip',
             buttons: [
