@@ -51,12 +51,53 @@ use Hashids;
 Use Nexmo;
 use Keygen;
 use SoapClient;
+use Normalizer;
 use Carbon\Carbon;
 
 trait ComprobanteTraits
 {
 
-
+    public function normalizarParaServidor($nombre)
+    {
+        // En tu servidor de archivos, la "í" está como "i" + acento combinado (U+0301)
+        // Convertimos a la forma descompuesta (NFD)
+        if (function_exists('normalizer_normalize')) {
+            // Normalizar a forma descompuesta (acentos separados pero en forma correcta)
+            $nombre = normalizer_normalize($nombre, Normalizer::FORM_D);
+        }
+        
+        // Reemplazar caracteres específicos si es necesario
+        $nombre = str_replace('á', "a\xCC\x81", $nombre); // a + acento combinado
+        $nombre = str_replace('é', "e\xCC\x81", $nombre); // e + acento combinado
+        $nombre = str_replace('í', "i\xCC\x81", $nombre); // i + acento combinado
+        $nombre = str_replace('ó', "o\xCC\x81", $nombre); // o + acento combinado
+        $nombre = str_replace('ú', "u\xCC\x81", $nombre); // u + acento combinado
+        
+        return $nombre;
+    }
+    public function normalizarNombreArchivo_2($nombre)
+    {
+        // Caso específico: "energi´a" -> "energía"
+        $nombre = str_replace('i´a', 'ía', $nombre);
+        $nombre = str_replace('a´', 'á', $nombre);
+        $nombre = str_replace('e´', 'é', $nombre);
+        $nombre = str_replace('i´', 'í', $nombre);
+        $nombre = str_replace('o´', 'ó', $nombre);
+        $nombre = str_replace('u´', 'ú', $nombre);
+        
+        // Mayúsculas
+        $nombre = str_replace('A´', 'Á', $nombre);
+        $nombre = str_replace('E´', 'É', $nombre);
+        $nombre = str_replace('I´', 'Í', $nombre);
+        $nombre = str_replace('O´', 'Ó', $nombre);
+        $nombre = str_replace('U´', 'Ú', $nombre);
+        $nombre = str_replace('N´', 'Ñ', $nombre);
+        
+        // Eliminar cualquier acento suelto que quede
+        $nombre = str_replace('´', '', $nombre);
+        
+        return $nombre;
+    }
     public function con_array_canjes() {
         $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
         return $array;
