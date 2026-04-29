@@ -2799,7 +2799,7 @@ class GestionOCAdministracionController extends Controller
                 ];
             }
 
-            //dd($initialPreviewConfig);
+
 
 
             $funciones = $this;

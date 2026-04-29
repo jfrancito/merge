@@ -139,6 +139,8 @@ class GestionOCAcopioController extends Controller
             $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_levantadas_cen($cod_empresa,$operacion_id,$centro_id);
         }
    
+
+
         $procedencia        =   'CONT';
         $funcion                =   $this;
         return View::make('acopio/ajax/mergelistaareaacopio',
