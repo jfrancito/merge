@@ -3187,7 +3187,7 @@ class GestionOCContabilidadController extends Controller
 
             }
         }
-        return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se actualizo Informacion');
+        return back()->with('bienhecho', 'Se actualizo Informacion');
     }
 
     public function actionRefrescarSunatContrato($idopcion, $linea, $prefijo, $idordencompra, Request $request)
