@@ -131,6 +131,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/guardar-cambio-reparable/{orden_id}/{idopcion}', 'UserController@actionGuardarCambiarReparable');
 
 
+    Route::any('/gestion-de-reporte-saldo-div/{idopcion}', 'ReporteDIVSaldosController@actionListarDivSaldos');
+    Route::any('/ajax-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldos');
+    Route::any('/descargar-archivo-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldosExcel');
+
 
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
