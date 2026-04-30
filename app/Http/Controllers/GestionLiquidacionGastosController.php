@@ -6091,6 +6091,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $empresa = DB::table('STD.EMPRESA')
                 ->where('NRO_DOCUMENTO', $dni)
+                ->where('COD_ESTADO','=','1')
                 ->first();
 
 
@@ -6226,7 +6227,7 @@ class GestionLiquidacionGastosController extends Controller
             $nombre = trim($partes[1]);
         }
 
-
+        //dd($empresa_id);
         $combo_cuenta = $this->lg_combo_cuenta_moneda("Seleccione una Cuenta", "", "TCO0000000000069", $centro_id, $empresa_id, $moneda_sel_id);
         //$combo_cuenta           =   $this->lg_combo_cuenta_lg_moneda('Seleccione una Cuenta','','',$centro_id,$empresa_id,$moneda_sel_id);
 
