@@ -4176,6 +4176,7 @@ class GestionOCController extends Controller
             ->get();
         ///////////////////ANTICIPO MERGE
 
+        //dd($lista_anticipo_merge);
 
         return View::make(
             'comprobante/registrocomprobanteadministrator',
