@@ -123,7 +123,7 @@
 
 @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
 <!-- Modal de Aviso Importante - Ultra Professional Edition (EXACT TEXT) -->
-<div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
+<!-- <div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
     <div class="modal-dialog modal-lg modal-dialog-centered responsive-modal-width" role="document">
         <div class="modal-content shadow-premium border-0" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
             
@@ -176,7 +176,7 @@
             </div>
         </div>
     </div>
-</div> 
+</div>  -->
 
 
 <style>
