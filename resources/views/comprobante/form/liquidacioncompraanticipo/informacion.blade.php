@@ -35,7 +35,7 @@
                                                       <tr>
                                                         <th>Codigo Producto</th>
                                                         <th>Nombre Producto</th>
-                                                        <th>Unidad</th>
+
                                                         <th>Cantidad</th>
                                                         <th>Precio</th>
                                                         <th>Total</th>
@@ -47,7 +47,7 @@
                                                           <tr>
                                                             <td>{{$item->COD_PRODUCTO}}</td>
                                                             <td>{{$item->TXT_NOMBRE_PRODUCTO}}</td>
-                                                            <td>{{$item->producto->unidadmedida->TXT_ABREVIATURA}}</td>
+
 
                                                             <td>{{number_format($item->CAN_PRODUCTO, 4, '.', ',')}}</td>
                                                             <td>{{number_format($item->CAN_PRECIO_UNIT_IGV, 4, '.', ',')}}</td>

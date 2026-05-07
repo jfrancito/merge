@@ -235,4 +235,23 @@ class ReporteComprobanteController extends Controller
 
 
 
+    public function actionComprobanteEnReparacionExcel($anio_id,$idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_actual           =   date("Y-m-d");
+        $titulo                 =   'Comprobantes-En-Reparacion';
+        $funcion                =   $this;
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
+
+        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+            $excel->sheet('REPARACIÓN', function($sheet) use ($listadatos,$titulo,$funcion) {
+                $sheet->loadView('reporte/excel/listareparacionreporte')->with('listadatos',$listadatos)
+                                                                   ->with('titulo',$titulo)
+                                                                   ->with('funcion',$funcion);                                               
+            });
+        })->export('xls');
+    }
 }

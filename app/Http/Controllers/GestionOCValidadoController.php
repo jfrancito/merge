@@ -429,7 +429,8 @@ class GestionOCValidadoController extends Controller
                                         'PROVISION_GASTO' => 'PROVISION DE GASTO',
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO',
-                                        'ORDEN_COMPRA_ANTICIPO'         => 'ORDEN COMPRA ANTICIPO',
+                                        'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
 
                                     );
 
@@ -492,6 +493,9 @@ class GestionOCValidadoController extends Controller
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
             }else{
+                if($operacion_id=='CONTRATO_ANTICIPO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                }else{
                 if($operacion_id=='CONTRATO'){
                     $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
                 }else{
@@ -513,7 +517,13 @@ class GestionOCValidadoController extends Controller
                             }
                         }
                     }
-                }              
+                }    
+                }
+
+
+
+
+
             }
         }
 
@@ -654,12 +664,27 @@ class GestionOCValidadoController extends Controller
                                     ->where('COD_ESTADO', 1)
                                     ->first();
 
-
+        ///////////////////ANTICIPO MERGE
+        $ocas =     DB::table('FE_REF_ASOC')
+                    ->where('ID_DOCUMENTO', $idoc)
+                    ->where('COD_ESTADO', 1)
+                    ->pluck('LOTE')
+                    ->toArray();
+        //ANTICIPO
+        $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+            ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            ->where('FE_REF_ASOC.COD_ESTADO', 1)
+            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->get();
+        ///////////////////ANTICIPO MERGE
 
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidadocontrato',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'lista_anticipo_merge'           =>  $lista_anticipo_merge,
+                            
                             'transferencia'         =>  $transferencia,
                             'transferencia_doc'     =>  $transferencia_doc,
                             'detalleordencompra'    =>  $detalleordencompra,
@@ -1285,11 +1310,27 @@ class GestionOCValidadoController extends Controller
         }    
         $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+        ///////////////////ANTICIPO MERGE
+        $ocas =     DB::table('FE_REF_ASOC')
+                    ->where('ID_DOCUMENTO', $idoc)
+                    ->where('COD_ESTADO', 1)
+                    ->pluck('LOTE')
+                    ->toArray();
+        //ANTICIPO
+        $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+            ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            ->where('FE_REF_ASOC.COD_ESTADO', 1)
+            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->get();
+        ///////////////////ANTICIPO MERGE
 
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidado',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'lista_anticipo_merge'           =>  $lista_anticipo_merge,
+
                             'archivospdf'           =>  $archivospdf,
                             'ordeningreso'          =>  $ordeningreso,
                             'detalleordencompra'    =>  $detalleordencompra,

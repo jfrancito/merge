@@ -781,6 +781,8 @@ class GestionOCController extends Controller
             'NOTA_CREDITO' => 'NOTA DE CREDITO',
             'NOTA_DEBITO' => 'NOTA DE DEBITO',
             'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+            'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
+
         );
 
         $cod_empresa = Session::get('usuario')->usuarioosiris_id;
@@ -992,38 +994,37 @@ class GestionOCController extends Controller
                 if ($operacion_id == 'CONTRATO') {
                     $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
                 } else {
-
-                    if ($operacion_id == 'PROVISION_GASTO') {
-                        $listadatos = $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
-                    } else {
-
-                        if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {
-                            $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
+                if ($operacion_id == 'CONTRATO_ANTICIPO') {
+                    $listadatos = $this->con_lista_cabecera_contrato_administrativo_anticipo($cod_empresa);
+                } else {
+                        if ($operacion_id == 'PROVISION_GASTO') {
+                            $listadatos = $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
                         } else {
-                            if ($operacion_id == 'NOTA_CREDITO') {
-                                $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
+                            if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {
+                                $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
                             } else {
-                                if ($operacion_id == 'NOTA_DEBITO') {
-                                    $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
+                                if ($operacion_id == 'NOTA_CREDITO') {
+                                    $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
                                 } else {
-                                    if (in_array($operacion_id, $array_canjes)) {
-                                        $categoria_id = $this->con_categoria_canje($operacion_id);
+                                    if ($operacion_id == 'NOTA_DEBITO') {
+                                        $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
+                                    } else {
+                                        if (in_array($operacion_id, $array_canjes)) {
+                                            $categoria_id = $this->con_categoria_canje($operacion_id);
 
-                                        if ($operacion_id == 'DOCUMENTO_INTERNO_COMPRA') {
-                                            $listadatos = $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
-                                        } else {
-                                            $listadatos = $this->con_lista_cabecera_estibas_administrativo($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
+                                            if ($operacion_id == 'DOCUMENTO_INTERNO_COMPRA') {
+                                                $listadatos = $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
+                                            } else {
+                                                $listadatos = $this->con_lista_cabecera_estibas_administrativo($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
+                                            }
                                         }
+
                                     }
-
                                 }
+
                             }
-
                         }
-
-
-                    }
-
+                    } 
                 }
             }
         }
@@ -2675,6 +2676,24 @@ class GestionOCController extends Controller
         }
         $comboant = array('' => "Seleccione Anticipo") + $arrayitem;
 
+
+        ///////////////////ANTICIPO MERGE
+        $ocas =     DB::table('FE_REF_ASOC')
+                    ->where('ID_DOCUMENTO', $idoc)
+                    ->where('COD_ESTADO', 1)
+                    ->pluck('LOTE')
+                    ->toArray();
+        //ANTICIPO
+        $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+            ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            ->where('FE_REF_ASOC.COD_ESTADO', 1)
+            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->get();
+        ///////////////////ANTICIPO MERGE
+
+
+
         return View::make(
             'comprobante/registrocomprobantecontratoadministrator',
             [
@@ -2687,7 +2706,7 @@ class GestionOCController extends Controller
                 'ordencompra_f' => $ordencompra_f,
                 'fedocumento_x' => $fedocumento_x,
 
-
+                'lista_anticipo_merge' => $lista_anticipo_merge,
                 'comboant' => $comboant,
                 'monto_anticipo' => $monto_anticipo,
 
@@ -2885,10 +2904,17 @@ class GestionOCController extends Controller
         // Nombre del archivo que estás buscando
         $nombreArchivoBuscado = $idop . '.xml';
         $liquidacion = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+
         $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR . '-04-' . $liquidacion->NRO_SERIE . '-' . $liquidacion->NRO_DOC . '.xml';
+
+
         if ($ordenpago->COD_CENTRO == 'CEN0000000000004' or $ordenpago->COD_CENTRO == 'CEN0000000000006') {
             if ($ordenpago->COD_CENTRO == 'CEN0000000000006') {
                 $sourceFile = '\\\\10.1.9.43\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
+            }
+            if ($ordenpago->COD_CENTRO == 'CEN0000000000004') {
+                //dd($nombreArchivoBuscado);
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
             }
             if ($ordenpago->COD_CENTRO == 'CEN0000000000002') {
                 $sourceFile = '\\\\10.1.4.201\\cpe\\Liquidacion\\' . $nombreArchivoBuscado;
@@ -2929,6 +2955,7 @@ class GestionOCController extends Controller
             ->first();
 
         //DD($contrato_pago);
+        //$ingresoliq_id = "NO";
         if(count($contrato_pago)>0){
             if($contrato_pago->PESO_ENTREGA>0){
                 $ingresoliq_id = "SI";
@@ -2967,7 +2994,20 @@ class GestionOCController extends Controller
                 } else {
                     if ($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006') { //rioja o bellavista
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
-                            ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
+                            ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049', 'DCC0000000000046'])->get();
+                        if(count($contrato_pago)>0){
+                            if($contrato_pago->ID_DOCUMENTO == ''){
+                                $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
+
+                            }else{
+                                $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049', 'DCC0000000000046'])->get();
+                            }
+
+                        }
+
+
                     } else {
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                             ->whereIn('COD_CATEGORIA', ['DCC0000000000041', 'DCC0000000000043', 'DCC0000000000045', 'DCC0000000000049'])->get();
@@ -4121,6 +4161,22 @@ class GestionOCController extends Controller
         $arraygrupo = DB::table('FE_GRUPO_DOCUMENTO')->pluck('NOMBRE', 'ID_DOCUMENTO')->toArray();
         $combogrupo = array('' => "Seleccione Grupo") + $arraygrupo;
 
+        ///////////////////ANTICIPO MERGE
+        $ocas =     DB::table('FE_REF_ASOC')
+                    ->where('ID_DOCUMENTO', $idoc)
+                    ->where('COD_ESTADO', 1)
+                    ->pluck('LOTE')
+                    ->toArray();
+        //ANTICIPO
+        $lista_anticipo_merge = DB::table('FE_REF_ASOC')
+            ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            ->where('FE_REF_ASOC.COD_ESTADO', 1)
+            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->get();
+        ///////////////////ANTICIPO MERGE
+
+        //dd($lista_anticipo_merge);
 
         return View::make(
             'comprobante/registrocomprobanteadministrator',
@@ -4131,7 +4187,7 @@ class GestionOCController extends Controller
                 'combogrupo' => $combogrupo,
                 'monto_anticipo' => $monto_anticipo,
                 'comboant' => $comboant,
-
+                'lista_anticipo_merge' => $lista_anticipo_merge,
                 'eliminadodoc' => $eliminadodoc,
                 'combobancos' => $combobancos,
                 'ordencompra_f' => $ordencompra_f,
@@ -4318,6 +4374,41 @@ class GestionOCController extends Controller
                     $cant_rentencion_cuarta = $ordencompra_t->CAN_IMPUESTO_RENTA;
                     $cant_perception = $ordencompra_t->CAN_PERCEPCION;
 
+
+                    $idoc = $ordencompra->COD_ORDEN;
+                    ///////////////////ANTICIPO MERGE
+                    $ocas =     DB::table('FE_REF_ASOC')
+                                ->where('ID_DOCUMENTO', $idoc)
+                                ->where('COD_ESTADO', 1)
+                                ->pluck('LOTE')
+                                ->toArray();
+
+                    if (count($ocas) > 0) {
+                        $estados = ['ETM0000000000003', 'ETM0000000000004'];
+                        $documento_camino = DB::table('FE_DOCUMENTO')
+                            ->whereIn('ID_DOCUMENTO', $ocas)
+                            ->whereIn('COD_ESTADO', $estados)
+                            ->first();
+                        if (count($documento_camino) > 0) {
+                            return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion ' . $documento_camino->ID_DOCUMENTO);
+                        }
+                    }
+
+                    //ANTICIPO
+                    $ANTIPOC_OC = DB::table('FE_REF_ASOC')
+                        ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                        ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                        ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                        ->select(DB::raw('SUM(FE_DOCUMENTO.TOTAL_VENTA_ORIG) as total'))
+                        ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                        ->first();
+
+                    $total_anticipo_t = $ANTIPOC_OC->total ?? 0;
+                    ///////////////////ANTICIPO MERGE
+
+                    //dd($total_anticipo_t);
+
+
                     //REGISTRO DEL XML LEIDO
                     $documento = new FeDocumento;
                     $documento->ID_DOCUMENTO = $ordencompra->COD_ORDEN;
@@ -4366,7 +4457,7 @@ class GestionOCController extends Controller
                     //$documento->OBSERVACION             =   $factura->getobservacion();
                     $documento->NRO_ORDEN_COMP = $factura->getcompra();
                     $documento->NUM_GUIA = $factura->getguiaEmbebida();
-
+                    $documento->MONTO_ANTICIPO_DESC = $total_anticipo_t;
 
                     $documento->estadoCp = 0;
                     $documento->ARCHIVO_XML = $nombrefile;
@@ -4403,9 +4494,6 @@ class GestionOCController extends Controller
                     $dcontrol->FECHA_CREA = $this->fechaactual;
                     $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
                     $dcontrol->save();
-
-
-
 
 
                     /**********DETALLE*********/
@@ -4678,7 +4766,7 @@ class GestionOCController extends Controller
                         ->where('ID_TIPO_DOC', '=', $tipo_documento_le)
                         ->first();
                     if (count($fedocumento_e) > 0) {
-                        return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        //return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                     }
 
                     //VALIDAR QUE EL XML SEA DE LA EMPRESA
@@ -4696,6 +4784,40 @@ class GestionOCController extends Controller
                     //$cant_perception                    =   $factura->getperception();
                     $cant_perception = 0;
                     $cant_rentencion = 0;
+
+
+
+                    $idoc = $ordencompra->COD_DOCUMENTO_CTBLE;
+                    ///////////////////ANTICIPO MERGE
+                    $ocas =     DB::table('FE_REF_ASOC')
+                                ->where('ID_DOCUMENTO', $idoc)
+                                ->where('COD_ESTADO', 1)
+                                ->pluck('LOTE')
+                                ->toArray();
+
+                    if (count($ocas) > 0) {
+                        $estados = ['ETM0000000000003', 'ETM0000000000004'];
+                        $documento_camino = DB::table('FE_DOCUMENTO')
+                            ->whereIn('ID_DOCUMENTO', $ocas)
+                            ->whereIn('COD_ESTADO', $estados)
+                            ->first();
+                        if (count($documento_camino) > 0) {
+                            return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion ' . $documento_camino->ID_DOCUMENTO);
+                        }
+                    }
+
+                    //ANTICIPO
+                    $ANTIPOC_OC = DB::table('FE_REF_ASOC')
+                        ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                        ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                        ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $ocas)
+                        ->select(DB::raw('SUM(FE_DOCUMENTO.TOTAL_VENTA_ORIG) as total'))
+                        ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                        ->first();
+
+                    $total_anticipo_t = $ANTIPOC_OC->total ?? 0;
+                    ///////////////////ANTICIPO MERGE
+
 
 
                     //REGISTRO DEL XML LEIDO
@@ -4744,7 +4866,7 @@ class GestionOCController extends Controller
                     //$documento->OBSERVACION             =   $factura->getobservacion();
                     $documento->NRO_ORDEN_COMP = $factura->getcompra();
                     $documento->NUM_GUIA = $factura->getguiaEmbebida();
-
+                    $documento->MONTO_ANTICIPO_DESC = $total_anticipo_t;
 
                     $documento->estadoCp = 0;
                     $documento->ARCHIVO_XML = $nombrefile;
@@ -5136,7 +5258,7 @@ class GestionOCController extends Controller
 
 
                         $tiposerie = substr($factura->getserie(), 0, 1);
-                        if ($ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000007') {
+                        if ($ordencompra->COD_CATEGORIA_MOTIVO_EMISION == 'MEM0000000000004') {
 
                             if ($tiposerie == 'E') {
                                 $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
@@ -5801,34 +5923,23 @@ class GestionOCController extends Controller
                 $procedencia = $request['procedencia'];
                 $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
 
-
-
-                //VALIDAR QUE LAS OC NO TENGAN UN ANTICIPO EN SEGUIMIENTO
-                $ocas = DB::table('FE_REF_ASOC')
-                    ->where('ID_DOCUMENTO', $idoc)
-                    ->where('COD_ESTADO', 1)
-                    ->first();
+                 ///////////////////ANTICIPO MERGE
+                $ocas =     DB::table('FE_REF_ASOC')
+                            ->where('ID_DOCUMENTO', $idoc)
+                            ->where('COD_ESTADO', 1)
+                            ->pluck('LOTE')
+                            ->toArray();
                 if (count($ocas) > 0) {
                     $estados = ['ETM0000000000003', 'ETM0000000000004'];
                     $documento_camino = DB::table('FE_DOCUMENTO')
-                        ->where('ID_DOCUMENTO', $ocas->LOTE)
+                        ->whereIn('ID_DOCUMENTO', $ocas)
                         ->whereIn('COD_ESTADO', $estados)
                         ->first();
                     if (count($documento_camino) > 0) {
-                        return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion ' . $ocas->LOTE);
+                        return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion ' . $documento_camino->ID_DOCUMENTO);
                     }
                 }
-
-                //ANTICIPO
-                $ANTIPOC_OC = DB::table('FE_REF_ASOC')
-                    ->select(DB::raw('SUM(FE_REF_ASOC.TOTAL_MERGE) as total'))
-                    ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
-                    ->where('FE_REF_ASOC.ID_DOCUMENTO', 'IILMCL0000002235')
-                    ->where('FE_REF_ASOC.COD_ESTADO', 1)
-                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
-                    ->first();
-
-                $total_anticipo_t = $ANTIPOC_OC->total ?? 0;
+                ///////////////////ANTICIPO MERGE
 
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
@@ -6161,7 +6272,7 @@ class GestionOCController extends Controller
                 }
 
 
-                $MONTO_ANTICIPO_DESC = $MONTO_ANTICIPO_DESC + $total_anticipo_t;
+                //$MONTO_ANTICIPO_DESC = $MONTO_ANTICIPO_DESC + $total_anticipo_t;
 
                 FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
@@ -6172,7 +6283,7 @@ class GestionOCController extends Controller
                             'ARCHIVO_CDR' => '',
                             'ARCHIVO_PDF' => '',
 
-                            'MONTO_ANTICIPO_DESC' => $MONTO_ANTICIPO_DESC,
+                            //'MONTO_ANTICIPO_DESC' => $MONTO_ANTICIPO_DESC,
                             'COD_ANTICIPO' => $COD_ANTICIPO,
                             'SERIE_ANTICIPO' => $SERIE_ANTICIPO,
                             'NRO_ANTICIPO' => $NRO_ANTICIPO,
@@ -6408,6 +6519,27 @@ class GestionOCController extends Controller
                 $bancocategoria = CMPCategoria::where('COD_CATEGORIA', '=', $entidadbanco_id)->first();
 
                 $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
+
+
+
+                 ///////////////////ANTICIPO MERGE
+                $ocas =     DB::table('FE_REF_ASOC')
+                            ->where('ID_DOCUMENTO', $idoc)
+                            ->where('COD_ESTADO', 1)
+                            ->pluck('LOTE')
+                            ->toArray();
+                if (count($ocas) > 0) {
+                    $estados = ['ETM0000000000003', 'ETM0000000000004'];
+                    $documento_camino = DB::table('FE_DOCUMENTO')
+                        ->whereIn('ID_DOCUMENTO', $ocas)
+                        ->whereIn('COD_ESTADO', $estados)
+                        ->first();
+                    if (count($documento_camino) > 0) {
+                        return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion ' . $documento_camino->ID_DOCUMENTO);
+                    }
+                }
+                ///////////////////ANTICIPO MERGE
+
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
                 $filescdr = $request['DCC0000000000004'];

@@ -8,9 +8,7 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-contrato-administrator/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
-
-
+                      <input type="hidden" name="device_info" id='device_info'>
                       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
 
                           <div class="form-group">
@@ -75,7 +73,7 @@
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-oc-contrato-administrator/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+              <input type="hidden" name="device_info" id='device_info'>
 
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
@@ -146,9 +144,7 @@
                               <td>
                                 <div class='subtitulomerge @if($fedocumento->ind_formapago == 1) msjexitoso @else msjerror @endif'>
                                   {{$fedocumento->FORMA_PAGO}}
-<!--                                   @if($tp->CODIGO_SUNAT == 'CRE')
-                                    A {{$fedocumento->FORMA_PAGO_DIAS}} DIAS
-                                  @endif -->
+
                                 </div>
                               </td>
                             </tr>
@@ -286,6 +282,10 @@
                                         </div>
                     </div>
                   </div>
+                  @if(count($lista_anticipo_merge)>0)
+                    @include('comprobante.form.ordencompra.anticipomerge')
+                  @endif
+
                 </div>
               </div>
 
@@ -553,7 +553,9 @@
                                       </div>
 
 
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte 
+                                          @if((float)$monto_anticipo<=0) ocultar @endif
+                                          @if(count($lista_anticipo_merge)>0) ocultar @endif">
                                           <div class="form-group">
                                             <label class="col-sm-12 control-label labelleft" >
                                               <div class="tooltipfr"><b>Aplicar Anticipo </b>

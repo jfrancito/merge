@@ -1414,6 +1414,7 @@ $(document).ready(function () {
         }
     });
 
+    /*
     $('#tipo_documento_asiento').on('change', function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
@@ -1428,6 +1429,7 @@ $(document).ready(function () {
                 break;
         }
     });
+     */
 
     $("#tipo_cambio_asiento").on('change', function (e) {
 
@@ -1694,7 +1696,8 @@ $(document).ready(function () {
     });
 
     $(".btn-guardar-asiento").on('click', function (e) {
-
+        abrircargando();
+        debugger;
         e.preventDefault();
         let _token = $('#token').val();
         let operacion = $('#operacion').val();
@@ -1790,7 +1793,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -1903,6 +1906,8 @@ $(document).ready(function () {
 
         $('.pnlasientos').hide();
         $('.pnldetallesdocumentos').focus();
+
+        cerrarcargando();
     })
 
     $("#porcentaje_detraccion").on('keypress keyup keydown change', function (e) {
@@ -2109,7 +2114,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -2367,7 +2372,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -2598,7 +2603,7 @@ $(document).ready(function () {
                             } else {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
+                        } else {
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                             } else {
@@ -3934,7 +3939,7 @@ $(document).ready(function () {
         let _token = $('#token').val();
 
         debugger;
-
+        /*
         if ($checkbox.is(':checked')) {
             // Obtenemos los datos de la fila seleccionada
             let idDocumento = $fila.attr('data_id');
@@ -3985,7 +3990,7 @@ $(document).ready(function () {
             // Si se desmarca, ocultamos el formulario
             $contenedorForm.hide();
             $('#tblobservacionesreparable').focus();
-        }
+        }*/
     });
 
     $('.btnobservarcomporbatnte').on('click', function (event) {

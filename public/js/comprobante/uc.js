@@ -115,6 +115,24 @@ $(document).ready(function () {
 
     });
 
+
+
+    $(".asientomodelo").on('click','.buscardocumentoadmin', function() {
+
+        event.preventDefault();
+
+        var operacion_id            =   $('#operacion_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        data            =   {
+                                _token                  : _token,
+                                operacion_id            : operacion_id,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-gestion-uc");
+
+    });
     $("#tipo_cambio_asiento_reparable").on('change', function (e) {
 
         let moneda = $('#moneda_asiento_reparable').val();
@@ -1673,6 +1691,7 @@ $(document).ready(function () {
         }
     });
 
+    /*
     $('#tipo_documento_asiento').on('change', function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
@@ -1686,6 +1705,7 @@ $(document).ready(function () {
                 break;
         }
     });
+     */
 
     $(document).on('click', ".ver-asiento", function (e) {
         e.preventDefault();
@@ -3322,7 +3342,7 @@ $(document).ready(function () {
         var grupo                   =   $('#grupo_data').val();
         var grupo_id           =   $('#grupo_id').val();
         if(grupo>0){
-            if(grupo_id ==''){ alerterrorajax("Seleeccione un grupo"); return false;}            
+            if(grupo_id ==''){ alerterrorajax("Seleeccione un grupo"); return false;}
         }
 
 

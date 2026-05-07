@@ -375,18 +375,19 @@ trait UserTraits
             $listadocumentosdet = DB::table('vcorreoplaconsolidadodet')->select('*')
                 ->where('emailcorp', '=', $item->emailcorp)
                 ->get();
-
+            //dd($listadocumentosdet);
             $array = array(
                 'item' => $item,
                 'listadocumentosdet' => $listadocumentosdet
             );
 
             Mail::send('emails.consolidadoplanilladet', $array, function ($message) use ($emailfrom, $item, $correocc) {
-                $message->from($emailfrom->correoprincipal, 'SU ATENCION INMEDIATA: CARGAR PLANILLAS DE MOVILIDAD A FEBRERO 2026');
+                $message->from($emailfrom->correoprincipal, 'MERGE: SUBIR DE FORMA INMEDIATA PLANILLA DE MOVILIDAD CONSOLIDADO EL EJERCICIO 2026.');
                 //$message->to($correocc);
                 $message->to($correocc)->cc('avisos.ia@induamerica.com.pe');
-                $message->subject('Planilla de Movilidad Pendientes consolidar');
+                $message->subject('Planilla de Movilidad Pendientes Consolidar');
             });
+            //dd("hola");
 
         }
         print ("Se envio correctamente");

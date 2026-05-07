@@ -22,6 +22,7 @@
         </td>
         <td class="cell-detail">
           <span><b>PROVEEDOR:</b> {{$item->TXT_PROVEEDOR}}</span>
+          <span><b>APROBO CONTRATO:</b> {{$item->TXT_USUARIO_CON_APRUEBA}}</span>
           <span class="cell-detail-description"><b>SEDE:</b> {{$item->TXT_CENTRO}}</span>
         </td>
         <td class="cell-detail">

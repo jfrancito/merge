@@ -44,8 +44,8 @@ $(document).ready(function(){
                 $('#distritopartida_id').val(district_code).trigger('change.select2');
                 $('#lugarpartida').val(location);
                 $('.nav-tabs a[href="#registro"]').tab('show');
-            }, 1000);
-        }, 1000);
+            }, 2000);
+        }, 2000);
 
 
     });
@@ -68,8 +68,8 @@ $(document).ready(function(){
                 $('#distritollegada_id').val(district_code).trigger('change.select2');
                 $('#lugarllegada').val(location);
                 $('.nav-tabs a[href="#registro"]').tab('show');
-            }, 1000);
-        }, 1000);
+            }, 2000);
+        }, 2000);
 
 
     });

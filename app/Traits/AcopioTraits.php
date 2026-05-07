@@ -60,7 +60,11 @@ trait AcopioTraits
 
         $listadatos     =   FeDocumento::join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
                             ->leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            ->leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                            //->leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                            ->leftJoin('STD.EMPRESA', function ($join){
+                                $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                                ->where('STD.EMPRESA.COD_ESTADO','=',1);
+                            })
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'),
@@ -68,7 +72,9 @@ trait AcopioTraits
                             ->leftJoin('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                             ->select(DB::raw('FE_DOCUMENTO.*,ALM.CENTRO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                            //->where('STD.EMPRESA.COD_ESTADO','=',1)
                             ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
+                            //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00008272')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
                                 $query->where('ind_observacion', '<>', 1)
@@ -82,8 +88,7 @@ trait AcopioTraits
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
                             ->get();
 
-
-
+        //DD($listadatos);
         return  $listadatos;
     }
 
@@ -124,6 +129,8 @@ trait AcopioTraits
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
                             ->get();
+
+                            //dd($listadatos);
 
         return  $listadatos;
     }

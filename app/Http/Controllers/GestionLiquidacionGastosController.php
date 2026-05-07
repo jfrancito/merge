@@ -582,9 +582,15 @@ class GestionLiquidacionGastosController extends Controller
         $departamento = $response_array['departamento'] ?? 'LAMBAYEQUE';
         $provincia = $response_array['departamento'] ?? 'CHICLAYO';
         $distrito = $response_array['departamento'] ?? 'CHICLAYO';
-
         $direccion = $response_array['direccion'] ?? 'CHICLAYO';
+        $distrito = '';
 
+
+        if($distrito==''){
+            $provincias = CMPCategoria::where('TXT_GRUPO', '=', 'PROVINCIA')->where('NOM_CATEGORIA', '=', $provincia)->first();
+            $distritos = CMPCategoria::where('TXT_GRUPO', '=', 'DISTRITO')->where('COD_CATEGORIA_SUP', '=', $provincias->COD_CATEGORIA)->first();
+            $distrito = $distritos->NOM_CATEGORIA;
+        }
 
         if (isset($response_array['success'])) {
             return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No se encontraron resultados.');
@@ -2919,7 +2925,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $combo_tipo_igv = $this->gn_generacion_combo_categoria('CONTABILIDAD_IGV', 'Seleccione tipo igv', '');
 
-            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '18' => '18%');
+            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '10.5' => '10.5%', '18' => '18%');
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
@@ -4122,7 +4128,14 @@ class GestionLiquidacionGastosController extends Controller
                         ->first();
                     $diasarendir = 1;
                     if (count($arendri) > 0) {
-                        $diasarendir = $arendri->AUMENTO_DIAS ?? 0;;
+                        $diasarendir = $arendri->AUMENTO_DIAS ?? 0;
+                    }
+                    //lista negra
+                    $listanegra = DB::table('LISTA_NEGRA')
+                        ->where('ID_DOCUMENTO', $trabajadorap->NRO_DOCUMENTO)
+                        ->first();
+                    if (count($listanegra) > 0) {
+                        $diasarendir = $diasarendir + 3;
                     }
 
                     //solo 2 dias
@@ -6078,6 +6091,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $empresa = DB::table('STD.EMPRESA')
                 ->where('NRO_DOCUMENTO', $dni)
+                ->where('COD_ESTADO','=','1')
                 ->first();
 
 
@@ -6213,7 +6227,7 @@ class GestionLiquidacionGastosController extends Controller
             $nombre = trim($partes[1]);
         }
 
-
+        //dd($empresa_id);
         $combo_cuenta = $this->lg_combo_cuenta_moneda("Seleccione una Cuenta", "", "TCO0000000000069", $centro_id, $empresa_id, $moneda_sel_id);
         //$combo_cuenta           =   $this->lg_combo_cuenta_lg_moneda('Seleccione una Cuenta','','',$centro_id,$empresa_id,$moneda_sel_id);
 

@@ -67,6 +67,11 @@
                             <b>CARGAR XML</b>
                         </div>
                     @else
+                      @if($fedocumento->OPERACION_DET == 'SIN_XML')
+                        <div class="col-sm-12">
+                            <b>SIN XML</b>
+                        </div>
+                      @else
                         <div class="col-sm-12">
                             <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
                             <p style="margin:0px;" class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado Comprobante</b> : 
@@ -76,6 +81,7 @@
                             <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
                             <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
                         </div>
+                      @endif
                     @endif
                 </div>
               </div>
@@ -187,84 +193,7 @@
                   </div>
                 </div>
               </div>
-              @if($fedocumento->OPERACION_DET == 'SIN_XML')
-<!--               <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                  <div class="panel panel-default panel-contrast">
-                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS DE LA FACTURA
-                    </div>
-                    <div class="panel-body panel-body-contrast">
-                            <div class="row">
 
-                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-                                      <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
-                                          <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Serie : (4 digitos)</b></label>
-                                            <div class="col-sm-12 abajocaja" >
-                                                <input type="text" name="serie" id='serie' class="form-control control input-sm" maxlength="4">
-                                            </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
-                                          <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Numero : (10 digitos)</b></label>
-                                            <div class="col-sm-12 abajocaja" >
-                                                <input type="text" name="numero" id='numero' class="form-control control input-sm" maxlength="10">
-                                            </div>
-                                          </div>
-                                      </div>
-
-
-                                      <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
-                                          <div class="form-group ">
-                                            <label class="col-sm-12 control-label labelleft" >Fecha Venta:</label>
-                                            <div class="col-sm-12 abajocaja" >
-                                              <div data-min-view="2" 
-                                                     data-date-format="dd-mm-yyyy"  
-                                                     class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                                     <input size="16" type="text" 
-                                                            placeholder="Fecha Venta"
-                                                            id='fechaventa' 
-                                                            name='fechaventa' 
-                                                            class="form-control input-sm"/>
-                                                      <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
-                                                </div>
-                                            </div>
-                                          </div>
-                                      </div> 
-
-                                      <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
-                                          <div class="form-group ">
-                                            <label class="col-sm-12 control-label labelleft" >Fecha Vencimiento:</label>
-                                            <div class="col-sm-12 abajocaja" >
-                                              <div data-min-view="2" 
-                                                     data-date-format="dd-mm-yyyy"  
-                                                     class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                                     <input size="16" type="text" 
-                                                            placeholder="Fecha Vencimiento"
-                                                            id='fechavencimiento' 
-                                                            name='fechavencimiento'     
-                                                            class="form-control input-sm"/>
-                                                      <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
-                                                </div>
-                                            </div>
-                                          </div>
-                                      </div> 
-
-
-
-
-                                  </div>
-
-
-                            </div>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-              @endif
-              
               @if($fedocumento->MONTO_DETRACCION_RED > 0)
                 <div class="row @if($fedocumento->ID_TIPO_DOC =='R1') ocultar @endif">
                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

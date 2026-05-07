@@ -19,11 +19,11 @@
                       $countnod    =   $count_x_aprobar_nod+$count_observados_nod+$count_observadosnod_le;
                       $countoca    =   $count_x_aprobar_oca+$count_observados_oca+$count_observadosoca_le;
                       $countcom    =   $count_x_aprobar_com+$count_observados_com+$count_observadosoca_com;
-
+                      $countcontratoa    =   $count_x_aprobar_contratoa+$count_observados_contratoa+$count_observadoscontratoa_le;
 
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca+$countcom;
+                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca+$countcom+$countcontratoa;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -182,6 +182,15 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="cta">
+                                <span class="nav-text">CONTRATO ANTICIPO </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countcontratoa}}</span>
+                                </div>
+                            </a>
+                        </li>
+
 
 
                     </ul>
@@ -268,6 +277,8 @@
                 @include('usuario.dashboard.com')
             </div>
 
-
+            <div id="cta" class="category-content">
+                @include('usuario.dashboard.cta')
+            </div>
         </main>
     </div>

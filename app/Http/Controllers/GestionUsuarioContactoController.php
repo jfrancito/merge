@@ -541,6 +541,7 @@ class GestionUsuarioContactoController extends Controller
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO',
                                         'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
 
                                     );
 
@@ -588,6 +589,10 @@ class GestionUsuarioContactoController extends Controller
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_observados_moca($cod_empresa);
             }else{
+
+            if($operacion_id=='CONTRATO_ANTICIPO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_observados_mcontratoa($cod_empresa);
+            }else{
                 if($operacion_id=='CONTRATO'){
                     $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_contrato($cod_empresa);
                 }else{
@@ -610,7 +615,10 @@ class GestionUsuarioContactoController extends Controller
                             }
                         }
                     }
-                }
+                } 
+            }
+
+
             }
 
         }
@@ -720,6 +728,61 @@ class GestionUsuarioContactoController extends Controller
                             'idopcion'          =>  $idopcion,
                          ]);
     }
+
+
+    public function actionListarComprobantesEnReparacion($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Documentos Reparable');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        $anio_id            =   date("Y");
+        $combo_anio         =   $this->gn_combo_anio_reparable('TODO', 'TODO');
+
+        if(isset($request['anio_id'])){
+            $anio_id       =   $request['anio_id'];
+        }
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
+
+        //dd($listadatos);
+
+
+        $funcion        =   $this;
+        return View::make('reporte/comprobante/listaocenreparacion',
+                         [
+                            'listadatos'        =>  $listadatos,
+
+                            'anio_id'           =>  $anio_id,
+                            'combo_anio'        =>  $combo_anio,
+
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+    public function actionListarAjaxBuscarDocumentoReparableReporte(Request $request) {
+
+        $anio_id            =   $request['anio_id'];
+        $idopcion           =   $request['idopcion'];
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_reporte($cod_empresa,$anio_id);
+
+        $funcion                =   $this;
+        return View::make('reporte/comprobante/ajax/alistaocenreparacion',
+                         [
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
 
     public function actionListarComprobantesReparableAdmin($idopcion,Request $request)
     {
@@ -1517,6 +1580,7 @@ class GestionUsuarioContactoController extends Controller
 
                         foreach ($cabeceras as $cabecera) {
 
+                            /*
                             if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
                                 $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
@@ -1572,6 +1636,7 @@ class GestionUsuarioContactoController extends Controller
                             } else {
                                 break;
                             }
+                            */
 
                             $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                             $COD_EMPR = $cabecera['COD_EMPR'];
@@ -2042,7 +2107,7 @@ class GestionUsuarioContactoController extends Controller
 
             $combo_tipo_igv = $this->gn_generacion_combo_categoria('CONTABILIDAD_IGV', 'Seleccione tipo igv', '');
 
-            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '18' => '18%');
+            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '10.5' => '10.5%', '18' => '18%');
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
@@ -3062,7 +3127,7 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $empresa                =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-
+            //dd($empresa);
             $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
             $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
@@ -4397,6 +4462,36 @@ class GestionUsuarioContactoController extends Controller
                          ]);
     }
 
+    public function actionListarAjaxBuscarDocumentoUC(Request $request)
+    {
+
+        $operacion_id = $request['operacion_id'];
+        $idopcion = $request['idopcion'];
+
+        $tab_id = 'oc';
+
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
+        }else{
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_contrato_uc($cod_empresa);
+        }
+        //dd($listadatos);
+        $procedencia = 'ADM';
+        $funcion = $this;
+        return View::make('comprobante/ajax/mergelistausuariocontacto',
+            [
+                'operacion_id' => $operacion_id,
+                'idopcion' => $idopcion,
+                'tab_id' => $tab_id,
+                'cod_empresa' => $cod_empresa,
+                'listadatos' => $listadatos,
+                'procedencia' => $procedencia,
+                'ajax' => true,
+                'funcion' => $funcion
+            ]);
+    }
+
     public function actionListarPreAprobarUsuarioContacto($idopcion,Request $request)
     {
 
@@ -5269,7 +5364,7 @@ class GestionUsuarioContactoController extends Controller
             $usuario_mkt    = DB::table('SGD.USUARIO')
                         ->where('COD_USUARIO', $ordencompra->COD_USUARIO_CREA_AUD)
                         ->first();
-            
+
             if($usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
                 $area_mkt    = DB::table('CMP.CATEGORIA')
                             ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)

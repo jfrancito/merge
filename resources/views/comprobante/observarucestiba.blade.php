@@ -13,11 +13,11 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Comprobante Observado<span class="panel-subtitle">Comprobante Observado</span></div>
+          <div class="panel-heading panel-heading-divider">Comprobante Observado ({{$fedocumento->ID_DOCUMENTO}})<span class="panel-subtitle">Comprobante Observado </span></div>
           <div class="panel-body">
             <form method="POST" id='formpedido' action="{{ url('/observacion-comprobante-uc-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                   {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                <input type="hidden" name="device_info" id='device_info'>
 
               @include('comprobante.form.formmitigarobservarestiba')
             </form>

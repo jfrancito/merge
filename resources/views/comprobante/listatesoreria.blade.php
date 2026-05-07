@@ -25,9 +25,9 @@
 
                   <div class="tools tooltiptop">
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo" style="width:125px;">
                       <span class="tooltiptext">Integracion Masiva</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
+                      Integracion Masivo
                     </a>
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">

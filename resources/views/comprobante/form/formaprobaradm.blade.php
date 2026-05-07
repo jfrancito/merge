@@ -5,7 +5,7 @@
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     @if($fedocumento->OPERACION_DET == 'SIN_XML') @include('comprobante.form.ordencompra.datosfactura') @endif    
-    @if($fedocumento->OPERACION_DET != 'SIN_XML') @include('comprobante.form.ordencompra.sunat') @endif 
+    @if($fedocumento->OPERACION_DET != 'SIN_XML') @include('comprobante.form.ordencompra.sunatconta') @endif 
     @include('comprobante.form.ordencompra.infodetraccion')
     @include('comprobante.form.ordencompra.ordeningreso')
     @include('comprobante.form.ordencompra.ordensalida')
@@ -23,6 +23,11 @@
   </div>
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
     @include('comprobante.form.ordencompra.informacion')
+
+    @if(count($lista_anticipo_merge)>0)
+      @include('comprobante.form.ordencompra.anticipomerge')
+    @endif
+    
   </div>
 </div>
 
