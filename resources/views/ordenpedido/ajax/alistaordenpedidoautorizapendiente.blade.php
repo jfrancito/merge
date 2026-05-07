@@ -60,22 +60,6 @@
                                         Detalle
                                     </button>
 
-                                    <button
-                                        class="btn btn-sm btn-success autorizar-pedido"
-                                        data-id="{{ $item['ID_PEDIDO'] }}"
-                                        title="Autorizar pedido">
-                                        <i class="fa fa-check-circle me-1"></i>
-                                        Autorizar
-                                    </button>
-
-                                    <button
-                                        class="btn btn-sm btn-danger rechazar-pedido"
-                                        data-id="{{ $item['ID_PEDIDO'] }}"
-                                        title="Rechazar pedido">
-                                        <i class="fa fa-times-circle me-1"></i>
-                                        Rechazar
-                                    </button>
-
                                 </div>
                             </td>
                             <td class="align-center-tb">

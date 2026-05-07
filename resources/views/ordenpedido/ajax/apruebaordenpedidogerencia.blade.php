@@ -11,13 +11,46 @@
         <div class="main-content container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="panel panel-default panel-table">
-                        <div class="panel-heading">Lista Orden Pedido - Aprueba Gerencia
-                        </div>
-                           <div class='listajax'>    
-                                @include('ordenpedido.ajax.alistaordenpedidoapruebagerencia')
+
+                    <!-- NAVEGACIÓN DE PESTAÑAS -->
+                    <div class="tab-container" style="margin-bottom: 25px;">
+                        <ul class="nav nav-tabs nav-tabs-primary" id="ordenpedido-tabs" style="border-bottom: 2px solid #e3e6f0; background: #fff; border-radius: 8px 8px 0 0;">
+                            <li class="active">
+                                <a href="#ordenpedidoger" data-toggle="tab" style="font-weight: 700; color: #4e73df; padding: 15px 25px;">
+                                    <i class="fa fa-list me-1"></i> LISTADO DE PEDIDOS (GERENCIA)
+                                </a>
+                            </li>
+                            <li id="tab-detalle-pedido-ger" style="display: none;">
+                                <a href="#detalle-pedido-ger" data-toggle="tab" style="font-weight: 700; color: #1cc88a; padding: 15px 25px;">
+                                    <i class="fa fa-eye me-1"></i> DETALLE DEL PEDIDO
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" style="background: #fff; padding: 0; border: 1px solid #e3e6f0; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <!-- PESTAÑA: LISTADO -->
+                            <div id="ordenpedidoger" class="tab-pane active">
+                                <div class="panel panel-default panel-table" style="border: none; margin-bottom: 0;">
+                                    <div class="panel-body" style="padding: 20px;">
+                                        <div class='listajax'>    
+                                            @include('ordenpedido.ajax.alistaordenpedidoapruebagerencia')
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- PESTAÑA: DETALLE (SE CARGA POR AJAX) -->
+                            <div id="detalle-pedido-ger" class="tab-pane">
+                                <div id="detalle-pedido-ger-container" style="padding: 2px;">
+                                    <div class="text-center" style="padding: 100px 0;">
+                                        <i class="fa fa-spinner fa-spin fa-3x text-primary"></i>
+                                        <p class="mt-3 text-muted fw-bold">Cargando información detallada...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>

@@ -254,11 +254,15 @@ $(document).ready(function () {
             detalles.push({
                 cod_producto: tds.eq(1).text().trim(),
                 nom_producto: tds.eq(2).text().trim(),
-                cod_categoria: tds.eq(8).text().trim(),
-                nom_categoria: tds.eq(3).text().trim(),
-                cantidad: parseInt(tds.eq(4).text().trim()) || 0,
-                precio: (tds.eq(5).find('input').length > 0) ? (parseFloat(tds.eq(5).find('input').val()) || 0) : (parseFloat(tds.eq(5).text().trim()) || 0),
-                txt_observacion: tds.eq(7).text().trim(),
+                cod_categoria: tds.eq(9).text().trim(),
+                nom_categoria: tds.eq(4).text().trim(),
+                cantidad: (tds.eq(5).find('input').length > 0) 
+                          ? (parseInt(tds.eq(5).find('input').val()) || 0) 
+                          : (parseInt(tds.eq(5).text().trim()) || 0),
+                precio: (tds.eq(6).find('input').length > 0) 
+                        ? (parseFloat(tds.eq(6).find('input').val().replace(/[^\d.-]/g, '')) || 0) 
+                        : (parseFloat(tds.eq(6).text().replace(/[^\d.-]/g, '')) || 0),
+                txt_observacion: tds.eq(8).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
             });
@@ -578,6 +582,15 @@ $(document).ready(function () {
                     $('#producto_id').append($(this).clone());
                 }
             });
+
+            // Cambiar nombre del botón según el tipo
+            if (tipo === 'M') {
+                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Material');
+            } else if (tipo === 'S') {
+                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
+            }
+        } else {
+            $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Producto');
         }
         $('#producto_id').trigger('change');
     });
@@ -585,11 +598,35 @@ $(document).ready(function () {
     $(document).on('change', '#producto_id', function () {
         let option = $('#producto_id option:selected');
         let unidad = option.data('unidad');
+        let indMaterialServicio = option.data('indmaterialservicio');
+        let precio = option.data('precio');
+
         if (unidad) {
             $('#unidad').val(unidad);
-            $('#cantidad').focus();
+            
+            if (indMaterialServicio === 'S') {
+                $('.div-precio-servicio').fadeIn();
+                $('#div-observacion').removeClass('col-md-3').addClass('col-md-2');
+                $('#cantidad').val(1).prop('disabled', true);
+                $('#precio_servicio').val(precio || '0.00').focus();
+            } else {
+                $('.div-precio-servicio').fadeOut();
+                $('#div-observacion').removeClass('col-md-2').addClass('col-md-3');
+                $('#cantidad').val('').prop('disabled', false).focus();
+                $('#precio_servicio').val('0.00');
+            }
         } else {
             $('#unidad').val('');
+            $('.div-precio-servicio').fadeOut();
+            $('#div-observacion').removeClass('col-md-2').addClass('col-md-3');
+            $('#precio_servicio').val('0.00');
+            
+            // Si el tipo general sigue siendo Servicio, mantener cantidad 1 y bloqueado
+            if($('#tipo_material_servicio').val() === 'S') {
+                $('#cantidad').val(1).prop('disabled', true);
+            } else {
+                $('#cantidad').val('').prop('disabled', false);
+            }
         }
     });
 
@@ -606,8 +643,14 @@ $(document).ready(function () {
             return;
         }
 
-        // Obtener mes del periodo seleccionado
-        let periodo = registrosPeriodos.find(p => p.COD_PERIODO === codPeriodo);
+        // Verificar si la variable global existe
+        if (typeof registrosPeriodos === 'undefined' || !Array.isArray(registrosPeriodos)) {
+            console.error('La variable registrosPeriodos no está definida o no es un array.');
+            return;
+        }
+
+        // Obtener mes del periodo seleccionado (comparación flexible)
+        let periodo = registrosPeriodos.find(p => String(p.COD_PERIODO).trim() === String(codPeriodo).trim());
         
         if (periodo) {
 
@@ -621,9 +664,12 @@ $(document).ready(function () {
                 codTipo = 'TOP0000000000003'; // NO PROGRAMADO
             }
 
+            // Asignamos valor (el select permanece deshabilitado según el requerimiento)
             tipoPedidoSelect.val(codTipo).trigger('change');
             
             console.log('Tipo de pedido asignado:', codTipo, 'Mes Periodo:', mesPeriodo, 'Mes Actual:', mesActual);
+        } else {
+            console.warn('No se encontró el periodo en los registros:', codPeriodo);
         }
     });
 
@@ -662,7 +708,12 @@ $(document).ready(function () {
         let cod_categoria = option.data('codcategoria');
         let nom_categoria = option.data('unidad');
         let cantidad = $('#cantidad').val();
-        let precio = parseFloat(option.data('precio')) || 0;
+        let isServicio = option.data('indmaterialservicio') === 'S';
+        
+        let precio = isServicio 
+                     ? parseFloat($('#precio_servicio').val()) || 0 
+                     : parseFloat(option.data('precio')) || 0;
+
         let subtotal = parseFloat(cantidad) * precio;
         let txt_observacion = $('#txt_observacion').val();
 
@@ -686,6 +737,16 @@ $(document).ready(function () {
             return;
         }
 
+        if (isServicio && precio <= 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠',
+                titulo: 'Atención',
+                mensaje: 'Para servicios, el precio debe ser mayor a 0.'
+            });
+            return;
+        }
+
         if (!cod_categoria) {
             modalBonito({
                 tipo: 'warn',
@@ -695,8 +756,6 @@ $(document).ready(function () {
             });
             return;
         }
-
-        let isServicio = option.data('indmaterialservicio') === 'S';
 
         if (!precio || precio <= 0) {
             if (!isServicio) {
@@ -730,27 +789,22 @@ $(document).ready(function () {
 
         filaCount++;
 
-        let precioHtml = '';
-        if (isServicio) {
-            precioHtml = `<input type="number" 
-                                 class="form-control input-sm text-right edit-precio-pedido" 
-                                 value="${precio.toFixed(2)}" 
-                                 step="0.01" 
-                                 min="0"
-                                 data-cantidad="${cantidad}"
-                                 style="width: 100px; display: inline-block;">`;
-        } else {
-            precioHtml = precio.toFixed(2);
-        }
+        let precioHtml = precio.toFixed(2);
+
+        let isEditMode = $('#id_pedido').val() !== "";
+        let cantidadHtml = isEditMode 
+            ? `<input type="number" class="form-control input-sm text-center edit-cantidad-pedido" value="${cantidad}" min="1" style="width: 70px; margin: 0 auto; font-weight: bold;">`
+            : cantidad;
 
         let fila = `<tr data-id="${cod_producto}">
             <td class="text-center">${filaCount}</td>
             <td class="text-center">${cod_producto}</td>
             <td>${nom_producto}</td>
+            <td class="text-center">${isServicio ? 'SERVICIO' : 'MATERIAL'}</td>
             <td class="text-center">${nom_categoria}</td>
-            <td class="text-center">${cantidad}</td>
-            <td class="text-center col-precio">${precioHtml}</td>
-            <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
+            <td class="text-center">${cantidadHtml}</td>
+            <td class="text-center col-precio">S/ ${precioHtml}</td>
+            <td class="text-center subtotal">S/ ${subtotal.toFixed(2)}</td>
             <td>${txt_observacion}</td>
             <td style="display:none">${cod_categoria}</td>
         </tr>`;
@@ -759,7 +813,6 @@ $(document).ready(function () {
         calcularTotalPedido();
 
         $('#producto_id').val('').trigger('change');
-        $('#cantidad').val('');
         $('#txt_observacion').val('');
     });
 
@@ -769,10 +822,11 @@ $(document).ready(function () {
 
         // Sumar subtotales
         $('#tabla_detalle_pedido tbody .subtotal').each(function () {
-            totalPedido += parseFloat($(this).text()) || 0;
+            let valor = $(this).text().replace(/[^\d.-]/g, '');
+            totalPedido += parseFloat(valor) || 0;
         });
 
-        $('#total_pedido').text(totalPedido.toFixed(2));
+        $('#total_pedido').text('S/ ' + totalPedido.toFixed(2));
 
         if (typeof registrosMonto !== 'undefined' && Array.isArray(registrosMonto)) {
 
@@ -794,7 +848,7 @@ $(document).ready(function () {
             // =========================
             // Se muestra cuando supera el umbral de Administración (ej: 800)
 
-            if (totalPedido > umbralAdminMaestra) {
+            if (totalPedido > umbralGerencia){
 
                 if ($('#cod_trabajador_aprueba_ger').closest('.col-md-6').is(':hidden')) {
 
@@ -848,6 +902,17 @@ $(document).ready(function () {
             }
         }
     }
+
+    $(document).on('input', '.edit-cantidad-pedido', function () {
+        let fila = $(this).closest('tr');
+        let cantidad = parseFloat($(this).val()) || 0;
+        let precioTxt = fila.find('.col-precio').text().replace(/[^\d.-]/g, '');
+        let precio = parseFloat(precioTxt) || 0;
+        let subtotal = cantidad * precio;
+
+        fila.find('.subtotal').text('S/ ' + subtotal.toFixed(2));
+        calcularTotalPedido();
+    });
 
     $(document).on('keyup change', '.edit-precio-pedido', function () {
         let input = $(this);
@@ -933,29 +998,45 @@ $(document).ready(function () {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
-
-        var _token = $('#token').val();
+        let _token = $('#token').val();
 
         let data = {
             _token: _token,
             orden_pedido_id: orden_pedido_id,
         };
 
-        // Limpiar contenido previo
-        $(".modal-verdetallepedido-solicitud-container").html('');
+        // Mostrar cargando
+        abrircargando();
 
-        ajax_modal(
-            data,
-            "/ver_detalle_orden_pedido",
-            "modal-verdetallepedido-solicitud",
-            "modal-verdetallepedido-solicitud-container"
-        );
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ver_detalle_orden_pedido",
+            data: data,
+            success: function (resp) {
+                cerrarcargando();
+                // Insertar contenido en el contenedor del tab
+                $("#detalle-pedido-container").html(resp);
+                
+                // Mostrar el tab y activarlo
+                $("#tab-detalle-pedido").show();
+                $('.nav-tabs a[href="#detallepedido"]').tab('show');
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo obtener el detalle del pedido.'
+                });
+            }
+        });
     });
 
     /* ===============================
-       DOBLE CLICK EDITAR PEDIDO
+       BOTÓN EDITAR PEDIDO
        =============================== */
-    $(".ordenpedidoprincipal").on('dblclick', '.fila-pedido', function () {
+    $(".ordenpedidoprincipal").on('click', '.editar-pedido', function () {
         let id_pedido = $(this).data('id');
         let estado = $(this).data('estado');
 
@@ -1018,10 +1099,17 @@ $(document).ready(function () {
                                     <td class="text-center">${filaCount}</td>
                                     <td class="text-center font-bold">${det.COD_PRODUCTO}</td>
                                     <td>${det.NOM_PRODUCTO}</td>
+                                    <td class="text-center">${det.IND_MATERIAL_SERVICIO === 'S' ? 'SERVICIO' : 'MATERIAL'}</td>
                                     <td class="text-center">${det.NOM_CATEGORIA}</td>
-                                    <td class="text-center font-bold">${parseInt(det.CANTIDAD)}</td>
-                                    <td class="text-center">${precio.toFixed(2)}</td>
-                                    <td class="text-center font-bold subtotal">${subtotal}</td>
+                                    <td class="text-center">
+                                        <input type="number" 
+                                               class="form-control input-sm text-center edit-cantidad-pedido" 
+                                               value="${parseInt(det.CANTIDAD)}" 
+                                               min="1" 
+                                               style="width: 70px; margin: 0 auto; font-weight: bold;">
+                                    </td>
+                                    <td class="text-center col-precio">S/ ${precio.toFixed(2)}</td>
+                                    <td class="text-center font-bold subtotal">S/ ${subtotal}</td>
                                     <td class="text-muted small">${det.TXT_OBSERVACION || '-'}</td>
                                     <td style="display:none;">${det.COD_CATEGORIA}</td>
                                 </tr>
@@ -1078,65 +1166,105 @@ $(document).ready(function () {
             orden_pedido_id: orden_pedido_id,
         };
 
-        // Limpiar contenido previo
-        $(".modal-verdetallepedido-solicitud-container").html('');
+        // Mostrar tab y cargar contenido vía AJAX
+        $('#tab-detalle-pedido-aut').fadeIn();
+        abrircargando();
 
-        ajax_modal(
-            data,
-            "/ver_detalle_orden_pedido_aut",
-            "modal-verdetallepedido-solicitud",
-            "modal-verdetallepedido-solicitud-container"
-        );
+        $.ajax({
+            type: 'POST',
+            url: carpeta + "/ver_detalle_orden_pedido_aut",
+            data: data,
+            success: function (html) {
+                cerrarcargando();
+                $("#detalle-pedido-aut-container").html(html);
+                $('.nav-tabs a[href="#detallepedidoaut"]').tab('show');
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo cargar el detalle del pedido.'
+                });
+            }
+        });
     });
 
     $(".ordenpedidoprincipal").on('click', '.ver-detalle-pedido-ger', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
+        let _token = $('#token').val();
 
-        var _token = $('#token').val();
+        // Mostrar pestaña de detalle y activarla
+        $('#tab-detalle-pedido-ger').show();
+        $('.nav-tabs a[href="#detalle-pedido-ger"]').tab('show');
 
-        let data = {
-            _token: _token,
-            orden_pedido_id: orden_pedido_id,
-        };
+        // Loading state
+        $("#detalle-pedido-ger-container").html('<div class="text-center" style="padding: 100px 0;"><i class="fa fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3 text-muted fw-bold">Cargando detalle del pedido...</p></div>');
 
-        // Limpiar contenido previo
-        $(".modal-verdetallepedido-solicitud-container").html('');
-
-        ajax_modal(
-            data,
-            "/ver_detalle_orden_pedido_ger",
-            "modal-verdetallepedido-solicitud",
-            "modal-verdetallepedido-solicitud-container"
-        );
+        $.ajax({
+            type: 'POST',
+            url: carpeta + "/ver_detalle_orden_pedido_ger",
+            data: {
+                _token: _token,
+                orden_pedido_id: orden_pedido_id
+            },
+            success: function (resp) {
+                $("#detalle-pedido-ger-container").html(resp);
+            },
+            error: function () {
+                $("#detalle-pedido-ger-container").html('<div class="alert alert-danger">Error al cargar el detalle.</div>');
+            }
+        });
     });
 
     $(".ordenpedidoprincipal").on('click', '.ver-detalle-pedido-adm', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
-
         var _token = $('#token').val();
 
-        let data = {
-            _token: _token,
-            orden_pedido_id: orden_pedido_id,
-        };
+        // Limpiar contenedor y mostrar loading
+        $("#detalle-pedido-adm-container").html(`
+            <div class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-3x mb-3 text-primary"></i>
+                <p class="text-muted">Cargando detalles del pedido...</p>
+            </div>
+        `);
 
-        // Limpiar contenido previo
-        $(".modal-verdetallepedido-solicitud-container").html('');
+        // Mostrar pestaña de detalle y activarla
+        $('#tab-detalle-pedido-adm').show();
+        $('.nav-tabs a[href="#detallepedidoadm"]').tab('show');
 
-        ajax_modal(
-            data,
-            "/ver_detalle_orden_pedido_adm",
-            "modal-verdetallepedido-solicitud",
-            "modal-verdetallepedido-solicitud-container"
-        );
+        // Scroll suave hacia arriba
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + "/ver_detalle_orden_pedido_adm",
+            data: {
+                _token: _token,
+                orden_pedido_id: orden_pedido_id,
+            },
+            success: function (html) {
+                $("#detalle-pedido-adm-container").html(html);
+            },
+            error: function (xhr) {
+                $('#tab-detalle-pedido-adm').hide();
+                $('.nav-tabs a[href="#ordenpedidoadm"]').tab('show');
+                modalBonito({
+                    tipo: 'error',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo cargar el detalle del pedido.'
+                });
+            }
+        });
     });
 
     // GUARDAR CANTIDADES EDITADAS EN EL DETALLE
-    $(".modal-verdetallepedido-solicitud-container").on('click', '.btn-editar-cantidades-aut', function (e) {
+    $(".ordenpedidoprincipal").on('click', '.btn-editar-cantidades-aut', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
@@ -1201,7 +1329,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".modal-verdetallepedido-solicitud-container").on('click', '.btn-editar-cantidades-ger', function (e) {
+    $(".ordenpedidoprincipal").on('click', '.btn-editar-cantidades-ger', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
@@ -1242,8 +1370,6 @@ $(document).ready(function () {
                                 titulo: 'Éxito',
                                 mensaje: resp.mensaje
                             });
-                            // Cerrar modal
-                            $.fn.niftyModal('close');
                         } else {
                             modalBonito({
                                 tipo: 'error',
@@ -1266,7 +1392,65 @@ $(document).ready(function () {
         });
     });
 
-    $(".modal-verdetallepedido-solicitud-container").on('click', '.btn-editar-cantidades-adm', function (e) {
+    // RECHAZAR PEDIDO GER
+    $(".ordenpedidoprincipal").on('click', '.rechazar-pedido-ger', function (e) {
+        e.preventDefault();
+
+        let orden_pedido_id = $(this).data('id');
+        let _token = $('#token').val();
+
+        modalBonito({
+            tipo: 'error',
+            icono: '❌',
+            titulo: 'Rechazar Orden',
+            mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
+                     '<div class="form-group">' +
+                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (GERENCIA):</label>' +
+                        '<textarea id="motivo_rechazo_ger" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
+                     '</div>',
+            confirmar: true,
+            onConfirm: function () {
+                let motivo = $('#motivo_rechazo_ger').val();
+                if(!motivo || motivo.trim() === ""){
+                    alerterrorajax("Debe ingresar un motivo de rechazo.");
+                    return false;
+                }
+
+                abrircargando();
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/rechazar_orden_pedido',
+                    data: {
+                        _token: _token,
+                        orden_pedido_id: orden_pedido_id,
+                        motivo: motivo
+                    },
+                    success: function (resp) {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✔',
+                            titulo: 'Orden rechazada',
+                            mensaje: 'La Orden de Pedido fue rechazada correctamente.'
+                        });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    },
+                    error: function () {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'error',
+                            titulo: 'Error',
+                            mensaje: 'No se pudo rechazar la orden.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    $(".ordenpedidoprincipal").on('click', '.btn-editar-cantidades-adm', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
@@ -1362,7 +1546,10 @@ $(document).ready(function () {
             confirmar: true,
             onConfirm: function () {
 
-                abrircargando();
+                // Desactivar botón para evitar doble clic
+                boton.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> EMITIENDO...');
+
+                abrircargando("<div class='texto'>Emitiendo Pedido...<br>Espere un momento por favor</div>");
 
                 $.ajax({
                     type: 'POST',
@@ -1389,6 +1576,9 @@ $(document).ready(function () {
                     },
                     error: function () {
                         cerrarcargando();
+                        // Re-activar botón en caso de error
+                        boton.prop('disabled', false).html('<i class="fa fa-check-circle me-2"></i> EMITIR PEDIDO');
+                        
                         modalBonito({
                             tipo: 'error',
                             icono: '❌',
@@ -1630,12 +1820,12 @@ $(document).ready(function () {
     });
 
 
+    // APROBAR PEDIDO ADM
     $(".ordenpedidoprincipal").on('click', '.aprobar-pedido-adm', function (e) {
         e.preventDefault();
 
         let orden_pedido_id = $(this).data('id');
         let _token = $('#token').val();
-        let boton = $(this);
 
         modalBonito({
             tipo: 'info',
@@ -1644,9 +1834,7 @@ $(document).ready(function () {
             mensaje: '¿Está seguro de <b>aprobar</b> esta Orden de Pedido?',
             confirmar: true,
             onConfirm: function () {
-
                 abrircargando();
-
                 $.ajax({
                     type: 'POST',
                     url: carpeta + '/ap_adm_orden_pedido',
@@ -1655,17 +1843,13 @@ $(document).ready(function () {
                         orden_pedido_id: orden_pedido_id
                     },
                     success: function (resp) {
-
                         cerrarcargando();
-
                         modalBonito({
                             tipo: 'success',
                             icono: '✔',
                             titulo: 'Orden aprobada',
                             mensaje: 'La Orden de Pedido fue aprobada correctamente.'
-
                         });
-
                         setTimeout(function () {
                             location.reload();
                         }, 1500);
@@ -1677,6 +1861,64 @@ $(document).ready(function () {
                             icono: '❌',
                             titulo: 'Error',
                             mensaje: 'No se pudo aprobar la orden.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // RECHAZAR PEDIDO ADM
+    $(".ordenpedidoprincipal").on('click', '.rechazar-pedido-adm', function (e) {
+        e.preventDefault();
+
+        let orden_pedido_id = $(this).data('id');
+        let _token = $('#token').val();
+
+        modalBonito({
+            tipo: 'error',
+            icono: '❌',
+            titulo: 'Rechazar Orden',
+            mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
+                     '<div class="form-group">' +
+                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (ADM):</label>' +
+                        '<textarea id="motivo_rechazo_adm" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
+                     '</div>',
+            confirmar: true,
+            onConfirm: function () {
+                let motivo = $('#motivo_rechazo_adm').val();
+                if(!motivo || motivo.trim() === ""){
+                    alerterrorajax("Debe ingresar un motivo de rechazo.");
+                    return false;
+                }
+
+                abrircargando();
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/rechazar_orden_pedido',
+                    data: {
+                        _token: _token,
+                        orden_pedido_id: orden_pedido_id,
+                        motivo: motivo
+                    },
+                    success: function (resp) {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✔',
+                            titulo: 'Orden rechazada',
+                            mensaje: 'La Orden de Pedido fue rechazada correctamente.'
+                        });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    },
+                    error: function () {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'error',
+                            titulo: 'Error',
+                            mensaje: 'No se pudo rechazar la orden.'
                         });
                     }
                 });
@@ -1953,32 +2195,28 @@ $(document).ready(function () {
     });
 
 
-    // Checkbox "Seleccionar todo"
-    $(document).on('change', '#checkAll', function () {
-        let checkboxes = document.querySelectorAll('.pedido_seleccionado');
-        checkboxes.forEach(cb => cb.checked = this.checked);
-    });
-
-    // Botón Consolidar
+    // Variable para almacenar los productos consolidados y persistirlos para el guardado
     let productosConsolidados = {};
 
-    $(document).on('click', '.btn-consolidar', function () {
-        productosConsolidados = {};        console.log("hola");
-        if (typeof pedidosData === 'undefined' || !pedidosData) {
-            console.error("pedidosData no está definido");
+    // Función para recalcular el consolidado automáticamente (Compatible con DataTables)
+    const recalcularConsolidado = function () {
+        productosConsolidados = {};
+        
+        if (typeof window.pedidosData === 'undefined' || !window.pedidosData) {
             return;
-        }        $('.pedido_seleccionado:checked').each(function () {
+        }
+
+        // Usar la API de DataTable para obtener TODOS los checkboxes seleccionados inclusive fuera de la vista
+        let table = $('#tablaconsolidadopedido').DataTable();
+        let checkboxesSeleccionados = table.$('.pedido_seleccionado:checked');
+
+        checkboxesSeleccionados.each(function () {
             let idPedido = $(this).val();
-            let detalles = pedidosData[idPedido];
+            let detalles = window.pedidosData[idPedido];
 
-
-            debugger;
             if (detalles) {
                 detalles.forEach(item => {
-                    debugger;
                     let key = item.COD_PRODUCTO + '-' + item.COD_CENTRO + '-' + item.COD_PERIODO;
-                    console.log(key);
-                    debugger;
                     if (!productosConsolidados[key]) {
                         productosConsolidados[key] = {
                             COD_PRODUCTO: item.COD_PRODUCTO,
@@ -1997,7 +2235,14 @@ $(document).ready(function () {
                 });
             }
         });
-        console.log();
+
+        // Mostrar/Ocultar contenedor principal del consolidado
+        if (Object.keys(productosConsolidados).length > 0) {
+            $('#contenedor-lista-consolidado').slideDown();
+        } else {
+            $('#contenedor-lista-consolidado').slideUp();
+        }
+
         // Pintar tabla consolidada
         let tbody = $('#tablaConsolidado tbody');
         tbody.empty();
@@ -2013,9 +2258,10 @@ $(document).ready(function () {
                 pedidos: []
             };
 
-            $('.pedido_seleccionado:checked').each(function () {
+            // Volver a usar la API para recolectar detalles por producto
+            checkboxesSeleccionados.each(function () {
                 let idPedido = $(this).val();
-                let detalles = pedidosData[idPedido];
+                let detalles = window.pedidosData[idPedido];
                 if (detalles) {
                     detalles.forEach(item => {
                         if (item.COD_PRODUCTO === producto.COD_PRODUCTO) {
@@ -2044,6 +2290,30 @@ $(document).ready(function () {
                 </tr>
             `);
         });
+    };
+
+    // Checkbox "Seleccionar todo" (Integración con DataTables)
+    $(document).on('change', '#checkAll', function () {
+        let isChecked = $(this).is(':checked');
+        let table = $('#tablaconsolidadopedido').DataTable();
+        
+        // Seleccionar/Deseleccionar en todas las páginas procesadas por DataTable
+        let rows = table.rows({ 'search': 'applied' }).nodes();
+        $('input.pedido_seleccionado', rows).prop('checked', isChecked);
+        
+        recalcularConsolidado(); 
+    });
+
+    // Evento al cambiar selección individual
+    $(document).on('change', '.pedido_seleccionado', function () {
+        let table = $('#tablaconsolidadopedido').DataTable();
+        let total = table.$('.pedido_seleccionado').length;
+        let checked = table.$('.pedido_seleccionado:checked').length;
+
+        // Si están todos marcados, marcar el general. Si falta alguno (o ninguno), desmarcar el general.
+        $('#checkAll').prop('checked', (total === checked && total > 0));
+
+        recalcularConsolidado();
     });
 
     // Evento Doble Clic en la fila del Consolidado
@@ -2089,7 +2359,8 @@ $(document).ready(function () {
         let $boton = $(this);
         let pedidos_ids = [];
 
-        $('.pedido_seleccionado:checked').each(function () {
+        let table = $('#tablaconsolidadopedido').DataTable();
+        table.$('.pedido_seleccionado:checked').each(function () {
             pedidos_ids.push($(this).val());
         });
 
@@ -2223,14 +2494,37 @@ $(document).ready(function () {
         let detalles = [];
         let _token = $('#token').val();
 
-        $('.fila-detalle-consolidado-generado').each(function () {
+        let validacion = true;
+        let table = $('#tabla-detalle-consolidado').DataTable();
+        table.rows().nodes().to$().each(function () {
             let cod_producto = $(this).data('id');
             let cantidad = $(this).find('.input-descontar').val();
+            let ind_compra = $(this).find('.combo-compra').val();
+
+            let $selected = $(this).find('.combo-compra option:selected');
+            let cod_centro_compra = $selected.data('codigo') || null;
+
+            if (ind_compra === '' || ind_compra === null) {
+                validacion = false;
+            }
+
             detalles.push({
                 cod_producto: cod_producto,
-                cantidad: cantidad
+                cantidad: cantidad,
+                ind_compra: ind_compra,
+                cod_centro_compra: cod_centro_compra
             });
         });
+
+        if (!validacion) {
+            modalBonito({
+                tipo: 'error',
+                icono: '❌',
+                titulo: 'Selección requerida',
+                mensaje: 'Debe seleccionar el lugar de COMPRA (LOCAL o SEDE) para todos los productos en la lista.'
+            });
+            return;
+        }
 
         if (id_consolidado_seleccionado === '' || detalles.length === 0) {
             modalBonito({
@@ -2256,6 +2550,7 @@ $(document).ready(function () {
                 if (res.success) {
                     modalBonito({
                         tipo: 'success',
+                        icono: '✔',
                         titulo: 'Éxito',
                         mensaje: res.mensaje
                     });
@@ -2296,6 +2591,39 @@ $(document).ready(function () {
             return;
         }
 
+        let validacion = true;
+        let detalles = [];
+        let table = $('#tabla-detalle-consolidado').DataTable();
+        table.rows().nodes().to$().each(function () {
+            let cod_producto = $(this).data('id');
+            let cantidad = $(this).find('.input-descontar').val().replace(/,/g, '');
+            let ind_compra = $(this).find('.combo-compra').val();
+
+            let $selected = $(this).find('.combo-compra option:selected');
+            let cod_centro_compra = $selected.data('codigo') || null;
+
+            if (ind_compra === '' || ind_compra === null) {
+                validacion = false;
+            }
+
+            detalles.push({
+                cod_producto: cod_producto,
+                cantidad: cantidad,
+                ind_compra: ind_compra,
+                cod_centro_compra: cod_centro_compra
+            });
+        });
+
+        if (!validacion) {
+            modalBonito({
+                tipo: 'error',
+                icono: '❌',
+                titulo: 'Campos Incompletos',
+                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> para todos los productos en la lista.'
+            });
+            return;
+        }
+
         modalBonito({
             tipo: 'info',
             icono: '✅',
@@ -2315,7 +2643,8 @@ $(document).ready(function () {
                     url: carpeta + '/ajax-aprobar-consolidado-op',
                     data: {
                         _token: _token,
-                        id_consolidado: id_consolidado_seleccionado
+                        id_consolidado: id_consolidado_seleccionado,
+                        detalles: JSON.stringify(detalles)
                     },
 
                     success: function (res) {
@@ -2408,23 +2737,56 @@ $(document).ready(function () {
                         let area = partes[2] ? partes[2].trim() : '';
                         let glosa = partes[3] ? partes[3].trim() : '';
                         let cantidad = partes[4] ? partes[4].trim() : "0.00";
+                        let multi_archivos = partes[5] ? partes[5].trim() : "";
 
                         // Limpieza de cantidad
                         cantidad = cantidad.replace(/[^0-9.]/g, '');
                         let cantFloat = parseFloat(cantidad);
                         if (isNaN(cantFloat)) cantFloat = 0.00;
 
+                        // Procesar archivos
+                        let htmlArchivos = '<span class="text-muted" style="font-size: 0.9em;">-</span>';
+                        if (multi_archivos && multi_archivos !== "") {
+                            htmlArchivos = '';
+                            let docs = multi_archivos.split(' [DOC] ');
+                            docs.forEach(doc_str => {
+                                if (doc_str.trim() !== "") {
+                                    let subpartes = doc_str.split(' [URI] ');
+                                    let nom_doc = subpartes[0] ? subpartes[0].trim() : 'Archivo';
+                                    let uri_doc = subpartes[1] ? subpartes[1].trim() : '';
+
+                                    if (uri_doc !== "") {
+                                        // Codificar la ruta en base64 para el controlador
+                                        let b64 = btoa(uri_doc);
+                                        htmlArchivos += `
+                                            <a href="${carpeta}/descargar-archivo-informe/${b64}" 
+                                               class="btn btn-xs btn-primary shadow-sm" 
+                                               style="border-radius: 12px; margin: 2px; padding: 2px 10px;"
+                                               title="${nom_doc}" target="_blank">
+                                                <i class="mdi mdi-download"></i> Archivo
+                                            </a>
+                                        `;
+                                    }
+                                }
+                            });
+                        }
+
                         tbodyInferior.append(`
                             <tr>
                                 <td class="text-center">${fecha}</td>
                                 <td class="text-center font-bold">${id}</td>
                                 <td>${area}</td>
-                                <td class="text-muted small">${glosa}</td>
-                                <td class="text-center font-bold" style="font-size: 1.1em;">
-                                    ${cantFloat.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}
+                                <td style="font-size: 1.1em; font-weight: 500; color: #333;">${glosa}</td>
+                                <td class="text-center">
+                                    <input type="number" 
+                                           class="form-control input-sm input-detalle-cantidad input-cantidad-moderno" 
+                                           value="${cantFloat}" 
+                                           step="0.01"
+                                           min="0"
+                                           style="width: 85px; margin: 0 auto; font-size: 1.1em;">
+                                </td>
+                                <td class="text-center">
+                                    ${htmlArchivos}
                                 </td>
                             </tr>
                         `);
@@ -3184,6 +3546,133 @@ $(document).ready(function () {
                 });
             }
         });
+    });
+
+    // ============================================
+    // FILTRAR LISTA DE CONSOLIDADOS POR ESTADO
+    // ============================================
+    $(document).on('change', '#filtro-estado-consolidado', function() {
+        filtrarConsolidados();
+    });
+
+    function filtrarConsolidados() {
+        let filtroValue = $('#filtro-estado-consolidado').val();
+        let total = 0;
+
+        // Si no hay filas, el contador es 0
+        if($('.fila-consolidado-generado').length === 0){
+            $('#contador-consolidados').text(0);
+            return;
+        }
+
+        $('.fila-consolidado-generado').each(function() {
+            let codEstado = $(this).data('estado');
+            let mostrar = false;
+
+            if (filtroValue === 'TODO') {
+                mostrar = true;
+            } else if (filtroValue === 'GENERADO') {
+                // Estado Generado (Activo)
+                if (codEstado === 'ETM0000000000001') mostrar = true;
+            } else if (filtroValue === 'CERRADO') {
+                // Estados Cerrado (Por Aprobar Jefe Compras) o ya Aprobado
+                if (codEstado === 'ETM0000000000015' || codEstado === 'ETM0000000000005') mostrar = true;
+            }
+
+            if (mostrar) {
+                $(this).show();
+                total++;
+            } else {
+                $(this).hide();
+            }
+        });
+
+        $('#contador-consolidados').text(total);
+    }
+
+    // Ejecutar filtro inicial (para que empiece solo con GENERADOS)
+    if ($('#filtro-estado-consolidado').length > 0) {
+        setTimeout(function() {
+            filtrarConsolidados();
+        }, 600);
+    }
+
+    /* =================================
+       PREVISUALIZACIÓN DE ARCHIVOS
+       ================================= */
+    $(document).on('change', '#formFile', function() {
+        var input = this;
+        var container = $('#previsualizacion-archivos-orden');
+        container.empty().show();
+
+        if (input.files && input.files.length > 0) {
+            $.each(input.files, function(i, file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var fileUrl = e.target.result;
+                    var ext = file.name.split('.').pop().toLowerCase();
+                    var isExcel = ['xls', 'xlsx', 'csv'].includes(ext);
+                    var isWord = ['doc', 'docx'].includes(ext);
+                    var isPDF = ext === 'pdf';
+
+                    var iconClass = 'fa-file-o';
+                    var iconColor = '#95a5a6';
+                    if (isPDF) {
+                        iconClass = 'fa-file-pdf-o';
+                        iconColor = '#e74c3c';
+                    } else if (isExcel) {
+                        iconClass = 'fa-file-excel-o';
+                        iconColor = '#27ae60';
+                    } else if (isWord) {
+                        iconClass = 'fa-file-word-o';
+                        iconColor = '#2980b9';
+                    }
+
+                    var previewContent = '';
+                    if (isPDF) {
+                        previewContent = `
+                            <object data="${fileUrl}" type="application/pdf" style="width: 100%; height: 100%;">
+                                <div style="padding-top: 40px; color: #999;">
+                                    <i class="fa ${iconClass}" style="font-size: 50px; color: ${iconColor};"></i>
+                                    <p style="font-size: 11px; margin-top: 10px;">Vista previa no disponible</p>
+                                </div>
+                            </object>`;
+                    } else {
+                        previewContent = `
+                            <div style="padding-top: 40px; color: #999; height: 100%;">
+                                <i class="fa ${iconClass}" style="font-size: 50px; color: ${iconColor};"></i>
+                                <p style="font-size: 11px; margin-top: 10px; font-weight: bold;">${ext.toUpperCase()}</p>
+                                <p style="font-size: 9px; color: #aaa; margin-top: 5px;">Haga clic en el ojo para descargar</p>
+                            </div>`;
+                    }
+
+                    var cardHtml = `
+                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" style="margin-bottom: 20px;">
+                            <div class="panel panel-default shadow-soft" style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff;">
+                                <div class="panel-heading" style="background: #1d3a6d; color: #fff; padding: 5px 10px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${file.name}">
+                                    <i class="fa ${iconClass}"></i> ${file.name}
+                                </div>
+                                <div class="panel-body" style="padding: 10px; text-align: center;">
+                                    <div style="height: 160px; position: relative; background: #f8f9fa; border-radius: 4px; overflow: hidden;">
+                                        ${previewContent}
+                                    </div>
+                                    <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 10px; color: #777; font-weight: bold;">
+                                            ${(file.size / 1024 / 1024).toFixed(2)} MB
+                                        </span>
+                                        <a href="${fileUrl}" download="${file.name}" class="btn btn-xs btn-primary" title="Descargar archivo" style="border-radius: 4px;">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.append(cardHtml);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     });
 
 });

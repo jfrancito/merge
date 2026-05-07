@@ -46,7 +46,7 @@
                                 <div class="grupo-acciones">
                                     <!-- VER DETALLE -->
                                     <button
-                                            class="btn btn-sm btn-primary ver-detalle-pedido"
+                                            class="btn btn-sm btn-primary ver-detalle-pedido-adm"
                                             data-id="{{ $item['ID_PEDIDO'] }}"
                                             title="Ver detalle del pedido">
                                         <i class="fa fa-eye me-1"></i>

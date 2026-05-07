@@ -39,6 +39,7 @@
                 <tr class="text-uppercase small">
                     <th style="width:5%" class="text-center">#</th>
                     <th style="width:30%">Producto</th>
+                    <th style="width:10%">Tipo Producto</th>
                     <th style="width:20%">Categoría</th>
                     <th style="width:10%" class="text-center">Cant.</th>
                     @if($mostrarJefe)
@@ -60,6 +61,10 @@
 
                         <td class="fw-semibold text-truncate" title="{{ $detalle->NOM_PRODUCTO }}">
                             {{ $detalle->NOM_PRODUCTO }}
+                        </td>
+
+                        <td class="text-secondary">
+                            {{ $detalle->IND_MATERIAL_SERVICIO == 'M' ? 'MATERIAL' : 'SERVICIO' }}
                         </td>
 
                         <td class="text-truncate text-secondary" title="{{ $detalle->NOM_CATEGORIA }}">

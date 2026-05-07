@@ -182,7 +182,7 @@ class ReporteOrdenPedidoController extends Controller
             abort(404, "El archivo no existe en el servidor: " . $final_path);
         }
 
-        return response()->download($final_path);
+        return response()->file($final_path);
     }
 
 

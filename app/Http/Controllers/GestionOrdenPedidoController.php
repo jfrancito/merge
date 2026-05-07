@@ -238,7 +238,6 @@ class GestionOrdenPedidoController extends Controller
             ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
             FROM WEB.ORDEN_PEDIDO OP
             WHERE OP.ACTIVO = 1
-            AND OP.COD_ESTADO <> 'ETM0000000000006'
             ORDER BY OP.FEC_PEDIDO DESC
         ");
 
@@ -526,33 +525,21 @@ class GestionOrdenPedidoController extends Controller
 
     public function actionDetallePedido(Request $request)
     {
-        $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
         $id_buscar = $request->input('orden_pedido_id');
 
-
         $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
-        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-            ->where('ID_PEDIDO', $id_buscar)
-            ->where('ACTIVO', 1)
+        
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+            ->where('D.ID_PEDIDO', $id_buscar)
+            ->where('D.ACTIVO', 1)
+            ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
             ->get();
 
-
-        $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');
-        $nom_producto = $pedillodetalle->pluck('NOM_PRODUCTO');
-        $nom_categoria = $pedillodetalle->pluck('NOM_CATEGORIA');
-        $cantidad = $pedillodetalle->pluck('CANTIDAD');
-        $txt_observacion = $pedillodetalle->pluck('TXT_OBSERVACION');
-
-        return view('ordenpedido.modal.modaldetallepedido', [
+        return view('ordenpedido.ajax.detalletabpedido', [
             'ajax' => true,
             'pedido' => $pedido,
-            'id_pedido' => $id_pedido,
-            'nom_producto' => $nom_producto,
-            'nom_categoria' => $nom_categoria,
-            'cantidad' => $cantidad,
-            'txt_observacion' => $txt_observacion,
             'pedillodetalle' => $pedillodetalle
-
         ]);
     }
 
@@ -626,9 +613,11 @@ class GestionOrdenPedidoController extends Controller
             }
 
             // 2. Detalle del pedido (productos registrados)
-            $details = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-                ->where('ID_PEDIDO', $header->ID_PEDIDO)
-                ->where('ACTIVO', 1)
+            $details = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+                ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+                ->where('D.ID_PEDIDO', $header->ID_PEDIDO)
+                ->where('D.ACTIVO', 1)
+                ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
                 ->get();
 
             // 3. Precios actualizados desde el SP solicitado
@@ -643,7 +632,13 @@ class GestionOrdenPedidoController extends Controller
 
             // Inyectar el precio actualizado en cada item del detalle
             foreach ($details as $d) {
-                $d->PRECIO = isset($precios_map[$d->COD_PRODUCTO]) ? $precios_map[$d->COD_PRODUCTO] : 0;
+                if ($d->IND_MATERIAL_SERVICIO === 'S') {
+                    // Para servicios usamos el precio guardado en el detalle
+                    $d->PRECIO = $d->CAN_PRECIO;
+                } else {
+                    // Para materiales intentamos obtener el precio actual del catálogo
+                    $d->PRECIO = isset($precios_map[$d->COD_PRODUCTO]) ? $precios_map[$d->COD_PRODUCTO] : $d->CAN_PRECIO;
+                }
             }
 
             // 4. Buscar si ya existe un archivo subido para este pedido

@@ -10,7 +10,7 @@
 
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table id="tabla-orden-pedido" class="table table-hover mb-0">
                 <thead>
                 <tr>
                     <th>ID PEDIDO</th>
@@ -61,6 +61,8 @@
                                         <i class="fa fa-eye me-1"></i> Detalle
                                     </button>
 
+
+
                                     @if($item['MULTI_ARCHIVOS'] != '')
                                         @php
                                             $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
@@ -105,21 +107,7 @@
                                         </button>
                                     @endif
 
-                                    @if ($item['COD_ESTADO'] === 'ETM0000000000001')
-                                        <!-- EMITIR -->
-                                        <button
-                                                class="btn btn-sm btn-success emitir-pedido"
-                                                data-id="{{ $item['ID_PEDIDO'] }}">
-                                            <i class="fa fa-check-circle me-1"></i> Emitir
-                                        </button>
 
-                                        <!-- ANULAR -->
-                                        <button
-                                                class="btn btn-sm btn-danger anular-pedido"
-                                                data-id="{{ $item['ID_PEDIDO'] }}">
-                                            <i class="fa fa-times-circle me-1"></i> Anular
-                                        </button>
-                                    @endif
 
                                 </div>
                             </td>

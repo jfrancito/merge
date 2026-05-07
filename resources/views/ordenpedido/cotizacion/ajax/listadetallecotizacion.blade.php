@@ -50,6 +50,13 @@
                     </tbody>
                 </table>
             </div>
+            
+            @if(isset($lista_detalle->first()->TXT_OBSERVACION) && !empty($lista_detalle->first()->TXT_OBSERVACION))
+            <div class="p-4 bg-white border-top">
+                <h4 class="fw-bold" style="color: #1d3a6d; margin-top: 0;"><i class="mdi mdi-comment-text-outline"></i> Observaciones:</h4>
+                <div class="well well-sm mb-0" style="background: #f8f9fa; border: 1px solid #eef1f7; white-space: pre-wrap; font-size: 14px;">{!! nl2br(e($lista_detalle->first()->TXT_OBSERVACION)) !!}</div>
+            </div>
+            @endif
         </div>
 
         <div class="modal-footer">

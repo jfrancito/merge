@@ -23,6 +23,7 @@
                     </div>
                 </th>
                 <th>ID CONSOLIDADO</th>
+                <th>CENTRO</th>
                 <th>ID PEDIDO</th>
                 <th>FECHA</th>
                 <th>CATEGORÍA FAMILIA</th>
@@ -34,16 +35,18 @@
             <tr>
                 <td class="text-center">
                     <div class="xs-check">
-                        <input id="check-{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}" 
+                        <input id="check-{{ $item->ID_PEDIDO_CONSOLIDADO }}" 
                                type="checkbox" 
-                               name="id_pedido_consolidado_general[]" 
+                               name="id_pedido_consolidado[]" 
                                class="check-consolidado" 
-                               value="{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}"
-                               data-familia="{{ $item->NOM_CATEGORIA_FAMILIA }}">
-                        <label for="check-{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}"></label>
+                               value="{{ $item->ID_PEDIDO_CONSOLIDADO }}"
+                               data-familia="{{ $item->NOM_CATEGORIA_FAMILIA }}"
+                               data-centro="{{ trim($item->NOM_CENTRO) }}">
+                        <label for="check-{{ $item->ID_PEDIDO_CONSOLIDADO }}"></label>
                     </div>
                 </td>
-                <td class="font-bold">{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}</td>
+                <td class="font-bold">{{ $item->ID_PEDIDO_CONSOLIDADO }}</td>
+                <td class="text-primary" style="font-size: 11px; font-weight: 700;">{{ $item->NOM_CENTRO }}</td>
                 <td style="color: #666; font-size: 11px;">{{ $item->ID_PEDIDOS }}</td>
                 <td>{{ date('d-m-Y', strtotime($item->FEC_PEDIDO)) }}</td>
                 <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
