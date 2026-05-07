@@ -29,6 +29,7 @@
                       </tr>
                     </thead>
                     <tbody>
+                    	@php $total =  0 @endphp
 				              @foreach($datastring as $index => $item) 
                       <tr>
                         <td>
@@ -44,7 +45,17 @@
                         	<span>{{$item->data_total}}</span>
                         </td>
                       </tr>
+                      @php $total = $total + $item->data_total @endphp
 				              @endforeach
+		                  <tfoot>
+		                    <tr>
+		                    	<th></th>
+		                    	<th></th>
+		                    	<th></th>
+		                    	<th>{{$total}}</th>
+		                    </tr>
+		                  </tfoot>
+
                     </tbody>
                   </table>
 	            </div>
