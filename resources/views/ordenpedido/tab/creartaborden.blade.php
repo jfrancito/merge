@@ -99,9 +99,10 @@
                         AÑO <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {!! Form::select('cod_anio', $periodo_anio, '', [
+                        {!! Form::select('cod_anio', $periodo_anio, date('Y'), [
                             'id' => 'cod_anio',
-                            'class' => 'form-control control select2'
+                            'class' => 'form-control control select2',
+                            'disabled' => 'disabled'
                         ]) !!}
                     </div>
                 </div>
@@ -294,24 +295,24 @@
         <div class="row form-row">
             <div class="col-xs-12 cajareporte">
                 <div class="form-group">
-                    <label class="control-label labelleft negrita">
-                        INFORME :
-                    </label>
-
-                    <input
-                            type="file"
-                            class="form-control input-sm"
-                            name="select_file[]"
-                            id="formFile"
-                            multiple
-                            accept=".xls,.xlsx,.csv,.pdf,.doc,.docx"
-                            style="cursor:pointer;">
+                    <div class="file-upload-wrapper" style="position: relative; width: 100%;">
+                        <div class="file-upload-box" id="drop-area-orden" style="border: 2px dashed #1d3a6d; border-radius: 10px; padding: 12px; text-align: center; background: #f8f9fc; cursor: pointer; transition: all 0.3s; position: relative; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                            <input type="file" name="select_file[]" id="formFile" multiple accept=".xls,.xlsx,.csv,.pdf,.doc,.docx" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; z-index: 10;">
+                            <i class="mdi mdi-cloud-upload" style="font-size: 24px; color: #1d3a6d;"></i>
+                            <div class="upload-content" style="text-align: left;">
+                                <h5 style="font-weight: 700; color: #1d3a6d; margin: 0; font-size: 14px;">Cargar Informe / Documentos</h5>
+                                <p style="color: #666; font-size: 11px; margin: 0;">Arrastre archivos aquí o haga clic</p>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <span class="file-tag">PDF</span>
+                                <span class="file-tag">EXCEL</span>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div id="contenedor_archivo_cargado" style="display: none; margin-top: 10px;">
-                        <span class="label label-success" style="font-size: 13px;">
-                            <i class="fa fa-file"></i> Archivo cargado: 
-                            <a href="#" id="enlace_archivo_cargado" target="_blank" style="color: white; text-decoration: underline;"></a>
-                        </span>
+                    <!-- CONTENEDOR DE PREVISUALIZACIÓN -->
+                    <div id="previsualizacion-archivos-orden" class="row" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; padding: 0 15px;">
+                        <!-- Dinámico -->
                     </div>
                 </div>
             </div>
@@ -385,7 +386,19 @@
                        oninput="this.value = Math.max(0, this.value)">
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-1 div-precio-servicio" style="display: none;">
+                <label class="label-sm negrita">
+                    PRECIO <span class="obligatorio">(*)</span>
+                </label>
+                <input type="number"
+                       id="precio_servicio"
+                       class="form-control text-center"
+                       min="0"
+                       step="0.01"
+                       value="0.00">
+            </div>
+
+            <div class="col-md-3" id="div-observacion">
                 <label class="label-sm negrita">
                     OBSERVACIÓN
                 </label>
@@ -416,18 +429,19 @@
                     <th class=" text-center">#</th>
                     <th class=" text-center">CÓDIGO</th>
                     <th class=" text-center">PRODUCTO</th>
+                    <th class=" text-center">TIPO PRODUCTO</th>
                     <th class=" text-center">UNIDAD</th>
                     <th class=" text-center">CANTIDAD</th>
-                    <th class=" text-center">PRECIO</th>
-                    <th class=" text-center">SUBTOTAL</th>
+                    <th class=" text-center">PRECIO (S/)</th>
+                    <th class=" text-center">SUBTOTAL (S/)</th>
                     <th class=" text-center">OBSERVACIÓN</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="6" class="text-right negrita" style="vertical-align: middle;">TOTAL PEDIDO:</th>
-                    <th class="text-center negrita" id="total_pedido" style="font-size: 16px; color: #1d3a6d;">0.00</th>
+                    <th colspan="7" class="text-right negrita" style="vertical-align: middle;">TOTAL PEDIDO:</th>
+                    <th class="text-center negrita" id="total_pedido" style="font-size: 16px; color: #1d3a6d;">S/ 0.00</th>
                     <th></th>
                 </tr>
                 </tfoot>
@@ -523,8 +537,26 @@
         cursor: pointer;
     }
     
-    #cod_tipo_pedido + .select2 .select2-selection__arrow {
-    display: none;
+    #cod_tipo_pedido + .select2 .select2-selection__arrow,
+    #cod_anio + .select2 .select2-selection__arrow {
+        display: none;
+    }
+
+    .file-upload-box:hover {
+        background: #f0f4f8 !important;
+        border-color: #4facfe !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .file-tag {
+        font-size: 10px;
+        background: #e2e8f0;
+        color: #475569;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
     }
 
 

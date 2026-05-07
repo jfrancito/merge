@@ -24,14 +24,17 @@
                     <th class="text-center">U.M.</th>
                     <th class="text-center">CANTIDAD</th>
                     <th class="text-center" width="120">PRECIO</th>
+                    <th class="text-center" width="120">PRECIO IGV</th>
                     <th>FAMILIA</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($lista_detalle as $index => $item)
                 @php
-                    $id_pedido_consolidado = isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL : (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE : '');
-                    $cod_producto = $item->COD_PRODUCTO;
+                    $id_pedido_consolidado = isset($item->ID_PEDIDO_CONSOLIDADO) ? $item->ID_PEDIDO_CONSOLIDADO : 
+                                            (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL : 
+                                            (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE : ''));
+                    $cod_producto = trim($item->COD_PRODUCTO);
                     $nom_producto = $item->NOM_PRODUCTO;
                     
                     // Nombres de columnas varían entre Consolidado y Detalle Cotización
@@ -70,6 +73,7 @@
                                    value="{{ number_format($cantidad_val, 2, '.', '') }}" 
                                    step="0.01" 
                                    min="0.01"
+                                   data-max-cantidad="{{ isset($item->SALDO_PENDIENTE) ? $item->SALDO_PENDIENTE : $cantidad_val }}"
                                    style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
                         @endif
                     </td>
@@ -84,12 +88,26 @@
                                    style="height: 32px !important; font-weight: 700;"
                                    data-cantidad="{{ $cantidad_val }}"
                                    data-id-consolidado="{{ $id_pedido_consolidado }}"
-                                   data-cod-producto="{{ $cod_producto }}"
+                                   data-breakdown="{{ json_encode(isset($item->BREAKDOWN) ? $item->BREAKDOWN : [['id' => $id_pedido_consolidado, 'cant' => $cantidad_val]]) }}"
+                                   data-cod-producto="{{ trim($cod_producto) }}"
                                    data-nom-producto="{{ $nom_producto }}"
                                    data-cod-medida="{{ $cod_medida }}"
                                    data-nom-medida="{{ $nom_medida }}"
                                    data-cod-familia="{{ $cod_familia }}"
-                                   data-nom-familia="{{ $nom_familia }}">
+                                   data-nom-familia="{{ $nom_familia }}"
+                                   data-breakdown="{{ isset($item->BREAKDOWN) ? json_encode($item->BREAKDOWN) : '' }}">
+                        </div>
+                    </td>
+
+                    <td class="text-center">
+                        <div class="input-group" style="width: 110px; margin: 0 auto;">
+                            <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
+                            <input type="number" 
+                                   class="form-control input-sm text-right precio-igv-producto premium-input" 
+                                   value="{{ number_format($precio * 1.18, 2, '.', '') }}" 
+                                   step="0.01" 
+                                   min="0"
+                                   style="height: 32px !important; font-weight: 700; background-color: #fdfefe;">
                         </div>
                     </td>
 

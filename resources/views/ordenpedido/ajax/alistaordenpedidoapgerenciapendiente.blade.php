@@ -43,39 +43,19 @@
 
                             <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
                             <td>@include('comprobante.ajax.estadospedido')</td>
-                            <td class="text-center">
-                                <div class="grupo-acciones">
+                                    <td class="text-center">
+                                        <div class="grupo-acciones">
 
-                                    <!-- VER DETALLE (SIEMPRE VISIBLE) -->
-                                    <button
-                                            class="btn btn-sm btn-primary ver-detalle-pedido-ger"
-                                            data-id="{{ $item['ID_PEDIDO'] }}"
-                                            title="Ver detalle del pedido">
-                                        <i class="fa fa-eye me-1"></i>
-                                        Detalle
-                                    </button>
-
-
-                                    <!-- AUTORIZAR -->
-                                    <button
-                                            class="btn btn-sm btn-success aprobar-pedido-ger"
-                                            data-id="{{ $item['ID_PEDIDO'] }}"
-                                            data-bs-toggle="tooltip"
-                                            title="Autorizar pedido">
-                                        <i class="fa fa-check-circle me-1"></i>
-                                        Aprobar
-                                    </button>
-
-                                    <!-- RECHAZAR -->
-                                    <button
-                                            class="btn btn-sm btn-danger rechazar-pedido"
-                                            data-id="{{ $item['ID_PEDIDO'] }}"
-                                            title="Rechazar pedido">
-                                        <i class="fa fa-times-circle me-1"></i>
-                                        Rechazar
-                                    </button>
-                                </div>
-                            </td>
+                                            <!-- VER DETALLE (SISTEMA DE PESTAÑAS) -->
+                                            <button
+                                                    class="btn btn-sm btn-primary ver-detalle-pedido-ger"
+                                                    data-id="{{ $item['ID_PEDIDO'] }}"
+                                                    title="Ver detalle del pedido">
+                                                <i class="fa fa-eye me-1"></i>
+                                                Detalle
+                                            </button>
+                                        </div>
+                                    </td>
                             <td class="align-center-tb">
                                 @if($item['MULTI_ARCHIVOS'] != '')
                                     @php

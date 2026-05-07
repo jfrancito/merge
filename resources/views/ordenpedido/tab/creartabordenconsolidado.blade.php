@@ -20,7 +20,7 @@
                         <div class="col-md-2">
                             <label>Centro</label>
                             {!! Form::select('centro_id', $combo_centro, $centro_id,
-                                ['class'=>'select2 form-control','id'=>'centro_id']) !!}
+                                ['class'=>'select2 form-control','id'=>'centro_id', 'disabled' => 'disabled']) !!}
                         </div>
 
                         <div class="col-md-2">
@@ -56,18 +56,15 @@
 
             </div>
 
-            <div class="text-right mt-1">
-                <button class="btn btn-success btn-accion-consolidado btn-consolidar">
-                    <i class="mdi mdi-check"></i> Consolidar
-                </button>
-                <button class="btn btn-primary btn-accion-consolidado btn-guardar-consolidado">
-                    <i class="fa fa-save"></i> Guardar
-                </button>
+            <div id="contenedor-lista-consolidado" style="display: none;">
+                @include('ordenpedido.consolidado.listaordenconsolidado')
+
+                <div class="text-right mt-2">
+                    <button class="btn btn-primary btn-accion-consolidado btn-guardar-consolidado">
+                        <i class="fa fa-save"></i> Guardar
+                    </button>
+                </div>
             </div>
-
-
-
-               @include('ordenpedido.consolidado.listaordenconsolidado')
 
                <!-- CONTENEDOR NUEVO: DETALLE DEL PRODUCTO CONSOLIDADO (EN TABLA INFERIOR) -->
                 <div id="contenedor-detalle-producto-consolidado-general" style="display: none; margin-top: 25px;">
@@ -143,6 +140,10 @@
 .select2-container--default .select2-selection--single{
     height:38px;
     border-radius:6px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    font-weight: normal !important;
 }
 
 .btn-primary{

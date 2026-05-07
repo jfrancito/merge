@@ -55,26 +55,6 @@
                                                 Detalle
                                             </button>
 
-
-                                            <!-- AUTORIZAR -->
-                                            <button
-                                                 class="btn btn-sm btn-success aprobar-pedido-adm"
-                                                 data-id="{{ $item['ID_PEDIDO'] }}"
-                                                 data-bs-toggle="tooltip"
-                                                 title="Autorizar pedido">
-                                                <i class="fa fa-check-circle me-1"></i>
-                                                        Aprobar
-                                            </button>
-
-                                                    <!-- RECHAZAR -->
-                                            <button
-                                                class="btn btn-sm btn-danger rechazar-pedido"
-                                                data-id="{{ $item['ID_PEDIDO'] }}"
-                                                title="Rechazar pedido">
-                                                <i class="fa fa-times-circle me-1"></i>
-                                                Rechazar
-                                            </button>
-
                                     </div>
                                 </td>
                                 <td class="align-center-tb">

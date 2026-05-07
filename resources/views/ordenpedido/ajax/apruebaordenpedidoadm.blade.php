@@ -11,13 +11,41 @@
         <div class="main-content container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="panel panel-default panel-table">
-                        <div class="panel-heading">Lista Orden Pedido - Aprueba Administración
-                        </div>
-                           <div class='listajax'>    
-                                @include('ordenpedido.ajax.alistaordenpedidoapruebaadministracion')
+                    
+                    <div class="tab-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#ordenpedidoadm" data-toggle="tab">
+                                    <i class="fa fa-list me-1"></i> <b>ORDEN PEDIDO - AP. ADM.</b>
+                                </a>
+                            </li>
+                            <li id="tab-detalle-pedido-adm" style="display:none;">
+                                <a href="#detallepedidoadm" data-toggle="tab">
+                                    <i class="fa fa-file-text-o me-1"></i> <b>DETALLE PEDIDO</b>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- LISTADO PRINCIPAL -->
+                            <div id="ordenpedidoadm" class="tab-pane fade in active cont">
+                                <div class='listajax'>    
+                                    @include('ordenpedido.ajax.alistaordenpedidoapruebaadministracion')
+                                </div>
                             </div>
-                    </div>
+
+                            <!-- DETALLE DINÁMICO -->
+                            <div id="detallepedidoadm" class="tab-pane fade cont">
+                                <div id="detalle-pedido-adm-container">
+                                    <div class="text-center py-5">
+                                        <i class="fa fa-spinner fa-spin fa-3x mb-3 text-primary"></i>
+                                        <p class="text-muted">Cargando detalles del pedido...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- FIN tab-content -->
+                    </div><!-- FIN tab-container -->
+
                 </div>
             </div>
         </div>

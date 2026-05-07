@@ -171,11 +171,13 @@ class GestionOrdenPedidoApruebaGerController extends Controller
     {
         $id_buscar = $request->input('orden_pedido_id');
 
-
         $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
-        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-            ->where('ID_PEDIDO', $id_buscar)
-            ->where('ACTIVO', 1)
+        
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+            ->where('D.ID_PEDIDO', $id_buscar)
+            ->where('D.ACTIVO', 1)
+            ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
             ->get();
 
 
@@ -188,7 +190,7 @@ class GestionOrdenPedidoApruebaGerController extends Controller
 
         $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
 
-        return view('ordenpedido.modal.modaldetallepedidoger', [
+        return view('ordenpedido.ajax.detalletabpedidoger', [
             'ajax' => true,
             'pedido' => $pedido,
             'id_pedido' => $id_pedido,

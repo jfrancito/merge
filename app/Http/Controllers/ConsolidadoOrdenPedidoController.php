@@ -14,6 +14,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Carbon;
 use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
@@ -148,7 +149,6 @@ class ConsolidadoOrdenPedidoController extends Controller
                 ->pluck('NOM_CENTRO', 'COD_CENTRO')
                 ->toArray();
         }
-
         /* =========================
            VARIABLES FILTRO
         ========================== */
@@ -199,7 +199,8 @@ class ConsolidadoOrdenPedidoController extends Controller
 
         $funcion = $this;
 
-        return View::make('ordenpedido/consolidado/listaordenpedidoporconsolidar',
+        return View::make(
+            'ordenpedido/consolidado/listaordenpedidoporconsolidar',
             [
                 'listaordenpedido' => $listaordenpedido,
                 'idopcion' => $idopcion,
@@ -209,7 +210,8 @@ class ConsolidadoOrdenPedidoController extends Controller
                 'anio_pedido' => $anio_pedido,
                 'funcion' => $funcion,
                 'ajax' => true,
-            ]);
+            ]
+        );
     }
 
     public function actionGuardarConsolidado(Request $request)
@@ -292,9 +294,9 @@ class ConsolidadoOrdenPedidoController extends Controller
                 // 5. Insertar detalles
                 foreach ($items_del_grupo as $p) {
 
-                    $cantidad = (float)$p['CANTIDAD'];
-                    $stock = (float)$p['STOCK'];
-                    $reservado = (float)$p['CAN_STOCK_RESERVADO'];
+                    $cantidad = (float) $p['CANTIDAD'];
+                    $stock = (float) $p['STOCK'];
+                    $reservado = (float) $p['CAN_STOCK_RESERVADO'];
                     $diferencia = $cantidad - $stock + $reservado;
 
                     $this->insertOrdenPedidoConsolidadoDetalle(
@@ -317,7 +319,7 @@ class ConsolidadoOrdenPedidoController extends Controller
 
             // 6. Guardar relación N:N en CMP.REFERENCIA_ASOC
             foreach ($pedidos_ids as $pedido_id) {
-                DB::table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$pedido_id)->delete();
+                DB::table('CMP.REFERENCIA_ASOC')->where('COD_TABLA', '=', $pedido_id)->delete();
                 foreach ($consolidated_ids as $consolidado_id) {
                     DB::table('CMP.REFERENCIA_ASOC')->insert([
                         'COD_TABLA' => $pedido_id,
@@ -367,10 +369,27 @@ class ConsolidadoOrdenPedidoController extends Controller
         $id_consolidado = $request->input('id_consolidado');
         $familia_id = $request->input('familia_id');
 
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $empresa_sesion = Session::get('empresas');
+
+        $planilla = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.empresa_osiris_id', $empresa_sesion->COD_EMPR)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
+            ->first();
+
+        $cod_centro_usuario = $planilla ? $planilla->COD_CENTRO : '';
+        $nom_centro_usuario = $planilla ? $planilla->NOM_CENTRO : '';
+
         $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
 
         return view('ordenpedido.consolidado.ajax.listadetalleconsolidado', [
             'listadetalle' => $listadetalle,
+            'cod_centro_usuario' => $cod_centro_usuario,
+            'nom_centro_usuario' => $nom_centro_usuario,
             'ajax' => true,
         ]);
     }
@@ -391,6 +410,8 @@ class ConsolidadoOrdenPedidoController extends Controller
                     ->where('COD_PRODUCTO', $det['cod_producto'])
                     ->update([
                         'CAN_COMPRADA' => $det['cantidad'],
+                        'IND_COMPRA' => $det['ind_compra'] ?? null,
+                        'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
                         'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id // Guardamos el ID del usuario
                     ]);
             }
@@ -413,26 +434,49 @@ class ConsolidadoOrdenPedidoController extends Controller
     public function actionAjaxAprobarConsolidado(Request $request)
     {
         $id_consolidado = $request->input('id_consolidado');
+        $detalles_json = $request->input('detalles');
+        $detalles = json_decode($detalles_json, true);
+
         try {
             DB::beginTransaction();
-            // Realizamos el UPDATE solicitado
+
+            // 1. Guardar los cambios en el detalle (si se envían)
+            if (!empty($detalles)) {
+                foreach ($detalles as $det) {
+                    DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                        ->where('COD_PRODUCTO', $det['cod_producto'])
+                        ->update([
+                            'CAN_COMPRADA' => $det['cantidad'],
+                            'IND_COMPRA' => $det['ind_compra'],
+                            'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
+                            'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                            'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
+                        ]);
+                }
+            }
+
+            // 2. Realizamos el UPDATE solicitado para cerrar
             DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
                 ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
                 ->update([
-                    'COD_ESTADO' => 'ETM0000000000015', // COD_ESTADO APROBADO
-                    'TXT_ESTADO' => 'CERRADO'        // TXT_ESTADO APROBADO
-
+                    'COD_ESTADO' => 'ETM0000000000015', // COD_ESTADO POR APROBAR JEFE DE COMPRAS
+                    'TXT_ESTADO' => 'POR APROBAR JEFE DE COMPRAS',
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                    'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
                 ]);
+
             DB::commit();
             return response()->json([
                 'success' => true,
-                'mensaje' => 'Consolidado aprobado correctamente.'
+                'mensaje' => 'Consolidado guardado y cerrado correctamente.'
             ]);
+
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'mensaje' => 'Error al aprobar: ' . $e->getMessage()
+                'mensaje' => 'Error al cerrar: ' . $e->getMessage()
             ]);
         }
     }
@@ -503,6 +547,26 @@ class ConsolidadoOrdenPedidoController extends Controller
             'listaordenconsolidado' => $listaordenconsolidado,
             'ajax' => true,
         ]);
+    }
+
+    public function actionExportarExcelConsolidado($id_consolidado)
+    {
+        set_time_limit(0);
+
+        $familia_id = 'TODO';
+        $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
+
+        $titulo = 'Detalle-Consolidado-' . $id_consolidado;
+        $fecha_actual = date("Y-m-d");
+
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $id_consolidado) {
+            $excel->sheet('DETALLE', function ($sheet) use ($listadetalle, $id_consolidado) {
+                $sheet->loadView('ordenpedido.excel.listaconsolidadodetalleexcel', [
+                    'listadetalle' => $listadetalle,
+                    'id_consolidado' => $id_consolidado
+                ]);
+            });
+        })->export('xls');
     }
 
 }

@@ -25,6 +25,7 @@
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#crearpedido" data-toggle="tab"><b>CREAR PEDIDO</b></a></li>
                         <li><a href="#ordenpedido" data-toggle="tab"><b>ORDEN PEDIDO</b></a></li>
+                        <li id="tab-detalle-pedido" style="display:none;"><a href="#detallepedido" data-toggle="tab"><b>DETALLE PEDIDO</b></a></li>
                     </ul>
 
                     <!-- CONTENIDO TABS -->
@@ -35,6 +36,12 @@
 
                         <div id="ordenpedido" class="tab-pane fade cont">
                             @include('ordenpedido.ajax.alistaordenpedido')
+                        </div>
+
+                        <div id="detallepedido" class="tab-pane fade cont">
+                            <div id="detalle-pedido-container">
+                                <!-- Contenido dinámico -->
+                            </div>
                         </div>
                     </div><!-- FIN tab-content -->
                 </div><!-- FIN tab-container -->
@@ -111,6 +118,12 @@
             App.formElements();
             
             App.dataTables();
+            
+            $("#tabla-orden-pedido").dataTable({
+                "pageLength": 10,
+                "order": [[0, "desc"]]
+            });
+
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>

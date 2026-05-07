@@ -21,6 +21,7 @@
     <!-- VALORES OCULTOS -->
     <input type="hidden" id="tipo_cambio_actual" value="{{ $valor_tipo_cambio }}">
     <input type="hidden" id="token" value="{{ csrf_token() }}">
+    <input type="hidden" id="cod_centro_usuario" value="{{ $cod_centro }}">
 
     <div class="main-content container-fluid">
         <div class="row">
@@ -33,6 +34,9 @@
                         <li>
                             <a href="#listacotizacionpedido" data-toggle="tab"><b>COTIZACIÓN PEDIDOS</b></a>
                         </li>
+                        <li id="tab-header-detalle" style="display: none;">
+                            <a href="#detallecotizacion" data-toggle="tab"><b style="color: #e67e22;">DETALLE COTIZACIÓN</b></a>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -44,6 +48,16 @@
                         <!-- TAB: LISTA -->
                         <div id="listacotizacionpedido" class="tab-pane fade cont">
                             @include('ordenpedido.cotizacion.listacotizacionpedido')
+                        </div>
+
+                        <!-- TAB: DETALLE (NUEVO) -->
+                        <div id="detallecotizacion" class="tab-pane fade cont">
+                            <div id="contenedor-detalle-cotizacion-tab">
+                                <div class="text-center" style="padding: 100px;">
+                                    <i class="fa fa-spinner fa-spin fa-4x text-primary" style="margin-bottom: 20px;"></i>
+                                    <h4 class="text-muted">Cargando información detallada...</h4>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

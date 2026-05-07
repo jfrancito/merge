@@ -514,7 +514,7 @@ class ValeRendirController extends Controller
                $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
                $pendienteCount = count($valesPendientes);
 
-                if (in_array($cod_usuario_registro, ['1CIX00000209', '1CIX00000046'])) {
+                if (in_array($cod_usuario_registro, ['1CIX00000209', '1CIX00000046','1CIX00000437'])) {
                     // Usuarios especiales → hasta 4 vales
                     if ($pendienteCount >= 4) {
                         return response()->json([

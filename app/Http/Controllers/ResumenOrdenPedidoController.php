@@ -161,9 +161,12 @@ class ResumenOrdenPedidoController extends Controller
         $id_buscar = $request->input('orden_pedido_id');
 
         $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
-        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-            ->where('ID_PEDIDO', $id_buscar)
-            ->where('ACTIVO', 1)
+
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+            ->where('D.ID_PEDIDO', $id_buscar)
+            ->where('D.ACTIVO', 1)
+            ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
             ->get();
 
         $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');

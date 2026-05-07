@@ -1,4 +1,3 @@
-
 <div class="container-fluid ordenpedido">
     <input type="hidden" id="tipo_cambio_actual" value="{{ $valor_tipo_cambio }}">
     <input type="hidden" id="id_cotizacion_edit" value="">
@@ -10,13 +9,17 @@
         </div>
 
         <div class="panel-body">
-            
+
             <!-- ALERTA TIPO DE CAMBIO -->
             @if($valor_tipo_cambio <= 0)
-                <div class="alert alert-warning alert-dismissible shadow-soft" role="alert" style="border-radius: 8px; border-left: 5px solid #f39c12;">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <i class="mdi mdi-information-outline" style="font-size: 20px; vertical-align: middle; margin-right: 10px;"></i>
-                    <strong>Nota:</strong> No se ha registrado el tipo de cambio para hoy ({{ date('d-m-Y') }}). El sistema no podrá realizar la conversión a dólares automáticamente.
+                <div class="alert alert-warning alert-dismissible shadow-soft" role="alert"
+                    style="border-radius: 8px; border-left: 5px solid #f39c12;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <i class="mdi mdi-information-outline"
+                        style="font-size: 20px; vertical-align: middle; margin-right: 10px;"></i>
+                    <strong>Nota:</strong> No se ha registrado el tipo de cambio para hoy ({{ date('d-m-Y') }}). El sistema
+                    no podrá realizar la conversión a dólares automáticamente.
                 </div>
             @endif
 
@@ -27,30 +30,47 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label>N° Cotización</label>
-                                <input type="text" class="form-control premium-input text-center" id="nro_cotizacion" value="{{ $nro_cotizacion }}" readonly>
+                                <input type="text" class="form-control premium-input text-center" id="nro_cotizacion"
+                                    value="{{ $nro_cotizacion }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Tipo Cotización</label>
+                                <select class="form-control premium-input" id="txt_tipo_cotizacion"
+                                    style="font-size: 14px;">
+                                    <option value="">Seleccione tipo</option>
+                                    <option value="CON COTIZACION">CON COTIZACION</option>
+                                    <option value="SIN COTIZACION">SIN COTIZACION</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>Serie</label>
-                                <input type="text" class="form-control premium-input text-center" id="serie" placeholder="S001" maxlength="4" oninput="this.value = this.value.toUpperCase().replace(/[^0-9A-Z]/g, '')">
+                                <input type="text" class="form-control premium-input text-center" id="serie"
+                                    placeholder="S001" maxlength="4"
+                                    oninput="this.value = this.value.toUpperCase().replace(/[^0-9A-Z]/g, '')">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label>Número</label>
-                                <input type="text" class="form-control premium-input" id="numero" placeholder="Escriba el número...">
+                                <input type="text" class="form-control premium-input text-center" id="numero"
+                                    placeholder="Escriba el número..." maxlength="8">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Fecha</label>
                                 <div class="input-group">
-                                    <input type="date" class="form-control premium-input" id="fecha_cotizacion" value="{{ date('Y-m-d') }}">
-                                    <span class="input-group-addon addon-premium"><i class="mdi mdi-calendar"></i></span>
+                                    <input type="date" class="form-control premium-input" id="fecha_cotizacion"
+                                        value="{{ date('Y-m-d') }}">
+                                    <span class="input-group-addon addon-premium"><i
+                                            class="mdi mdi-calendar"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -69,7 +89,8 @@
                             <div class="form-group">
                                 <label>RUC / Documento</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control premium-input" id="ruc_proveedor" placeholder="Buscar RUC...">
+                                    <input type="text" class="form-control premium-input" id="ruc_proveedor"
+                                        placeholder="Buscar RUC...">
                                     <span class="input-group-btn">
                                         <button class="btn btn-primary btn-search-premium" type="button">
                                             <i class="mdi mdi-search"></i>
@@ -81,13 +102,15 @@
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label>Razón Social / Nombre</label>
-                                <input type="text" class="form-control premium-input" id="nombre_proveedor" placeholder="Nombre completo del proveedor...">
+                                <input type="text" class="form-control premium-input" id="nombre_proveedor"
+                                    placeholder="Nombre completo del proveedor...">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Dirección</label>
-                                <input type="text" class="form-control premium-input" id="direccion" placeholder="Calle, Av, Jr...">
+                                <input type="text" class="form-control premium-input" id="direccion"
+                                    placeholder="Calle, Av, Jr...">
                             </div>
                         </div>
                     </div>
@@ -95,14 +118,19 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Teléfono</label>
-                                <input type="text" class="form-control premium-input" id="telefono" placeholder="+51 ...">
+                                <input type="text" class="form-control premium-input" id="telefono" maxlength="9"
+                                    placeholder="987654321">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Tipo de Crédito</label>
-                                {!! Form::select( 'tipo_pago_id', $combo_tipo_pago, null,
-                                    ['class' => 'form-control select2 premium-input' , 'id' => 'tipo_pago_id', 'required' => 'required']) 
+                                {!! Form::select(
+    'tipo_pago_id',
+    $combo_tipo_pago,
+    null,
+    ['class' => 'form-control select2 premium-input', 'id' => 'tipo_pago_id', 'required' => 'required']
+) 
                                 !!}
                             </div>
                         </div>
@@ -110,7 +138,9 @@
                             <div class="form-group">
                                 <label>Validez Cotización</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control premium-input text-center" id="validez" placeholder="0" min="1" oninput="if(this.value<0) this.value=Math.abs(this.value)">
+                                    <input type="number" class="form-control premium-input text-center" id="validez"
+                                        placeholder="0" min="1"
+                                        oninput="if(this.value<0) this.value=Math.abs(this.value)">
                                     <span class="input-group-addon addon-premium">día(s)</span>
                                 </div>
                             </div>
@@ -119,7 +149,9 @@
                             <div class="form-group">
                                 <label>Tiempo de Entrega</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control premium-input text-center" id="entrega" placeholder="0" min="1" oninput="if(this.value<0) this.value=Math.abs(this.value)">
+                                    <input type="number" class="form-control premium-input text-center" id="entrega"
+                                        placeholder="0" min="1"
+                                        oninput="if(this.value<0) this.value=Math.abs(this.value)">
                                     <span class="input-group-addon addon-premium">día(s)</span>
                                 </div>
                             </div>
@@ -130,34 +162,48 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Moneda</label>
-                                {!! Form::select( 'moneda_id', $combo_moneda, null,
-                                    ['class' => 'form-control select2 premium-input' , 'id' => 'moneda_id', 'required' => 'required']) 
+                                {!! Form::select(
+    'moneda_id',
+    $combo_moneda,
+    null,
+    ['class' => 'form-control select2 premium-input', 'id' => 'moneda_id', 'required' => 'required']
+) 
                                 !!}
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Observación</label>
-                                <input type="text" class="form-control premium-input" id="observacion" placeholder="Notas adicionales...">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Total Estimado</label>
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <div class="input-group" style="flex: 1;">
                                         <span class="input-group-addon addon-premium moneda-simbolo">S/</span>
-                                        <input type="number" class="form-control premium-input text-right font-bold" id="total" value="0.00" step="0.01" readonly style="background-color: #f8f9fa; cursor: not-allowed; color: #1d3a6d;">
+                                        <input type="number" class="form-control premium-input text-right font-bold"
+                                            id="total" value="0.00" step="0.01" readonly
+                                            style="background-color: #f8f9fa; cursor: not-allowed; color: #1d3a6d;">
                                     </div>
                                     <div class="be-checkbox be-checkbox-sm inline" style="margin: 0; min-width: 80px;">
                                         <input type="checkbox" id="incluir_igv">
-                                        <label for="incluir_igv" style="font-size: 11px; font-weight: 700; color: #1e3a6d; white-space: nowrap;">+ IGV</label>
+                                        <label for="incluir_igv"
+                                            style="font-size: 11px; font-weight: 700; color: #1e3a6d; white-space: nowrap;">+
+                                            IGV</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 text-center" style="margin-top: 25px;">
-                            <button class="btn btn-info btn-block btn-seleccionar-consolidados shadow-soft">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Observación / Glosa</label>
+                                <textarea class="form-control premium-input" id="observacion"
+                                    placeholder="Escriba la glosa aquí..." rows="4"
+                                    style="height: auto; min-height: 95px; padding-top: 10px; resize: vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button class="btn btn-info btn-seleccionar-consolidados shadow-soft"
+                                style="padding: 6px 20px; font-size: 12px; border-radius: 20px;">
                                 <i class="mdi mdi-layers" style="margin-right: 5px;"></i> Seleccionar Consolidados
                             </button>
                         </div>
@@ -165,7 +211,7 @@
                 </div>
             </div>
 
-           
+
 
 
 
@@ -177,7 +223,7 @@
                 </div>
             </div>
 
-             <!-- SECCIÓN: ARCHIVO ADJUNTO (PDF) -->
+            <!-- SECCIÓN: ARCHIVO ADJUNTO (PDF) -->
             <div class="panel panel-default box-seccion shadow-soft" style="border-left: 5px solid #3498db;">
                 <div class="panel-heading subheader-seccion">
                     <i class="mdi mdi-upload"></i> Archivo
@@ -186,11 +232,19 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group mb-0">
-                                <label class="text-primary"><i class="fa fa-file-pdf-o"></i> Seleccionar Cotización Firmada / PDF</label>
-                                <input type="file" id="archivo_cotizacion_crear" class="form-control premium-input" accept=".pdf" style="padding: 7px;" multiple>
+                                <label class="text-primary"><i class="fa fa-file-pdf-o"></i> Seleccionar Cotización
+                                    Firmada / PDF</label>
+                                <input type="file" id="archivo_cotizacion_crear" class="form-control premium-input"
+                                    accept=".pdf" style="padding: 7px;" multiple>
                                 <p class="help-block" style="font-size: 12px; margin-top: 5px; color: #777;">
-                                    <i class="fa fa-info-circle"></i> El archivo se subirá automáticamente al servidor remoto al momento de "Generar Cotización".
+                                    <i class="fa fa-info-circle"></i> El archivo se subirá automáticamente al servidor
+                                    remoto al momento de "Generar Cotización".
                                 </p>
+                            </div>
+                            <!-- CONTENEDOR DE PREVISUALIZACIÓN -->
+                            <div id="previsualizacion-archivos-cotizacion" class="row"
+                                style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; padding: 0 15px;">
+                                <!-- Dinámico -->
                             </div>
                         </div>
                     </div>
@@ -205,11 +259,13 @@
                     </div>
                     <div class="panel-body">
                         <div class="alert alert-info" style="font-size: 13px; margin-bottom: 10px;">
-                            <i class="fa fa-info-circle"></i> Los archivos marcados con el ícono de basura <i class="fa fa-trash text-danger"></i> se desactivarán al guardar.
+                            <i class="fa fa-info-circle"></i> Los archivos marcados con el ícono de basura <i
+                                class="fa fa-trash text-danger"></i> se desactivarán al guardar.
                         </div>
-                        <ul id="lista-archivos-existentes" class="list-group" style="margin-bottom: 0;">
+                        <div id="lista-archivos-existentes" class="row"
+                            style="margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 15px; padding: 0 15px;">
                             <!-- Dinámico -->
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -221,7 +277,8 @@
                     <button class="btn btn-default btn-cancelar btn-lg shadow-soft">
                         <i class="mdi mdi-close"></i> Cancelar
                     </button>
-                    <button class="btn btn-success btn-guardar-cotizacion btn-lg shadow-success" style="min-width: 180px;">
+                    <button class="btn btn-success btn-guardar-cotizacion btn-lg shadow-success"
+                        style="min-width: 180px;">
                         <i class="mdi mdi-content-save"></i> Generar Cotización
                     </button>
                 </div>
@@ -344,7 +401,7 @@
     }
 
     .shadow-soft {
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
     .shadow-success {
@@ -371,16 +428,28 @@
         margin-bottom: 10px;
     }
 
-    .font-bold { font-weight: 700; }
-    .mt-4 { margin-top: 20px; }
+    .font-bold {
+        font-weight: 700;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
 
     @keyframes success-pulse {
-        0% { border-color: #2980b9; box-shadow: 0 0 0 0px rgba(40, 167, 69, 0.4); }
-        100% { border-color: #28a745; box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        0% {
+            border-color: #2980b9;
+            box-shadow: 0 0 0 0px rgba(40, 167, 69, 0.4);
+        }
+
+        100% {
+            border-color: #28a745;
+            box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+        }
     }
+
     .success-pulse {
         animation: success-pulse 1s ease-out;
         border-color: #28a745 !important;
     }
-
 </style>
