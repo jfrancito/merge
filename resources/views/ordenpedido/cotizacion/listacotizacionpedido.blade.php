@@ -22,16 +22,15 @@
                         <thead style="background: #1d3a6d; color: #fff;">
                             <tr>
                                 <th class="text-center" style="padding: 15px;">#</th>
-                                <th style="padding: 15px;">ID COTIZACIÓN</th>
-                                <th style="padding: 15px;">CENTRO</th>
-                                <th style="padding: 15px;">FECHA</th>
-                                <th style="padding: 15px;">NRO SERIE</th>
-                                <th style="padding: 15px;">NRO DOC</th>
-                                <th style="padding: 15px;">PROVEEDOR</th>
+                                <th class="text-center" style="padding: 15px;">ID COTIZACIÓN</th>
+                                <th class="text-center" style="padding: 15px;">CENTRO</th>
+                                <th class="text-center" style="padding: 15px;">FECHA</th>
+                                <th class="text-center" style="padding: 15px;">NRO SERIE</th>
+                                <th class="text-center" style="padding: 15px;">NRO DOC</th>
+                                <th class="text-center" style="padding: 15px;">PROVEEDOR</th>
                                 <th class="text-center" style="padding: 15px;">MONEDA</th>
                                 <th class="text-center" style="padding: 15px;">TIPO PAGO</th>
-                                <th style="padding: 15px;">OBSERVACIÓN</th>
-                                <th class="text-right" style="padding: 15px;">TOTAL</th>
+                                <th class="text-center" style="padding: 15px;">TOTAL</th>
                                 <th class="text-center" style="padding: 15px;">ESTADO</th>
                                 <th class="text-center" style="padding: 15px;">ACCIONES</th>
                             </tr>
@@ -40,17 +39,17 @@
                             @foreach($listacotizaciones as $index => $item)
                                 <tr style="transition: all 0.3s; border-bottom: 1px solid #f2f2f2;">
                                     <td class="text-center">{{ $index + 1 }}</td>
-                                    <td><b style="color: #1d3a6d;">{{ $item->ID_COTIZACION }}</b></td>
+                                    <td class="text-center"><b style="color: #1d3a6d;">{{ $item->ID_COTIZACION }}</b></td>
                                     <td class="text-center">
                                         <span class="label label-info"
                                             style="background: #34aadc; color: #fff; font-weight: bold;">
                                             {{ $item->ABREV_CENTRO }}
                                         </span>
                                     </td>
-                                    <td>{{ date('d-m-Y', strtotime($item->FEC_COTIZACION)) }}</td>
-                                    <td>{{ $item->NRO_SERIE }}</td>
-                                    <td>{{ $item->NRO_DOC }}</td>
-                                    <td title="{{ $item->NOM_EMPR_PROVEEDOR }}">
+                                    <td class="text-center">{{ date('d-m-Y', strtotime($item->FEC_COTIZACION)) }}</td>
+                                    <td class="text-center">{{ $item->NRO_SERIE }}</td>
+                                    <td class="text-center">{{ $item->NRO_DOC }}</td>
+                                    <td class="text-center" title="{{ $item->NOM_EMPR_PROVEEDOR }}">
                                         {{ str_limit($item->NOM_EMPR_PROVEEDOR, 30) }}
                                     </td>
                                     <td class="text-center">
@@ -60,9 +59,7 @@
                                         </span>
                                     </td>
                                     <td class="text-center">{{ $item->TXT_CATEGORIA_TIPO_PAGO }}</td>
-                                    <td style="white-space: pre-line;">
-                                        {!! nl2br(e(str_limit($item->TXT_OBSERVACION, 100))) !!}</td>
-                                    <td class="text-right">
+                                    <td class="text-center">
                                         <b style="font-size: 14px;">{{ number_format($item->CAN_TOTAL, 2, '.', ',') }}</b>
                                     </td>
                                     <td class="text-center">
@@ -70,8 +67,7 @@
                                             <span class="label label-primary"
                                                 style="padding: 5px 10px; border-radius: 20px;">{{ $item->TXT_ESTADO }}</span>
                                         @elseif($item->TXT_ESTADO == 'ANULADO')
-                                            <span class="label label-danger"
-                                                style="padding: 5px 10px; border-radius: 20px;"
+                                            <span class="label label-danger" style="padding: 5px 10px; border-radius: 20px;"
                                                 title="{{ $item->TXT_GLOSA_ANULACION }}">{{ $item->TXT_ESTADO }}</span>
                                         @else
                                             <span class="label label-success"
