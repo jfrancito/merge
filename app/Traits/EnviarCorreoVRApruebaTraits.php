@@ -126,9 +126,13 @@ trait EnviarCorreoVRApruebaTraits
 
             if ($emailfromcentro === 'CEN0000000000004') {
                 if ($VALE_RENDIR->TIPO_PAGO == 1) {
-                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                    $destinatarios = [
+                        "doris.delgado@induamerica.com.pe",
+                        "yajaira.alfaro@induamerica.com.pe"
+                    ];
                     $copias = [
                         "doris.delgado@induamerica.com.pe",
+                        "yajaira.alfaro@induamerica.com.pe",
                         "tesoreria.cix@induamerica.com.pe",
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
@@ -139,8 +143,13 @@ trait EnviarCorreoVRApruebaTraits
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
-                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
-                    $copias = ["doris.delgado@induamerica.com.pe"];
+                    $destinatarios = [
+                        "doris.delgado@induamerica.com.pe",
+                        "yajaira.alfaro@induamerica.com.pe"
+                    ];
+                    $copias = ["doris.delgado@induamerica.com.pe",
+                        "yajaira.alfaro@induamerica.com.pe"
+                    ];
                 }
 
             } elseif ($emailfromcentro === 'CEN0000000000006') {
