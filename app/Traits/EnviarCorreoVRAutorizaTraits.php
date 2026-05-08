@@ -121,7 +121,10 @@ trait EnviarCorreoVRAutorizaTraits
       
 
             if ($emailfromcentro === 'CEN0000000000004') {
-                $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                 $destinatarios = [
+                        "doris.delgado@induamerica.com.pe",
+                        "yajaira.alfaro@induamerica.com.pe"
+                    ];
             } elseif ($emailfromcentro === 'CEN0000000000006') {
                 $destinatarios = ["diana.paredes@induamerica.com.pe"];
             } elseif ($emailfromcentro === 'CEN0000000000002') {
