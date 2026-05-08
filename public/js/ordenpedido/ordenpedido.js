@@ -857,7 +857,7 @@ $(document).ready(function () {
                         icono: '⚠️',
                         titulo: 'Atención',
                         mensaje: 'El monto total <b>superó los ' +
-                            umbralAdminMaestra.toFixed(2) +
+                            umbralGerencia.toFixed(2) +
                             '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
                     });
                 }
