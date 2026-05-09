@@ -6248,6 +6248,7 @@ trait ComprobanteTraits
                     ->leftJoin('FE_REF_ASOC', function ($leftJoin){
                         $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
                                 ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                                //->where('FE_REF_ASOC.ESTATUS', '=', 'ON')
                                 ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
                                 ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
 
