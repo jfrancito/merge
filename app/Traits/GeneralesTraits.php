@@ -41,6 +41,20 @@ use PDO;
 trait GeneralesTraits
 {
 
+    public function limpiarTildes($texto) {
+        // Reemplazar tildes manualmente si es necesario
+        $buscar = ['á','é','í','ó','ú','ñ','Á','É','Í','Ó','Ú','Ñ','ü','Ü'];
+        $reemplazar = ['a','e','i','o','u','n','A','E','I','O','U','N','u','U'];
+        
+        $texto = str_replace($buscar, $reemplazar, $texto);
+        
+        // Convertir el resto de caracteres especiales
+        $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+        
+        return $texto;
+    }
+
+
     public function generarAsientoComprasFeDocumento($anio, $empresa, $cod_contable, $ind_anulado, $igv, $ind_recalcular, $centro_costo, $ind_igv, $cod_usuario_registra)
     {
         $pdo = DB::connection()->getPdo();

@@ -303,7 +303,7 @@ class GestionEstibaController extends Controller
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -777,7 +777,7 @@ class GestionEstibaController extends Controller
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -1269,7 +1269,7 @@ class GestionEstibaController extends Controller
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -2719,7 +2719,7 @@ class GestionEstibaController extends Controller
 
                         $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;
-                        $nombrefile      =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $nombrefile      =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefile;
                         $nombreoriginal  =      $file->getClientOriginalName();
@@ -3258,7 +3258,7 @@ class GestionEstibaController extends Controller
                             $contadorArchivos = Archivo::count();
                             $prefijocarperta  =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile         =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;
-                            $nombrefile       =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefile       =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor            =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefile;
                             $nombreoriginal  =      $file->getClientOriginalName();
@@ -3777,7 +3777,7 @@ class GestionEstibaController extends Controller
                             $contadorArchivos =      Archivo::count();
                             $prefijocarperta  =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile         =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;
-                            $nombrefile       =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefile       =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor            =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta     =      $rutafile.'\\'.$nombrefile;
                             $nombreoriginal   =      $file->getClientOriginalName();

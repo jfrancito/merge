@@ -4957,7 +4957,7 @@ class GestionLiquidacionGastosController extends Controller
                                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                     $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $iddocumento;
-                                    $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                    $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                     $valor = $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                     copy($file->getRealPath(), $rutacompleta);
@@ -5076,7 +5076,7 @@ class GestionLiquidacionGastosController extends Controller
                                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                     $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $iddocumento;
-                                    $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                    $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                     $valor = $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                     copy($file->getRealPath(), $rutacompleta);
@@ -5136,7 +5136,7 @@ class GestionLiquidacionGastosController extends Controller
                                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                     $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $iddocumento;
-                                    $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                    $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                     $valor = $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                     copy($file->getRealPath(), $rutacompleta);

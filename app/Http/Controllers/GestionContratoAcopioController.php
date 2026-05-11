@@ -607,7 +607,7 @@ class GestionContratoAcopioController extends Controller
                             $nombre = $idcab . '-' . $file->getClientOriginalName();
                             $prefijocarperta = 'CONTRATOACOPIO';
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta;
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
 
                             if (!file_exists($rutafile)) {

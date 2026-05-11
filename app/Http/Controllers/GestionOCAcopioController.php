@@ -257,7 +257,7 @@ class GestionOCAcopioController extends Controller
                         $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -721,7 +721,7 @@ class GestionOCAcopioController extends Controller
                         $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
