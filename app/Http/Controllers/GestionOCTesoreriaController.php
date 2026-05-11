@@ -285,7 +285,7 @@ class GestionOCTesoreriaController extends Controller
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $idoc;
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -541,7 +541,7 @@ class GestionOCTesoreriaController extends Controller
                             $contadorArchivos = Archivo::count();
                             $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $lote;
-                            $nombrefile = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefile = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefile;
                             $nombreoriginal = $file->getClientOriginalName();
@@ -2094,7 +2094,7 @@ class GestionOCTesoreriaController extends Controller
                                     $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                                     $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $ordencompra->NRO_DOCUMENTO_CLIENTE;
                                     // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                    $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                    $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                     $valor = $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                     copy($file->getRealPath(), $rutacompleta);
@@ -2146,7 +2146,7 @@ class GestionOCTesoreriaController extends Controller
                                         $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                                         $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $ordencompra->NRO_DOCUMENTO_CLIENTE;
                                         // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                        $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                        $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                         $valor = $this->versicarpetanoexiste($rutafile);
                                         $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                         copy($file->getRealPath(), $rutacompleta);
@@ -2194,7 +2194,7 @@ class GestionOCTesoreriaController extends Controller
                                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                         $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                         $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $pedido_id;
-                                        $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                        $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                                         $valor = $this->versicarpetanoexiste($rutafile);
                                         $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                                         copy($file->getRealPath(), $rutacompleta);
@@ -2433,7 +2433,7 @@ class GestionOCTesoreriaController extends Controller
 
                             $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $fedocumento->ID_DOCUMENTO;
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -2523,7 +2523,7 @@ class GestionOCTesoreriaController extends Controller
 
                             $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $empresa->NRO_DOCUMENTO;
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -2605,7 +2605,7 @@ class GestionOCTesoreriaController extends Controller
 
                             $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $ordencompra->NRO_DOCUMENTO_CLIENTE;
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -2698,7 +2698,7 @@ class GestionOCTesoreriaController extends Controller
                             $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -2929,7 +2929,7 @@ class GestionOCTesoreriaController extends Controller
                             $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);
@@ -3075,7 +3075,7 @@ class GestionOCTesoreriaController extends Controller
                             $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $fedocumento->ID_DOCUMENTO;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
                             $valor = $this->versicarpetanoexiste($rutafile);
                             $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
                             copy($file->getRealPath(), $rutacompleta);

@@ -122,7 +122,7 @@ class GestionUsuarioContactoController extends Controller
                                     $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$fedocumento->RUC_PROVEEDOR;
                                     // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                    $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                    $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                     $valor           =      $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                     copy($file->getRealPath(),$rutacompleta);
@@ -251,7 +251,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -1051,7 +1051,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -1271,7 +1271,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -1507,7 +1507,7 @@ class GestionUsuarioContactoController extends Controller
                                 $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                                 // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $valor           =      $this->versicarpetanoexiste($rutafile);
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);
@@ -2448,7 +2448,7 @@ class GestionUsuarioContactoController extends Controller
                                 $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
                                 // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $valor           =      $this->versicarpetanoexiste($rutafile);
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);
@@ -2782,7 +2782,7 @@ class GestionUsuarioContactoController extends Controller
                                 $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                                 // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $valor           =      $this->versicarpetanoexiste($rutafile);
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);
@@ -2999,7 +2999,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -3238,7 +3238,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -3479,7 +3479,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -3707,7 +3707,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -3883,7 +3883,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -4085,7 +4085,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -4292,7 +4292,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -4880,7 +4880,7 @@ class GestionUsuarioContactoController extends Controller
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
@@ -5866,7 +5866,7 @@ class GestionUsuarioContactoController extends Controller
                                 $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                                 // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $valor           =      $this->versicarpetanoexiste($rutafile);
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);
@@ -5964,7 +5964,7 @@ class GestionUsuarioContactoController extends Controller
                                 $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                                 // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $valor           =      $this->versicarpetanoexiste($rutafile);
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);

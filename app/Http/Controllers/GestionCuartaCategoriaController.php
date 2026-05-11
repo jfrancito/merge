@@ -346,7 +346,7 @@ class GestionCuartaCategoriaController extends Controller
                                 /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                 $prefijocarperta =      'RENTACUARTA';
                                 $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta;
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$this->limpiarTildes($file->getClientOriginalName());
                                 $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                 copy($file->getRealPath(),$rutacompleta);
                                 $path            =      $rutacompleta;
