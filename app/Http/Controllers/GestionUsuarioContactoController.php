@@ -1995,6 +1995,8 @@ class GestionUsuarioContactoController extends Controller
                     ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
                     ->first();
 
+
+
                 if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
