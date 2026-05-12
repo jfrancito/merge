@@ -1443,6 +1443,8 @@ class GestionOCContabilidadController extends Controller
             $ind_igv = 0;
             $usuario = Session::get('usuario')->id;
 
+
+
             $asiento_compra = $this->ejecutarSP(
                 "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
                 @anio = :anio,
