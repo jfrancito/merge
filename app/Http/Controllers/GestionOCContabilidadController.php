@@ -983,35 +983,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -1023,17 +1040,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -1442,8 +1464,6 @@ class GestionOCContabilidadController extends Controller
             $centro_costo = '';
             $ind_igv = 0;
             $usuario = Session::get('usuario')->id;
-
-
 
             $asiento_compra = $this->ejecutarSP(
                 "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
@@ -2112,35 +2132,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -2152,17 +2189,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -3370,35 +3412,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -3410,17 +3469,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -3725,35 +3789,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -3765,17 +3846,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -4455,35 +4541,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -4495,17 +4598,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -5430,35 +5538,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -5470,17 +5595,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -6328,35 +6458,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -6368,17 +6515,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -7071,35 +7223,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -7111,17 +7280,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -8021,35 +8195,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -8061,17 +8252,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -8598,12 +8794,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -8819,35 +9016,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -8859,17 +9073,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -9399,12 +9618,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -9623,35 +9843,52 @@ class GestionOCContabilidadController extends Controller
                     foreach ($cabeceras as $cabecera) {
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
-                            $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                 ->where('COD_ESTADO', '=', 1)
                                 ->where('TXT_GLOSA', 'LIKE', '%COMPRA%')
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                 ->first();
+
                         } else {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                             } else {
+
                                 if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
-                                    $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                         ->where('COD_ESTADO', '=', 1)
                                         ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
                                         ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                         ->first();
+
                                 } else {
+
                                     if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                             ->first();
+
                                     } else {
-                                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                             ->where('COD_ESTADO', '=', 1)
                                             ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
                                             ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
@@ -9663,17 +9900,22 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         if (empty($asiento_busqueda)) {
+
                             if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION')) {
-                                $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                                     ->where('COD_ESTADO', '=', 1)
                                     ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
                                     ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
                                     ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                                     ->first();
+
                                 if (empty($asiento_busqueda)) {
                                     break;
                                 }
                             }
+
                         } else {
                             break;
                         }
@@ -10298,12 +10540,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
