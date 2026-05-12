@@ -615,7 +615,7 @@ class GestionUsuarioContactoController extends Controller
                             }
                         }
                     }
-                } 
+                }
             }
 
 
@@ -1987,15 +1987,14 @@ class GestionUsuarioContactoController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
-
-
 
                 if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
