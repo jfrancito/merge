@@ -90,6 +90,7 @@
                                             <!-- UN SOLO ARCHIVO -->
                                             <a href="{{ url('descargar-archivo-informe/'.base64_encode($archivos[0]['url'])) }}"
                                                class="btn btn-xs btn-success"
+                                               target="_blank"
                                                title="Descargar: {{ $archivos[0]['nombre'] }}">
                                                 <i class="fa fa-download"></i>
                                             </a>

@@ -149,13 +149,36 @@
     <div class="modal-overlay"></div>
 
     <style>
+        /* ── Contenedor principal: centrado fijo en pantalla ── */
         #modal-detalle-pedido-resumen {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
             width: 95%;
             max-width: 1200px;
-            margin: auto;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0 !important;
+            z-index: 9999;
         }
+
+        /* ── Caja blanca interior ── */
         #modal-detalle-pedido-resumen .modal-content {
             border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        /* ── Asegurar que el contenido interno use el espacio disponible ── */
+        .modal-detalle-pedido-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
             overflow: hidden;
         }
     </style>

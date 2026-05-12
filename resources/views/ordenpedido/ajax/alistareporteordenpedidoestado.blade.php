@@ -36,6 +36,7 @@
                 @if(!empty($item->URL_ARCHIVO))
                     <a href="{{ url('descargar-archivo-informe/'.base64_encode($item->URL_ARCHIVO)) }}"
                        class="btn btn-xs btn-success"
+                       target="_blank"
                        title="Descargar archivo">
                         <i class="fa fa-download"></i>
                     </a>
