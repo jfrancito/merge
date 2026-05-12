@@ -1,21 +1,21 @@
 <!-- HEADER -->
-<div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #0b1a3d, #1f2a50);">
-    <h5 class="modal-title fw-semibold text-center w-100">
+<div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #0b1a3d, #1f2a50); flex: 0 0 auto;">
+    <h5 class="modal-title fw-semibold text-center w-100" style="margin: 0;">
         <div class="d-flex justify-content-center align-items-center mb-1">
-            <i class="bi bi-receipt me-2 opacity-75"></i>
-            <span>DETALLE DEL PEDIDO</span>
+            <i class="mdi mdi-receipt me-2 opacity-75" style="font-size: 20px;"></i>
+            <span style="letter-spacing: 1px;">DETALLE DEL PEDIDO</span>
         </div>
 
-        <span class="d-block fw-medium pedido-numero">
+        <span class="d-block fw-medium pedido-numero" style="color: #64b5f6;">
             N° {{ $pedido->ID_PEDIDO ?? '' }}
         </span>
     </h5>
 </div>
 
 <!-- BODY -->
-<div class="modal-body p-0 bg-light">
+<div class="modal-body p-0 bg-light" style="flex: 1 1 auto; overflow: hidden; display: flex; flex-direction: column;">
 
-    <div class="table-responsive detalle-scroll">
+    <div class="table-responsive detalle-scroll" style="flex: 1 1 auto; width: 100%;">
         <table class="table table-hover align-middle mb-0 detalle-table">
             @php
                 $mostrarJefe = false;
@@ -33,22 +33,21 @@
                         $mostrarAdm = true;
                     }
                 }
-                $total_general = 0;
             @endphp
 
             <thead class="text-white sticky-top detalle-thead">
                 <tr class="text-uppercase small">
-                    <th class="text-center">#</th>
-                    <th>Producto</th>
-                    <th>Tipo Producto</th>
-                    <th>Categoría</th>
-                    <th class="text-center">Cant.</th>
+                    <th class="text-center" style="width: 50px;">#</th>
+                    <th style="min-width: 200px;">Producto</th>
+                    <th style="width: 120px;">Tipo</th>
+                    <th style="width: 150px;">Categoría</th>
+                    <th class="text-center" style="width: 80px;">Cant.</th>
                     @if($mostrarJefe)
-                    <th class="text-center">Cant. Jefe</th> @endif
+                    <th class="text-center" style="width: 100px;">Cant. Jefe</th> @endif
                     @if($mostrarGer)
-                    <th class="text-center">Cant. Gerencia</th>@endif
+                    <th class="text-center" style="width: 100px;">Cant. Ger.</th>@endif
                     @if($mostrarAdm)
-                    <th class="text-center">Cant. Admin</th>@endif
+                    <th class="text-center" style="width: 100px;">Cant. Adm.</th>@endif
                     <th>Observación</th>
                 </tr>
             </thead>
@@ -60,228 +59,181 @@
                             {{ $index + 1 }}
                         </td>
 
-                        <td class="fw-semibold" title="{{ $detalle->NOM_PRODUCTO }}">
+                        <td class="fw-bold product-name" title="{{ $detalle->NOM_PRODUCTO }}">
                             {{ $detalle->NOM_PRODUCTO }}
                         </td>
 
-                        <td class="text-secondary">
+                        <td class="text-secondary small">
                             {{ $detalle->IND_MATERIAL_SERVICIO == 'M' ? 'MATERIAL' : 'SERVICIO' }}
                         </td>
 
-                        <td class="text-secondary" title="{{ $detalle->NOM_CATEGORIA }}">
+                        <td class="text-secondary small" title="{{ $detalle->NOM_CATEGORIA }}">
                             {{ $detalle->NOM_CATEGORIA }}
                         </td>
 
-                        {{-- CANTIDAD ORIGINAL (SIEMPRE SE MUESTRA) --}}
+                        {{-- CANTIDAD ORIGINAL --}}
                         <td class="text-center">
-                            <span class="badge badge-cantidad">
+                            <span class="badge-cantidad">
                                 {{ $detalle->CANTIDAD }}
                             </span>
                         </td>
-                        {{-- CANTIDAD JEFE --}}
+
                         @if($mostrarJefe)
                             <td class="text-center">
                                 @if(!is_null($detalle->CAN_MODIF_JEF_AUT))
-                                    <span class="badge badge-cantidad">
+                                    <span class="badge-cantidad badge-jefe">
                                         {{ $detalle->CAN_MODIF_JEF_AUT }}
                                     </span>
                                 @else
-                                    —
+                                    <span class="text-muted small">—</span>
                                 @endif
                             </td>
                         @endif
 
-                        {{-- CANTIDAD GERENCIA --}}
                         @if($mostrarGer)
                             <td class="text-center">
                                 @if(!is_null($detalle->CAN_MODIF_GER))
-                                    <span class="badge badge-cantidad">
+                                    <span class="badge-cantidad badge-gerencia">
                                         {{ $detalle->CAN_MODIF_GER }}
                                     </span>
                                 @else
-                                    —
+                                    <span class="text-muted small">—</span>
                                 @endif
                             </td>
                         @endif
 
-                        {{-- CANTIDAD ADMIN --}}
                         @if($mostrarAdm)
                             <td class="text-center">
                                 @if(!is_null($detalle->CAN_MODIF_ADM))
-                                    <span class="badge badge-cantidad">
+                                    <span class="badge-cantidad badge-admin">
                                         {{ $detalle->CAN_MODIF_ADM }}
                                     </span>
                                 @else
-                                    —
+                                    <span class="text-muted small">—</span>
                                 @endif
                             </td>
                         @endif
 
-                        <td class="observacion" title="{{ $detalle->TXT_OBSERVACION }}">
+                        <td class="observacion-cell text-muted" title="{{ $detalle->TXT_OBSERVACION }}">
                             {{ $detalle->TXT_OBSERVACION ?: '—' }}
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted fst-italic py-4">
+                        <td colspan="10" class="text-center text-muted fst-italic py-5">
+                            <i class="mdi mdi-information-outline" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
                             No hay productos en este pedido.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
-
         </table>
     </div>
+
     @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))
-        <div class="alert alert-danger mx-3 my-3"
-            style="border-left: 5px solid #d9534f; background-color: #fdf2f2; border-radius: 8px; box-shadow: 0 2px 8px rgba(217, 83, 79, 0.1);">
-            <h5 class="fw-bold mb-1" style="color: #d9534f; font-size: 1.1rem;"><i class="fa fa-times-circle"></i> MOTIVO
-                DEL RECHAZO:</h5>
-            <p class="mb-0" style="font-size: 1rem; font-weight: 500; color: #000 !important;">
-                {{ $pedido->TXT_GLOSA_RECHAZO }}
-            </p>
+        <div class="rechazo-container mx-3 my-3">
+            <div class="alert alert-danger mb-0" style="border-radius: 10px; border: none; background: #fff5f5; border-left: 4px solid #f44336; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div class="d-flex align-items-center mb-1">
+                    <i class="mdi mdi-close-circle text-danger me-2" style="font-size: 18px;"></i>
+                    <h6 class="fw-bold text-danger mb-0" style="font-size: 13px; text-transform: uppercase;">Motivo del Rechazo</h6>
+                </div>
+                <p class="mb-0 text-dark" style="font-size: 14px; line-height: 1.4;">
+                    {{ $pedido->TXT_GLOSA_RECHAZO }}
+                </p>
+            </div>
         </div>
     @endif
 </div>
 
-<div class="modal-footer justify-content-center bg-light" style="margin-top:-10px; border-top:1px solid #ffffffff;">
-    <button type="button" data-dismiss="modal" class="btn btn-primary btn-space modal-close">
-        Cerrar
+<div class="modal-footer justify-content-center bg-white border-top" style="flex: 0 0 auto; padding: 15px;">
+    <button type="button" data-dismiss="modal" class="btn btn-primary modal-close shadow-sm" style="border-radius: 20px; padding: 6px 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px;">
+        Cerrar Detalle
     </button>
 </div>
 
-
 <style>
-    /* ===== HEADER ===== */
-    .modal-header {
-        backdrop-filter: blur(6px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
-    }
-
-    .modal-title small {
-        font-size: .8rem;
-        letter-spacing: .12em;
-    }
-
     .pedido-numero {
-        font-size: 1.6rem;
-        font-weight: 900;
-        letter-spacing: .22em;
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: 2px;
     }
 
-
-
-    /* ===== SCROLL ===== */
     .detalle-scroll {
-        max-height: 60vh;
+        max-height: calc(90vh - 160px);
         overflow-y: auto;
-        background: linear-gradient(180deg, #f9fafc, #eef1f7);
+        background: #f8f9fa;
     }
 
     .detalle-scroll::-webkit-scrollbar {
-        width: 5px;
+        width: 6px;
     }
-
     .detalle-scroll::-webkit-scrollbar-thumb {
-        background: rgba(31, 42, 80, .35);
+        background: #ced4da;
         border-radius: 10px;
     }
 
-    /* ===== TABLE ===== */
     .detalle-table {
         border-collapse: separate;
-        border-spacing: 0 8px;
-        /* separación tipo cards */
-        font-size: .94rem;
+        border-spacing: 0 5px;
+        padding: 0 15px;
     }
 
-    /* ===== THEAD ===== */
     .detalle-thead th {
-        background: #f1f3f5;
-        /* gris claro */
-        color: #212529;
-        /* negro/gris oscuro */
+        background: #1f2a50;
+        color: #fff;
         font-weight: 600;
-        letter-spacing: .08em;
-        padding: 16px 14px;
+        font-size: 11px;
+        padding: 12px 10px;
         border: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-    /* ===== ROWS (CARD STYLE) ===== */
     .detalle-table tbody tr {
-        background: #ffffff;
-        border-radius: 14px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
-        transition: transform .25s ease, box-shadow .25s ease;
+        background: #fff;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
 
     .detalle-table tbody tr:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, .12);
+        background: #f1f4ff;
+        transform: scale(1.005);
     }
 
-    /* ===== CELLS ===== */
     .detalle-table td {
-        padding: 14px 14px;
+        padding: 10px;
         border: none;
         vertical-align: middle;
+        font-size: 13px;
     }
 
-    .detalle-table td:first-child {
-        border-radius: 14px 0 0 14px;
+    .product-name {
+        color: #2c3e50;
+        font-size: 14px !important;
     }
 
-    .detalle-table td:last-child {
-        border-radius: 0 14px 14px 0;
-    }
-
-    /* ===== PRODUCTO ===== */
-    .detalle-table td:nth-child(2) {
-        font-weight: 900;
-        color: #1f2a50;
-        font-size: 1.20rem;
-    }
-
-    /* ===== CATEGORIA ===== */
-    .detalle-table td:nth-child(3) {
-        font-size: 1.25rem;
-        color: #6c757d;
-    }
-
-    /* ===== BADGE CANTIDAD ===== */
     .badge-cantidad {
-        background: linear-gradient(135deg, #e7efff, #d6e2ff);
-        color: #1f4ed8;
-        font-size: 1.45rem;
-        /* ⬅ aquí lo agrandas */
-        font-weight: 900;
-        padding: 10px 22px;
-        border-radius: 999px;
-        box-shadow: inset 0 0 0 1px rgba(31, 78, 216, .15);
+        display: inline-block;
+        background: #eef2f7;
+        color: #334155;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        min-width: 40px;
     }
 
+    .badge-jefe { background: #e0f2fe; color: #0369a1; }
+    .badge-gerencia { background: #f0fdf4; color: #15803d; }
+    .badge-admin { background: #faf5ff; color: #7e22ce; }
 
-    /* ===== OBSERVACION ===== */
-    .observacion {
-        font-size: 1.35rem;
-        color: #495057;
-    }
-
-    /* ===== EMPTY ===== */
-    tbody tr td[colspan] {
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    /* ===== FOOTER ===== */
-    .modal-footer {
-        backdrop-filter: blur(4px);
-        box-shadow: 0 -4px 14px rgba(0, 0, 0, .08);
-    }
-
-    /* Forzar ancho similar a otros modales */
-    .modal-container {
-        width: 80% !important;
-        max-width: 1000px !important;
+    .observacion-cell {
+        font-style: italic;
+        font-size: 12px;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 </style>

@@ -654,10 +654,10 @@ $(document).ready(function () {
             return;
         }
 
-        if (ruc.trim().length === 0 || nombre.trim().length === 0 || direccion.trim().length === 0 || telefono.trim().length === 0) {
+        if (ruc.trim().length === 0 || nombre.trim().length === 0 || direccion.trim().length === 0) {
             modalBonito({
                 tipo: 'warn', icono: '⚠️', titulo: 'Información del Proveedor',
-                mensaje: 'Debe completar el <b>RUC, Razón Social, Dirección y Teléfono</b> del proveedor.',
+                mensaje: 'Debe completar el <b>RUC, Razón Social y Dirección</b> del proveedor.',
                 ancho: '450px'
             });
             return;

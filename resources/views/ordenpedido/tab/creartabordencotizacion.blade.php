@@ -117,7 +117,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Teléfono</label>
+                                <label>Teléfono <small class="text-muted">(Opcional)</small></label>
                                 <input type="text" class="form-control premium-input" id="telefono" maxlength="9"
                                     placeholder="987654321">
                             </div>
