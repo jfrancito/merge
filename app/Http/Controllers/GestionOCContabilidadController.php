@@ -598,7 +598,7 @@ class GestionOCContabilidadController extends Controller
                     $sheet->setWidth('A', 8);
                     $sheet->setWidth('B', 20);
                     $sheet->setWidth('C', 20);
-                    $sheet->setWidth('D', 20);              
+                    $sheet->setWidth('D', 20);
                     $sheet->setWidth('E', 20);
                     $sheet->setWidth('F', 40);
                     $sheet->setWidth('G', 30);
@@ -961,7 +961,7 @@ class GestionOCContabilidadController extends Controller
         $peso_entrega_c = 0;
         $contrato_anticipo = array();
         $detalles_contrato = array();
-        $pagos_contrato = array(); 
+        $pagos_contrato = array();
         if ($contrato_pago) {
             if ($contrato_pago->IND_CONTRATO == 'C') {
                 $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', trim($contrato_pago->ID_DOCUMENTO))->first();
@@ -1497,12 +1497,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -2935,12 +2936,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -4293,12 +4295,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -5271,12 +5274,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -6656,12 +6660,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -7388,12 +7393,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
@@ -8346,12 +8352,13 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
-                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
 
                 if ($asiento_existe_reparable) {
