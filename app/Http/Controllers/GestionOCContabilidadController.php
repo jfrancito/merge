@@ -6800,6 +6800,7 @@ class GestionOCContabilidadController extends Controller
                     ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
                     ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
                     ->first();
+                //dd($asiento_existe_reparable);
 
                 if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
