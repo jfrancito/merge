@@ -27,6 +27,11 @@
                             <i class="fa fa-calendar me-1" style="color: white;"></i> Fecha: <b>{{ date('d-m-Y', strtotime($pedido->FEC_PEDIDO)) }}</b>
                         </span>
                     </div>
+                    <div class="mt-1">
+                        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500;">
+                            <i class="fa fa-clock-o me-1" style="color: white;"></i> Hora Creación: <b>{{ $pedido->FEC_USUARIO_CREA_AUD ? date('H:i:s', strtotime($pedido->FEC_USUARIO_CREA_AUD)) : '—' }}</b>
+                        </span>
+                    </div>
                 </div>
                 
                 <!-- BOTÓN REGRESAR DISCRETO EN LA DERECHA -->
