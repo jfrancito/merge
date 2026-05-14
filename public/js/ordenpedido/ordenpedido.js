@@ -2747,28 +2747,53 @@ $(document).ready(function () {
                         // Procesar archivos
                         let htmlArchivos = '<span class="text-muted" style="font-size: 0.9em;">-</span>';
                         if (multi_archivos && multi_archivos !== "") {
-                            htmlArchivos = '';
-                            let docs = multi_archivos.split(' [DOC] ');
-                            docs.forEach(doc_str => {
-                                if (doc_str.trim() !== "") {
-                                    let subpartes = doc_str.split(' [URI] ');
-                                    let nom_doc = subpartes[0] ? subpartes[0].trim() : 'Archivo';
-                                    let uri_doc = subpartes[1] ? subpartes[1].trim() : '';
+                            let docs = multi_archivos.split(' [DOC] ').filter(d => d.trim() !== "");
+                            let arrayDocs = [];
 
-                                    if (uri_doc !== "") {
-                                        // Codificar la ruta en base64 para el controlador
-                                        let b64 = btoa(uri_doc);
-                                        htmlArchivos += `
-                                            <a href="${carpeta}/descargar-archivo-informe/${b64}" 
-                                               class="btn btn-xs btn-primary shadow-sm" 
-                                               style="border-radius: 12px; margin: 2px; padding: 2px 10px;"
-                                               title="${nom_doc}" target="_blank">
-                                                <i class="mdi mdi-download"></i> Archivo
-                                            </a>
-                                        `;
-                                    }
+                            docs.forEach(doc_str => {
+                                let subpartes = doc_str.split(' [URI] ');
+                                let nom_doc = subpartes[0] ? subpartes[0].trim() : 'Archivo';
+                                let uri_doc = subpartes[1] ? subpartes[1].trim() : '';
+                                if (uri_doc !== "") {
+                                    arrayDocs.push({ nombre: nom_doc, uri: uri_doc });
                                 }
                             });
+                            if (arrayDocs.length > 1) {
+                                let listItems = '';
+                                arrayDocs.forEach((d, idx) => {
+                                    let b64 = btoa(d.uri);
+                                    listItems += `
+                                        <li>
+                                            <a href="${carpeta}/descargar-archivo-informe/${b64}" target="_blank" style="padding: 8px 12px; font-size: 13px;">
+                                                <i class="mdi mdi-download"></i> ${idx + 1}. ${d.nombre}
+                                            </a>
+                                        </li>
+                                    `;
+                                });
+
+                                htmlArchivos = `
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-xs btn-primary dropdown-toggle shadow-sm" 
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                style="border-radius: 12px; padding: 2px 12px;">
+                                            <i class="mdi mdi-download"></i> Archivos <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" style="border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                                            ${listItems}
+                                        </ul>
+                                    </div>
+                                `;
+                            } else if (arrayDocs.length === 1) {
+                                let b64 = btoa(arrayDocs[0].uri);
+                                htmlArchivos = `
+                                    <a href="${carpeta}/descargar-archivo-informe/${b64}" 
+                                       class="btn btn-xs btn-primary shadow-sm" 
+                                       style="border-radius: 12px; padding: 2px 10px;"
+                                       title="${arrayDocs[0].nombre}" target="_blank">
+                                        <i class="mdi mdi-download"></i> Archivo
+                                    </a>
+                                `;
+                            }
                         }
 
                         tbodyInferior.append(`
