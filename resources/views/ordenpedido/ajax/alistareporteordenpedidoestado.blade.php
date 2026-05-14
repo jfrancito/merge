@@ -10,7 +10,9 @@
         <th>PERIODO</th>
         <th>CENTRO</th>
         <th>ESTADO</th>
+        <th>SOLICITA</th>
         <th>APRUEBA JEFE COMPRAS</th>
+        <th>GLOSA</th>
         <th>CONSOLIDADO SEDE</th>
         <th>CONSOLIDADO GENERAL</th>
         <th>ARCHIVO</th>
@@ -29,17 +31,47 @@
             <td>{{$item->NOM_PERIODO}}</td>
             <td>{{$item->NOM_CENTRO}}</td>
             <td>{{$item->TXT_ESTADO}}</td>
+            <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>
+            <td>{{$item->TXT_GLOSA}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO_GENERAL}}</td>
             <td class="align-center-tb">
-                @if(!empty($item->URL_ARCHIVO))
-                    <a href="{{ url('descargar-archivo-informe/'.base64_encode($item->URL_ARCHIVO)) }}"
-                       class="btn btn-xs btn-success"
-                       target="_blank"
-                       title="Descargar archivo">
-                        <i class="fa fa-download"></i>
-                    </a>
+                @if(isset($item->MULTI_ARCHIVOS) && $item->MULTI_ARCHIVOS != '')
+                    @php
+                        $archivos_raw = explode(' [SEP] ', $item->MULTI_ARCHIVOS);
+                        $archivos = [];
+                        foreach($archivos_raw as $ar) {
+                            $partes = explode(' [FLD] ', $ar);
+                            if(count($partes) == 2) {
+                                $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
+                            }
+                        }
+                    @endphp
+
+                    @if(count($archivos) > 1)
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-download"></i> Archivo <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                @foreach($archivos as $index => $arch)
+                                    <li>
+                                        <a href="{{ url('descargar-archivo-informe/'.base64_encode($arch['url'])) }}" target="_blank">
+                                            {{ ($index + 1) . '. ' . $arch['nombre'] }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @elseif(count($archivos) == 1)
+                        <a href="{{ url('descargar-archivo-informe/'.base64_encode($archivos[0]['url'])) }}"
+                           class="btn btn-xs btn-success"
+                           target="_blank"
+                           title="Descargar: {{ $archivos[0]['nombre'] }}">
+                            <i class="fa fa-download"></i> Archivo
+                        </a>
+                    @endif
                 @else
                     <span class="text-muted">—</span>
                 @endif
