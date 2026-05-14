@@ -74,7 +74,8 @@ class GestionOrdenPedidoController extends Controller
             ->where(function ($query) {
                 $query->where('cadcargo', 'LIKE', '%JEFE%')
                     ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
-                    ->orWhere('COD_TRAB', 'IITR000000000391');
+                    ->orWhere('COD_TRAB', 'IITR000000000391')
+                    ->orWhere('COD_TRAB', 'ICTR000000000250');
             })
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->whereIn('empresa_osiris_id', [

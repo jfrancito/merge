@@ -385,7 +385,14 @@ trait OrdenPedidoTraits
                   AND ALC.COD_CATEGORIA_AREA='AEM0000000000015'
                   AND ALC.NOM_ALMACEN LIKE '%SUMINISTRO%'
             ) AS STOCK"),
-                'PRD.CAN_STOCK_REQUERIDO AS CAN_STOCK_RESERVADO'
+                'PRD.CAN_STOCK_REQUERIDO AS CAN_STOCK_RESERVADO',
+                DB::raw("STUFF((
+                    SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                    FROM dbo.ARCHIVOS ARCH
+                    WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                    AND ARCH.ACTIVO = 1
+                    FOR XML PATH(''), TYPE
+                ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS")
             )
             ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OP.ID_PEDIDO', '=', 'OD.ID_PEDIDO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
