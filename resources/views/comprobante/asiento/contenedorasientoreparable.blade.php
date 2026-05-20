@@ -324,6 +324,11 @@
                                 ➕ Agregar Detalle
                             </button>
                         </div>
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-lg btn-warning diferencia-montos-reparable">
+                                🔄 Recalcular Decimales Debe - Haber
+                            </button>
+                        </div>
                     </div>
                     <table id="asientodetallereparable"
                            class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"

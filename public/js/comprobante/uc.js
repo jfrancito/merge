@@ -45,9 +45,9 @@ $(document).ready(function () {
     $(".comboreparable").on('change', function (e) {
 
         let reparable = $(this).val();
-        if(reparable == 'ARCHIVO_FISICO'){
+        if (reparable == 'ARCHIVO_FISICO') {
             $('.checkfisico').addClass('ocultar');
-        }else{
+        } else {
             $('.checkfisico').removeClass('ocultar');
         }
 
@@ -70,7 +70,7 @@ $(document).ready(function () {
 
 
     });
-//reparable
+    //reparable
 
     $("#fecha_asiento_reparable").on('change', function (e) {
 
@@ -95,7 +95,7 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: carpeta + "/obtener-periodo-tipo-cambio",
-            data: {_token: _token, fecha: fecha},
+            data: { _token: _token, fecha: fecha },
             success: function (res) {
                 $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
 
@@ -116,23 +116,23 @@ $(document).ready(function () {
     });
 
 
-
-    $(".asientomodelo").on('click','.buscardocumentoadmin', function() {
+    $(".asientomodelo").on('click', '.buscardocumentoadmin', function () {
 
         event.preventDefault();
 
-        var operacion_id            =   $('#operacion_id').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
+        var operacion_id = $('#operacion_id').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
 
-        data            =   {
-                                _token                  : _token,
-                                operacion_id            : operacion_id,
-                                idopcion                : idopcion
-                            };
-        ajax_normal(data,"/ajax-buscar-documento-gestion-uc");
+        data = {
+            _token: _token,
+            operacion_id: operacion_id,
+            idopcion: idopcion
+        };
+        ajax_normal(data, "/ajax-buscar-documento-gestion-uc");
 
     });
+
     $("#tipo_cambio_asiento_reparable").on('change', function (e) {
 
         let moneda = $('#moneda_asiento_reparable').val();
@@ -260,11 +260,10 @@ $(document).ready(function () {
     });
 
     $(".btn-regresar-lista-reparable").on('click', function (e) {
-        $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
-        setTimeout(function () {
+        $('.tablageneralreparable').toggle("slow", function () {
             $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $(document).on('click', ".editar-cuenta-reparable", function (e) {
@@ -580,76 +579,118 @@ $(document).ready(function () {
             }
         }
 
-        // Recorrerlo
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
-                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
-                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
-                    item.TXT_GLOSA = glosa_cuenta;
-                    item.COD_PRODUCTO = '';
-                    item.TXT_NOMBRE_PRODUCTO = '';
-                    item.COD_LOTE = '';
-                    item.NRO_LINEA_PRODUCTO = '0';
-                    item.CAN_DEBE_MN = can_debe_mn;
-                    item.CAN_HABER_MN = can_haber_mn;
-                    item.CAN_DEBE_ME = can_debe_me;
-                    item.CAN_HABER_ME = can_haber_me;
-                    item.COD_DOC_CTBLE_REF = afecto_igv;
-                    item.COD_ORDEN_REF = porc_afecto_igv;
-                    item.COD_ESTADO = activo;
+        let texto_partida = $("#partida_id_reparable option:selected").text();
+        let texto_afecto = $("#tipo_igv_id_reparable option:selected").text();
+
+        let modalContent = `
+            <div style="font-family: inherit; font-size: 14px; color: #333;">
+                <div style="background-color: #f7f9fa; border-left: 4px solid #0056b3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <h5 style="margin-top: 0; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                        <i class="fa fa-info-circle"></i> Datos del Movimiento Reparable a Modificar
+                    </h5>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                        <div><b>Cuenta Contable:</b> ${texto}</div>
+                        <div><b>Partida:</b> ${texto_partida}</div>
+                        <div><b>Monto ingresado:</b> ${number_format(parseFloat(monto) || 0, 4)}</div>
+                        <div><b>Afecto IGV:</b> ${texto_afecto} (${porc_afecto_igv || '0'}%)</div>
+                    </div>
+                </div>
+                
+                <h5 style="margin-top: 15px; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                    <i class="fa fa-calculator"></i> Valores Calculados para el Asiento
+                </h5>
+                <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #0056b3; color: white;">
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe ME</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber ME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_debe_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_haber_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_debe_me, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_haber_me, 4)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        $.confirm({
+            title: 'Confirmar Modificación',
+            content: modalContent,
+            type: 'blue',
+            columnClass: 'col-md-6 col-md-offset-3',
+            buttons: {
+                confirmar: {
+                    text: 'Confirmar',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        // Recorrerlo
+                        arrayDetalle.forEach(item => {
+                            if (parseInt(item.COD_ESTADO) === 1) {
+                                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                                    item.TXT_GLOSA = glosa_cuenta;
+                                    item.COD_PRODUCTO = '';
+                                    item.TXT_NOMBRE_PRODUCTO = '';
+                                    item.COD_LOTE = '';
+                                    item.NRO_LINEA_PRODUCTO = '0';
+                                    item.CAN_DEBE_MN = can_debe_mn;
+                                    item.CAN_HABER_MN = can_haber_mn;
+                                    item.CAN_DEBE_ME = can_debe_me;
+                                    item.CAN_HABER_ME = can_haber_me;
+                                    item.COD_DOC_CTBLE_REF = afecto_igv;
+                                    item.COD_ORDEN_REF = porc_afecto_igv;
+                                    item.COD_ESTADO = activo;
+                                }
+                            }
+                        });
+
+                        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+                        // Después de actualizar arrayDetalle
+                        let table = $('#asientodetallereparable').DataTable();
+
+                        $("#asientodetallereparable tbody tr").each(function () {
+                            let fila = $(this);
+                            let codAsiento = fila.attr('data_codigo');
+
+                            if (codAsiento === asiento_id_editar) {
+                                // obtenemos el índice de la fila
+                                let rowIdx = table.row(fila).index();
+
+                                // actualizamos celdas por columna
+                                table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                            }
+                        });
+
+                        // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                        table.columns.adjust().draw();
+
+                        $('.tablageneralreparable').toggle("slow");
+                        $('.editarcuentasreparable').toggle("slow", function () {
+                            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-red'
                 }
             }
         });
-
-        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
-        // Después de actualizar arrayDetalle
-        let table = $('#asientodetallereparable').DataTable();
-
-        $("#asientodetallereparable tbody tr").each(function () {
-            let fila = $(this);
-            let codAsiento = fila.attr('data_codigo');
-
-            if (codAsiento === asiento_id_editar) {
-                // obtenemos el índice de la fila
-                let rowIdx = table.row(fila).index();
-
-                // actualizamos celdas por columna
-                table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-            }
-        });
-
-// redibujar la tabla → esto dispara footerCallback y recalcula totales
-        table.columns.adjust().draw();
-        /*
-        $("#asientodetallereparable tbody tr").each(function () {
-            let fila = $(this);
-
-            // buscamos en la fila el hidden con el id del asiento
-            let codAsiento = fila.attr('data_codigo');
-
-            if (codAsiento === asiento_id_editar) {
-                // Actualizar las celdas visibles de la tabla
-                fila.find(".col-cuenta").text(numero_cuenta);
-                fila.find(".col-glosa").text(glosa_cuenta);
-                fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-            }
-        });*/
-
-        $('.tablageneralreparable').toggle("slow");
-        $('.editarcuentasreparable').toggle("slow");
-
-        setTimeout(function () {
-            $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".btn-registrar-movimiento-reparable").on('click', function (e) {
@@ -799,42 +840,401 @@ $(document).ready(function () {
             "CODIGO_CONTABLE": ""
         };
 
-        arrayDetalle.push(nuevoMovimiento);
+        let texto_partida = $("#partida_id_reparable option:selected").text();
+        let texto_afecto = $("#tipo_igv_id_reparable option:selected").text();
 
-        let table = $('#asientodetallereparable').DataTable();
-
-        // Crear la fila con atributos y estilos
-        let nuevaFila = `
-            <tr class="fila" data_codigo="${asiento_id_editar}"
-                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td class="col-codigo">${asiento_id_editar}</td>
-                <td class="col-cuenta">${numero_cuenta}</td>
-                <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
-                        ✏ Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
-                        🗑 Eliminar
-                    </button>
-                </td>
-            </tr>
+        let modalContent = `
+            <div style="font-family: inherit; font-size: 14px; color: #333;">
+                <div style="background-color: #f7f9fa; border-left: 4px solid #0056b3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <h5 style="margin-top: 0; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                        <i class="fa fa-info-circle"></i> Datos del Movimiento Reparable
+                    </h5>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                        <div><b>Cuenta Contable:</b> ${texto}</div>
+                        <div><b>Partida:</b> ${texto_partida}</div>
+                        <div><b>Monto ingresado:</b> ${number_format(parseFloat(monto) || 0, 4)}</div>
+                        <div><b>Afecto IGV:</b> ${texto_afecto} (${porc_afecto_igv || '0'}%)</div>
+                    </div>
+                </div>
+                
+                <h5 style="margin-top: 15px; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                    <i class="fa fa-calculator"></i> Valores Calculados para el Asiento
+                </h5>
+                <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #0056b3; color: white;">
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe ME</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber ME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_debe_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_haber_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_debe_me, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_haber_me, 4)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         `;
 
-        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
-        // Después de actualizar arrayDetalle
-        table.row.add($(nuevaFila)).draw(false);
+        $.confirm({
+            title: 'Confirmar Registro',
+            content: modalContent,
+            type: 'blue',
+            columnClass: 'col-md-6 col-md-offset-3',
+            buttons: {
+                confirmar: {
+                    text: 'Confirmar',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        arrayDetalle.push(nuevoMovimiento);
 
-        $('.tablageneralreparable').toggle("slow");
-        $('.editarcuentasreparable').toggle("slow");
+                        let table = $('#asientodetallereparable').DataTable();
 
-        setTimeout(function () {
+                        // Crear la fila con atributos y estilos
+                        let nuevaFila = `
+                            <tr class="fila" data_codigo="${asiento_id_editar}"
+                                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                                <td class="col-codigo">${asiento_id_editar}</td>
+                                <td class="col-cuenta">${numero_cuenta}</td>
+                                <td class="col-glosa">${glosa_cuenta}</td>
+                                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
+                                        ✏ Editar
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
+                                        🗑 Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+
+                        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+                        // Después de actualizar arrayDetalle
+                        table.row.add($(nuevaFila)).draw(false);
+
+                        $('.tablageneralreparable').toggle("slow");
+                        $('.editarcuentasreparable').toggle("slow", function () {
+                            if (typeof table !== 'undefined') table.columns.adjust().draw();
+                            else $('#asientodetallereparable').DataTable().columns.adjust().draw();
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-red'
+                }
+            }
+        });
+    });
+
+    $(".diferencia-montos-reparable").on('click', function (e) {
+        let totalDebeMN = 0;
+        let totalHaberMN = 0;
+        let totalDebeME = 0;
+        let totalHaberME = 0;
+        let diferencia = 0;
+        let diferenciaME = 0;
+        let table = $('#asientodetallereparable').DataTable();
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+        let data_asiento = $(this).attr("data");
+        let array_text = "asiento_detalle_reparable";
+        let table_text = "#asientodetallereparable tbody tr";
+        let totalAsiento = parseFloat(document.getElementById("total_xml_reparable").value.replaceAll(/[\$,]/g, "")) || 0;
+        let totalAsientoOriginal = parseFloat(document.getElementById("total_xml_reparable").value.replaceAll(/[\$,]/g, "")) || 0;
+        let moneda = $('#moneda_asiento_reparable').val();
+        let tc = $('#tipo_cambio_asiento_reparable').val().replaceAll(/[\$,]/g, "");
+
+        if (moneda === null || moneda.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay moneda seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        if (!tc || parseFloat(tc) === 0) {
+            $.alert({
+                title: 'Error',
+                content: 'El tipo de cambio no puede ser 0',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        // recorrer filas y acumular
+        $(table_text).each(function () {
+            let debeMN = parseFloat($(this).find("td:eq(3)").text().replaceAll(/[\$,]/g, "")) || 0; // Debe MN
+            let haberMN = parseFloat($(this).find("td:eq(4)").text().replaceAll(/[\$,]/g, "")) || 0; // Haber MN
+            let debeME = parseFloat($(this).find("td:eq(5)").text().replaceAll(/[\$,]/g, "")) || 0; // Debe ME
+            let haberME = parseFloat($(this).find("td:eq(6)").text().replaceAll(/[\$,]/g, "")) || 0; // Haber ME
+
+            totalDebeMN += debeMN;
+            totalHaberMN += haberMN;
+            totalDebeME += debeME;
+            totalHaberME += haberME;
+        });
+
+        totalDebeMN = redondear4(totalDebeMN);
+        totalHaberMN = redondear4(totalHaberMN);
+        totalDebeME = redondear4(totalDebeME);
+        totalHaberME = redondear4(totalHaberME);
+
+        // calcular diferencia
+        diferencia = totalHaberMN - totalDebeMN;
+
+        diferencia = redondear4(diferencia);
+
+        if (moneda === 'MON0000000000001') {
+            totalAsiento = redondear4(totalAsientoOriginal);
+        } else {
+            totalAsiento = redondear4(totalAsientoOriginal * parseFloat(tc));
+        }
+
+        // si la diferencia es menor o igual a 0.1, ajustar
+        if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
+
+            // Recorrerlo
+            for (let item of arrayDetalle) {
+                if (totalAsiento > totalHaberMN || totalAsiento < totalHaberMN) {
+                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_MN) > 0.0000) {
+                        if (totalAsiento > totalHaberMN) {
+                            item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_MN) + Math.abs(diferencia));
+                        } else {
+                            item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_MN) - Math.abs(diferencia));
+                        }
+                        break; // ✅ Rompe el bucle
+                    }
+                }
+
+                if (totalAsiento > totalDebeMN || totalAsiento < totalDebeMN) {
+                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_MN) > 0.0000) {
+                        if (totalAsiento > totalDebeMN) {
+                            item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_MN) + Math.abs(diferencia));
+                        } else {
+                            item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_MN) - Math.abs(diferencia));
+                        }
+                        break; // ✅ Rompe el bucle
+                    }
+                }
+            }
+
+            document.getElementById(array_text).value = JSON.stringify(arrayDetalle);
+
+            // recorrer filas y hacer el cambio
+            $(table_text).each(function () {
+                let fila = $(this);
+
+                // obtenemos el índice de la fila
+                let rowIdx = table.row(fila).index();
+
+                // obtenemos el numero de cuenta
+                let numero_cuenta = table.cell(rowIdx, 1).data();
+
+                // ejemplo: obtener el valor actual de la columna 3 (Debe MN)
+                let debeMN = parseFloat(table.cell(rowIdx, 3).data().replaceAll(/[\$,]/g, "")) || 0;
+                let haberMN = parseFloat(table.cell(rowIdx, 4).data().replaceAll(/[\$,]/g, "")) || 0;
+
+                if (totalAsiento > totalHaberMN || totalAsiento < totalHaberMN) {
+                    if (!/^40/.test(numero_cuenta) && haberMN > 0.0000) {
+                        let nuevoHaberMN = totalAsiento > totalHaberMN
+                            ? haberMN + Math.abs(diferencia)
+                            : haberMN - Math.abs(diferencia);
+
+                        table.cell(rowIdx, 4).data(number_format(nuevoHaberMN, 4));
+                        table.row(rowIdx).invalidate().draw(false);
+
+                        return false; // ✅ Rompe el bucle de jQuery.each
+                    }
+                }
+
+                if (totalAsiento > totalDebeMN || totalAsiento < totalDebeMN) {
+                    if (!/^40/.test(numero_cuenta) && debeMN > 0.0000) {
+                        let nuevoDebeMN = totalAsiento > totalDebeMN
+                            ? debeMN + Math.abs(diferencia)
+                            : debeMN - Math.abs(diferencia);
+
+                        table.cell(rowIdx, 3).data(number_format(nuevoDebeMN, 4));
+                        table.row(rowIdx).invalidate().draw(false);
+
+                        return false; // ✅ Rompe el bucle de jQuery.each
+                    }
+                }
+            });
+
+            // redibujar la tabla → esto dispara footerCallback y recalcula totales
             table.columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+
+            //alert("🔄 Totales ajustados automáticamente (diferencia menor o igual a 0.1).");
+            $.alert({
+                title: 'Success',
+                content: "🔄 Totales de Moneda Nacional ajustados automáticamente (diferencia menor o igual a 0.1).",
+                type: 'green',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-green',
+                    }
+                }
+            });
+        } else if (diferencia !== 0) {
+            //alert("⚠️ Los totales no cuadran. Diferencia: " + diferencia.toFixed(2));
+            $.alert({
+                title: 'Error',
+                content: "⚠️ Los totales de Moneda Nacional no cuadran. Diferencia: " + diferencia.toFixed(2),
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+        }
+
+        debugger;
+
+        // calcular diferencia
+        diferencia = totalHaberME - totalDebeME;
+
+        diferencia = redondear4(diferencia);
+
+        if (moneda === 'MON0000000000001') {
+            totalAsiento = redondear4(totalAsientoOriginal / parseFloat(tc));
+        } else {
+            totalAsiento = redondear4(totalAsientoOriginal);
+        }
+
+        // si la diferencia es menor o igual a 0.1, ajustar
+        if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
+
+            debugger;
+
+            // Recorrerlo
+            for (let item of arrayDetalle) {
+                debugger;
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
+                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_ME) > 0.0000) {
+                        //if (totalAsiento > totalHaberME) {
+                        if (totalDebeME > totalHaberME) {
+                            item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) + Math.abs(diferencia));
+                        } else {
+                            item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) - Math.abs(diferencia));
+                        }
+                        break; // ✅ aquí se rompe el bucle
+                    }
+                }
+
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
+                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_ME) > 0.0000) {
+                        //if (totalAsiento > totalDebeME) {
+                        if (totalHaberME > totalDebeME) {
+                            item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) + Math.abs(diferencia));
+                        } else {
+                            item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) - Math.abs(diferencia));
+                        }
+                        break; // ✅ aquí se rompe el bucle
+                    }
+                }
+            }
+
+            document.getElementById(array_text).value = JSON.stringify(arrayDetalle);
+
+            // recorrer filas y hacer el cambio
+            $(table_text).each(function (index) {
+                debugger;
+                let fila = $(this);
+                let rowIdx = table.row(fila).index();
+                let numero_cuenta = table.cell(rowIdx, 1).data();
+
+                let debeME = parseFloat(table.cell(rowIdx, 5).data().replaceAll(/[\$,]/g, "")) || 0;
+                let haberME = parseFloat(table.cell(rowIdx, 6).data().replaceAll(/[\$,]/g, "")) || 0;
+
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
+                    if (!/^40/.test(numero_cuenta) && haberME > 0) {
+                        //let nuevoHaberME = totalAsiento > totalHaberME
+                        let nuevoHaberME = totalDebeME > totalHaberME
+                            ? haberME + Math.abs(diferencia)
+                            : haberME - Math.abs(diferencia);
+
+                        table.cell(rowIdx, 6).data(number_format(nuevoHaberME, 4));
+                        table.row(rowIdx).invalidate().draw(false);
+
+                        return false; // ✅ en jQuery .each, return false rompe el bucle
+                    }
+                }
+
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
+                    if (!/^40/.test(numero_cuenta) && debeME > 0) {
+                        //let nuevoDebeME = totalAsiento > totalDebeME
+                        let nuevoDebeME = totalHaberME > totalDebeME
+                            ? debeME + Math.abs(diferencia)
+                            : debeME - Math.abs(diferencia);
+
+                        table.cell(rowIdx, 5).data(number_format(nuevoDebeME, 4));
+                        table.row(rowIdx).invalidate().draw(false);
+
+                        return false; // ✅ corta el bucle en jQuery
+                    }
+                }
+            });
+
+            // redibujar la tabla → esto dispara footerCallback y recalcula totales
+            table.columns.adjust().draw();
+
+            //alert("🔄 Totales ajustados automáticamente (diferencia menor o igual a 0.1).");
+            $.alert({
+                title: 'Success',
+                content: "🔄 Totales de Moneda Extrajera ajustados automáticamente (diferencia menor o igual a 0.1).",
+                type: 'green',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-green',
+                    }
+                }
+            });
+        } else if (diferencia !== 0) {
+            //alert("⚠️ Los totales no cuadran. Diferencia: " + diferencia.toFixed(2));
+            $.alert({
+                title: 'Error',
+                content: "⚠️ Los totales de Moneda Extrajera no cuadran. Diferencia: " + diferencia.toFixed(2),
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+        }
     });
 
     //nuevo reparable
@@ -1410,7 +1810,7 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: carpeta + "/obtener-periodo-tipo-cambio",
-            data: {_token: _token, fecha: fecha},
+            data: { _token: _token, fecha: fecha },
             success: function (res) {
                 $('#tipo_cambio_asiento').val(res.tipoCambio);
 
@@ -1497,17 +1897,17 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Anio", valor: anio_asiento},
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Anio", valor: anio_asiento },
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -1611,58 +2011,164 @@ $(document).ready(function () {
             return false; // Detiene la ejecución
         }
 
-        arrayCabecera.forEach(item => {
-            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
-            item.CAN_TIPO_CAMBIO = Number(tc_editar.replaceAll(/[\$,]/g, "")) || 0;
-            item.FEC_ASIENTO = new Date(fecha_asiento);
-            item.COD_PERIODO = periodo_asiento;
-            item.COD_EMPR_CLI = proveedor_asiento;
-            item.COD_CATEGORIA_TIPO_ASIENTO = tipo_asiento;
-            item.COD_CATEGORIA_TIPO_DOCUMENTO = tipo_comprobante;
-            item.NRO_SERIE = serie_comprobante;
-            item.NRO_DOC = numero_comprobante;
-            item.COD_CATEGORIA_TIPO_DOCUMENTO_REF = tipo_comprobante_ref;
-            item.NRO_SERIE_REF = serie_comprobante_ref;
-            item.NRO_DOC_REF = numero_comprobante_ref;
-            item.TXT_GLOSA = glosa_asiento;
-            item.COD_CATEGORIA_TIPO_DETRACCION = tipo_descuento;
-            item.NRO_DETRACCION = constancia_des;
-            item.FEC_DETRACCION = new Date(fecha_des);
-            item.CAN_DESCUENTO_DETRACCION = Number(porcentaje_des) || 0;
-            item.CAN_TOTAL_DETRACCION = Number(total_des) || 0;
-            item.TXT_REFERENCIA = comprobante_asiento.split("-")[0];
-            item.TOTAL_BASE_IMPONIBLE = base_imponible;
-            item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-            item.TOTAL_BASE_INAFECTA = base_inafecto;
-            item.TOTAL_BASE_EXONERADA = base_exonerado;
-            item.TOTAL_IGV = total_igv;
-            item.TOTAL_AFECTO_IVAP = base_ivap;
-            item.TOTAL_IVAP = total_ivap;
-        });
+        let periodo_asiento_text = $("#periodo_asiento option:selected").text().trim() || periodo_asiento;
+        let moneda_asiento_text = $("#moneda_asiento option:selected").text().trim() || moneda_id_editar;
+        let tipo_asiento_text = $("#tipo_asiento option:selected").text().trim() || tipo_asiento;
+        let tipo_comprobante_text = $("#tipo_documento_asiento option:selected").text().trim() || tipo_comprobante;
 
-        let data_input = '';
+        let proveedor_el = document.querySelector('#empresa_asiento');
+        let proveedor_txt = '';
+        if (proveedor_el && proveedor_el.tomselect) {
+            let val = proveedor_el.value;
+            let opt = proveedor_el.tomselect.options[val];
+            proveedor_txt = opt ? opt.text : $("#empresa_asiento option:selected").text();
+        } else {
+            proveedor_txt = $("#empresa_asiento option:selected").text();
+        }
+        proveedor_txt = (proveedor_txt || '').trim();
 
-        $('#asientolista tbody tr').each(function () {
-            if ($(this).hasClass('selected')) {
-                // Cambiar estilo o atributo de las celdas de esta fila
-                data_input = $(this).attr('data_input');
-                $(this).attr('data_asiento_cabecera', JSON.stringify(arrayCabecera));
-                $(this).attr('data_asiento_detalle', JSON.stringify(arrayDetalle));
-                if (data_input === 'C') {
-                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
-                }
+        let rowsHtml = '';
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                let cuenta = item.TXT_CUENTA_CONTABLE || '';
+                let glosa = item.TXT_GLOSA || '';
+                let debeMN = number_format(parseFloat(item.CAN_DEBE_MN) || 0, 4);
+                let haberMN = number_format(parseFloat(item.CAN_HABER_MN) || 0, 4);
+                let debeME = number_format(parseFloat(item.CAN_DEBE_ME) || 0, 4);
+                let haberME = number_format(parseFloat(item.CAN_HABER_ME) || 0, 4);
+                rowsHtml += `
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: left;">${cuenta}</td>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: left;">${glosa}</td>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right;">${debeMN}</td>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right;">${haberMN}</td>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right;">${debeME}</td>
+                        <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right;">${haberME}</td>
+                    </tr>
+                `;
             }
         });
 
-        $('#listone').addClass('active');
-        $('#listtwo').removeClass('active');
-        $('#listtree').removeClass('active');
-        $('#astcabgeneral').addClass('active');
-        $('#astcabcomplementario').removeClass('active');
-        $('#astdetgeneral').removeClass('active');
+        let modalContent = `
+            <div style="font-family: inherit; font-size: 14px; color: #333;">
+                <div style="background-color: #f7f9fa; border-left: 4px solid #0056b3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <h5 style="margin-top: 0; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                        <i class="fa fa-info-circle"></i> Datos de Cabecera del Asiento
+                    </h5>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px;">
+                        <div><b>Año / Periodo:</b> ${anio_asiento} - ${periodo_asiento_text}</div>
+                        <div><b>Comprobante:</b> ${comprobante_asiento}</div>
+                        <div><b>Fecha:</b> ${fecha_asiento}</div>
+                        <div><b>Moneda / T.C.:</b> ${moneda_asiento_text} (T.C.: ${tc_editar})</div>
+                        <div><b>Proveedor:</b> ${proveedor_txt}</div>
+                        <div><b>Tipo Asiento:</b> ${tipo_asiento_text}</div>
+                        <div><b>Doc. Referencia:</b> ${tipo_comprobante_text} ${serie_comprobante}-${numero_comprobante}</div>
+                        <div><b>Glosa:</b> ${glosa_asiento}</div>
+                    </div>
+                </div>
+                
+                <h5 style="margin-top: 15px; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                    <i class="fa fa-list"></i> Detalle del Asiento
+                </h5>
+                <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; max-height: 250px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #0056b3; color: white;">
+                                <th style="padding: 6px; text-align: left; border: 1px solid #dee2e6;">Cuenta</th>
+                                <th style="padding: 6px; text-align: left; border: 1px solid #dee2e6;">Glosa / Descripción</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe ME</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber ME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #e9ecef; font-weight: bold; border-top: 2px solid #dee2e6;">
+                                <td colspan="2" style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Totales:</td>
+                                <td style="padding: 6px; text-align: right; color: #0056b3; border: 1px solid #dee2e6;">${totalDebeMN}</td>
+                                <td style="padding: 6px; text-align: right; color: #0056b3; border: 1px solid #dee2e6;">${totalHaberMN}</td>
+                                <td style="padding: 6px; text-align: right; color: #28a745; border: 1px solid #dee2e6;">${totalDebeME}</td>
+                                <td style="padding: 6px; text-align: right; color: #28a745; border: 1px solid #dee2e6;">${totalHaberME}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        `;
 
-        $('.pnlasientos').hide();
-        $('#asientolista').focus();
+        $.confirm({
+            title: 'Confirmar Asiento',
+            content: modalContent,
+            type: 'blue',
+            columnClass: 'col-md-8 col-md-offset-2',
+            buttons: {
+                confirmar: {
+                    text: 'Confirmar y Guardar',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        arrayCabecera.forEach(item => {
+                            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
+                            item.CAN_TIPO_CAMBIO = Number(tc_editar.replaceAll(/[\$,]/g, "")) || 0;
+                            item.FEC_ASIENTO = new Date(fecha_asiento);
+                            item.COD_PERIODO = periodo_asiento;
+                            item.COD_EMPR_CLI = proveedor_asiento;
+                            item.COD_CATEGORIA_TIPO_ASIENTO = tipo_asiento;
+                            item.COD_CATEGORIA_TIPO_DOCUMENTO = tipo_comprobante;
+                            item.NRO_SERIE = serie_comprobante;
+                            item.NRO_DOC = numero_comprobante;
+                            item.COD_CATEGORIA_TIPO_DOCUMENTO_REF = tipo_comprobante_ref;
+                            item.NRO_SERIE_REF = serie_comprobante_ref;
+                            item.NRO_DOC_REF = numero_comprobante_ref;
+                            item.TXT_GLOSA = glosa_asiento;
+                            item.COD_CATEGORIA_TIPO_DETRACCION = tipo_descuento;
+                            item.NRO_DETRACCION = constancia_des;
+                            item.FEC_DETRACCION = new Date(fecha_des);
+                            item.CAN_DESCUENTO_DETRACCION = Number(porcentaje_des) || 0;
+                            item.CAN_TOTAL_DETRACCION = Number(total_des) || 0;
+                            item.TXT_REFERENCIA = comprobante_asiento.split("-")[0];
+                            item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                            item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                            item.TOTAL_BASE_INAFECTA = base_inafecto;
+                            item.TOTAL_BASE_EXONERADA = base_exonerado;
+                            item.TOTAL_IGV = total_igv;
+                            item.TOTAL_AFECTO_IVAP = base_ivap;
+                            item.TOTAL_IVAP = total_ivap;
+                        });
+
+                        let data_input = '';
+
+                        $('#asientolista tbody tr').each(function () {
+                            if ($(this).hasClass('selected')) {
+                                // Cambiar estilo o atributo de las celdas de esta fila
+                                data_input = $(this).attr('data_input');
+                                $(this).attr('data_asiento_cabecera', JSON.stringify(arrayCabecera));
+                                $(this).attr('data_asiento_detalle', JSON.stringify(arrayDetalle));
+                                if (data_input === 'C') {
+                                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+                                }
+                            }
+                        });
+
+                        $('#listone').addClass('active');
+                        $('#listtwo').removeClass('active');
+                        $('#listtree').removeClass('active');
+                        $('#astcabgeneral').addClass('active');
+                        $('#astcabcomplementario').removeClass('active');
+                        $('#astdetgeneral').removeClass('active');
+
+                        $('.pnlasientos').hide();
+                        $('#asientolista').focus();
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-red'
+                }
+            }
+        });
     })
 
     $('#tipo_igv_id').on('change', function () {
@@ -1710,12 +2216,13 @@ $(document).ready(function () {
     $(document).on('click', ".ver-asiento", function (e) {
         e.preventDefault();
         if ($('.editarcuentas').is(':visible')) {
-            $('.tablageneral').toggle("slow");
             $('.editarcuentas').toggle("slow");
-        }
-        setTimeout(function () {
+            $('.tablageneral').toggle("slow", function () {
+                $('#asientodetalle').DataTable().columns.adjust().draw();
+            });
+        } else {
             $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        }
 
         let $tr = $(this).closest("tr");
 
@@ -1927,11 +2434,10 @@ $(document).ready(function () {
     });
 
     $(".btn-regresar-lista").on('click', function (e) {
-        $('.tablageneral').toggle("slow");
         $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
+        $('.tablageneral').toggle("slow", function () {
             $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $(".btn-registrar-movimiento").on('click', function (e) {
@@ -2056,105 +2562,159 @@ $(document).ready(function () {
             }
         }
 
-        if (afecto_igv !== '') {
-            ind_producto = 1;
-        }
+        let texto_afecto = $("#tipo_igv_id option:selected").text();
+        let texto_partida = $("#partida_id option:selected").text();
 
-        // Nuevo objeto con todos los campos
-        let nuevoMovimiento = {
-            "COD_ASIENTO_MOVIMIENTO": asiento_id_editar,
-            "COD_EMPR": "IACHEM0000010394",
-            "COD_CENTRO": "CEN0000000000002",
-            "COD_ASIENTO": "IIBEAC0000000001",
-            "COD_CUENTA_CONTABLE": cuenta_contable_id,
-            "IND_PRODUCTO": ind_producto,
-            "TXT_CUENTA_CONTABLE": numero_cuenta,
-            "TXT_GLOSA": glosa_cuenta,
-            "CAN_DEBE_MN": can_debe_mn,
-            "CAN_HABER_MN": can_haber_mn,
-            "CAN_DEBE_ME": can_debe_me,
-            "CAN_HABER_ME": can_haber_me,
-            "NRO_LINEA": "4",
-            "COD_CUO": "",
-            "IND_EXTORNO": "0",
-            "TXT_TIPO_REFERENCIA": "",
-            "TXT_REFERENCIA": "",
-            "COD_USUARIO_CREA_AUD": "1CIX00000001",
-            "FEC_USUARIO_CREA_AUD": "2025-08-19 14:30:00",
-            "COD_USUARIO_MODIF_AUD": "",
-            "FEC_USUARIO_MODIF_AUD": "2025-08-19 14:30:00",
-            "COD_ESTADO": activo,
-            "COD_DOC_CTBLE_REF": afecto_igv,
-            "COD_ORDEN_REF": porc_afecto_igv,
-            "COD_PRODUCTO": "",
-            "TXT_NOMBRE_PRODUCTO": "",
-            "COD_LOTE": "",
-            "NRO_LINEA_PRODUCTO": "0",
-            "COD_EMPR_CLI_REF": "",
-            "TXT_EMPR_CLI_REF": "",
-            "DOCUMENTO_REF": "",
-            "CODIGO_CONTABLE": ""
-        };
+        let modalContent = `
+            <div style="font-family: inherit; font-size: 14px; color: #333;">
+                <div style="background-color: #f7f9fa; border-left: 4px solid #0056b3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <h5 style="margin-top: 0; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                        <i class="fa fa-info-circle"></i> Datos del Movimiento
+                    </h5>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                        <div><b>Cuenta Contable:</b> ${texto}</div>
+                        <div><b>Partida:</b> ${texto_partida}</div>
+                        <div><b>Monto ingresado:</b> ${number_format(parseFloat(monto) || 0, 4)}</div>
+                        <div><b>Afecto IGV:</b> ${texto_afecto} (${porc_afecto_igv || '0'}%)</div>
+                    </div>
+                </div>
+                
+                <h5 style="margin-top: 15px; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                    <i class="fa fa-calculator"></i> Valores Calculados para el Asiento
+                </h5>
+                <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #0056b3; color: white;">
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe ME</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber ME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_debe_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_haber_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_debe_me, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_haber_me, 4)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
 
-        arrayDetalle.push(nuevoMovimiento);
+        $.confirm({
+            title: 'Confirmar Registro',
+            content: modalContent,
+            type: 'blue',
+            columnClass: 'col-md-6 col-md-offset-3',
+            buttons: {
+                confirmar: {
+                    text: 'Confirmar',
+                    btnClass: 'btn-blue',
+                    action: function () {
 
-        let base_imponible = 0.0000;
-        let base_imponible_10 = 0.0000;
-        let base_ivap = 0.0000;
-        let base_inafecto = 0.0000;
-        let base_exonerado = 0.0000;
-        let total_igv = 0.0000;
-        let total_ivap = 0.0000;
-        let total = 0.0000;
+                        if (afecto_igv !== '') {
+                            ind_producto = 1;
+                        }
 
-        // Recorrerlo
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                switch (item.COD_DOC_CTBLE_REF) {
-                    case 'AIGV':
-                        if (item.COD_ORDEN_REF === '18') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        // Nuevo objeto con todos los campos
+                        let nuevoMovimiento = {
+                            "COD_ASIENTO_MOVIMIENTO": asiento_id_editar,
+                            "COD_EMPR": "IACHEM0000010394",
+                            "COD_CENTRO": "CEN0000000000002",
+                            "COD_ASIENTO": "IIBEAC0000000001",
+                            "COD_CUENTA_CONTABLE": cuenta_contable_id,
+                            "IND_PRODUCTO": ind_producto,
+                            "TXT_CUENTA_CONTABLE": numero_cuenta,
+                            "TXT_GLOSA": glosa_cuenta,
+                            "CAN_DEBE_MN": can_debe_mn,
+                            "CAN_HABER_MN": can_haber_mn,
+                            "CAN_DEBE_ME": can_debe_me,
+                            "CAN_HABER_ME": can_haber_me,
+                            "NRO_LINEA": "4",
+                            "COD_CUO": "",
+                            "IND_EXTORNO": "0",
+                            "TXT_TIPO_REFERENCIA": "",
+                            "TXT_REFERENCIA": "",
+                            "COD_USUARIO_CREA_AUD": "1CIX00000001",
+                            "FEC_USUARIO_CREA_AUD": "2025-08-19 14:30:00",
+                            "COD_USUARIO_MODIF_AUD": "",
+                            "FEC_USUARIO_MODIF_AUD": "2025-08-19 14:30:00",
+                            "COD_ESTADO": activo,
+                            "COD_DOC_CTBLE_REF": afecto_igv,
+                            "COD_ORDEN_REF": porc_afecto_igv,
+                            "COD_PRODUCTO": "",
+                            "TXT_NOMBRE_PRODUCTO": "",
+                            "COD_LOTE": "",
+                            "NRO_LINEA_PRODUCTO": "0",
+                            "COD_EMPR_CLI_REF": "",
+                            "TXT_EMPR_CLI_REF": "",
+                            "DOCUMENTO_REF": "",
+                            "CODIGO_CONTABLE": ""
+                        };
+
+                        arrayDetalle.push(nuevoMovimiento);
+
+                        let base_imponible = 0.0000;
+                        let base_imponible_10 = 0.0000;
+                        let base_ivap = 0.0000;
+                        let base_inafecto = 0.0000;
+                        let base_exonerado = 0.0000;
+                        let total_igv = 0.0000;
+                        let total_ivap = 0.0000;
+                        let total = 0.0000;
+
+                        // Recorrerlo
+                        arrayDetalle.forEach(item => {
+                            if (parseInt(item.COD_ESTADO) === 1) {
+                                switch (item.COD_DOC_CTBLE_REF) {
+                                    case 'AIGV':
+                                        if (item.COD_ORDEN_REF === '18') {
+                                            if (moneda_id_editar !== 'MON0000000000001') {
+                                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                            } else {
+                                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                            }
+                                        } else if (item.COD_ORDEN_REF === '10') {
+                                            if (moneda_id_editar !== 'MON0000000000001') {
+                                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                            } else {
+                                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                            }
+                                        }
+                                        break;
+                                    case 'IIGV':
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                        break;
+                                    case 'EIGV':
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                        break;
+                                }
+                                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                }
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                            }
-                        }
-                        break;
-                    case 'IIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                    case 'EIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                }
-                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
-                    if (moneda_id_editar !== 'MON0000000000001') {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                    } else {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                    }
-                }
-            }
-        });
+                        });
 
-        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+                        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
 
-        // Crear la fila con atributos y estilos
-        let nuevaFila = `
+                        // Crear la fila con atributos y estilos
+                        let nuevaFila = `
             <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
                 data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
                 <td class="col-codigo">${asiento_id_editar}</td>
@@ -2175,99 +2735,110 @@ $(document).ready(function () {
             </tr>
         `;
 
-        let table = $('#asientodetalle').DataTable();
+                        let table = $('#asientodetalle').DataTable();
 
-        switch (form_id_editar) {
-            case 'C':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetalle').DataTable();
-                table.row.add($(nuevaFila)).draw(false);
-                table.columns.adjust().draw();
-                //$("#asientodetalle tbody").append(nuevaFila);
-                $("#asientototales tbody tr").each(function () {
-                    let fila = $(this);
+                        switch (form_id_editar) {
+                            case 'C':
+                                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                                // Recorrerlo
+                                arrayCabecera.forEach(item => {
+                                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                    item.TOTAL_IGV = total_igv;
+                                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                                    item.TOTAL_IVAP = total_ivap;
+                                });
+                                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetalle').DataTable();
+                                table.row.add($(nuevaFila)).draw(false);
+                                table.columns.adjust().draw();
+                                //$("#asientodetalle tbody").append(nuevaFila);
+                                $("#asientototales tbody tr").each(function () {
+                                    let fila = $(this);
 
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
+                                    // Actualizar las celdas visibles de la tabla
+                                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                    fila.find(".col-total").text(number_format(total, 4));
 
-                });
-                break;
-            case 'RV':
-                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallereversion').DataTable();
-                table.row.add($(nuevaFila)).draw(false);
-                table.columns.adjust().draw();
-                //$("#asientodetallereversion tbody").append(nuevaFila);
-                break;
-            case 'D':
-                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallededuccion').DataTable();
-                table.row.add($(nuevaFila)).draw(false);
-                table.columns.adjust().draw();
-                //$("#asientodetallededuccion tbody").append(nuevaFila);
-                break;
-            case 'P':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallepercepcion').DataTable();
-                table.row.add($(nuevaFila)).draw(false);
-                table.columns.adjust().draw();
-                //$("#asientodetallepercepcion tbody").append(nuevaFila);
-                $("#asiento_totales_percepcion tbody tr").each(function () {
-                    let fila = $(this);
+                                });
+                                break;
+                            case 'RV':
+                                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallereversion').DataTable();
+                                table.row.add($(nuevaFila)).draw(false);
+                                table.columns.adjust().draw();
+                                //$("#asientodetallereversion tbody").append(nuevaFila);
+                                break;
+                            case 'D':
+                                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallededuccion').DataTable();
+                                table.row.add($(nuevaFila)).draw(false);
+                                table.columns.adjust().draw();
+                                //$("#asientodetallededuccion tbody").append(nuevaFila);
+                                break;
+                            case 'P':
+                                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
+                                // Recorrerlo
+                                arrayCabecera.forEach(item => {
+                                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                    item.TOTAL_IGV = total_igv;
+                                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                                    item.TOTAL_IVAP = total_ivap;
+                                });
+                                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
+                                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallepercepcion').DataTable();
+                                table.row.add($(nuevaFila)).draw(false);
+                                table.columns.adjust().draw();
+                                //$("#asientodetallepercepcion tbody").append(nuevaFila);
+                                $("#asiento_totales_percepcion tbody tr").each(function () {
+                                    let fila = $(this);
 
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
+                                    // Actualizar las celdas visibles de la tabla
+                                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                    fila.find(".col-total").text(number_format(total, 4));
 
-                });
-                break;
-        }
-        $('.tablageneral').toggle("slow");
-        $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
-            $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+                                });
+                                break;
+                        }
+                        $('.editarcuentas').toggle("slow");
+                        $('.tablageneral').toggle("slow", function () {
+                            if (typeof table !== 'undefined') {
+                                table.columns.adjust().draw();
+                            } else {
+                                $('#asientodetalle').DataTable().columns.adjust().draw();
+                            }
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-red'
+                }
+            }
+        });
     });
 
     $(".btn-editar-movimiento").on('click', function (e) {
@@ -2393,310 +2964,374 @@ $(document).ready(function () {
             }
         }
 
-        let base_imponible = 0.0000;
-        let base_imponible_10 = 0.0000;
-        let base_ivap = 0.0000;
-        let base_inafecto = 0.0000;
-        let base_exonerado = 0.0000;
-        let total_igv = 0.0000;
-        let total_ivap = 0.0000;
-        let total = 0.0000;
+        let texto_afecto = $("#tipo_igv_id option:selected").text();
+        let texto_partida = $("#partida_id option:selected").text();
 
-        // Recorrerlo
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
-                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
-                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
-                    item.TXT_GLOSA = glosa_cuenta;
-                    item.COD_PRODUCTO = '';
-                    item.TXT_NOMBRE_PRODUCTO = '';
-                    item.COD_LOTE = '';
-                    item.NRO_LINEA_PRODUCTO = '0';
-                    item.CAN_DEBE_MN = can_debe_mn;
-                    item.CAN_HABER_MN = can_haber_mn;
-                    item.CAN_DEBE_ME = can_debe_me;
-                    item.CAN_HABER_ME = can_haber_me;
-                    item.COD_DOC_CTBLE_REF = afecto_igv;
-                    item.COD_ORDEN_REF = porc_afecto_igv;
-                    item.COD_ESTADO = activo;
-                }
-                switch (item.COD_DOC_CTBLE_REF) {
-                    case 'AIGV':
-                        if (item.COD_ORDEN_REF === '18') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+        let modalContent = `
+            <div style="font-family: inherit; font-size: 14px; color: #333;">
+                <div style="background-color: #f7f9fa; border-left: 4px solid #0056b3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <h5 style="margin-top: 0; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                        <i class="fa fa-info-circle"></i> Datos del Movimiento (Modificación)
+                    </h5>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                        <div><b>Cuenta Contable:</b> ${texto}</div>
+                        <div><b>Partida:</b> ${texto_partida}</div>
+                        <div><b>Monto ingresado:</b> ${number_format(parseFloat(monto) || 0, 4)}</div>
+                        <div><b>Afecto IGV:</b> ${texto_afecto} (${porc_afecto_igv || '0'}%)</div>
+                    </div>
+                </div>
+                
+                <h5 style="margin-top: 15px; margin-bottom: 8px; color: #0056b3; font-weight: bold;">
+                    <i class="fa fa-calculator"></i> Valores Calculados para el Asiento
+                </h5>
+                <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #0056b3; color: white;">
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber MN</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Debe ME</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid #dee2e6;">Haber ME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_debe_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #0056b3;">${number_format(can_haber_mn, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_debe_me, 4)}</td>
+                                <td style="padding: 6px; border: 1px solid #dee2e6; text-align: right; font-weight: bold; color: #28a745;">${number_format(can_haber_me, 4)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        $.confirm({
+            title: 'Confirmar Edición',
+            content: modalContent,
+            type: 'blue',
+            columnClass: 'col-md-6 col-md-offset-3',
+            buttons: {
+                confirmar: {
+                    text: 'Confirmar',
+                    btnClass: 'btn-blue',
+                    action: function () {
+
+                        let base_imponible = 0.0000;
+                        let base_imponible_10 = 0.0000;
+                        let base_ivap = 0.0000;
+                        let base_inafecto = 0.0000;
+                        let base_exonerado = 0.0000;
+                        let total_igv = 0.0000;
+                        let total_ivap = 0.0000;
+                        let total = 0.0000;
+
+                        // Recorrerlo
+                        arrayDetalle.forEach(item => {
+                            if (parseInt(item.COD_ESTADO) === 1) {
+                                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                                    item.TXT_GLOSA = glosa_cuenta;
+                                    item.COD_PRODUCTO = '';
+                                    item.TXT_NOMBRE_PRODUCTO = '';
+                                    item.COD_LOTE = '';
+                                    item.NRO_LINEA_PRODUCTO = '0';
+                                    item.CAN_DEBE_MN = can_debe_mn;
+                                    item.CAN_HABER_MN = can_haber_mn;
+                                    item.CAN_DEBE_ME = can_debe_me;
+                                    item.CAN_HABER_ME = can_haber_me;
+                                    item.COD_DOC_CTBLE_REF = afecto_igv;
+                                    item.COD_ORDEN_REF = porc_afecto_igv;
+                                    item.COD_ESTADO = activo;
+                                }
+                                switch (item.COD_DOC_CTBLE_REF) {
+                                    case 'AIGV':
+                                        if (item.COD_ORDEN_REF === '18') {
+                                            if (moneda_id_editar !== 'MON0000000000001') {
+                                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                            } else {
+                                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                            }
+                                        } else if (item.COD_ORDEN_REF === '10') {
+                                            if (moneda_id_editar !== 'MON0000000000001') {
+                                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                            } else {
+                                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                            }
+                                        }
+                                        break;
+                                    case 'IIGV':
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                        break;
+                                    case 'EIGV':
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                        break;
+                                }
+                                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                }
                             }
-                        } else if (item.COD_ORDEN_REF === '10') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        });
+
+                        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+                        let table = $('#asientodetalle').DataTable();
+
+                        switch (form_id_editar) {
+                            case 'C':
+                                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                                // Recorrerlo
+                                arrayCabecera.forEach(item => {
+                                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                    item.TOTAL_IGV = total_igv;
+                                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                                    item.TOTAL_IVAP = total_ivap;
+                                });
+                                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetalle').DataTable();
+
+                                $("#asientodetalle tbody tr").each(function () {
+                                    let fila = $(this);
+                                    let codAsiento = fila.attr('data_codigo');
+
+                                    if (codAsiento === asiento_id_editar) {
+                                        // obtenemos el índice de la fila
+                                        let rowIdx = table.row(fila).index();
+
+                                        // actualizamos celdas por columna
+                                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                                    }
+                                });
+
+                                // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                                table.columns.adjust().draw();
+                                /*
+                                $("#asientodetalle tbody tr").each(function () {
+                                    let fila = $(this);
+                
+                                    // buscamos en la fila el hidden con el id del asiento
+                                    let codAsiento = fila.attr('data_codigo');
+                
+                                    if (codAsiento === asiento_id_editar) {
+                                        // Actualizar las celdas visibles de la tabla
+                                        fila.find(".col-cuenta").text(numero_cuenta);
+                                        fila.find(".col-glosa").text(glosa_cuenta);
+                                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+                                    }
+                                });*/
+                                $("#asientototales tbody tr").each(function () {
+                                    let fila = $(this);
+
+                                    // Actualizar las celdas visibles de la tabla
+                                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                    fila.find(".col-total").text(number_format(total, 4));
+
+                                });
+                                break;
+                            case 'RV':
+                                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallereversion').DataTable();
+
+                                $("#asientodetallereversion tbody tr").each(function () {
+                                    let fila = $(this);
+                                    let codAsiento = fila.attr('data_codigo');
+
+                                    if (codAsiento === asiento_id_editar) {
+                                        // obtenemos el índice de la fila
+                                        let rowIdx = table.row(fila).index();
+
+                                        // actualizamos celdas por columna
+                                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                                    }
+                                });
+
+                                // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                                table.columns.adjust().draw();
+                                /*
+                                $("#asientodetallereversion tbody tr").each(function () {
+                                    let fila = $(this);
+                
+                                    // buscamos en la fila el hidden con el id del asiento
+                                    let codAsiento = fila.attr('data_codigo');
+                
+                                    if (codAsiento === asiento_id_editar) {
+                                        // Actualizar las celdas visibles de la tabla
+                                        fila.find(".col-cuenta").text(numero_cuenta);
+                                        fila.find(".col-glosa").text(glosa_cuenta);
+                                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+                                    }
+                                });*/
+                                break;
+                            case 'D':
+                                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallededuccion').DataTable();
+
+                                $("#asientodetallededuccion tbody tr").each(function () {
+                                    let fila = $(this);
+                                    let codAsiento = fila.attr('data_codigo');
+
+                                    if (codAsiento === asiento_id_editar) {
+                                        // obtenemos el índice de la fila
+                                        let rowIdx = table.row(fila).index();
+
+                                        // actualizamos celdas por columna
+                                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                                    }
+                                });
+
+                                // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                                table.columns.adjust().draw();
+                                /*
+                                $("#asientodetallededuccion tbody tr").each(function () {
+                                    let fila = $(this);
+                
+                                    // buscamos en la fila el hidden con el id del asiento
+                                    let codAsiento = fila.attr('data_codigo');
+                
+                                    if (codAsiento === asiento_id_editar) {
+                                        // Actualizar las celdas visibles de la tabla
+                                        fila.find(".col-cuenta").text(numero_cuenta);
+                                        fila.find(".col-glosa").text(glosa_cuenta);
+                                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+                                    }
+                                });*/
+                                break;
+                            case 'P':
+                                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
+                                // Recorrerlo
+                                arrayCabecera.forEach(item => {
+                                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                    item.TOTAL_IGV = total_igv;
+                                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                                    item.TOTAL_IVAP = total_ivap;
+                                });
+                                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
+                                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
+                                // Después de actualizar arrayDetalle
+                                table = $('#asientodetallepercepcion').DataTable();
+
+                                $("#asientodetallepercepcion tbody tr").each(function () {
+                                    let fila = $(this);
+                                    let codAsiento = fila.attr('data_codigo');
+
+                                    if (codAsiento === asiento_id_editar) {
+                                        // obtenemos el índice de la fila
+                                        let rowIdx = table.row(fila).index();
+
+                                        // actualizamos celdas por columna
+                                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                                    }
+                                });
+
+                                // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                                table.columns.adjust().draw();
+                                /*
+                                $("#asientodetallepercepcion tbody tr").each(function () {
+                                    let fila = $(this);
+                
+                                    // buscamos en la fila el hidden con el id del asiento
+                                    let codAsiento = fila.attr('data_codigo');
+                
+                                    if (codAsiento === asiento_id_editar) {
+                                        // Actualizar las celdas visibles de la tabla
+                                        fila.find(".col-cuenta").text(numero_cuenta);
+                                        fila.find(".col-glosa").text(glosa_cuenta);
+                                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+                                    }
+                                });*/
+                                $("#asiento_totales_percepcion tbody tr").each(function () {
+                                    let fila = $(this);
+
+                                    // Actualizar las celdas visibles de la tabla
+                                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                    fila.find(".col-total").text(number_format(total, 4));
+
+                                });
+                                break;
+                        }
+                        $('.editarcuentas').toggle("slow");
+                        $('.tablageneral').toggle("slow", function () {
+                            if (typeof table !== 'undefined') {
+                                table.columns.adjust().draw();
                             }
-                        }
-                        break;
-                    case 'IIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                    case 'EIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                }
-                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
-                    if (moneda_id_editar !== 'MON0000000000001') {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                    } else {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        });
+
                     }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-red'
                 }
             }
         });
-
-        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
-
-        let table = $('#asientodetalle').DataTable();
-
-        switch (form_id_editar) {
-            case 'C':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetalle').DataTable();
-
-                $("#asientodetalle tbody tr").each(function () {
-                    let fila = $(this);
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // obtenemos el índice de la fila
-                        let rowIdx = table.row(fila).index();
-
-                        // actualizamos celdas por columna
-                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                    }
-                });
-
-                // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                table.columns.adjust().draw();
-                /*
-                $("#asientodetalle tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // buscamos en la fila el hidden con el id del asiento
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // Actualizar las celdas visibles de la tabla
-                        fila.find(".col-cuenta").text(numero_cuenta);
-                        fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                    }
-                });*/
-                $("#asientototales tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
-
-                });
-                break;
-            case 'RV':
-                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallereversion').DataTable();
-
-                $("#asientodetallereversion tbody tr").each(function () {
-                    let fila = $(this);
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // obtenemos el índice de la fila
-                        let rowIdx = table.row(fila).index();
-
-                        // actualizamos celdas por columna
-                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                    }
-                });
-
-                // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                table.columns.adjust().draw();
-                /*
-                $("#asientodetallereversion tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // buscamos en la fila el hidden con el id del asiento
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // Actualizar las celdas visibles de la tabla
-                        fila.find(".col-cuenta").text(numero_cuenta);
-                        fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                    }
-                });*/
-                break;
-            case 'D':
-                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallededuccion').DataTable();
-
-                $("#asientodetallededuccion tbody tr").each(function () {
-                    let fila = $(this);
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // obtenemos el índice de la fila
-                        let rowIdx = table.row(fila).index();
-
-                        // actualizamos celdas por columna
-                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                    }
-                });
-
-                // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                table.columns.adjust().draw();
-                /*
-                $("#asientodetallededuccion tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // buscamos en la fila el hidden con el id del asiento
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // Actualizar las celdas visibles de la tabla
-                        fila.find(".col-cuenta").text(numero_cuenta);
-                        fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                    }
-                });*/
-                break;
-            case 'P':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetallepercepcion').DataTable();
-
-                $("#asientodetallepercepcion tbody tr").each(function () {
-                    let fila = $(this);
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // obtenemos el índice de la fila
-                        let rowIdx = table.row(fila).index();
-
-                        // actualizamos celdas por columna
-                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                    }
-                });
-
-                // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                table.columns.adjust().draw();
-                /*
-                $("#asientodetallepercepcion tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // buscamos en la fila el hidden con el id del asiento
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // Actualizar las celdas visibles de la tabla
-                        fila.find(".col-cuenta").text(numero_cuenta);
-                        fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                    }
-                });*/
-                $("#asiento_totales_percepcion tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
-
-                });
-                break;
-        }
-        $('.tablageneral').toggle("slow");
-        $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
-            $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".agregar-linea").on('click', function (e) {
@@ -3123,7 +3758,7 @@ $(document).ready(function () {
         }
 
     });
-//nuevo
+    //nuevo
     $('.elimnaritem').on('click', function (event) {
         event.preventDefault();
         var href = $(this).attr('href');
@@ -3206,10 +3841,10 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0 || $('#nro_cuenta_contable').val() === ''){
+            if (detalles.length === 0 || $('#nro_cuenta_contable').val() === '') {
                 $('#nro_cuenta_contable').val("000000");
             } else {
-                if($('#nro_cuenta_contable').val() === ''){
+                if ($('#nro_cuenta_contable').val() === '') {
                     $('#nro_cuenta_contable').val("000000");
                 }
             }
@@ -3246,21 +3881,21 @@ $(document).ready(function () {
 
             // Array de todos los valores
             let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                {nombre: "Anio", valor: anio_asiento},
-                {nombre: "Periodo", valor: periodo_asiento},
-                {nombre: "Comprobante", valor: comprobante_asiento},
-                {nombre: "Moneda", valor: moneda_id_editar},
-                {nombre: "Tipo de Cambio", valor: tc_editar},
-                {nombre: "Proveedor", valor: proveedor_asiento},
-                {nombre: "Tipo Asiento", valor: tipo_asiento},
-                {nombre: "Fecha", valor: fecha_asiento},
-                {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                {nombre: "Serie", valor: serie_comprobante},
-                {nombre: "Número", valor: numero_comprobante},
+                { nombre: "Cuenta Contable", valor: nro_cuenta_aux },
+                { nombre: "Anio", valor: anio_asiento },
+                { nombre: "Periodo", valor: periodo_asiento },
+                { nombre: "Comprobante", valor: comprobante_asiento },
+                { nombre: "Moneda", valor: moneda_id_editar },
+                { nombre: "Tipo de Cambio", valor: tc_editar },
+                { nombre: "Proveedor", valor: proveedor_asiento },
+                { nombre: "Tipo Asiento", valor: tipo_asiento },
+                { nombre: "Fecha", valor: fecha_asiento },
+                { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+                { nombre: "Serie", valor: serie_comprobante },
+                { nombre: "Número", valor: numero_comprobante },
             ];
 
-            if(detalles.length > 0) {
+            if (detalles.length > 0) {
                 // Recorremos y validamos
                 for (let campo of campos) {
                     if (!campo.valor || campo.valor === "") {
@@ -3339,10 +3974,10 @@ $(document).ready(function () {
     $('.btnaprobarcomporbatnteus').on('click', function (event) {
 
         event.preventDefault();
-        var grupo                   =   $('#grupo_data').val();
-        var grupo_id           =   $('#grupo_id').val();
-        if(grupo>0){
-            if(grupo_id ==''){ alerterrorajax("Seleeccione un grupo"); return false;}
+        var grupo = $('#grupo_data').val();
+        var grupo_id = $('#grupo_id').val();
+        if (grupo > 0) {
+            if (grupo_id == '') { alerterrorajax("Seleeccione un grupo"); return false; }
         }
 
 
@@ -3425,11 +4060,11 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0){
+            if (detalles.length === 0) {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
-                if($('#nro_cuenta_contable').val() === ''){
+                if ($('#nro_cuenta_contable').val() === '') {
                     $('#nro_cuenta_contable').val("000000");
                 }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
@@ -3447,18 +4082,18 @@ $(document).ready(function () {
 
                 // Array de todos los valores
                 let campos = [
-                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                    {nombre: "Anio", valor: anio_asiento},
-                    {nombre: "Periodo", valor: periodo_asiento},
-                    {nombre: "Comprobante", valor: comprobante_asiento},
-                    {nombre: "Moneda", valor: moneda_id_editar},
-                    {nombre: "Tipo de Cambio", valor: tc_editar},
-                    {nombre: "Proveedor", valor: proveedor_asiento},
-                    {nombre: "Tipo Asiento", valor: tipo_asiento},
-                    {nombre: "Fecha", valor: fecha_asiento},
-                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                    {nombre: "Serie", valor: serie_comprobante},
-                    {nombre: "Número", valor: numero_comprobante},
+                    { nombre: "Cuenta Contable", valor: nro_cuenta_aux },
+                    { nombre: "Anio", valor: anio_asiento },
+                    { nombre: "Periodo", valor: periodo_asiento },
+                    { nombre: "Comprobante", valor: comprobante_asiento },
+                    { nombre: "Moneda", valor: moneda_id_editar },
+                    { nombre: "Tipo de Cambio", valor: tc_editar },
+                    { nombre: "Proveedor", valor: proveedor_asiento },
+                    { nombre: "Tipo Asiento", valor: tipo_asiento },
+                    { nombre: "Fecha", valor: fecha_asiento },
+                    { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+                    { nombre: "Serie", valor: serie_comprobante },
+                    { nombre: "Número", valor: numero_comprobante },
                 ];
 
                 // Recorremos y validamos
@@ -3519,7 +4154,7 @@ $(document).ready(function () {
 
     });
 
-    $('.btnaprobarcomporbatntenuevo').on('click', function(event){
+    $('.btnaprobarcomporbatntenuevo').on('click', function (event) {
         event.preventDefault();
 
         let ruta = window.location.pathname;
@@ -3564,11 +4199,11 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0){
+            if (detalles.length === 0) {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
-                if($('#nro_cuenta_contable').val() === ''){
+                if ($('#nro_cuenta_contable').val() === '') {
                     $('#nro_cuenta_contable').val("000000");
                 }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
@@ -3586,18 +4221,18 @@ $(document).ready(function () {
 
                 // Array de todos los valores
                 let campos = [
-                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                    {nombre: "Anio", valor: anio_asiento},
-                    {nombre: "Periodo", valor: periodo_asiento},
-                    {nombre: "Comprobante", valor: comprobante_asiento},
-                    {nombre: "Moneda", valor: moneda_id_editar},
-                    {nombre: "Tipo de Cambio", valor: tc_editar},
-                    {nombre: "Proveedor", valor: proveedor_asiento},
-                    {nombre: "Tipo Asiento", valor: tipo_asiento},
-                    {nombre: "Fecha", valor: fecha_asiento},
-                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                    {nombre: "Serie", valor: serie_comprobante},
-                    {nombre: "Número", valor: numero_comprobante},
+                    { nombre: "Cuenta Contable", valor: nro_cuenta_aux },
+                    { nombre: "Anio", valor: anio_asiento },
+                    { nombre: "Periodo", valor: periodo_asiento },
+                    { nombre: "Comprobante", valor: comprobante_asiento },
+                    { nombre: "Moneda", valor: moneda_id_editar },
+                    { nombre: "Tipo de Cambio", valor: tc_editar },
+                    { nombre: "Proveedor", valor: proveedor_asiento },
+                    { nombre: "Tipo Asiento", valor: tipo_asiento },
+                    { nombre: "Fecha", valor: fecha_asiento },
+                    { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+                    { nombre: "Serie", valor: serie_comprobante },
+                    { nombre: "Número", valor: numero_comprobante },
                 ];
 
                 // Recorremos y validamos
@@ -3649,7 +4284,7 @@ $(document).ready(function () {
             buttons: {
                 confirmar: function () {
                     debugger;
-                    $( "#formpedido" ).submit();
+                    $("#formpedido").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -3659,7 +4294,7 @@ $(document).ready(function () {
 
     });
 
-    $('.btnaprobarcomporbatntenuevocomision').on('click', function(event){
+    $('.btnaprobarcomporbatntenuevocomision').on('click', function (event) {
         event.preventDefault();
 
         let ruta = window.location.pathname;
@@ -3704,11 +4339,11 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0){
+            if (detalles.length === 0) {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
-                if($('#nro_cuenta_contable').val() === ''){
+                if ($('#nro_cuenta_contable').val() === '') {
                     $('#nro_cuenta_contable').val("000000");
                 }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
@@ -3726,18 +4361,18 @@ $(document).ready(function () {
 
                 // Array de todos los valores
                 let campos = [
-                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                    {nombre: "Anio", valor: anio_asiento},
-                    {nombre: "Periodo", valor: periodo_asiento},
-                    {nombre: "Comprobante", valor: comprobante_asiento},
-                    {nombre: "Moneda", valor: moneda_id_editar},
-                    {nombre: "Tipo de Cambio", valor: tc_editar},
-                    {nombre: "Proveedor", valor: proveedor_asiento},
-                    {nombre: "Tipo Asiento", valor: tipo_asiento},
-                    {nombre: "Fecha", valor: fecha_asiento},
-                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                    {nombre: "Serie", valor: serie_comprobante},
-                    {nombre: "Número", valor: numero_comprobante},
+                    { nombre: "Cuenta Contable", valor: nro_cuenta_aux },
+                    { nombre: "Anio", valor: anio_asiento },
+                    { nombre: "Periodo", valor: periodo_asiento },
+                    { nombre: "Comprobante", valor: comprobante_asiento },
+                    { nombre: "Moneda", valor: moneda_id_editar },
+                    { nombre: "Tipo de Cambio", valor: tc_editar },
+                    { nombre: "Proveedor", valor: proveedor_asiento },
+                    { nombre: "Tipo Asiento", valor: tipo_asiento },
+                    { nombre: "Fecha", valor: fecha_asiento },
+                    { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+                    { nombre: "Serie", valor: serie_comprobante },
+                    { nombre: "Número", valor: numero_comprobante },
                 ];
 
                 // Recorremos y validamos
@@ -3789,7 +4424,7 @@ $(document).ready(function () {
             buttons: {
                 confirmar: function () {
                     debugger;
-                    $( "#formpedidocomision" ).submit();
+                    $("#formpedidocomision").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -3890,16 +4525,16 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -3990,16 +4625,16 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -4090,16 +4725,16 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -4190,16 +4825,16 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -4332,10 +4967,10 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0){
+            if (detalles.length === 0) {
                 $('#nro_cuenta_contable').val("000000");
             } else {
-                if($('#nro_cuenta_contable').val() === ''){
+                if ($('#nro_cuenta_contable').val() === '') {
                     $('#nro_cuenta_contable').val("000000");
                 }
             }
@@ -4372,21 +5007,21 @@ $(document).ready(function () {
 
             // Array de todos los valores
             let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                {nombre: "Anio", valor: anio_asiento},
-                {nombre: "Periodo", valor: periodo_asiento},
-                {nombre: "Comprobante", valor: comprobante_asiento},
-                {nombre: "Moneda", valor: moneda_id_editar},
-                {nombre: "Tipo de Cambio", valor: tc_editar},
-                {nombre: "Proveedor", valor: proveedor_asiento},
-                {nombre: "Tipo Asiento", valor: tipo_asiento},
-                {nombre: "Fecha", valor: fecha_asiento},
-                {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                {nombre: "Serie", valor: serie_comprobante},
-                {nombre: "Número", valor: numero_comprobante},
+                { nombre: "Cuenta Contable", valor: nro_cuenta_aux },
+                { nombre: "Anio", valor: anio_asiento },
+                { nombre: "Periodo", valor: periodo_asiento },
+                { nombre: "Comprobante", valor: comprobante_asiento },
+                { nombre: "Moneda", valor: moneda_id_editar },
+                { nombre: "Tipo de Cambio", valor: tc_editar },
+                { nombre: "Proveedor", valor: proveedor_asiento },
+                { nombre: "Tipo Asiento", valor: tipo_asiento },
+                { nombre: "Fecha", valor: fecha_asiento },
+                { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+                { nombre: "Serie", valor: serie_comprobante },
+                { nombre: "Número", valor: numero_comprobante },
             ];
 
-            if(detalles.length > 0) {
+            if (detalles.length > 0) {
                 // Recorremos y validamos
                 for (let campo of campos) {
                     if (!campo.valor || campo.valor === "") {
@@ -4446,23 +5081,23 @@ $(document).ready(function () {
     });
 
 
-    $(".registrocomprobanteuc").on('click','.agregar_grupo_marketing_oc', function() {
+    $(".registrocomprobanteuc").on('click', '.agregar_grupo_marketing_oc', function () {
 
-        var _token                  =   $('#token').val();
-        var idopcion                =   $('#idopcion').val();
-        var prefijo_id              =   $('#prefijo_id').val();
-        var orden_id                =   $('#orden_id').val();
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
+        var prefijo_id = $('#prefijo_id').val();
+        var orden_id = $('#orden_id').val();
 
-        data                        =   {
-                                            _token                  : _token,
-                                            prefijo_id              : prefijo_id,
-                                            orden_id                : orden_id,
-                                            idopcion                : idopcion,
+        data = {
+            _token: _token,
+            prefijo_id: prefijo_id,
+            orden_id: orden_id,
+            idopcion: idopcion,
 
-                                        };
+        };
 
-        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
-                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+        ajax_modal(data, "/ajax-modal-configuracion-grupo-oc",
+            "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
 
     });
 
@@ -4536,7 +5171,7 @@ $(document).ready(function () {
             nombre = $(this).find('input').attr('id');
             if (nombre != 'todo') {
                 if ($(check).is(':checked')) {
-                    data.push({id: $(check).attr("id")});
+                    data.push({ id: $(check).attr("id") });
                 }
             }
         });
@@ -4571,7 +5206,7 @@ $(document).ready(function () {
         let listaAsientos = [];
 
         // Recorremos solo las filas que quedaron en el tbody
-        $('#asientolista tbody tr').each(function() {
+        $('#asientolista tbody tr').each(function () {
             let fila = $(this);
 
             // Extraemos la data que guardaste en los atributos
