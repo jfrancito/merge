@@ -2074,8 +2074,9 @@ class GestionOCContabilidadController extends Controller
 
         $dt = new DateTime($fecha);
 
-        $tipoCambio = CMPTipoCambio::where('FEC_CAMBIO', '=', $dt)
+        $tipoCambio = CMPTipoCambio::whereDate('FEC_CAMBIO', '<=', $dt->format('Y-m-d'))
             ->where('COD_ESTADO', '=', 1)
+            ->orderBy('FEC_CAMBIO', 'desc')
             ->first();
 
         $periodo = CONPeriodo::where('COD_ANIO', '=', $dt->format("Y"))
@@ -2093,7 +2094,7 @@ class GestionOCContabilidadController extends Controller
             $codAnio = $periodo->COD_ANIO;
         }
 
-        if (isset($periodo)) {
+        if (isset($tipoCambio)) {
             $tipoCambioVenta = $tipoCambio->CAN_VENTA;
         }
 
