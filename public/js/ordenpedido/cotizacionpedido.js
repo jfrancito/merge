@@ -100,6 +100,24 @@ $(document).ready(function () {
 
 
     /* ===============================
+       MOSTRAR BOTONES SEGÚN INDICADOR
+       =============================== */
+    $(document).on('change', '#ind_mat_o_ser', function (e) {
+        var val = $(this).val();
+        if (val === 'M') {
+            $('.btn-seleccionar-consolidados').fadeIn();
+            $('.btn-seleccionar-pedidos').hide();
+        } else if (val === 'S') {
+            $('.btn-seleccionar-consolidados').hide();
+            $('.btn-seleccionar-pedidos').fadeIn();
+        } else {
+            $('.btn-seleccionar-consolidados').hide();
+            $('.btn-seleccionar-pedidos').hide();
+        }
+    });
+
+
+    /* ===============================
        BUSCAR PROVEEDOR POR RUC
        =============================== */
     $(document).on('click', '.btn-search-premium', function (e) {
@@ -176,6 +194,20 @@ $(document).ready(function () {
        MODAL SELECCIONAR CONSOLIDADOS
        =============================== */
     $(document).on('click', '.btn-seleccionar-consolidados', function (e) {
+        
+        var $existingTable = $('#table-productos-seleccionados');
+        var hasItems = $('.precio-producto').length > 0;
+
+        if (hasItems && $existingTable.data('tipo') === 'S') {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Mezcla No Permitida',
+                mensaje: 'Usted está cotizando servicios, no se puede agregar un consolidado de materiales.<br><br>Debe eliminar los servicios actuales si desea cotizar materiales.',
+                ancho: '500px'
+            });
+            return;
+        }
 
         abrircargando();
 
@@ -198,6 +230,52 @@ $(document).ready(function () {
                     icono: '❌',
                     titulo: 'Error',
                     mensaje: 'No se pudo cargar la lista de consolidados.',
+                    ancho: '400px'
+                });
+            }
+        });
+    });
+
+    /* ===============================
+       MODAL SELECCIONAR PEDIDOS (SERVICIOS)
+       =============================== */
+    $(document).on('click', '.btn-seleccionar-pedidos', function (e) {
+
+        var $existingTable = $('#table-productos-seleccionados');
+        var hasItems = $('.precio-producto').length > 0;
+
+        if (hasItems && $existingTable.data('tipo') === 'M') {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Mezcla No Permitida',
+                mensaje: 'Usted está cotizando materiales, no se puede agregar servicios de pedidos.<br><br>Debe eliminar los materiales actuales si desea cotizar servicios.',
+                ancho: '500px'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-listar-pedidos-aprobados-servicio',
+            data: {
+                _token: _token,
+                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+            },
+            success: function (data) {
+                cerrarcargando();
+                $('.modal-seleccionar-pedido-container').html(data);
+                $('#modal-seleccionar-pedido').niftyModal('show');
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo cargar la lista de pedidos de servicios.',
                     ancho: '400px'
                 });
             }
@@ -314,7 +392,9 @@ $(document).ready(function () {
                 var $container = $('#lista-productos-cotizacion');
                 var $existingTable = $container.find('#table-productos-seleccionados');
 
-                if ($existingTable.length > 0 && !$container.find('.message-empty').length) {
+                var hasActiveItems = $('.precio-producto').length > 0;
+
+                if ($existingTable.length > 0 && hasActiveItems) {
                     
                     // Si ya existe la tabla, extraemos solo las filas <tr> del tbody
                     var $newData = $(data);
@@ -406,7 +486,7 @@ $(document).ready(function () {
                 }
 
                 $('#modal-seleccionar-consolidado-general').niftyModal('hide');
-                calcularTotal();
+                $('#incluir_igv').trigger('change');
             },
             error: function () {
                 cerrarcargando();
@@ -415,6 +495,130 @@ $(document).ready(function () {
                     icono: '❌',
                     titulo: 'Error',
                     mensaje: 'Ocurrió un error al cargar el detalle de los consolidados.',
+                    ancho: '400px'
+                });
+            }
+        });
+    });
+
+    // Confirmar selección de Pedidos (Servicios) en el modal
+    $(document).on('click', '.btn-confirmar-seleccion-pedidos', function (e) {
+
+        var selected = [];
+        var centros = [];
+
+        $('.check-pedido:checked').each(function () {
+            var id = $(this).val();
+            var centro = $(this).attr('data-centro');
+            
+            if (centro && !centros.includes(centro)) {
+                centros.push(centro);
+            }
+            selected.push(id);
+        });
+
+        // VALIDACIÓN DE CENTROS
+        if (centros.length > 1) {
+            modalBonito({
+                tipo: 'error',
+                icono: '❌',
+                titulo: 'Centros Diferentes',
+                mensaje: 'No puede seleccionar pedidos de diferentes centros para una misma cotización.<br><br>Centros detectados: <b>' + centros.join(', ') + '</b>',
+                ancho: '500px'
+            });
+            return;
+        }
+
+        if (selected.length === 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Sin Selección',
+                mensaje: 'Debe seleccionar al menos un pedido para continuar.',
+                ancho: '400px'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-listar-detalle-pedidos-aprobados-seleccionados',
+            data: {
+                _token: _token,
+                selected_ids: selected,
+                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+            },
+            success: function (data) {
+                cerrarcargando();
+                
+                var $container = $('#lista-productos-cotizacion');
+                var $existingTable = $container.find('#table-productos-seleccionados');
+
+                var hasActiveItems = $('.precio-producto').length > 0;
+
+                if ($existingTable.length > 0 && hasActiveItems) {
+                    
+                    var $newData = $(data);
+                    var $newRows = $newData.find('#table-productos-seleccionados tbody tr');
+                    var table = $('#table-productos-seleccionados').DataTable();
+
+                    $newRows.each(function () {
+                        var $newRow = $(this);
+                        var $newPriceEl = $newRow.find('.precio-producto');
+                        var codProd = $newPriceEl.data('cod-producto');
+                        var idPedido = $newPriceEl.data('id-consolidado');
+
+                        var existingRow = null;
+
+                        table.rows().every(function () {
+                            var $row = $(this.node());
+                            var currentCod = $.trim($row.find('.precio-producto').data('cod-producto'));
+                            var currentPed = $.trim($row.find('.precio-producto').data('id-consolidado'));
+                            if (currentCod === $.trim(codProd) && currentPed === $.trim(idPedido)) {
+                                existingRow = this;
+                                return false;
+                            }
+                        });
+
+                        if (!existingRow) {
+                            table.row.add($newRow).draw(false);
+                        }
+                    });
+
+                    table.draw();
+                    reordenarItems();
+
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Servicios Agregados',
+                        mensaje: 'Se han añadido los servicios adicionales a la lista.',
+                        ancho: '400px'
+                    });
+
+                } else {
+                    $container.html(data);
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Servicios Cargados',
+                        mensaje: 'Se han importado los servicios del pedido correctamente.',
+                        ancho: '400px'
+                    });
+                }
+
+                $('#modal-seleccionar-pedido').niftyModal('hide');
+                $('#incluir_igv').trigger('change');
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'Ocurrió un error al cargar el detalle de los pedidos.',
                     ancho: '400px'
                 });
             }
@@ -459,6 +663,76 @@ $(document).ready(function () {
         $('#total').val(totalFinal.toFixed(2));
     }
 
+    function verificarPrecioAnterior($input) {
+        var $row = $input.closest('tr');
+        var $alerta = $row.find('.precio-alerta-info');
+        if ($alerta.length === 0) return;
+
+        var precioActual = parseFloat($input.val()) || 0;
+        var precioAnterior = parseFloat($input.data('precio-compra-anterior')) || 0;
+
+        if (precioAnterior > 0) {
+            precioActual = Math.round(precioActual * 100) / 100;
+            precioAnterior = Math.round(precioAnterior * 100) / 100;
+
+            if (precioActual > precioAnterior) {
+                $alerta.html('<div style="display: flex; align-items: center; justify-content: center; gap: 3px; line-height: 1.25; padding: 2px 0;"><i class="mdi mdi-alert" style="font-size: 14px; color: #a04000; display: inline-block; vertical-align: middle;"></i><span style="font-family: inherit; font-size: 10.5px; letter-spacing: -0.1px;">Última OC: <b style="font-weight: 800;">S/ ' + precioAnterior.toFixed(2) + '</b> <span style="font-weight: 800; color: #a04000;">(Mayor)</span></span></div>')
+                       .css({
+                           'background': '#fdf2e9',
+                           'border': '1px solid #fadbd8',
+                           'color': '#a04000',
+                           'padding': '5px 8px',
+                           'margin': '5px auto 0 auto',
+                           'border-radius': '6px',
+                           'display': 'block',
+                           'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.05)',
+                           'width': '125px',
+                           'text-align': 'center'
+                       });
+                $input.css({
+                    'border-color': '#f5b041',
+                    'box-shadow': '0 0 4px rgba(245, 176, 65, 0.5)'
+                });
+            } else if (precioActual < precioAnterior && precioActual > 0) {
+                $alerta.html('<div style="display: flex; align-items: center; justify-content: center; gap: 3px; line-height: 1.25; padding: 2px 0;"><i class="mdi mdi-arrow-down-bold-circle" style="font-size: 14px; color: #117864; display: inline-block; vertical-align: middle;"></i><span style="font-family: inherit; font-size: 10.5px; letter-spacing: -0.1px;">Última OC: <b style="font-weight: 800;">S/ ' + precioAnterior.toFixed(2) + '</b> <span style="font-weight: 800; color: #117864;">(Menor)</span></span></div>')
+                       .css({
+                           'background': '#e8f8f5',
+                           'border': '1px solid #d1f2eb',
+                           'color': '#117864',
+                           'padding': '5px 8px',
+                           'margin': '5px auto 0 auto',
+                           'border-radius': '6px',
+                           'display': 'block',
+                           'box-shadow': '0 2px 4px rgba(0, 0, 0, 0.05)',
+                           'width': '125px',
+                           'text-align': 'center'
+                       });
+                $input.css({
+                    'border-color': '#5dade2',
+                    'box-shadow': '0 0 4px rgba(93, 173, 226, 0.5)'
+                });
+            } else {
+                $alerta.hide().html('');
+                $input.css({
+                    'border-color': '',
+                    'box-shadow': ''
+                });
+            }
+        } else {
+            $alerta.hide().html('');
+            $input.css({
+                'border-color': '',
+                'box-shadow': ''
+            });
+        }
+    }
+
+    function inicializarAlertasPrecio() {
+        $('.precio-producto').each(function () {
+            verificarPrecioAnterior($(this));
+        });
+    }
+
     $(document).on('change', '#incluir_igv', function() {
         var incluirIGV = $(this).is(':checked');
         var cod_centro_usuario = $('#cod_centro_usuario').val();
@@ -472,6 +746,7 @@ $(document).ready(function () {
             $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
         });
         calcularTotal();
+        inicializarAlertasPrecio();
     });
 
     $(document).on('change keyup', '.precio-producto', function (e) {
@@ -485,6 +760,7 @@ $(document).ready(function () {
         var precioIGV = incluirIGV ? (precio * multiplier) : 0;
         $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
         calcularTotal();
+        verificarPrecioAnterior($(this));
     });
 
     $(document).on('change keyup', '.precio-igv-producto', function (e) {
@@ -503,6 +779,7 @@ $(document).ready(function () {
         var precio = precioIGV / divisor;
         $row.find('.precio-producto').val(precio.toFixed(2));
         calcularTotal();
+        verificarPrecioAnterior($row.find('.precio-producto'));
     });
 
     $(document).on('change keyup', '.cantidad-producto', function (e) {
@@ -760,6 +1037,8 @@ $(document).ready(function () {
         formData.append('txt_tipo_cotizacion', $('#txt_tipo_cotizacion').val());
         formData.append('can_total', $('#total').val());
         formData.append('ind_igv', $('#incluir_igv').is(':checked') ? 1 : 0);
+        var tableTipo = $('#table-productos-seleccionados').data('tipo') || 'M';
+        formData.append('ind_mat_o_ser', tableTipo);
         formData.append('detalles', JSON.stringify(detalles));
         formData.append('archivos_a_eliminar', JSON.stringify(archivos_a_eliminar));
 
@@ -961,6 +1240,7 @@ $(document).ready(function () {
                             setTimeout(function(){
                                 $('.check-producto').prop('checked', true);
                                 calcularTotal();
+                                inicializarAlertasPrecio();
                             }, 500);
                         }
 

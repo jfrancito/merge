@@ -47,9 +47,9 @@
 
                                     <!-- VER DETALLE (SIEMPRE VISIBLE) -->
                                     <button
-                                            class="btn btn-sm btn-primary ver-detalle-pedido-adm"
+                                            class="btn btn-sm ver-detalle-pedido-adm btn-detalle-moderno"
                                             data-id="{{ $item['ID_PEDIDO'] }}">
-                                        <i class="fa fa-eye me-1"></i> Detalle
+                                        <i class="fa fa-eye"></i> Detalle
                                     </button>
                                 </div>
                             </td>

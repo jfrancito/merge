@@ -87,9 +87,56 @@ trait OrdenPedidoCotizacionTraits
 	        $stmt->execute();
 
 	        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-	        $id_cotizacion = $resultado['ID_COTIZACION'];
+	        $id_cotizacion_res = $resultado['ID_COTIZACION'];
 
-	        return $id_cotizacion;
+	        // 🔗 Réplica en Zonas
+	        $conexionbd = 'sqlsrv';
+	        if($cod_centro == 'CEN0000000000004'){
+	            $conexionbd = 'sqlsrv_r';
+	        }else{
+	            if($cod_centro == 'CEN0000000000006'){
+	                $conexionbd = 'sqlsrv_b';
+	            }
+	        }
+
+	        if ($conexionbd !== 'sqlsrv') {
+	            try {
+	                // 1. Obtener la cabecera completa recién insertada/actualizada de la base central
+	                $cabecera = DB::connection('sqlsrv')->table('WEB.ORDEN_COTIZACION')
+	                    ->where('ID_COTIZACION', $id_cotizacion_res)
+	                    ->first();
+
+	                if ($cabecera) {
+	                    // Formatear fechas de manera inequívoca para SQL Server en zonas
+	                    $safe_format_dates = function($array) {
+	                        foreach ($array as $key => $value) {
+	                            if (is_string($value)) {
+	                                if (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}(\.\d+)?)$/', $value, $matches)) {
+	                                    $array[$key] = $matches[1] . 'T' . $matches[2];
+	                                }
+	                                elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+	                                    $array[$key] = $matches[1] . $matches[2] . $matches[3];
+	                                }
+	                            }
+	                        }
+	                        return $array;
+	                    };
+
+	                    $cab_array = $safe_format_dates((array)$cabecera);
+
+	                    // Sincronizar directamente a la tabla sin requerir SP en la zona
+	                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION')
+	                        ->updateOrInsert(
+	                            ['ID_COTIZACION' => $id_cotizacion_res],
+	                            $cab_array
+	                        );
+	                }
+	            } catch (\Exception $ez) {
+	                Log::error('Error al replicar cotización cabecera a zona (' . $conexionbd . '): ' . $ez->getMessage());
+	            }
+	        }
+
+	        return $id_cotizacion_res;
 
 	    } catch (\Exception $e) {
 	        Log::error('Error al insertar cotización: ' . $e->getMessage());
@@ -147,6 +194,54 @@ trait OrdenPedidoCotizacionTraits
 	        $stmt->bindParam(16, $cod_usuario_registro, PDO::PARAM_STR);
 
 	        $stmt->execute();
+
+	        // 🔗 Réplica en Zonas
+	        $conexionbd = 'sqlsrv';
+	        if($cod_centro == 'CEN0000000000004'){
+	            $conexionbd = 'sqlsrv_r';
+	        }else{
+	            if($cod_centro == 'CEN0000000000006'){
+	                $conexionbd = 'sqlsrv_b';
+	            }
+	        }
+
+	        if ($conexionbd !== 'sqlsrv') {
+	            try {
+	                // 1. Obtener el detalle completo recién insertado/actualizado de la base central
+	                $detalle = DB::connection('sqlsrv')->table('WEB.ORDEN_COTIZACION_DETALLE')
+	                    ->where('ID_COTIZACION', $id_cotizacion)
+	                    ->where('COD_PRODUCTO', $cod_producto)
+	                    ->first();
+
+	                if ($detalle) {
+	                    // Formatear fechas de manera inequívoca para SQL Server en zonas
+	                    $safe_format_dates = function($array) {
+	                        foreach ($array as $key => $value) {
+	                            if (is_string($value)) {
+	                                if (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}(\.\d+)?)$/', $value, $matches)) {
+	                                    $array[$key] = $matches[1] . 'T' . $matches[2];
+	                                }
+	                                elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+	                                    $array[$key] = $matches[1] . $matches[2] . $matches[3];
+	                                }
+	                            }
+	                        }
+	                        return $array;
+	                    };
+
+	                    $det_array = $safe_format_dates((array)$detalle);
+
+	                    // Sincronizar directamente a la tabla sin requerir SP en la zona
+	                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+	                        ->updateOrInsert(
+	                            ['ID_COTIZACION' => $id_cotizacion, 'COD_PRODUCTO' => $cod_producto],
+	                            $det_array
+	                        );
+	                }
+	            } catch (\Exception $ez) {
+	                Log::error('Error al replicar cotización detalle a zona (' . $conexionbd . '): ' . $ez->getMessage());
+	            }
+	        }
 
 	    } catch (\Exception $e) {
 	        Log::error('Error al insertar cotización detalle: ' . $e->getMessage());

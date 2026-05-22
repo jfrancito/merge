@@ -231,6 +231,7 @@ class GestionOrdenPedidoApruebaGerController extends Controller
                     ->update(['CAN_MODIF_GER' => $item['cantidad']]);
             }
             DB::commit();
+            $this->replicateOrdenPedidoToZona($orden_pedido_id);
             return response()->json(['success' => true, 'mensaje' => 'Cantidades actualizadas correctamente.']);
         }
         catch (\Exception $e) {
