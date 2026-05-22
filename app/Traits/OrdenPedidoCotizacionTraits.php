@@ -248,4 +248,94 @@ trait OrdenPedidoCotizacionTraits
 	        throw $e;
 	    }
 	}
+
+    public function replicateCotizacionToZona($id_cotizacion)
+    {
+        try {
+            // 1. Obtener la cabecera desde sqlsrv
+            $cabecera = DB::connection('sqlsrv')->table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->first();
+
+            if (!$cabecera) {
+                return;
+            }
+
+            $cod_centro = $cabecera->COD_CENTRO;
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } else {
+                if ($cod_centro == 'CEN0000000000006') {
+                    $conexionbd = 'sqlsrv_b';
+                }
+            }
+
+            if ($conexionbd !== 'sqlsrv') {
+                // Formatear fechas de manera inequívoca para SQL Server en zonas
+                $safe_format_dates = function($array) {
+                    foreach ($array as $key => $value) {
+                        if (is_string($value)) {
+                            if (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}(\.\d+)?)$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . 'T' . $matches[2];
+                            }
+                            elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . $matches[2] . $matches[3];
+                            }
+                        }
+                    }
+                    return $array;
+                };
+
+                // Replicar Cabecera
+                $cab_array = $safe_format_dates((array)$cabecera);
+                DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION')
+                    ->updateOrInsert(
+                        ['ID_COTIZACION' => $id_cotizacion],
+                        $cab_array
+                    );
+
+                // Replicar Detalles activos e inactivos
+                $detalles = DB::connection('sqlsrv')->table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->get();
+
+                // Desactivar temporalmente los de la zona para evitar duplicados residuales si cambiaron
+                DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->update(['ACTIVO' => 0]);
+
+                foreach ($detalles as $det) {
+                    $det_array = $safe_format_dates((array)$det);
+                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->updateOrInsert(
+                            ['ID_COTIZACION' => $id_cotizacion, 'COD_PRODUCTO' => $det->COD_PRODUCTO, 'ID_PEDIDO_CONSOLIDADO_GENERAL' => $det->ID_PEDIDO_CONSOLIDADO_GENERAL],
+                            $det_array
+                        );
+                }
+
+                // Replicar Referencias Asociadas
+                $referencias = DB::connection('sqlsrv')->table('CMP.REFERENCIA_ASOC')
+                    ->where('COD_TABLA_ASOC', $id_cotizacion)
+                    ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                    ->get();
+
+                DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')
+                    ->where('COD_TABLA_ASOC', $id_cotizacion)
+                    ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                    ->delete();
+
+                foreach ($referencias as $ref) {
+                    $ref_array = $safe_format_dates((array)$ref);
+                    DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')
+                        ->updateOrInsert(
+                            ['COD_TABLA' => $ref->COD_TABLA, 'COD_TABLA_ASOC' => $id_cotizacion, 'TXT_TIPO_REFERENCIA' => $ref->TXT_TIPO_REFERENCIA],
+                            $ref_array
+                        );
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al replicar cotización completa a zona (' . $id_cotizacion . '): ' . $e->getMessage());
+        }
+    }
 }

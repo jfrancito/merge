@@ -898,6 +898,7 @@ class CotizacionOrdenPedidoController extends Controller
             }
 
             DB::commit();
+            $this->replicateCotizacionToZona($id_cotizacion);
             return response()->json(['success' => true, 'id_cotizacion' => $id_cotizacion, 'mensaje' => 'Cotización guardada correctamente con ID: ' . $id_cotizacion]);
 
         } catch (\Exception $e) {
@@ -973,12 +974,12 @@ class CotizacionOrdenPedidoController extends Controller
             // 4. Eliminar referencias en CMP.REFERENCIA_ASOC
             $referencias = DB::table('CMP.REFERENCIA_ASOC')
                 ->where('COD_TABLA_ASOC', $id_cotizacion)
-                ->where('TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
                 ->get();
 
             DB::table('CMP.REFERENCIA_ASOC')
                 ->where('COD_TABLA_ASOC', $id_cotizacion)
-                ->where('TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
                 ->delete();
 
             // Réplica de eliminación REFERENCIA_ASOC en zonas
@@ -986,7 +987,7 @@ class CotizacionOrdenPedidoController extends Controller
                 try {
                     DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')
                         ->where('COD_TABLA_ASOC', $id_cotizacion)
-                        ->where('TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
                         ->delete();
                 } catch (\Exception $ez) {
                     Log::error('Error al replicar eliminación de CMP.REFERENCIA_ASOC a zona (' . $conexionbd . '): ' . $ez->getMessage());
@@ -1010,6 +1011,7 @@ class CotizacionOrdenPedidoController extends Controller
             }
 
             DB::commit();
+            $this->replicateCotizacionToZona($id_cotizacion);
             return response()->json(['success' => true, 'message' => 'Cotización eliminada correctamente.']);
 
         } catch (\Exception $e) {
@@ -1086,6 +1088,8 @@ class CotizacionOrdenPedidoController extends Controller
                     'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
                     'COD_USUARIO_MODIF_AUD' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
                 ]);
+
+            $this->replicateCotizacionToZona($id_cotizacion);
 
             return response()->json([
                 'success' => true,
