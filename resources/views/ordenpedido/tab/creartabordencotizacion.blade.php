@@ -39,6 +39,17 @@
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
+                                <label>Indicador Producto</label>
+                                <select class="form-control premium-input" id="ind_mat_o_ser" style="font-size: 14px;"
+                                    required>
+                                    <option value="">Seleccione Indicador</option>
+                                    <option value="M">MATERIAL</option>
+                                    <option value="S">SERVICIO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
                                 <label>Tipo Cotización</label>
                                 <select class="form-control premium-input" id="txt_tipo_cotizacion"
                                     style="font-size: 14px;">
@@ -56,14 +67,14 @@
                                     oninput="this.value = this.value.toUpperCase().replace(/[^0-9A-Z]/g, '')">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label>Número</label>
                                 <input type="text" class="form-control premium-input text-center" id="numero"
                                     placeholder="Escriba el número..." maxlength="8">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label>Fecha</label>
                                 <div class="input-group">
@@ -203,8 +214,12 @@
                     <div class="row">
                         <div class="col-md-12 text-right">
                             <button class="btn btn-info btn-seleccionar-consolidados shadow-soft"
-                                style="padding: 6px 20px; font-size: 12px; border-radius: 20px;">
+                                style="display: none; padding: 6px 20px; font-size: 12px; border-radius: 20px;">
                                 <i class="mdi mdi-layers" style="margin-right: 5px;"></i> Seleccionar Consolidados
+                            </button>
+                            <button class="btn btn-info btn-seleccionar-pedidos shadow-soft"
+                                style="display: none; padding: 6px 20px; font-size: 12px; border-radius: 20px;">
+                                <i class="mdi mdi-layers" style="margin-right: 5px;"></i> Seleccionar Pedidos
                             </button>
                         </div>
                     </div>
@@ -384,7 +399,8 @@
         border-radius: 0 6px 6px 0 !important;
     }
 
-    .btn-seleccionar-consolidados {
+    .btn-seleccionar-consolidados,
+    .btn-seleccionar-pedidos {
         background: #17a2b8;
         border: none;
         font-weight: 700;
@@ -395,7 +411,8 @@
         padding: 12px;
     }
 
-    .btn-seleccionar-consolidados:hover {
+    .btn-seleccionar-consolidados:hover,
+    .btn-seleccionar-pedidos:hover {
         background: #138496;
         transform: translateY(-2px);
     }

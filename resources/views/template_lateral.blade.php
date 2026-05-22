@@ -33,6 +33,30 @@
         .libre-baskerville-bold { font-family: "Libre Baskerville", serif; peso de fuente: 700; estilo de fuente: normal; } 
         .libre-baskerville-regular-italic { font-family: "Libre Baskerville", serif; peso de fuente: 400; estilo de fuente: cursiva; }
 
+        .btn-detalle-moderno {
+            background: linear-gradient(135deg, #1d3a6d 0%, #3b82f6 100%) !important;
+            border: none !important;
+            border-radius: 15px !important;
+            padding: 5px 14px !important;
+            font-weight: 600 !important;
+            color: white !important;
+            box-shadow: 0 3px 8px rgba(29, 58, 109, 0.3) !important;
+            transition: all 0.2s ease-in-out !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 5px !important;
+            text-decoration: none !important;
+        }
+        .btn-detalle-moderno:hover {
+            transform: translateY(-1.5px) !important;
+            box-shadow: 0 5px 12px rgba(29, 58, 109, 0.4) !important;
+            filter: brightness(1.08) !important;
+            color: white !important;
+        }
+        .btn-detalle-moderno:active {
+            transform: translateY(0) !important;
+        }
     </style>
 
 

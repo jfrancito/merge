@@ -82,11 +82,99 @@ trait OrdenPedidoTraits
 
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $id_pedido = $resultado['ID_PEDIDO'];
+
+            try {
+                $this->replicateOrdenPedidoToZona($id_pedido);
+            } catch (\Exception $ez) {
+                Log::error('Error en réplica automática de pedido: ' . $ez->getMessage());
+            }
+
             return $id_pedido;
 
         } catch (\Exception $e) {
             Log::error('Error al insertar el vale rendir: ' . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function replicateOrdenPedidoToZona($id_pedido)
+    {
+        try {
+            // 1. Check if the order has at least one detail with IND_MATERIAL_SERVICIO = 'S'
+            $hasService = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_DETALLE')
+                ->where('ID_PEDIDO', $id_pedido)
+                ->where('IND_MATERIAL_SERVICIO', 'S')
+                ->where('ACTIVO', 1)
+                ->exists();
+
+            if (!$hasService) {
+                return;
+            }
+
+            // 2. Get the COD_CENTRO to determine connection
+            $pedido = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $id_pedido)
+                ->first();
+
+            if (!$pedido) {
+                return;
+            }
+
+            $cod_centro = $pedido->COD_CENTRO;
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } else {
+                if ($cod_centro == 'CEN0000000000006') {
+                    $conexionbd = 'sqlsrv_b';
+                }
+            }
+
+            if ($conexionbd !== 'sqlsrv') {
+                // Formatear fechas de manera inequívoca para SQL Server en zonas
+                $safe_format_dates = function($array) {
+                    foreach ($array as $key => $value) {
+                        if (is_string($value)) {
+                            if (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}(\.\d+)?)$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . 'T' . $matches[2];
+                            }
+                            elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . $matches[2] . $matches[3];
+                            }
+                        }
+                    }
+                    return $array;
+                };
+
+                // Replicar cabecera
+                $cab_array = $safe_format_dates((array)$pedido);
+                DB::connection($conexionbd)->table('WEB.ORDEN_PEDIDO')
+                    ->updateOrInsert(
+                        ['ID_PEDIDO' => $id_pedido],
+                        $cab_array
+                    );
+
+                // Replicar todos los detalles (activos e inactivos) de este pedido
+                $detalles = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_DETALLE')
+                    ->where('ID_PEDIDO', $id_pedido)
+                    ->get();
+
+                // Primero desactivar/limpiar detalles en la zona
+                DB::connection($conexionbd)->table('WEB.ORDEN_PEDIDO_DETALLE')
+                    ->where('ID_PEDIDO', $id_pedido)
+                    ->update(['ACTIVO' => 0]);
+
+                foreach ($detalles as $det) {
+                    $det_array = $safe_format_dates((array)$det);
+                    DB::connection($conexionbd)->table('WEB.ORDEN_PEDIDO_DETALLE')
+                        ->updateOrInsert(
+                            ['ID_PEDIDO' => $id_pedido, 'COD_PRODUCTO' => $det->COD_PRODUCTO],
+                            $det_array
+                        );
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al replicar pedido a zona (' . $id_pedido . '): ' . $e->getMessage());
         }
     }
 

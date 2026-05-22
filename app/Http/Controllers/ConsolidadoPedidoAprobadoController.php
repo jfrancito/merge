@@ -206,6 +206,89 @@ class ConsolidadoPedidoAprobadoController extends Controller
                 ]);
 
             DB::commit();
+
+            // --- REPLICACIÓN EN ZONAS SEGÚN EL DETALLE ---
+            try {
+                // Función auxiliar para formatear fechas de manera inequívoca para SQL Server (evita problemas de idioma/regional en zonas)
+                $safe_format_dates = function($array) {
+                    foreach ($array as $key => $value) {
+                        if (is_string($value)) {
+                            // 1. Datetime con o sin milisegundos: YYYY-MM-DD HH:MM:SS(.fff)
+                            if (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}(\.\d+)?)$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . 'T' . $matches[2];
+                            }
+                            // 2. Date únicamente: YYYY-MM-DD
+                            elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches)) {
+                                $array[$key] = $matches[1] . $matches[2] . $matches[3]; // Formato YYYYMMDD libre de ambigüedades
+                            }
+                        }
+                    }
+                    return $array;
+                };
+
+                // 1. Obtener la cabecera completa que acabamos de aprobar
+                $cabecera = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                    ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                    ->first();
+
+                if ($cabecera) {
+                    // 2. Obtener todos los detalles activos de este consolidado
+                    $detalles_consolidado = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                        ->where('ACTIVO', 1)
+                        ->get();
+
+                    // 3. Agrupar los detalles por la conexión correspondiente a su COD_CENTRO_COMPRA
+                    $detalles_por_zona = [];
+                    foreach ($detalles_consolidado as $det) {
+                        $cod_centro_compra = $det->COD_CENTRO_COMPRA;
+                        $conexionbd = 'sqlsrv';
+
+                        if ($cod_centro_compra == 'CEN0000000000004') {
+                            $conexionbd = 'sqlsrv_r';
+                        } else {
+                            if ($cod_centro_compra == 'CEN0000000000006') {
+                                $conexionbd = 'sqlsrv_b';
+                            }
+                        }
+
+                        if ($conexionbd !== 'sqlsrv') {
+                            $detalles_por_zona[$conexionbd][] = $det;
+                        }
+                    }
+
+                    // 4. Insertar cabecera y detalles en las zonas correspondientes
+                    foreach ($detalles_por_zona as $conn => $list_details) {
+                        try {
+                            $cab_array = $safe_format_dates((array)$cabecera);
+
+                            // Sincronizar cabecera (usando updateOrInsert para evitar llaves duplicadas)
+                            DB::connection($conn)->table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                                ->updateOrInsert(
+                                    ['ID_PEDIDO_CONSOLIDADO' => $id_consolidado],
+                                    $cab_array
+                                );
+
+                            // Eliminar detalles anteriores de este consolidado en esa zona específica para evitar duplicados
+                            DB::connection($conn)->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                                ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                                ->delete();
+
+                            // E insertar únicamente los detalles asignados a esa zona
+                            foreach ($list_details as $det) {
+                                $det_array = $safe_format_dates((array)$det);
+                                DB::connection($conn)->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                                    ->insert($det_array);
+                            }
+                        } catch (\Exception $ez) {
+                            \Illuminate\Support\Facades\Log::error("Error al replicar consolidado $id_consolidado a zona ($conn): " . $ez->getMessage());
+                        }
+                    }
+                }
+            } catch (\Exception $e_rep) {
+                \Illuminate\Support\Facades\Log::error("Error general en el proceso de réplica para consolidado $id_consolidado: " . $e_rep->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'mensaje' => 'Consolidado guardado y aprobado correctamente.'

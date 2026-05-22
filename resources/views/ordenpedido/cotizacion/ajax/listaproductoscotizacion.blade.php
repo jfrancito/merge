@@ -1,14 +1,14 @@
 <div class="panel panel-default box-seccion shadow-soft">
     <div class="panel-heading subheader-seccion">
-        <i class="mdi mdi-format-list-bulleted"></i> Productos de Consolidados Seleccionados
+        <i class="mdi mdi-format-list-bulleted"></i> {{ isset($es_servicio) && $es_servicio ? 'Servicios de Pedidos Seleccionados' : 'Productos de Consolidados Seleccionados' }}
         <div class="pull-right" style="margin-top: -5px;">
              <button class="btn btn-danger btn-sm btn-eliminar-seleccionados shadow-soft" title="Eliminar seleccionados">
-                <i class="mdi mdi-delete"></i> Eliminar Productos
+                <i class="mdi mdi-delete"></i> {{ isset($es_servicio) && $es_servicio ? 'Eliminar Servicios' : 'Eliminar Productos' }}
             </button>
         </div>
     </div>
     <div class="panel-body">
-        <table id="table-productos-seleccionados" class="table table-striped table-hover table-fw-widget listatabla">
+        <table id="table-productos-seleccionados" class="table table-striped table-hover table-fw-widget listatabla" data-tipo="{{ isset($es_servicio) && $es_servicio ? 'S' : 'M' }}">
             <thead>
                 <tr>
                     <th class="text-center" width="30">
@@ -18,14 +18,16 @@
                         </div>
                     </th>
                     <th class="text-center" width="50">ITEM</th>
-                    <th>ID CONSOLIDADO</th>
+                    <th>{{ isset($es_servicio) && $es_servicio ? 'ID PEDIDO' : 'ID CONSOLIDADO' }}</th>
                     <th>CÓDIGO</th>
                     <th>PRODUCTO</th>
                     <th class="text-center">U.M.</th>
                     <th class="text-center">CANTIDAD</th>
                     <th class="text-center" width="120">PRECIO</th>
                     <th class="text-center" width="120">PRECIO IGV</th>
+                    @if(!(isset($es_servicio) && $es_servicio))
                     <th>FAMILIA</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -77,25 +79,28 @@
                                    style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
                         @endif
                     </td>
-                    <td class="text-center">
-                        <div class="input-group" style="width: 110px; margin: 0 auto;">
-                            <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
-                            <input type="number" 
-                                   class="form-control input-sm text-right precio-producto premium-input" 
-                                   value="{{ number_format($precio, 2, '.', '') }}" 
-                                   step="0.01" 
-                                   min="0"
-                                   style="height: 32px !important; font-weight: 700;"
-                                   data-cantidad="{{ $cantidad_val }}"
-                                   data-id-consolidado="{{ $id_pedido_consolidado }}"
-                                   data-breakdown="{{ json_encode(isset($item->BREAKDOWN) ? $item->BREAKDOWN : [['id' => $id_pedido_consolidado, 'cant' => $cantidad_val]]) }}"
-                                   data-cod-producto="{{ trim($cod_producto) }}"
-                                   data-nom-producto="{{ $nom_producto }}"
-                                   data-cod-medida="{{ $cod_medida }}"
-                                   data-nom-medida="{{ $nom_medida }}"
-                                   data-cod-familia="{{ $cod_familia }}"
-                                   data-nom-familia="{{ $nom_familia }}"
-                                   data-breakdown="{{ isset($item->BREAKDOWN) ? json_encode($item->BREAKDOWN) : '' }}">
+                    <td class="text-center" style="vertical-align: middle;">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                            <div class="input-group" style="width: 110px; margin: 0;">
+                                <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
+                                <input type="number" 
+                                       class="form-control input-sm text-right precio-producto premium-input" 
+                                       value="{{ number_format($precio, 2, '.', '') }}" 
+                                       step="0.01" 
+                                       min="0"
+                                       style="height: 32px !important; font-weight: 700;"
+                                       data-cantidad="{{ $cantidad_val }}"
+                                       data-id-consolidado="{{ $id_pedido_consolidado }}"
+                                       data-breakdown="{{ json_encode(isset($item->BREAKDOWN) ? $item->BREAKDOWN : [['id' => $id_pedido_consolidado, 'cant' => $cantidad_val]]) }}"
+                                       data-cod-producto="{{ trim($cod_producto) }}"
+                                       data-nom-producto="{{ $nom_producto }}"
+                                       data-cod-medida="{{ $cod_medida }}"
+                                       data-nom-medida="{{ $nom_medida }}"
+                                       data-cod-familia="{{ $cod_familia }}"
+                                       data-nom-familia="{{ $nom_familia }}"
+                                       data-precio-compra-anterior="{{ isset($item->PRECIO_COMPRA_ANTERIOR) ? number_format($item->PRECIO_COMPRA_ANTERIOR, 2, '.', '') : '0.00' }}">
+                            </div>
+                            <div class="precio-alerta-info" style="display: none; white-space: normal; word-break: break-word;"></div>
                         </div>
                     </td>
 
@@ -111,7 +116,9 @@
                         </div>
                     </td>
 
+                    @if(!(isset($es_servicio) && $es_servicio))
                     <td>{{ $nom_familia }}</td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>

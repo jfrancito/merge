@@ -87,9 +87,9 @@
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
             <td style="text-align: center;">
-                <button class="btn btn-sm btn-primary ver-detalle-pedido-res" 
+                <button class="btn btn-sm ver-detalle-pedido-res btn-detalle-moderno" 
                         data-id="{{ $item->ID_PEDIDO }}">
-                    <i class="fa fa-eye me-1"></i> Detalle
+                    <i class="fa fa-eye"></i> Detalle
                 </button>
             </td>
         </tr>
