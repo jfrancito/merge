@@ -16,7 +16,15 @@
             </tr>
             </thead>
             <tbody>
+            @php
+                $sumaTotal = 0;
+            @endphp
+
             @foreach($tdetliquidaciongastos as $index => $item)
+                @php
+                    $sumaTotal += $item->TOTAL;
+                @endphp
+
                 <tr class="filalg filalgvalidar {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
                     data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_cabecera="{{$item->TXT_CENTRO}}"
                     data_asiento_detalle="{{$item->TOKEN}}" data_valor_id="{{$item->BUSQUEDAD}}">
@@ -31,6 +39,17 @@
                 </tr>
             @endforeach
             </tbody>
+            <tr style="font-weight: bold; background-color: #f5f5f5;">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><b>{{ number_format($sumaTotal, 2) }}</b></td>
+                <td></td>
+            </tr>
+            
         </table>
     </div>
     <input type="hidden" id="total_xml" name="total_xml"
