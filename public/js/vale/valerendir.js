@@ -926,7 +926,8 @@ $(document).ready(function(){
             "TIG0000000000006": "COMBUSTIBLE",
             "TIG0000000000007": "PEAJES",
             "TIG0000000000008": "MANTENIMIENTO DE VEHICULOS",
-            "TIG0000000000009": "MOVILIDAD AEROPUERTO"
+            "TIG0000000000009": "MOVILIDAD AEROPUERTO",
+            "TIG0000000000010": "SERVICIOS DE ESTACIONAMIENTO"
         };
 
       $('#agregarImporteGasto').on('click', function () {
@@ -1038,7 +1039,7 @@ $(document).ready(function(){
                 if ((codigoTipo === "TIG0000000000006" || codigoTipo === "TIG0000000000007") && ind_propio !== 1) return;
 
                 // Filtro para destino propio
-                if (ind_propio === 1 && !["TIG0000000000001","TIG0000000000002","TIG0000000000006","TIG0000000000007"].includes(codigoTipo)) return;
+                if (ind_propio === 1 && !["TIG0000000000001","TIG0000000000002","TIG0000000000006","TIG0000000000007","TIG0000000000008","TIG0000000000010"].includes(codigoTipo)) return;
 
                 // PASAJES INTERDEPATAMENTALES
                 /*if (codigoTipo === "TIG0000000000004") {
