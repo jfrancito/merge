@@ -8,7 +8,7 @@ use Validator;
 use View;
 use Illuminate\Support\Facades\DB;
 use App\User, App\WEBGrupoopcion, App\WEBRol, App\WEBRolOpcion, App\WEBOpcion;
-
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
