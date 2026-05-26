@@ -65,6 +65,7 @@
         </div>
     </div>
     @include('ordenpedido.modal.modal_seleccionar_consolidado_general')
+    @include('ordenpedido.modal.modal_seleccionar_pedido')
 </div>
 
 @stop

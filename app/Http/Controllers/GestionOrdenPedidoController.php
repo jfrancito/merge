@@ -493,6 +493,15 @@ class GestionOrdenPedidoController extends Controller
                     true,
                     ""
                 );
+
+                // ACTUALIZAR IND_MATERIAL_SERVICIO BASADO EN SELECCION DEL FRONTEND
+                if (isset($item['ind_material_servicio'])) {
+                    DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                        ->where('ID_PEDIDO', $orden_pedido_id)
+                        ->where('COD_PRODUCTO', $item['cod_producto'])
+                        ->where('ACTIVO', 1)
+                        ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                }
             }
         }
 
@@ -519,6 +528,8 @@ class GestionOrdenPedidoController extends Controller
                 ]);
             }
         }
+
+        $this->replicateOrdenPedidoToZona($orden_pedido_id);
 
         return response()->json(['success' => true]);
     }
@@ -709,6 +720,8 @@ class GestionOrdenPedidoController extends Controller
             ->update([
                 'ACTIVO' => 0
             ]);
+
+        $this->replicateOrdenPedidoToZona($orden_pedido_id);
 
         return response()->json([
             'success' => true

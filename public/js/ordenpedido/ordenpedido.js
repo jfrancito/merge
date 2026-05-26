@@ -263,6 +263,7 @@ $(document).ready(function () {
                         ? (parseFloat(tds.eq(6).find('input').val().replace(/[^\d.-]/g, '')) || 0) 
                         : (parseFloat(tds.eq(6).text().replace(/[^\d.-]/g, '')) || 0),
                 txt_observacion: tds.eq(8).text().trim(),
+                ind_material_servicio: tds.eq(3).text().trim() === 'SERVICIO' ? 'S' : 'M',
                 opcion_detalle: 'I',
                 detalle_id: null
             });

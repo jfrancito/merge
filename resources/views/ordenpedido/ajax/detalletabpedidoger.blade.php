@@ -30,6 +30,11 @@
                             <i class="fa fa-clock-o me-1" style="color: white;"></i> Hora Creación: <b>{{ $pedido->FEC_USUARIO_CREA_AUD ? date('H:i:s', strtotime($pedido->FEC_USUARIO_CREA_AUD)) : '—' }}</b>
                         </span>
                     </div>
+                    <div class="mt-1">
+                        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500;">
+                            <i class="fa fa-check-circle-o me-1" style="color: white;"></i> Fec/Hora Aprobación: <b>{{ $pedido->FEC_USUARIO_MODIF_AUD ? date('d-m-Y H:i:s', strtotime($pedido->FEC_USUARIO_MODIF_AUD)) : '—' }}</b>
+                        </span>
+                    </div>
                 </div>
                 
                 <!-- BOTÓN REGRESAR -->
@@ -68,6 +73,7 @@
                                 <th style="color: #000; font-weight: 700;">Producto</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Tipo</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Original</th>
+                                <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
                                 @if($mostrarJefe) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th> @endif
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Gerencia</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Observación</th>
@@ -110,6 +116,10 @@
                                         <span class="badge" style="background: #f0f3ff; color: #4e73df; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int)$cant_original }}</span>
                                     </td>
 
+                                    <td class="text-center" style="font-weight: 600; color: #333;">
+                                        {{ $detalle->NOM_CATEGORIA ?: '—' }}
+                                    </td>
+
                                     {{-- CANTIDAD JEFE --}}
                                     @if($mostrarJefe)
                                         <td class="text-center">
@@ -145,7 +155,7 @@
                         </tbody>
                         <tfoot>
                             <tr style="background: #f8f9fc;">
-                                <td colspan="{{ 7 + ($mostrarJefe ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #0f2a52;">Total General</td>
+                                <td colspan="{{ 8 + ($mostrarJefe ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #0f2a52;">Total General</td>
                                 <td class="text-center fw-bold text-primary total-general-ger" style="padding: 15px; font-size: 18px;">S/ {{ number_format($suma_total_general, 2) }}</td>
                             </tr>
                         </tfoot>
