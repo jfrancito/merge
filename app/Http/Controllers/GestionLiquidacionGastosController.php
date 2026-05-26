@@ -2469,6 +2469,35 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
 
+                $lista = DB::table(DB::raw('LQG_LIQUIDACION_GASTO WITH (NOLOCK) as LG'))
+                    ->select(
+                        'LG.ID_DOCUMENTO',
+                        'LG.COD_EMPRESA',
+                        'LG.FECHA_EMI',
+                        'LG.COD_ESTADO',
+                        'LGD.ITEM'
+                    )
+                    ->join(DB::raw('LQG_DETLIQUIDACIONGASTO WITH (NOLOCK) as LGD'), function ($join) {
+                        $join->on('LGD.ID_DOCUMENTO', '=', 'LG.ID_DOCUMENTO')
+                            ->where('LGD.ACTIVO', 1);
+                    })
+                    ->leftJoin(DB::raw('WEB.asientos WITH (NOLOCK) as AST2'), function ($join) {
+                        $join->on(
+                                'AST2.TXT_REFERENCIA',
+                                '=',
+                                DB::raw("LG.ID_DOCUMENTO + '-' + CAST(LGD.ITEM AS VARCHAR(MAX))")
+                            )
+                            ->where('AST2.COD_ESTADO', 1)
+                            ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
+                    })
+                    ->where('LG.ID_DOCUMENTO', $iddocumento)
+                    ->whereNull('AST2.COD_ASIENTO')
+                    ->get();
+
+                if (count($lista) > 0) {
+                    return Redirect::back()->with('errorurl', 'La liquidacion de gastos no tiene todos sus asientos creados');
+                }
+
 /*
                 $detalles = $request->input('detalles');
 
@@ -2851,6 +2880,7 @@ class GestionLiquidacionGastosController extends Controller
                     array_push($asiento_compra, $asiento[1]);
                     array_push($asiento_compra, $asiento[2]);
 
+                    /*
                     $ind_reversion = 'R';
 
                     $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
@@ -2892,10 +2922,11 @@ class GestionLiquidacionGastosController extends Controller
                         array_push($asiento_reversion, $asiento_reparable_reversion[2]);
                     } else {
                         $documentolg->CONTADOR = 0;
-                    }
+                    }*/
 
+                    $documentolg->CONTADOR = 0;
                     $documentolg->TXT_CENTRO = json_encode($asiento_compra);
-                    $documentolg->TOKEN = json_encode($asiento_reversion);
+                    $documentolg->TOKEN = json_encode([]);
                     $documentolg->BUSQUEDAD = 1;
 
                 } else {
