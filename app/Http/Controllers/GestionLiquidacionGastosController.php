@@ -2469,30 +2469,30 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
 
-                $lista = DB::table(DB::raw('LQG_LIQUIDACION_GASTO WITH (NOLOCK) as LG'))
-                    ->select(
-                        'LG.ID_DOCUMENTO',
-                        'LG.COD_EMPRESA',
-                        'LG.FECHA_EMI',
-                        'LG.COD_ESTADO',
-                        'LGD.ITEM'
-                    )
-                    ->join(DB::raw('LQG_DETLIQUIDACIONGASTO WITH (NOLOCK) as LGD'), function ($join) {
-                        $join->on('LGD.ID_DOCUMENTO', '=', 'LG.ID_DOCUMENTO')
-                            ->where('LGD.ACTIVO', 1);
-                    })
-                    ->leftJoin(DB::raw('WEB.asientos WITH (NOLOCK) as AST2'), function ($join) {
-                        $join->on(
-                                'AST2.TXT_REFERENCIA',
-                                '=',
-                                DB::raw("LG.ID_DOCUMENTO + '-' + CAST(LGD.ITEM AS VARCHAR(MAX))")
-                            )
-                            ->where('AST2.COD_ESTADO', 1)
-                            ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
-                    })
+                $lista = DB::table(DB::raw('LQG_LIQUIDACION_GASTO as LG WITH (NOLOCK)'))
+                        ->select(
+                            'LG.ID_DOCUMENTO',
+                            'LG.COD_EMPRESA',
+                            'LG.FECHA_EMI',
+                            'LG.COD_ESTADO',
+                            'LGD.ITEM'
+                )
+                ->join(DB::raw('LQG_DETLIQUIDACIONGASTO as LGD WITH (NOLOCK)'), function ($join) {
+                    $join->on('LGD.ID_DOCUMENTO', '=', 'LG.ID_DOCUMENTO')
+                        ->where('LGD.ACTIVO', 1);
+                })
+                ->leftJoin(DB::raw('WEB.asientos as AST2 WITH (NOLOCK)'), function ($join) {
+                    $join->on(
+                            'AST2.TXT_REFERENCIA',
+                            '=',
+                            DB::raw("LG.ID_DOCUMENTO + '-' + CAST(LGD.ITEM AS VARCHAR(MAX))")
+                        )
+                        ->where('AST2.COD_ESTADO', 1)
+                        ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
+                })
                     ->where('LG.ID_DOCUMENTO', $iddocumento)
-                    ->whereNull('AST2.COD_ASIENTO')
-                    ->get();
+                ->whereNull('AST2.COD_ASIENTO')
+                ->get();
 
                 if (count($lista) > 0) {
                     return Redirect::back()->with('errorurl', 'La liquidacion de gastos no tiene todos sus asientos creados');
