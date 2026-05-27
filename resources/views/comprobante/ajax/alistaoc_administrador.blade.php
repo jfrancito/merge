@@ -64,18 +64,18 @@
 
 
               </li>
-              <li>
+<!--               <li>
                 <a href="{{ url('/agregar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                   Agregar Archivos
                 </a>  
-              </li>
-              @if(Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000020')
+              </li> -->
+<!--               @if(Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000020')
               <li>
                 <a href="{{ url('/quitar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                   Quitar Archivos
                 </a>  
               </li>
-              @endif
+              @endif -->
 
               <li>
                 <a href="{{ url('/cambiar-orden-compra-anticipo/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
