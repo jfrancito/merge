@@ -53,10 +53,10 @@
                                 <div class="grupo-acciones">
 
                                     <button
-                                        class="btn btn-sm btn-primary ver-detalle-pedido-aut"
+                                        class="btn btn-sm ver-detalle-pedido-aut btn-detalle-moderno"
                                         data-id="{{ $item['ID_PEDIDO'] }}"
                                         title="Ver detalle del pedido">
-                                        <i class="fa fa-eye me-1"></i>
+                                        <i class="fa fa-eye"></i>
                                         Detalle
                                     </button>
 

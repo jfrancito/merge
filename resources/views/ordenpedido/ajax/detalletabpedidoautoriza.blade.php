@@ -30,6 +30,11 @@
                             <i class="fa fa-clock-o me-1" style="color: white;"></i> Hora Creación: <b>{{ $pedido->FEC_USUARIO_CREA_AUD ? date('H:i:s', strtotime($pedido->FEC_USUARIO_CREA_AUD)) : '—' }}</b>
                         </span>
                     </div>
+                    <div class="mt-1">
+                        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500;">
+                            <i class="fa fa-check-circle-o me-1" style="color: white;"></i> Fec/Hora Aprobación: <b>{{ $pedido->FEC_USUARIO_MODIF_AUD ? date('d-m-Y H:i:s', strtotime($pedido->FEC_USUARIO_MODIF_AUD)) : '—' }}</b>
+                        </span>
+                    </div>
                 </div>
 
                 <!-- BOTÓN REGRESAR DISCRETO EN LA DERECHA -->
@@ -75,6 +80,7 @@
                                 <th style="color: #000; font-weight: 700;">Producto</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Tipo</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Origen</th>
+                                <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Observación</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Precio Unit.</th>
@@ -112,6 +118,9 @@
                                         <span class="badge"
                                             style="background: #f0f3ff; color: #4e73df; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int) $detalle->CANTIDAD }}</span>
                                     </td>
+                                    <td class="text-center" style="font-weight: 600; color: #333;">
+                                        {{ $detalle->NOM_CATEGORIA ?: '—' }}
+                                    </td>
                                     <td class="text-center">
                                         @if ($pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session && $pedido->COD_ESTADO == 'ETM0000000000010')
                                             <input type="number" class="form-control text-center input-cantidad-editar input-sm"
@@ -135,7 +144,7 @@
                         </tbody>
                         <tfoot>
                             <tr style="background: #f8f9fc;">
-                                <td colspan="7" class="text-right fw-bold text-uppercase"
+                                <td colspan="8" class="text-right fw-bold text-uppercase"
                                     style="padding: 15px; color: #1d3a6d;">Total General</td>
                                 <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px;">S/
                                     {{ number_format($suma_total_general, 2) }}</td>
