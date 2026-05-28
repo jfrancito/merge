@@ -2722,16 +2722,25 @@ class GestionLiquidacionGastosController extends Controller
                         ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
                 })
                     ->where('LG.ID_DOCUMENTO', $iddocumento)
-                ->whereNull('AST2.COD_ASIENTO')
+                ->whereNotNull('AST2.COD_ASIENTO')
                 ->get();
 
                 if (count($lista) <> count($tdetliquidaciongastos)) {
-                    return Redirect::back()->with('errorurl', 'La liquidacion de gastos no tiene todos sus asientos creados');
+                    DB::rollback();
+                    return response()->json([
+                        'status' => 'error',
+                        'mensaje' => 'La liquidacion de gastos no tiene todos sus asientos creados',
+                        'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
+                    ]);
                 }
 
                 if ($liquidaciongastos->IND_OBSERVACION == 1) {
                     DB::rollback();
-                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                    return response()->json([
+                        'status' => 'error',
+                        'mensaje' => 'El documento esta observado no se puede observar',
+                        'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
+                    ]);
                 }
 
                 $descripcion = $request['descripcion'];
