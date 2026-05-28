@@ -326,7 +326,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo.trim()) {
                 data_cuenta_id = item.COD_CUENTA_CONTABLE;
                 data_debe_mn = item.CAN_DEBE_MN;
                 data_haber_mn = item.CAN_HABER_MN;
@@ -399,7 +399,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo.trim()) {
                 item.COD_ESTADO = '0';
                 return; // saltar esta iteración
             }
@@ -644,7 +644,7 @@ $(document).ready(function () {
                         // Recorrerlo
                         arrayDetalle.forEach(item => {
                             if (parseInt(item.COD_ESTADO) === 1) {
-                                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                                if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                                     item.TXT_CUENTA_CONTABLE = numero_cuenta;
                                     item.TXT_GLOSA = glosa_cuenta;
@@ -3082,7 +3082,7 @@ $(document).ready(function () {
                         // Recorrerlo
                         arrayDetalle.forEach(item => {
                             if (parseInt(item.COD_ESTADO) === 1) {
-                                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                                if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                                     item.TXT_CUENTA_CONTABLE = numero_cuenta;
                                     item.TXT_GLOSA = glosa_cuenta;
@@ -3508,7 +3508,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo.trim()) {
                 item.COD_ESTADO = '0';
             }
             if (parseInt(item.COD_ESTADO) === 1) {
@@ -3690,7 +3690,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo.trim()) {
                 data_cuenta_id = item.COD_CUENTA_CONTABLE === null ? '' : item.COD_CUENTA_CONTABLE;
                 data_debe_mn = item.CAN_DEBE_MN;
                 data_haber_mn = item.CAN_HABER_MN;

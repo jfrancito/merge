@@ -549,7 +549,7 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
-                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                     item.TXT_CUENTA_CONTABLE = numero_cuenta;
                     item.TXT_GLOSA = glosa_cuenta;
@@ -2495,7 +2495,7 @@ $(document).ready(function () {
                     // Recorrerlo
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
-                            if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                            if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                                 item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                                 item.TXT_CUENTA_CONTABLE = numero_cuenta;
                                 item.TXT_GLOSA = glosa_cuenta;
