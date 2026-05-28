@@ -142,9 +142,20 @@ class RegistroPersonalAutorizaController extends Controller
 
         $personal = $query->get();
 
+        // Obtener todos los trabajadores activos para el selector de autorizadores
+        $todos_los_trabajadores = DB::table('WEB.ListaplatrabajadoresGenereal')
+            ->select('cod_trab', 'nombres', 'apellidopaterno', 'apellidomaterno')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->whereIn('codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
+            ->orderBy('apellidopaterno')
+            ->orderBy('apellidomaterno')
+            ->orderBy('nombres')
+            ->get();
+
         return response()->json([
             'data' => $personal,
-            'tipos_linea' => $tipos_linea
+            'tipos_linea' => $tipos_linea,
+            'todos_los_trabajadores' => $todos_los_trabajadores
         ]);
     }
 
