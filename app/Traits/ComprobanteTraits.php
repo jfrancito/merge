@@ -944,6 +944,9 @@ trait ComprobanteTraits
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+
+
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
@@ -973,6 +976,7 @@ trait ComprobanteTraits
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
