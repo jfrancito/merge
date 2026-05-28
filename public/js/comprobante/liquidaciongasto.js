@@ -180,6 +180,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -187,6 +190,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].enable();
+                }
                 break;
 
             default:
@@ -194,6 +200,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
         }
     });
@@ -218,11 +227,10 @@ $(document).ready(function () {
     });
 
     $(".btn-regresar-lista-reparable").on('click', function (e) {
-        $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
-        setTimeout(function () {
+        $('.tablageneralreparable').toggle("slow", function () {
             $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $(document).on('click', ".editar-cuenta-reparable", function (e) {
@@ -602,12 +610,10 @@ $(document).ready(function () {
             }
         });*/
 
-        $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
-
-        setTimeout(function () {
+        $('.tablageneralreparable').toggle("slow", function () {
             $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $(".btn-registrar-movimiento-reparable").on('click', function (e) {
@@ -787,12 +793,10 @@ $(document).ready(function () {
         // Después de actualizar arrayDetalle
         table.row.add($(nuevaFila)).draw(false);
 
-        $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
-
-        setTimeout(function () {
+        $('.tablageneralreparable').toggle("slow", function () {
             table.columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $(".btn-eliminar-asiento-reparable").on('click', function (e) {
@@ -1513,11 +1517,10 @@ $(document).ready(function () {
     });
 
     $(".btn-regresar-lista").on('click', function (e) {
-        $('.tablageneral').toggle("slow");
         $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
+        $('.tablageneral').toggle("slow", function () {
             $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        });
     });
 
     $("#anio_asiento").on('change', function () {
@@ -1555,6 +1558,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -1562,6 +1568,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].enable();
+                }
                 break;
 
             default:
@@ -1569,6 +1578,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
         }
     });
@@ -1696,7 +1708,6 @@ $(document).ready(function () {
     });
 
     $(".btn-guardar-asiento").on('click', function (e) {
-        abrircargando();
         debugger;
         e.preventDefault();
         let _token = $('#token').val();
@@ -1861,53 +1872,162 @@ $(document).ready(function () {
             item.TOTAL_IVAP = total_ivap;
         });
 
-        $.ajax({
-            type: "POST",
-            url: carpeta + "/gestion-asiento",
-            data: {
-                _token: _token,
-                cabecera: JSON.stringify(arrayCabecera),
-                detalle: JSON.stringify(arrayDetalle),
-                operacion: operacion
-            },
-            success: function (res) {
+        // Obtener textos legibles para la cabecera
+        let proveedor_texto = $("#empresa_asiento option:selected").text().trim() || proveedor_asiento;
+        let tipo_asiento_texto = $("#tipo_asiento option:selected").text().trim();
+        let moneda_texto = $("#moneda_asiento option:selected").text().trim();
+        let comprobante_texto = $("#tipo_documento_asiento option:selected").text().trim() + ' ' + (serie_comprobante || '') + '-' + (numero_comprobante || '');
 
-                debugger;
-                // Si res.cabecera y res.detalle ya vienen del controlador:
-                let asientoUnificado = [
-                    res.cabecera,
-                    res.detalle
-                ];
-                $('#tblactivos tbody tr').each(function () {
-                    if ($(this).hasClass('activofl')) {
-                        // Cambiar estilo o atributo de las celdas de esta fila
-                        if(tipo_operacion === 'C'){
-                            $(this).attr('data_asiento_compra', JSON.stringify(asientoUnificado));
-                        } else {
-                            $(this).attr('data_asiento_reversion', JSON.stringify(asientoUnificado));
-                        }
-                    }
-                });
-                crearNotificacion(res.mensaje, res.titulo, res.tipo, res.boton);
+        // Construir el detalle del asiento para el modal
+        let rowsHtml = '';
+        let idx = 1;
+        let totalDebeMN_calc = 0;
+        let totalHaberMN_calc = 0;
+        let totalDebeME_calc = 0;
+        let totalHaberME_calc = 0;
 
-            },
-            error: function (res) {
-                debugger;
-                crearNotificacion(res.mensaje);
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                let debeMN = parseFloat(item.CAN_DEBE_MN) || 0;
+                let haberMN = parseFloat(item.CAN_HABER_MN) || 0;
+                let debeME = parseFloat(item.CAN_DEBE_ME) || 0;
+                let haberME = parseFloat(item.CAN_HABER_ME) || 0;
+                totalDebeMN_calc += debeMN;
+                totalHaberMN_calc += haberMN;
+                totalDebeME_calc += debeME;
+                totalHaberME_calc += haberME;
+                rowsHtml += `<tr>
+                    <td>${idx++}</td>
+                    <td>${item.TXT_CUENTA_CONTABLE || ''}</td>
+                    <td>${item.TXT_GLOSA || ''}</td>
+                    <td style="text-align: right;">${debeMN.toFixed(4)}</td>
+                    <td style="text-align: right;">${haberMN.toFixed(4)}</td>
+                    <td style="text-align: right;">${debeME.toFixed(4)}</td>
+                    <td style="text-align: right;">${haberME.toFixed(4)}</td>
+                </tr>`;
             }
         });
 
-        $('#listone').addClass('active');
-        $('#listtwo').removeClass('active');
-        $('#listtree').removeClass('active');
-        $('#astcabgeneral').addClass('active');
-        $('#astcabcomplementario').removeClass('active');
-        $('#astdetgeneral').removeClass('active');
+        rowsHtml += `<tr style="font-weight: bold; background-color: #f5f5f5;">
+            <td colspan="3" style="text-align: right;">Totales:</td>
+            <td style="text-align: right;">${totalDebeMN_calc.toFixed(4)}</td>
+            <td style="text-align: right;">${totalHaberMN_calc.toFixed(4)}</td>
+            <td style="text-align: right;">${totalDebeME_calc.toFixed(4)}</td>
+            <td style="text-align: right;">${totalHaberME_calc.toFixed(4)}</td>
+        </tr>`;
 
-        $('.pnlasientos').hide();
-        $('.pnldetallesdocumentos').focus();
+        // Mostrar confirmación con cabecera y detalle
+        $.confirm({
+            title: 'Confirmar Registro del Asiento',
+            columnClass: 'col-md-10 col-md-offset-1 col-xs-12',
+            content: `<div class="row" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px;">
+                <div class="col-xs-12">
+                    <h4 style="border-bottom: 2px solid #1d3a6d; padding-bottom: 5px; color: #1d3a6d; font-weight: bold; margin-bottom: 15px;">
+                        <i class="fa fa-info-circle"></i> Información de la Cabecera
+                    </h4>
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <p style="margin-bottom: 6px;"><strong>Proveedor:</strong> <span style="color: #555;">${proveedor_texto}</span></p>
+                    <p style="margin-bottom: 6px;"><strong>Tipo Asiento:</strong> <span style="color: #555;">${tipo_asiento_texto}</span></p>
+                    <p style="margin-bottom: 6px;"><strong>Moneda:</strong> <span style="color: #555;">${moneda_texto}</span></p>
+                    <p style="margin-bottom: 6px;"><strong>Tipo Cambio:</strong> <span style="color: #555;">${tc_editar}</span></p>
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <p style="margin-bottom: 6px;"><strong>Fecha Documento:</strong> <span style="color: #555;">${fecha_asiento}</span></p>
+                    <p style="margin-bottom: 6px;"><strong>Comprobante:</strong> <span style="color: #555;">${comprobante_texto}</span></p>
+                    <p style="margin-bottom: 6px;"><strong>Glosa:</strong> <span style="color: #555;">${glosa_asiento}</span></p>
+                </div>
+                <div class="col-xs-12" style="margin-top: 20px;">
+                    <h4 style="border-bottom: 2px solid #1d3a6d; padding-bottom: 5px; color: #1d3a6d; font-weight: bold; margin-bottom: 15px;">
+                        <i class="fa fa-list"></i> Detalle del Asiento
+                    </h4>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped" style="margin-bottom: 0; font-size: 12px;">
+                            <thead style="background-color: #1d3a6d; color: white;">
+                                <tr>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 15%;">Cuenta</th>
+                                    <th>Descripción</th>
+                                    <th style="width: 12%; text-align: right;">Debe MN</th>
+                                    <th style="width: 12%; text-align: right;">Haber MN</th>
+                                    <th style="width: 12%; text-align: right;">Debe ME</th>
+                                    <th style="width: 12%; text-align: right;">Haber ME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+            buttons: {
+                confirmar: {
+                    text: 'Registrar',
+                    btnClass: 'btn-success',
+                    action: function () {
+                        abrircargando();
+                        $.ajax({
+                            type: "POST",
+                            url: carpeta + "/gestion-asiento",
+                            data: {
+                                _token: _token,
+                                cabecera: JSON.stringify(arrayCabecera),
+                                detalle: JSON.stringify(arrayDetalle),
+                                operacion: operacion
+                            },
+                            success: function (res) {
+                                debugger;
+                                let asientoUnificado = [
+                                    res.cabecera,
+                                    res.detalle
+                                ];
+                                $('#tblactivos tbody tr').each(function () {
+                                    if ($(this).hasClass('activofl')) {
+                                        if(tipo_operacion === 'C'){
+                                            $(this).attr('data_asiento_compra', JSON.stringify(asientoUnificado));
+                                        } else {
+                                            $(this).attr('data_asiento_reversion', JSON.stringify(asientoUnificado));
+                                        }
+                                    }
+                                });
+                                crearNotificacion(res.mensaje, res.titulo, res.tipo, res.boton);
 
-        cerrarcargando();
+                                $('#listone').addClass('active');
+                                $('#listtwo').removeClass('active');
+                                $('#listtree').removeClass('active');
+                                $('#astcabgeneral').addClass('active');
+                                $('#astcabcomplementario').removeClass('active');
+                                $('#astdetgeneral').removeClass('active');
+
+                                $('.pnlasientos').hide();
+                                $('.pnldetallesdocumentos').focus();
+
+                                cerrarcargando();
+                            },
+                            error: function (res) {
+                                debugger;
+                                let errorMsg = 'Ocurrió un error al registrar el asiento.';
+                                if (res && res.responseJSON && res.responseJSON.mensaje) {
+                                    errorMsg = res.responseJSON.mensaje;
+                                } else if (res && res.mensaje) {
+                                    errorMsg = res.mensaje;
+                                }
+                                crearNotificacion(errorMsg);
+                                cerrarcargando();
+                            }
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    btnClass: 'btn-default',
+                    action: function () {
+                        // Cierra el modal sin registrar
+                    }
+                }
+            }
+        });
     })
 
     $("#porcentaje_detraccion").on('keypress keyup keydown change', function (e) {
@@ -1940,6 +2060,7 @@ $(document).ready(function () {
     });
 
     $(".btn-registrar-movimiento").on('click', function (e) {
+        e.preventDefault();
 
         let cuenta_contable_id = $('#cuenta_contable_id').val();
         let afecto_igv = $('#tipo_igv_id').val();
@@ -2092,130 +2213,146 @@ $(document).ready(function () {
             "CODIGO_CONTABLE": ""
         };
 
-        arrayDetalle.push(nuevoMovimiento);
+        $.confirm({
+            title: '¿Confirmar Registro del Movimiento?',
+            content: '¿Está seguro de registrar el movimiento con los siguientes datos?<br><br>' +
+                     '<b>Cuenta Contable:</b> ' + texto + '<br>' +
+                     '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                     '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
+                     '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                     '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
+            buttons: {
+                confirmar: function () {
+                    arrayDetalle.push(nuevoMovimiento);
 
-        let base_imponible = 0.0000;
-        let base_imponible_10 = 0.0000;
-        let base_ivap = 0.0000;
-        let base_inafecto = 0.0000;
-        let base_exonerado = 0.0000;
-        let total_igv = 0.0000;
-        let total_ivap = 0.0000;
-        let total = 0.0000;
+                    let base_imponible = 0.0000;
+                    let base_imponible_10 = 0.0000;
+                    let base_ivap = 0.0000;
+                    let base_inafecto = 0.0000;
+                    let base_exonerado = 0.0000;
+                    let total_igv = 0.0000;
+                    let total_ivap = 0.0000;
+                    let total = 0.0000;
 
-        // Recorrerlo
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                switch (item.COD_DOC_CTBLE_REF) {
-                    case 'AIGV':
-                        if (item.COD_ORDEN_REF === '18') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            switch (item.COD_DOC_CTBLE_REF) {
+                                case 'AIGV':
+                                    if (item.COD_ORDEN_REF === '18') {
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                    } else {
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                    }
+                                    break;
+                                case 'IIGV':
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                    break;
+                                case 'EIGV':
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                    break;
                             }
-                        } else {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (moneda_id_editar !== 'MON0000000000001') {
+                                    total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                } else {
+                                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                }
                             }
                         }
-                        break;
-                    case 'IIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                    case 'EIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                }
-                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
-                    if (moneda_id_editar !== 'MON0000000000001') {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                    } else {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    });
+
+                    total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+                    // Crear la fila con atributos y estilos
+                    let nuevaFila = `
+                        <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                            data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                            <td class="col-codigo">${asiento_id_editar}</td>
+                            <td class="col-cuenta">${numero_cuenta}</td>
+                            <td class="col-glosa">${glosa_cuenta}</td>
+                            <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                            <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                            <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                            <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                                    ✏ Editar
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                                    🗑 Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+
+                    let table = $('#asientodetalle').DataTable();
+
+                    switch (form_id_editar) {
+                        case 'C':
+                            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                            // Recorrerlo
+                            arrayCabecera.forEach(item => {
+                                item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                item.TOTAL_IGV = total_igv;
+                                item.TOTAL_AFECTO_IVAP = base_ivap;
+                                item.TOTAL_IVAP = total_ivap;
+                            });
+                            document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                            document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                            // Después de actualizar arrayDetalle
+                            table = $('#asientodetalle').DataTable();
+                            table.row.add($(nuevaFila)).draw(false);
+                            //$("#asientodetalle tbody").append(nuevaFila);
+                            $("#asientototales tbody tr").each(function () {
+                                let fila = $(this);
+
+                                // Actualizar las celdas visibles de la tabla
+                                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                fila.find(".col-igv").text(number_format(total_igv, 4));
+                                fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                fila.find(".col-total").text(number_format(total, 4));
+
+                            });
+                            break;
                     }
+                    $('.editarcuentas').toggle("slow");
+                    $('.tablageneral').toggle("slow", function () {
+                        $('#asientodetalle').DataTable().columns.adjust().draw();
+                    });
+                },
+                cancelar: function () {
+                    // Do nothing
                 }
             }
         });
-
-        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
-
-        // Crear la fila con atributos y estilos
-        let nuevaFila = `
-            <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
-                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td class="col-codigo">${asiento_id_editar}</td>
-                <td class="col-cuenta">${numero_cuenta}</td>
-                <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                        ✏ Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                        🗑 Eliminar
-                    </button>
-                </td>
-            </tr>
-        `;
-
-        let table = $('#asientodetalle').DataTable();
-
-        switch (form_id_editar) {
-            case 'C':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                table = $('#asientodetalle').DataTable();
-                table.row.add($(nuevaFila)).draw(false);
-                //$("#asientodetalle tbody").append(nuevaFila);
-                $("#asientototales tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
-
-                });
-                break;
-        }
-        $('.tablageneral').toggle("slow");
-        $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
-            $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".btn-editar-movimiento").on('click', function (e) {
+        e.preventDefault();
 
         let cuenta_contable_id = $('#cuenta_contable_id').val();
         let afecto_igv = $('#tipo_igv_id').val();
@@ -2336,153 +2473,168 @@ $(document).ready(function () {
             }
         }
 
-        let base_imponible = 0.0000;
-        let base_imponible_10 = 0.0000;
-        let base_ivap = 0.0000;
-        let base_inafecto = 0.0000;
-        let base_exonerado = 0.0000;
-        let total_igv = 0.0000;
-        let total_ivap = 0.0000;
-        let total = 0.0000;
+        $.confirm({
+            title: '¿Confirmar Modificación del Movimiento?',
+            content: '¿Está seguro de modificar el movimiento con los siguientes datos?<br><br>' +
+                     '<b>Cuenta Contable:</b> ' + texto + '<br>' +
+                     '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                     '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
+                     '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                     '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
+            buttons: {
+                confirmar: function () {
+                    let base_imponible = 0.0000;
+                    let base_imponible_10 = 0.0000;
+                    let base_ivap = 0.0000;
+                    let base_inafecto = 0.0000;
+                    let base_exonerado = 0.0000;
+                    let total_igv = 0.0000;
+                    let total_ivap = 0.0000;
+                    let total = 0.0000;
 
-        // Recorrerlo
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
-                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
-                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
-                    item.TXT_GLOSA = glosa_cuenta;
-                    item.COD_PRODUCTO = '';
-                    item.TXT_NOMBRE_PRODUCTO = '';
-                    item.COD_LOTE = '';
-                    item.NRO_LINEA_PRODUCTO = '0';
-                    item.CAN_DEBE_MN = can_debe_mn;
-                    item.CAN_HABER_MN = can_haber_mn;
-                    item.CAN_DEBE_ME = can_debe_me;
-                    item.CAN_HABER_ME = can_haber_me;
-                    item.COD_DOC_CTBLE_REF = afecto_igv;
-                    item.COD_ORDEN_REF = porc_afecto_igv;
-                    item.COD_ESTADO = activo;
-                }
-                switch (item.COD_DOC_CTBLE_REF) {
-                    case 'AIGV':
-                        if (item.COD_ORDEN_REF === '18') {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                                item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                                item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                                item.TXT_GLOSA = glosa_cuenta;
+                                item.COD_PRODUCTO = '';
+                                item.TXT_NOMBRE_PRODUCTO = '';
+                                item.COD_LOTE = '';
+                                item.NRO_LINEA_PRODUCTO = '0';
+                                item.CAN_DEBE_MN = can_debe_mn;
+                                item.CAN_HABER_MN = can_haber_mn;
+                                item.CAN_DEBE_ME = can_debe_me;
+                                item.CAN_HABER_ME = can_haber_me;
+                                item.COD_DOC_CTBLE_REF = afecto_igv;
+                                item.COD_ORDEN_REF = porc_afecto_igv;
+                                item.COD_ESTADO = activo;
                             }
-                        } else {
-                            if (moneda_id_editar !== 'MON0000000000001') {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                            } else {
-                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            switch (item.COD_DOC_CTBLE_REF) {
+                                case 'AIGV':
+                                    if (item.COD_ORDEN_REF === '18') {
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                    } else {
+                                        if (moneda_id_editar !== 'MON0000000000001') {
+                                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                        } else {
+                                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                        }
+                                    }
+                                    break;
+                                case 'IIGV':
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                    break;
+                                case 'EIGV':
+                                    if (moneda_id_editar !== 'MON0000000000001') {
+                                        base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                    } else {
+                                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                    }
+                                    break;
+                            }
+                            if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (moneda_id_editar !== 'MON0000000000001') {
+                                    total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                                } else {
+                                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                                }
                             }
                         }
-                        break;
-                    case 'IIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                    case 'EIGV':
-                        if (moneda_id_editar !== 'MON0000000000001') {
-                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                        } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
-                        }
-                        break;
-                }
-                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
-                    if (moneda_id_editar !== 'MON0000000000001') {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
-                    } else {
-                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    });
+
+                    total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+                    switch (form_id_editar) {
+                        case 'C':
+                            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                            // Recorrerlo
+                            arrayCabecera.forEach(item => {
+                                item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                                item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                                item.TOTAL_BASE_INAFECTA = base_inafecto;
+                                item.TOTAL_BASE_EXONERADA = base_exonerado;
+                                item.TOTAL_IGV = total_igv;
+                                item.TOTAL_AFECTO_IVAP = base_ivap;
+                                item.TOTAL_IVAP = total_ivap;
+                            });
+                            document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                            document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                            // Después de actualizar arrayDetalle
+                            let table = $('#asientodetalle').DataTable();
+
+                            $("#asientodetalle tbody tr").each(function () {
+                                let fila = $(this);
+                                let codAsiento = fila.attr('data_codigo');
+
+                                if (codAsiento === asiento_id_editar) {
+                                    // obtenemos el índice de la fila
+                                    let rowIdx = table.row(fila).index();
+
+                                    // actualizamos celdas por columna
+                                    table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                                    table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                                    table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                                    table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                                    table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                                    table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+                                }
+                            });
+
+                            // redibujar la tabla → esto dispara footerCallback y recalcula totales
+                            table.columns.adjust().draw();
+                            /*
+                            $("#asientodetalle tbody tr").each(function () {
+                                let fila = $(this);
+
+                                // buscamos en la fila el hidden con el id del asiento
+                                let codAsiento = fila.attr('data_codigo');
+
+                                if (codAsiento === asiento_id_editar) {
+                                    // Actualizar las celdas visibles de la tabla
+                                    fila.find(".col-cuenta").text(numero_cuenta);
+                                    fila.find(".col-glosa").text(glosa_cuenta);
+                                    fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                                    fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                                    fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                                    fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+                                }
+                            });*/
+                            $("#asientototales tbody tr").each(function () {
+                                let fila = $(this);
+
+                                // Actualizar las celdas visibles de la tabla
+                                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                                fila.find(".col-igv").text(number_format(total_igv, 4));
+                                fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                                fila.find(".col-total").text(number_format(total, 4));
+
+                            });
+                            break;
                     }
+                    $('.editarcuentas').toggle("slow");
+                    $('.tablageneral').toggle("slow", function () {
+                        $('#asientodetalle').DataTable().columns.adjust().draw();
+                    });
+                },
+                cancelar: function () {
+                    // Do nothing
                 }
             }
         });
-
-        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
-
-        switch (form_id_editar) {
-            case 'C':
-                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                // Recorrerlo
-                arrayCabecera.forEach(item => {
-                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
-                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
-                    item.TOTAL_BASE_INAFECTA = base_inafecto;
-                    item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
-                    item.TOTAL_AFECTO_IVAP = base_ivap;
-                    item.TOTAL_IVAP = total_ivap;
-                });
-                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
-                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                // Después de actualizar arrayDetalle
-                let table = $('#asientodetalle').DataTable();
-
-                $("#asientodetalle tbody tr").each(function () {
-                    let fila = $(this);
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // obtenemos el índice de la fila
-                        let rowIdx = table.row(fila).index();
-
-                        // actualizamos celdas por columna
-                        table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                        table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                        table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                        table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                        table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                        table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                    }
-                });
-
-                // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                table.columns.adjust().draw();
-                /*
-                $("#asientodetalle tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // buscamos en la fila el hidden con el id del asiento
-                    let codAsiento = fila.attr('data_codigo');
-
-                    if (codAsiento === asiento_id_editar) {
-                        // Actualizar las celdas visibles de la tabla
-                        fila.find(".col-cuenta").text(numero_cuenta);
-                        fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                    }
-                });*/
-                $("#asientototales tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
-
-                });
-                break;
-        }
-        $('.tablageneral').toggle("slow");
-        $('.editarcuentas').toggle("slow");
-        setTimeout(function () {
-            $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".agregar-linea").on('click', function (e) {
@@ -4941,13 +5093,13 @@ $(document).ready(function () {
         };
 
         if ($('.editarcuentasreparable').is(':visible')) {
-            $('.tablageneralreparable').toggle("slow");
             $('.editarcuentasreparable').toggle("slow");
-        }
-
-        setTimeout(function () {
+            $('.tablageneralreparable').toggle("slow", function () {
+                $('#asientodetallereparable').DataTable().columns.adjust().draw();
+            });
+        } else {
             $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        }
 
         // Crear la fila con atributos y estilos
         let nuevaFila = ``;
@@ -5190,13 +5342,13 @@ $(document).ready(function () {
         };
 
         if ($('.editarcuentas').is(':visible')) {
-            $('.tablageneral').toggle("slow");
             $('.editarcuentas').toggle("slow");
-        }
-
-        setTimeout(function () {
+            $('.tablageneral').toggle("slow", function () {
+                $('#asientodetalle').DataTable().columns.adjust().draw();
+            });
+        } else {
             $('#asientodetalle').DataTable().columns.adjust().draw();
-        }, 3000); // espera medio segundo o el tiempo necesario
+        }
 
         // Crear la fila con atributos y estilos
         let nuevaFila = ``;

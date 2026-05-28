@@ -290,6 +290,14 @@
             language: 'es',
         });
 
+        $('.dinero').inputmask({
+            'alias': 'numeric',
+            'groupSeparator': ',', 'autoGroup': true, 'digits': 4,
+            'digitsOptional': false,
+            'prefix': '',
+            'placeholder': '0'
+        });
+
         @foreach($archivospdf as $index => $item)
         var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
         $('#file-' + {{$index}}).fileinput({

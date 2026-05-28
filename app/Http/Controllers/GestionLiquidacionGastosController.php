@@ -2700,6 +2700,35 @@ class GestionLiquidacionGastosController extends Controller
                 $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
                 $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
 
+                $lista = DB::table(DB::raw('LQG_LIQUIDACION_GASTO as LG WITH (NOLOCK)'))
+                        ->select(
+                            'LG.ID_DOCUMENTO',
+                            'LG.COD_EMPRESA',
+                            'LG.FECHA_EMI',
+                            'LG.COD_ESTADO',
+                            'LGD.ITEM'
+                )
+                ->join(DB::raw('LQG_DETLIQUIDACIONGASTO as LGD WITH (NOLOCK)'), function ($join) {
+                    $join->on('LGD.ID_DOCUMENTO', '=', 'LG.ID_DOCUMENTO')
+                        ->where('LGD.ACTIVO', 1);
+                })
+                ->leftJoin(DB::raw('WEB.asientos as AST2 WITH (NOLOCK)'), function ($join) {
+                    $join->on(
+                            'AST2.TXT_REFERENCIA',
+                            '=',
+                            DB::raw("LG.ID_DOCUMENTO + '-' + CAST(LGD.ITEM AS VARCHAR(MAX))")
+                        )
+                        ->where('AST2.COD_ESTADO', 1)
+                        ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
+                })
+                    ->where('LG.ID_DOCUMENTO', $iddocumento)
+                ->whereNull('AST2.COD_ASIENTO')
+                ->get();
+
+                if (count($lista) <> count($tdetliquidaciongastos)) {
+                    return Redirect::back()->with('errorurl', 'La liquidacion de gastos no tiene todos sus asientos creados');
+                }
+
                 if ($liquidaciongastos->IND_OBSERVACION == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
@@ -2851,6 +2880,7 @@ class GestionLiquidacionGastosController extends Controller
                     array_push($asiento_compra, $asiento[1]);
                     array_push($asiento_compra, $asiento[2]);
 
+                    /*
                     $ind_reversion = 'R';
 
                     $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
@@ -2892,10 +2922,11 @@ class GestionLiquidacionGastosController extends Controller
                         array_push($asiento_reversion, $asiento_reparable_reversion[2]);
                     } else {
                         $documentolg->CONTADOR = 0;
-                    }
+                    }*/
 
+                    $documentolg->CONTADOR = 0;
                     $documentolg->TXT_CENTRO = json_encode($asiento_compra);
-                    $documentolg->TOKEN = json_encode($asiento_reversion);
+                    $documentolg->TOKEN = json_encode([]);
                     $documentolg->BUSQUEDAD = 1;
 
                 } else {

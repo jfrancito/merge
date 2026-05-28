@@ -222,6 +222,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -229,6 +232,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].enable();
+                }
                 break;
 
             default:
@@ -236,6 +242,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
         }
     });
@@ -2179,6 +2188,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -2186,6 +2198,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].enable();
+                }
                 break;
 
             default:
@@ -2193,6 +2208,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
         }
     });
@@ -2211,7 +2229,41 @@ $(document).ready(function () {
                 break;
         }
     });
-     */
+    */
+
+    function actualizarGlosaAsiento() {
+        let tipo_asiento_text = $("#tipo_asiento option:selected").text().trim();
+        let tipo_comprobante_text = $("#tipo_documento_asiento option:selected").text().trim();
+        let moneda_asiento_text = $("#moneda_asiento option:selected").text().trim();
+        let serie = ($("#serie_asiento").val() || '').trim();
+        let numero = ($("#numero_asiento").val() || '').trim();
+
+        let proveedor_el = document.querySelector('#empresa_asiento');
+        let proveedor_txt = '';
+        if (proveedor_el && proveedor_el.tomselect) {
+            let val = proveedor_el.value;
+            let opt = proveedor_el.tomselect.options[val];
+            proveedor_txt = opt ? opt.text : $("#empresa_asiento option:selected").text();
+        } else {
+            proveedor_txt = $("#empresa_asiento option:selected").text();
+        }
+        proveedor_txt = (proveedor_txt || '').trim();
+
+        let glosa = `${tipo_asiento_text} : ${tipo_comprobante_text} // ${moneda_asiento_text} // ${serie} - ${numero} // ${proveedor_txt}`;
+        $("#glosa_asiento").val(glosa);
+    }
+
+    $(document).on('change', '#tipo_asiento, #tipo_documento_asiento, #moneda_asiento, #empresa_asiento', function () {
+        actualizarGlosaAsiento();
+    });
+
+    $(document).on('input change keyup', '#serie_asiento, #numero_asiento', function () {
+        actualizarGlosaAsiento();
+    });
+
+    $('a[href="#astdetgeneral"]').on('shown.bs.tab', function () {
+        $('#asientodetalle').DataTable().columns.adjust().draw();
+    });
 
     $(document).on('click', ".ver-asiento", function (e) {
         e.preventDefault();

@@ -157,6 +157,14 @@ trait LiquidacionGastoTraits
                     ->where('ACTIVO', 1)
                     ->sum('TOTAL');
 
+
+                if($producto_id == 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
+                    $porcentaje = 30;
+                    $monto_por = $monto * ($porcentaje / 100);
+                    $monto = $monto + $monto_por;
+                }
+
+
                 if($monto==0){
                     $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
                 }
