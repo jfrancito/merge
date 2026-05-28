@@ -222,6 +222,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -229,6 +232,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].enable();
+                }
                 break;
 
             default:
@@ -236,6 +242,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id_reparable']) {
+                    window.selects['porc_tipo_igv_id_reparable'].disable();
+                }
                 break;
         }
     });
@@ -2179,6 +2188,9 @@ $(document).ready(function () {
                     .val('0')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
 
             case "CTI0000000000001":
@@ -2186,6 +2198,9 @@ $(document).ready(function () {
                     .val('18')
                     .trigger('change')
                     .prop('disabled', false);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].enable();
+                }
                 break;
 
             default:
@@ -2193,6 +2208,9 @@ $(document).ready(function () {
                     .val('')
                     .trigger('change')
                     .prop('disabled', true);
+                if (window.selects && window.selects['porc_tipo_igv_id']) {
+                    window.selects['porc_tipo_igv_id'].disable();
+                }
                 break;
         }
     });
