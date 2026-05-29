@@ -60,6 +60,7 @@ class GestionOCValidadoController extends Controller
                             'archivospdf'           =>  $archivospdf,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -324,6 +325,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -402,6 +404,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -553,6 +556,7 @@ class GestionOCValidadoController extends Controller
                             'proveedor_id'          =>  $proveedor_id,
                             'estado_id'             =>  $estado_id,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'ajax'                  =>  true,
@@ -624,6 +628,7 @@ class GestionOCValidadoController extends Controller
                          [
 
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'ajax'                  =>  true,
@@ -716,6 +721,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -796,6 +802,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                             'contrato_anticipo'     =>  $contrato_anticipo,
                             'detalles_contrato'     =>  $detalles_contrato,
                             'pagos_contrato'        =>  $pagos_contrato,
@@ -857,6 +864,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -913,6 +921,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -972,6 +981,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -1027,6 +1037,7 @@ class GestionOCValidadoController extends Controller
                             'xmlarchivo'            =>  $xmlarchivo,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -1198,6 +1209,7 @@ class GestionOCValidadoController extends Controller
 
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                                 'idoc'                  =>  $idoc,
                          ]);
     }
@@ -1243,6 +1255,7 @@ class GestionOCValidadoController extends Controller
                             'xmlarchivo'            =>  $xmlarchivo,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
@@ -1363,6 +1376,7 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                          ]);
     }
 
