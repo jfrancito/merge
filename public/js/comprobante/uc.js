@@ -53,7 +53,7 @@ $(document).ready(function () {
         arrayCabecera.forEach(item => {
             if (selectedMoneda !== undefined && selectedMoneda !== null) {
                 item.COD_CATEGORIA_MONEDA = 'MON0000000000001';
-                item.COD_CATEGORIA_MONEDA_CONVERSION = (selectedMoneda === 'MON0000000000002') ? 'MON0000000000002' : '';
+                item.COD_CATEGORIA_MONEDA_CONVERSION = (selectedMoneda === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             }
             if (!isNaN(tc_value)) {
                 item.CAN_TIPO_CAMBIO = tc_value;
@@ -566,6 +566,10 @@ $(document).ready(function () {
                 }
             });
             return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento_reparable").value;
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
@@ -2334,7 +2338,7 @@ $(document).ready(function () {
                     action: function () {
                         arrayCabecera.forEach(item => {
                             item.COD_CATEGORIA_MONEDA = 'MON0000000000001'; // Siempre soles
-                            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : '';
+                            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
                             item.CAN_TIPO_CAMBIO = Number(tc_editar.replaceAll(/[\$,]/g, "")) || 0;
                             item.FEC_ASIENTO = new Date(fecha_asiento);
                             item.COD_PERIODO = periodo_asiento;
@@ -3688,6 +3692,10 @@ $(document).ready(function () {
                 }
             });
             return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento").value;
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
