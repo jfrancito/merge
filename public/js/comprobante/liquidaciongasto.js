@@ -3,41 +3,41 @@ $(document).ready(function () {
 
     function sincronizarCabeceraDesdeUI(arrayCabecera, esReparable = false) {
         if (!arrayCabecera || !Array.isArray(arrayCabecera) || arrayCabecera.length === 0) return arrayCabecera;
-        
+
         let sufijo = esReparable ? '_reparable' : '';
-        
+
         let selectedMoneda = $('#moneda_asiento' + sufijo).val();
         let tc_value = parseFloat($('#tipo_cambio_asiento' + sufijo).val() || '0') || 0;
         let periodo = $('#periodo_asiento' + sufijo).val();
         let fecha = $('#fecha_asiento' + sufijo).val();
         let glosa = $('#glosa_asiento' + sufijo).val();
         let tipo_asiento = $('#tipo_asiento' + sufijo).val();
-        
+
         let empresa_el = document.querySelector('#empresa_asiento' + sufijo);
         let proveedor = empresa_el ? empresa_el.value : '';
         let proveedor_txt = '';
         if (empresa_el && empresa_el.tomselect && empresa_el.tomselect.options && empresa_el.tomselect.options[proveedor]) {
             proveedor_txt = empresa_el.tomselect.options[proveedor].text;
         }
-        
+
         let tipo_doc = $('#tipo_documento_asiento' + sufijo).val();
         let serie = $('#serie_asiento' + sufijo).val();
         let numero = $('#numero_asiento' + sufijo).val();
-        
+
         let tipo_doc_ref = $('#tipo_documento_ref' + sufijo).val();
         let serie_ref = $('#serie_ref_asiento' + sufijo).val();
         let numero_ref = $('#numero_ref_asiento' + sufijo).val();
-        
+
         let tipo_desc = $('#tipo_descuento_asiento' + sufijo).val();
         let constancia = $('#const_detraccion_asiento' + sufijo).val();
         let fecha_desc = $('#fecha_detraccion_asiento' + sufijo).val();
         let porcentaje = parseFloat($('#porcentaje_detraccion' + sufijo).val() || '0') || 0;
         let total_desc = parseFloat($('#total_detraccion_asiento' + sufijo).val() || '0') || 0;
-        
+
         arrayCabecera.forEach(item => {
             if (selectedMoneda !== undefined && selectedMoneda !== null) {
                 item.COD_CATEGORIA_MONEDA = 'MON0000000000001';
-                item.COD_CATEGORIA_MONEDA_CONVERSION = (selectedMoneda === 'MON0000000000002') ? 'MON0000000000002' : '';
+                item.COD_CATEGORIA_MONEDA_CONVERSION = (selectedMoneda === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             }
             if (!isNaN(tc_value)) {
                 item.CAN_TIPO_CAMBIO = tc_value;
@@ -92,7 +92,7 @@ $(document).ready(function () {
                 item.CAN_TOTAL_DETRACCION = total_desc;
             }
         });
-        
+
         return arrayCabecera;
     }
 
@@ -365,7 +365,7 @@ $(document).ready(function () {
             success: function (htmlResponse) {
                 cerrarcargando();
                 $(".ajax_anio_asiento_reparable").html(htmlResponse);
-                
+
                 let pending = $("#anio_asiento_reparable").data('pending-period');
                 if (pending && window.selects['periodo_asiento_reparable']) {
                     window.selects['periodo_asiento_reparable'].setSelected(pending.trim());
@@ -1122,7 +1122,7 @@ $(document).ready(function () {
 
         arrayCabecera.forEach(item => {
             item.COD_CATEGORIA_MONEDA = 'MON0000000000001'; // Siempre soles
-            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : '';
+            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
             item.FEC_ASIENTO = new Date(fecha_asiento);
             item.COD_PERIODO = periodo_asiento;
@@ -1636,7 +1636,7 @@ $(document).ready(function () {
             success: function (htmlResponse) {
                 cerrarcargando();
                 $(".ajax_anio_asiento").html(htmlResponse);
-                
+
                 let pending = $("#anio_asiento").data('pending-period');
                 if (pending && window.selects['periodo_asiento']) {
                     window.selects['periodo_asiento'].setSelected(pending.trim());
@@ -1953,7 +1953,7 @@ $(document).ready(function () {
 
         arrayCabecera.forEach(item => {
             item.COD_CATEGORIA_MONEDA = 'MON0000000000001'; // Siempre soles
-            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : '';
+            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
             item.FEC_ASIENTO = new Date(fecha_asiento);
             item.COD_PERIODO = periodo_asiento;
