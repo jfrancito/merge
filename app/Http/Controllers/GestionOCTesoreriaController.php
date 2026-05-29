@@ -42,7 +42,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 use App\Traits\ComprobanteProvisionTraits;
-
+use App\Traits\UserTraits;
 
 use Storage;
 use ZipArchive;
@@ -58,6 +58,7 @@ class GestionOCTesoreriaController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
+    use UserTraits;
 
     public function actionEliminacionLoteComision(Request $request)
     {
@@ -385,7 +386,7 @@ class GestionOCTesoreriaController extends Controller
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR TESORERIA');
                 //geolocalización
-
+                $this->update_serie_correlativo_cpe();
 
 
                 DB::commit();
