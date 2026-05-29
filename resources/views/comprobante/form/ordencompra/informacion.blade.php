@@ -11,6 +11,9 @@
                             <div class="tab-content">
                               <div id="oc" class="tab-pane active cont">
 
+                                    <input type="hidden" name="idoc" id="idoc" value="{{$idoc}}">
+                                    <input type="hidden" name="idopcion" id="idopcion" value="{{$idopcion}}">
+                                    <input type="hidden" name="token" id="token" value="{{csrf_token()}}">
                                     <table class="table table-condensed table-striped">
                                       <thead>
                                         <tr>
@@ -32,7 +35,7 @@
 
 
                                   
-                                  <table class="table table-condensed table-striped">
+                                  <table class="table table-condensed table-striped tablainformacion">
                                       <thead>
                                         <tr>
                                           <th>Codigo Producto</th>
@@ -41,6 +44,7 @@
                                           <th>Cantidad</th>
                                           <th>Precio</th>
                                           <th>Total</th>
+                                          <th>Acción</th>
                                         </tr>
                                       </thead>
                                       <tbody>
@@ -54,7 +58,13 @@
                                               <td>{{number_format($item->CAN_PRODUCTO, 4, '.', ',')}}</td>
                                               <td>{{number_format($item->CAN_PRECIO_UNIT_IGV, 4, '.', ',')}}</td>
                                               <td>{{number_format($item->CAN_VALOR_VENTA_IGV, 4, '.', ',')}}</td>
-
+                                              
+                                              <td class="tdopcionesordaf" style="display: flex;align-content: center;flex-wrap: nowrap;flex-direction: row;justify-content: center;align-items: baseline;">
+                                                  <input type="checkbox" id="checkboxcataf{{$index}}" class="checkboxcataf" attd="{{ json_encode($item) }}" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" style="accent-color: green;width: 15px;height:15px;border-radius: 5px; transform: scale(1.5);cursor: not-allowed;margin-right: 5px;" {{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? 'checked' : '' }}>
+                                                  <button type="button" name="btnActivoFijo" class="btn btn-xs btn-primary btnActivoFijo" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" id="btnActivoFijo{{ $index }}" idcheckbox="checkboxcataf{{$index}}" title="Asignar categoría de Activo Fijo" style="font-size: 24px !important;border-radius: 5px; margin-top: -10px;">
+                                                      <span class="mdi mdi-assignment"></span>
+                                                  </button>
+                                              </td>
                                             </tr>
                                           @endforeach
 
@@ -118,3 +128,9 @@
 
       </div>
     </div>
+	<div id="modal-content-categoria-af" class="modal-dialog modal-container colored-header colored-header-warning modal-effect-6" style="margin-top: -40px;">
+		<div class="modal-content ">
+			<div class='modal-content-categoria-af-container'>
+			</div>
+		</div>
+	</div>

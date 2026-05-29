@@ -135,7 +135,11 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/ajax-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldos');
     Route::any('/descargar-archivo-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldosExcel');
 
-
+	// GESTION ACTIVOS FIJOS (VALE A RENDIR)
+	Route::any('/gestion-de-obras/{idopcion}', 'ValeRendirAdministracionController@actionListar');
+	Route::any('/ajax-listar-activos-fijos', 'ValeRendirAdministracionController@actionAjaxListar');
+	Route::any('/agregar-modificar-activo-fijo', 'ValeRendirAdministracionController@actionAgregarModificar');
+	Route::any('/eliminar-activo-fijo', 'ValeRendirAdministracionController@actionEliminar');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');
