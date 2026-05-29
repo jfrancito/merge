@@ -655,7 +655,7 @@ $(document).ready(function () {
 
         let data_codigo = $(this).parents('.fila').attr('data_codigo');
         let moneda_id_editar = $(this).parents('.fila').attr('data_moneda');
-        let tc_editar = $(this).parents('.fila').attr('data_tc');
+        let tc_editar = document.getElementById("tipo_cambio_asiento_reparable").value;
         let arrayDetalle = null;
 
         arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
@@ -3599,7 +3599,7 @@ $(document).ready(function () {
                 console.log(arrayCabecera);
                 document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
                 document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, 0);
+                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, document.getElementById("tipo_cambio_asiento").value);
                 $("#asientototales tbody tr").each(function () {
                     let fila = $(this);
 
@@ -3617,11 +3617,11 @@ $(document).ready(function () {
                 break;
             case 'RV':
                 document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
-                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, 0);
+                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, document.getElementById("tipo_cambio_asiento").value);
                 break;
             case 'D':
                 document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
-                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, 0);
+                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, document.getElementById("tipo_cambio_asiento").value);
                 break;
             case 'P':
                 arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
@@ -3637,7 +3637,7 @@ $(document).ready(function () {
                 });
                 document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
                 document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
-                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, 0);
+                renderAsientoDetalle(arrayDetalle, data_asiento, moneda_id_editar, document.getElementById("tipo_cambio_asiento").value);
                 $("#asiento_totales_percepcion tbody tr").each(function () {
                     let fila = $(this);
 
