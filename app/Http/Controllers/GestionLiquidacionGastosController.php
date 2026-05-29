@@ -2553,11 +2553,12 @@ class GestionLiquidacionGastosController extends Controller
                         $TOTAL_OTROS_IMPUESTOS = $detalle['TOTAL_OTROS_IMPUESTOS'];
 
                         $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
-                        $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+                        $moneda_asiento_conversion_aux = !empty($COD_CATEGORIA_MONEDA_CONVERSION)
+                            ? CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA_CONVERSION)->first()
+                            : $moneda_asiento_aux;
 
-                        if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                            $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                            $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+                        if (!$moneda_asiento_conversion_aux) {
+                            $moneda_asiento_conversion_aux = $moneda_asiento_aux;
                         }
 
                         $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $COD_EMPR_CLI)->first();
