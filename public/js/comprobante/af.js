@@ -39,7 +39,7 @@ $(document).ready(function () {
 		let cantprod    =   $(this).attr("attcantprod");
 		let codlote    =   $(this).attr("attcodlote");
 		let nrolinea    =   $(this).attr("attnrolinea");
-		let txtnombprod    =   $(this).attr("attnombprod");
+		let txtnombprod    =   $(this).attr("atttxtnombprod");
 		let txtdetprod    =   $(this).attr("atttxtdetprod");
 
 		let idcheckbox    	=   $(this).attr("idcheckbox");
@@ -65,9 +65,13 @@ $(document).ready(function () {
 
 	$('#modal-content-categoria-af').on('submit', '#frmAgregarCategoriaActivoFijo', function(e){
 	    e.preventDefault();
-	    // alert('holll'); // ✅ ahora sí debe dispararse
-	    // debugger;
+	    
 	    var form 		= 	$(this);
+        form.parsley().validate();
+        if (!form.parsley().isValid()) {
+            return false;
+        }
+
 	    var url  		= 	form.attr('action');
 	    var idfila		=	$('#idfila').val();
 		var _token      =   $('#token').val();
@@ -105,16 +109,15 @@ $(document).ready(function () {
 	        success: function(response){
 	              if(!response.error){
 				        $('#modal-content-categoria-af').niftyModal('hide');
+	    				$('body').css('overflow', 'auto');
+	    				$('.be-wrapper').css('filter', 'none');
 				        alertajax(response.mensaje);
-				       	console.error(response.mensaje);
-				       	// abrircargando('Registrando Categoria');
-				       	// debugger;
+				       	console.log(response.mensaje);
 				       	$('#'+response.idcheckbox).prop('checked',true);
-				        // location.reload();
-				       	// debugger;
-				        // alertajax('CATEGORIZADO CORRECTAMENTE');
 				  } else {
 				  		$('#modal-content-categoria-af').niftyModal('hide');
+	    				$('body').css('overflow', 'auto');
+	    				$('.be-wrapper').css('filter', 'none');
 				       alertajax(response.mensaje);
 				  }
 
@@ -122,7 +125,9 @@ $(document).ready(function () {
 	        error: function(xhr){
 	            console.error(xhr.responseText);
 	            $('#modal-content-categoria-af').niftyModal('hide');
-	            alert('Ocurrió un error al guardar');
+	    		$('body').css('overflow', 'auto');
+	    		$('.be-wrapper').css('filter', 'none');
+	            alert('Ocurrió un error al guardar: ' + xhr.responseText);
 	        }
 	    });
 	});
@@ -171,7 +176,7 @@ $(document).ready(function () {
 					debugger;
 				        // $('#modal-content-categoria-af').niftyModal('hide');
 				        alertajax(response.mensaje);
-				       	console.error(response.mensaje);
+				       	console.log(response.mensaje);
 				       	$('#'+response.idcheckbox).prop('checked',false);
 				        
 				  } else {
@@ -202,9 +207,20 @@ $(document).ready(function () {
 	            cerrarcargando();
 	            $('.'+contenedor_ajax).html(data);
 
+	            // Mover el modal al body para evitar que el filtro blur de be-wrapper lo afecte
+	            $('#'+modal).appendTo('body');
+
 	            // Inicializar y abrir modal Nifty
 	            $('#'+modal).niftyModal('show'); 
-	            // O prueba con $('#'+modal).openModal();
+	            
+	            // Efecto difuminado y bloqueo de scroll
+	            $('body').css('overflow', 'hidden');
+	            $('.be-wrapper').css('filter', 'blur(3px)');
+	            
+	            // Inicializar parsley
+	            if ($('#frmAgregarCategoriaActivoFijo').length > 0) {
+	                $('#frmAgregarCategoriaActivoFijo').parsley();
+	            }
 	        },
 	        error: function (data) {
 	            cerrarcargando();

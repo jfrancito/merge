@@ -42,6 +42,7 @@
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
 
 
+    <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/general.js') }}" type="text/javascript"></script>
@@ -53,6 +54,17 @@
         App.init();
         App.formElements();
         $('form').parsley();
+        
+        //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+        $.fn.niftyModal('setDefaults', {
+            overlaySelector: '.modal-overlay',
+            closeSelector: '.modal-close',
+            classAddAfterOpen: 'modal-show',
+            afterClose: function(modal, e) {
+                $('body').css('overflow', 'auto');
+                $('.be-wrapper').css('filter', 'none');
+            }
+        });
       });
     </script> 
 
@@ -85,6 +97,7 @@
            
     </script>
   <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/af.js?v=' . time()) }}" type="text/javascript"></script>
 
     
 @stop
