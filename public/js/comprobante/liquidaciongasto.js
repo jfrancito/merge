@@ -420,6 +420,10 @@ $(document).ready(function () {
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento_reparable").value;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
             $.alert({
                 title: 'Error',
                 content: 'El tipo de cambio no puede ser 0',
@@ -2846,6 +2850,10 @@ $(document).ready(function () {
                 }
             });
             return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento").value;
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
