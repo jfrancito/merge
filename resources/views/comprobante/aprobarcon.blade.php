@@ -281,6 +281,10 @@
                 overlaySelector: '.modal-overlay',
                 closeSelector: '.modal-close',
                 classAddAfterOpen: 'modal-show',
+                afterClose: function(modal, e) {
+                    $('body').css('overflow', 'auto');
+                    $('.be-wrapper').css('filter', 'none');
+                }
             });
 
             let select = new TomSelect("#empresa_asiento", {

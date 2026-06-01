@@ -16,21 +16,54 @@ class ValeRendirAdministracionController extends Controller
         $decidopcion = \Hashids::decode($idopcion);
         $idopcioncompleta = '1CIX' . str_pad($decidopcion[0], 8, "0", STR_PAD_LEFT);
         $opcion = DB::table('WEB.opciones')->where('id', $idopcioncompleta)->first();
-        
         $cod_empresa = Session::get('empresas')->COD_EMPR;
         $combocentros = DB::table('ALM.CENTRO')->where('COD_ESTADO', 1)->pluck('NOM_CENTRO', 'COD_CENTRO');
+
+        $usuario_id = Session::get('usuario')->id;
+        $permisos = \DB::table('WEB.rolopciones')
+            ->join('users', 'users.rol_id', '=', 'WEB.rolopciones.rol_id')
+            ->where('users.id', $usuario_id)
+            ->where('WEB.rolopciones.opcion_id', $idopcioncompleta)
+            ->orderBy('WEB.rolopciones.fecha_crea', 'desc')
+            ->first();
+
+        $permisosArray = [
+            'ver'       => $permisos ? $permisos->ver : 0,
+            'anadir'    => $permisos ? $permisos->anadir : 0,
+            'modificar' => $permisos ? $permisos->modificar : 0,
+            'eliminar'  => $permisos ? $permisos->eliminar : 0,
+        ];
 
         return view('activofijo.lista', [
             'idopcion' => $idopcion,
             'opcion' => $opcion,
-            'combocentros' => $combocentros
+            'combocentros' => $combocentros,
+            'permisos' => $permisosArray
         ]);
     }
 
     public function actionAjaxListar(Request $request)
     {
+        \Log::info("AJAX LISTAR OBRA LLAMADO");
         $fecha_inicio = $request->input('fecha_inicio', '');
         $fecha_fin = $request->input('fecha_fin', '');
+        $idopcion = $request->input('idopcion');
+        $usuario_id = Session::get('usuario')->id;
+        
+        $decidopcion = \Hashids::decode($idopcion);
+        $idopcioncompleta = '1CIX' . str_pad($decidopcion[0], 8, "0", STR_PAD_LEFT);
+
+        $permisos = \DB::table('WEB.rolopciones')
+            ->join('users', 'users.rol_id', '=', 'WEB.rolopciones.rol_id')
+            ->where('users.id', $usuario_id)
+            ->where('WEB.rolopciones.opcion_id', $idopcioncompleta)
+            ->orderBy('WEB.rolopciones.fecha_crea', 'desc')
+            ->first();
+
+        $permisosArray = [
+            'modificar' => $permisos ? $permisos->modificar : 0,
+            'eliminar'  => $permisos ? $permisos->eliminar : 0,
+        ];
 
         $query = WEBActivoFijo::where('modalidad_adquisicion', 'OBRA');
         
@@ -45,7 +78,8 @@ class ValeRendirAdministracionController extends Controller
 
         return view('activofijo.ajax.lista', [
             'lista' => $lista,
-            'ajax' => true
+            'ajax' => true,
+            'permisos' => $permisosArray
         ]);
     }
 

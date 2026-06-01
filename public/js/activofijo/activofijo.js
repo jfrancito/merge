@@ -6,6 +6,7 @@ $(document).ready(function(){
         var _token = $('#token').val();
         var data = { 
             _token: _token,
+            idopcion: $('#idopcion').val(),
             fecha_inicio: window.fecha_inicio_val || '',
             fecha_fin: window.fecha_fin_val || ''
         };
@@ -17,6 +18,28 @@ $(document).ready(function(){
             success: function (data) {
                 $('.listajax').html(data);
                 
+                // ===== FIX COLOR VIA MUTATIONOBSERVER =====
+                // Observar cuando el dropdown se abre (clase 'open' se agrega al btn-group)
+                // y forzar color negro en los links
+                var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            var el = mutation.target;
+                            if ($(el).hasClass('open')) {
+                                // El dropdown se abrió - forzar color en los links
+                                $(el).find('.btn-editar-activo, .btn-eliminar-activo').each(function() {
+                                    this.style.setProperty('color', '#333333', 'important');
+                                });
+                            }
+                        }
+                    });
+                });
+                // Observar todos los btn-group en la lista
+                $('.listajax .btn-group').each(function() {
+                    observer.observe(this, { attributes: true });
+                });
+                // ===== FIN FIX =====
+
                 // Inicializar datatable localmente para evitar problemas de caché con app-tables-datatables.js
                 $("#tabla-obras").dataTable({
                     dom: 'Bfrtip',
@@ -110,6 +133,26 @@ $(document).ready(function(){
                             $('#filtro_fecha_inicio').attr('max', window.fecha_fin_val);
                         }
                         
+                        // ===== DIAGNOSTICO COLOR DESPUES DE DATATABLES =====
+                        setTimeout(function() {
+                            var $linkAfter = $('.listajax').find('.btn-editar-activo').first();
+                            if ($linkAfter.length) {
+                                var computedColorAfter = window.getComputedStyle($linkAfter[0]).color;
+                                var inlineColorAfter = $linkAfter[0].style.color;
+                                console.log('[DIAG] Color computado DESPUES de DataTables:', computedColorAfter);
+                                console.log('[DIAG] Color inline DESPUES de DataTables:', inlineColorAfter);
+                                // Forzar color via JS como prueba
+                                $linkAfter.css('color', '#333');
+                                var colorForzado = window.getComputedStyle($linkAfter[0]).color;
+                                console.log('[DIAG] Color DESPUES de forzar via JS:', colorForzado);
+                                console.log('[DIAG] Clase padre del link:', $linkAfter.parent().attr('class'));
+                                console.log('[DIAG] Clase abuelo del link:', $linkAfter.parent().parent().attr('class'));
+                            } else {
+                                console.log('[DIAG] No se encontro .btn-editar-activo despues de DataTables!');
+                            }
+                        }, 500);
+                        // ===== FIN DIAGNOSTICO =====
+
                         // Eventos automáticos onChange y validación
                         $('#filtro_fecha_inicio').on('change', function() {
                             $('#filtro_fecha_fin').attr('min', $(this).val());
@@ -226,6 +269,10 @@ $(document).ready(function(){
         
         var form = $('#form-activo');
         if (form.parsley().validate()) {
+            
+            var $btn = $(this);
+            $btn.prop('disabled', true).html('<i class="mdi mdi-spinner mdi-spin"></i> Guardando...');
+            
             var _token = $('#token').val();
             var data = form.serialize() + "&_token=" + _token;
 
@@ -240,13 +287,16 @@ $(document).ready(function(){
                         setTimeout(function() {
                             $('.md-overlay').removeClass('md-overlay-show');
                             $('.modal-overlay').removeClass('modal-overlay-show');
+                            $btn.prop('disabled', false).html('Guardar');
                             cargarLista();
                         }, 300);
                     } else {
                         alerterrorajax(response.error);
+                        $btn.prop('disabled', false).html('Guardar');
                     }
                 },
                 error: function (data) {
+                    $btn.prop('disabled', false).html('Guardar');
                     console.log(data);
                 }
             });
