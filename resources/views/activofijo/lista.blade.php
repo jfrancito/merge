@@ -106,6 +106,12 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
             outline: none !important;
         }
+
+        /* Fix color de botones Editar y Eliminar en dropdown */
+        .activofijo .dropdown-menu > li > a.btn-editar-activo,
+        .activofijo .dropdown-menu > li > a.btn-eliminar-activo {
+            color: #333333 !important;
+        }
     </style>
 @stop
 @section('section')
@@ -118,9 +124,11 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">Gestión de Obras
                   <div class="tools">
+                    @if(isset($permisos) && $permisos['anadir'] == 1)
                       <a href="#" class="btn btn-agregar-activo">
                         <i class="icon mdi mdi-plus-circle"></i> Agregar Obra
                       </a>
+                    @endif
                   </div>
                 </div>
 

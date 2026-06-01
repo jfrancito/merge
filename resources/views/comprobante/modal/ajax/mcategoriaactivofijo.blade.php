@@ -1,5 +1,5 @@
 	<div class="modal-header" style="background: #1d3a6d;">
-		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close" ><b><span style="color: white;font-size: 20px;margin-top: -15px;" class="mdi mdi-close"></span></b></button>
+		<button type="button" data-dismiss="modal" class="close modal-close" ><b><span style="color: white;font-size: 20px;margin-top: -15px;" class="mdi mdi-close"></span></b></button>
 		<div class="row">
 			<div class="col-xs-12">
 				<h3>PRUDUCTO {{ $oeProducto->TXT_NOMBRE_PRODUCTO }}</h3>

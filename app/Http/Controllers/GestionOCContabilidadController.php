@@ -15364,7 +15364,7 @@ class GestionOCContabilidadController extends Controller
     }
 
 
-    public function actionRegistrarActivoFijoCategoria($idoc, $COD_PRODUCTO, Request $request)
+    public function actionRegistrarActivoFijoCategoria($idopcion, $idoc, $COD_PRODUCTO, Request $request)
     {
         $COD_CAT_ACTFIJO = $request['COD_CATEGORIA_AF'];
         $COD_PRODUCTO = $request['COD_PRODUCTO'];
@@ -15380,38 +15380,53 @@ class GestionOCContabilidadController extends Controller
 
         try {
 
-            $oeExiste = CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)->where('COD_PRODUCTO', $COD_PRODUCTO)->where('NRO_LINEA', $NRO_LINEA)->first();
+            $oeExiste = CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)->where('COD_PRODUCTO', $COD_PRODUCTO)
+                        ->where(function($q) use ($NRO_LINEA) {
+                            if (empty($NRO_LINEA)) {
+                                $q->whereNull('NRO_LINEA')->orWhere('NRO_LINEA', '')->orWhere('NRO_LINEA', '0');
+                            } else {
+                                $q->where('NRO_LINEA', $NRO_LINEA);
+                            }
+                        })
+                        ->first();
+                        
             if ($oeExiste) {
                 // VALIDAR QUE NO ESTE YA SIENDO PROCESADO O CALCULADO SU DEPRECIACION
                 if (1 == 0) {
                     $error = true;
                     $mensaje = 'YA SE ESTA DEPRECIANDO';
                 } else {
-                    $oeExiste->COD_PRODUCTO = $COD_PRODUCTO;
-                    $oeExiste->COD_TABLA = $COD_TABLA;
-                    $oeExiste->COD_LOTE = $COD_LOTE;
-                    $oeExiste->NRO_LINEA = $NRO_LINEA;
-                    $oeExiste->TXT_DETALLE_PRODUCTO = $TXT_DETALLE_PRODUCTO;
-                    $oeExiste->TXT_NOMBRE_PRODUCTO = $TXT_NOMBRE_PRODUCTO;
-                    $oeExiste->CAN_PRODUCTO = $CAN_PRODUCTO;
-                    $oeExiste->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO;
-                    $oeExiste->save();
+                    CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)->where('COD_PRODUCTO', $COD_PRODUCTO)
+                        ->where(function($q) use ($NRO_LINEA) {
+                            if (empty($NRO_LINEA)) {
+                                $q->whereNull('NRO_LINEA')->orWhere('NRO_LINEA', '')->orWhere('NRO_LINEA', '0');
+                            } else {
+                                $q->where('NRO_LINEA', $NRO_LINEA);
+                            }
+                        })
+                        ->update([
+                            'COD_LOTE' => $COD_LOTE ?? '',
+                            'TXT_DETALLE_PRODUCTO' => $TXT_DETALLE_PRODUCTO ?? '',
+                            'TXT_NOMBRE_PRODUCTO' => $TXT_NOMBRE_PRODUCTO ?? '',
+                            'CAN_PRODUCTO' => $CAN_PRODUCTO ?? 0,
+                            'COD_CAT_ACTFIJO' => $COD_CAT_ACTFIJO ?? ''
+                        ]);
                 }
             } else {
                 $oeRegistro = new CMPDetalleProductoAF;
-                $oeRegistro->COD_PRODUCTO = $COD_PRODUCTO;
-                $oeRegistro->COD_TABLA = $COD_TABLA;
-                $oeRegistro->COD_LOTE = $COD_LOTE;
-                $oeRegistro->NRO_LINEA = $NRO_LINEA;
-                $oeRegistro->TXT_DETALLE_PRODUCTO = $TXT_DETALLE_PRODUCTO;
-                $oeRegistro->TXT_NOMBRE_PRODUCTO = $TXT_NOMBRE_PRODUCTO;
-                $oeRegistro->CAN_PRODUCTO = $CAN_PRODUCTO;
-                $oeRegistro->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO;
+                $oeRegistro->COD_PRODUCTO = $COD_PRODUCTO ?? '';
+                $oeRegistro->COD_TABLA = $COD_TABLA ?? '';
+                $oeRegistro->COD_LOTE = $COD_LOTE ?? '';
+                $oeRegistro->NRO_LINEA = $NRO_LINEA ?? '';
+                $oeRegistro->TXT_DETALLE_PRODUCTO = $TXT_DETALLE_PRODUCTO ?? '';
+                $oeRegistro->TXT_NOMBRE_PRODUCTO = $TXT_NOMBRE_PRODUCTO ?? '';
+                $oeRegistro->CAN_PRODUCTO = $CAN_PRODUCTO ?? 0;
+                $oeRegistro->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO ?? '';
                 $oeRegistro->save();
             }
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $error = true;
-            $mensaje = 'ocurrio un error inesperado ' . $ex;
+            $mensaje = 'Error al guardar: ' . $ex->getMessage() . ' (Línea ' . $ex->getLine() . ')';
         }
 
         $datos = [
@@ -15440,10 +15455,47 @@ class GestionOCContabilidadController extends Controller
         $idoc = $request['idoc'];
         $idcheckbox = $request['idcheckbox'];
 
-        $oeProducto = CMPDetalleProducto::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc)->where('COD_LOTE', $COD_LOTE)->where('NRO_LINEA', $NRO_LINEA)->first();
+        $oeProductoQuery = CMPDetalleProducto::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc);
+        if ($COD_LOTE != '') {
+            $oeProductoQuery = $oeProductoQuery->where('COD_LOTE', $COD_LOTE);
+        }
+        if ($NRO_LINEA != '') {
+            $oeProductoQuery = $oeProductoQuery->where('NRO_LINEA', $NRO_LINEA);
+        }
+        $oeProducto = $oeProductoQuery->first();
+
+        if (!$oeProducto) {
+            $oeProducto = (object)[
+                'COD_PRODUCTO' => $COD_PRODUCTO,
+                'COD_TABLA' => $idoc,
+                'CAN_PRODUCTO' => $CAN_PRODUCTO,
+                'TXT_NOMBRE_PRODUCTO' => $TXT_NOMBRE_PRODUCTO,
+                'NRO_LINEA' => $NRO_LINEA,
+            ];
+        }
+
         $combo_categoria_activo_fijo = ['' => 'SELECCIONE OPCION'] + $this->funciones->combo_categoria_activo_fijo();
-        $oeProductoAF = CMPDetalleProductoAF::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc)->where('NRO_LINEA', $oeProducto->NRO_LINEA)->first();
+        
+        $oeProductoAFQuery = CMPDetalleProductoAF::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc);
+        
+        if (!empty($COD_LOTE)) {
+            $oeProductoAFQuery->where('COD_LOTE', $COD_LOTE);
+        }
+        
+        if (empty($NRO_LINEA)) {
+            $oeProductoAFQuery->where(function ($query) {
+                $query->whereNull('NRO_LINEA')
+                      ->orWhere('NRO_LINEA', '')
+                      ->orWhere('NRO_LINEA', '0');
+            });
+        } else {
+            $oeProductoAFQuery->where('NRO_LINEA', $NRO_LINEA);
+        }
+        
+        $oeProductoAF = $oeProductoAFQuery->first();
+        
         $select_categoria_id = ($oeProductoAF) ? $oeProductoAF->COD_CAT_ACTFIJO : '';
+        
         return View::make('comprobante/modal/ajax/mcategoriaactivofijo',
             [
                 'COD_PRODUCTO' => $COD_PRODUCTO,

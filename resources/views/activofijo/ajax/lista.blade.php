@@ -12,35 +12,36 @@
       <tr>
         <td class="rigth">
           <div class="btn-group btn-hspace">
-            <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
-            <ul role="menu" class="dropdown-menu pull-right">
-              <li>
-                <a href="#" class="btn-editar-activo" 
-                   data-id="{{$item->id}}" 
-                   data-item_ple="{{$item->item_ple}}" 
-                   data-nombre="{{$item->nombre}}" 
-                   data-cantidad="{{$item->cantidad}}" 
-                   data-estado="{{$item->estado}}" 
-                   data-tipo="{{ $item->tipo_activo }}"
-                   data-marca="{{ $item->marca }}"
-                   data-modelo="{{ $item->modelo }}"
-                   data-numero_serie="{{ $item->numero_serie }}"
-                   data-factura="{{ $item->factura }}"
-                   data-fecha_emision="{{ $item->fecha_emision }}"
-                   data-base_de_calculo="{{ $item->base_de_calculo }}"
-                   data-depreciacion_acumulada="{{ $item->depreciacion_acumulada }}"
-                   data-fecha_inicio_depreciacion="{{ $item->fecha_inicio_depreciacion }}"
-                   data-ultima_fecha_depreciacion="{{ $item->ultima_fecha_depreciacion }}"
-                   data-cod_centro="{{ $item->cod_centro }}">
-                  Editar
-                </a>
-              </li>
-              <li>
-                <a href="#" class="btn-eliminar-activo" data-id="{{$item->id}}">
-                  Eliminar
-                </a>
-              </li>
-            </ul>
+            @if(isset($permisos) && $permisos['modificar'] == 1)
+            <button type="button" class="btn btn-primary btn-xs btn-editar-activo"
+               data-id="{{$item->id}}" 
+               data-item_ple="{{$item->item_ple}}" 
+               data-nombre="{{$item->nombre}}" 
+               data-cantidad="{{$item->cantidad}}" 
+               data-estado="{{$item->estado}}" 
+               data-tipo="{{ $item->tipo_activo }}"
+               data-marca="{{ $item->marca }}"
+               data-modelo="{{ $item->modelo }}"
+               data-numero_serie="{{ $item->numero_serie }}"
+               data-factura="{{ $item->factura }}"
+               data-fecha_emision="{{ $item->fecha_emision }}"
+               data-base_de_calculo="{{ $item->base_de_calculo }}"
+               data-depreciacion_acumulada="{{ $item->depreciacion_acumulada }}"
+               data-fecha_inicio_depreciacion="{{ $item->fecha_inicio_depreciacion }}"
+               data-ultima_fecha_depreciacion="{{ $item->ultima_fecha_depreciacion }}"
+               data-cod_centro="{{ $item->cod_centro }}"
+               data-toggle="tooltip" data-placement="top" title="Editar">
+              <i class="mdi mdi-edit"></i>
+            </button>
+            @endif
+
+            @if(isset($permisos) && $permisos['eliminar'] == 1)
+            <button type="button" class="btn btn-danger btn-xs btn-eliminar-activo" 
+               data-id="{{$item->id}}"
+               data-toggle="tooltip" data-placement="top" title="Eliminar">
+              <i class="mdi mdi-delete"></i>
+            </button>
+            @endif
           </div>
         </td>
         <td>{{$item->item_ple}}</td>
