@@ -1703,7 +1703,13 @@ class GestionUsuarioContactoController extends Controller
                             $TOTAL_OTROS_IMPUESTOS = $cabecera['TOTAL_OTROS_IMPUESTOS'];
 
                             $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
-                            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+                            $moneda_asiento_conversion_aux = !empty($COD_CATEGORIA_MONEDA_CONVERSION)
+                                ? CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA_CONVERSION)->first()
+                                : $moneda_asiento_aux;
+
+                            if (!$moneda_asiento_conversion_aux) {
+                                $moneda_asiento_conversion_aux = $moneda_asiento_aux;
+                            }
 
                             if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
                                 $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
@@ -1715,6 +1721,20 @@ class GestionUsuarioContactoController extends Controller
                             $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO)->first();
                             $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                             $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
+
+                            // Validar duplicados antes de insertar
+                            $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $TXT_CATEGORIA_TIPO_ASIENTO)
+                                ->first();
+
+                            if ($asiento_existente) {
+                                DB::rollback();
+                                return Redirect::back()->withInput()->with('errorurl', 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $TXT_CATEGORIA_TIPO_ASIENTO . '). Código existente: ' . $asiento_existente->COD_ASIENTO);
+                            }
 
                             if ($generar) {
                                 $codAsiento = $this->ejecutarAsientosIUDConSalida(
@@ -6457,5 +6477,46 @@ class GestionUsuarioContactoController extends Controller
         }
     }
 
+
+    public function actionAjaxValidarAsientoDuplicado(Request $request)
+    {
+        $asientos_json = $request->input('asientos');
+        $asientos = json_decode($asientos_json, true);
+
+        if (is_array($asientos)) {
+            foreach ($asientos as $detalle) {
+                $cabeceras = json_decode($detalle['cabecera'], true);
+                if (is_array($cabeceras)) {
+                    foreach ($cabeceras as $cabecera) {
+                        $txt_referencia = $cabecera['TXT_REFERENCIA'];
+                        $txt_tipo_referencia = $cabecera['TXT_TIPO_REFERENCIA'];
+                        $cod_estado = $cabecera['COD_ESTADO'];
+                        $cod_categoria_tipo_asiento = $cabecera['COD_CATEGORIA_TIPO_ASIENTO'];
+                        $txt_categoria_tipo_asiento = $cabecera['TXT_CATEGORIA_TIPO_ASIENTO'];
+
+                        $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                            ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                            ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                            ->where('COD_ESTADO', '=', $cod_estado)
+                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                            ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $txt_categoria_tipo_asiento)
+                            ->first();
+
+                        if ($asiento_existente) {
+                            return response()->json([
+                                'status' => 'error',
+                                'titulo' => 'ASIENTO DUPLICADO',
+                                'tipo' => 'red',
+                                'boton' => 'btn-red',
+                                'mensaje' => 'Ya existe un asiento registrado con la misma referencia (' . $txt_referencia . '), tipo de referencia (' . $txt_tipo_referencia . ') y tipo de asiento (' . $txt_categoria_tipo_asiento . '). Código existente: ' . $asiento_existente->COD_ASIENTO
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json(['status' => 'success']);
+    }
 
 }

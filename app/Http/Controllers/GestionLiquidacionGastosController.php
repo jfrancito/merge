@@ -2553,11 +2553,12 @@ class GestionLiquidacionGastosController extends Controller
                         $TOTAL_OTROS_IMPUESTOS = $detalle['TOTAL_OTROS_IMPUESTOS'];
 
                         $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
-                        $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+                        $moneda_asiento_conversion_aux = !empty($COD_CATEGORIA_MONEDA_CONVERSION)
+                            ? CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA_CONVERSION)->first()
+                            : $moneda_asiento_aux;
 
-                        if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                            $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                            $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+                        if (!$moneda_asiento_conversion_aux) {
+                            $moneda_asiento_conversion_aux = $moneda_asiento_aux;
                         }
 
                         $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $COD_EMPR_CLI)->first();
@@ -2722,16 +2723,25 @@ class GestionLiquidacionGastosController extends Controller
                         ->where('AST2.GLOSA_EXTORNO', '<>', 'COMPENSACION');
                 })
                     ->where('LG.ID_DOCUMENTO', $iddocumento)
-                ->whereNull('AST2.COD_ASIENTO')
+                ->whereNotNull('AST2.COD_ASIENTO')
                 ->get();
 
                 if (count($lista) <> count($tdetliquidaciongastos)) {
-                    return Redirect::back()->with('errorurl', 'La liquidacion de gastos no tiene todos sus asientos creados');
+                    DB::rollback();
+                    return response()->json([
+                        'status' => 'error',
+                        'mensaje' => 'La liquidacion de gastos no tiene todos sus asientos creados',
+                        'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
+                    ]);
                 }
 
                 if ($liquidaciongastos->IND_OBSERVACION == 1) {
                     DB::rollback();
-                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                    return response()->json([
+                        'status' => 'error',
+                        'mensaje' => 'El documento esta observado no se puede observar',
+                        'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
+                    ]);
                 }
 
                 $descripcion = $request['descripcion'];
@@ -3114,11 +3124,12 @@ class GestionLiquidacionGastosController extends Controller
                 $TOTAL_OTROS_IMPUESTOS = $cabecera['TOTAL_OTROS_IMPUESTOS'];
 
                 $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+                $moneda_asiento_conversion_aux = !empty($COD_CATEGORIA_MONEDA_CONVERSION)
+                    ? CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA_CONVERSION)->first()
+                    : $moneda_asiento_aux;
 
-                if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                    $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                    $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+                if (!$moneda_asiento_conversion_aux) {
+                    $moneda_asiento_conversion_aux = $moneda_asiento_aux;
                 }
 
                 $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $COD_EMPR_CLI)->first();
@@ -3126,6 +3137,27 @@ class GestionLiquidacionGastosController extends Controller
                 $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO)->first();
                 $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                 $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
+
+                // Validar duplicados solo al insertar
+                if ($indicador === 'I') {
+                    $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                        ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                        ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                        ->where('COD_ESTADO', '=', 1)
+                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                        ->first();
+
+                    if ($asiento_existente) {
+                        DB::rollback();
+                        return response()->json([
+                            'status' => 'error',
+                            'titulo' => 'ASIENTO DUPLICADO',
+                            'tipo' => 'red',
+                            'boton' => 'btn-red',
+                            'mensaje' => 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $tipo_asiento->NOM_CATEGORIA . '). Código existente: ' . $asiento_existente->COD_ASIENTO
+                        ]);
+                    }
+                }
 
                 $codAsiento = $this->ejecutarAsientosIUDConSalidaSIC(
                     $indicador,

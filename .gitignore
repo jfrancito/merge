@@ -19,3 +19,5 @@ app/Http/Controllers/DocumentoApiController.php
 /public/firmas
 /config/database.php
 /config/mail.php
+/public/public/
+/public/js/file/img/

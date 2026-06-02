@@ -305,6 +305,7 @@ class GestionOCController extends Controller
                 'documentohistorial' => $documentohistorial,
                 'data_cod_extorno' => $data_cod_extorno,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'ajax' => true,
             ]
         );
@@ -722,6 +723,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -852,6 +854,7 @@ class GestionOCController extends Controller
                 'combo_operacion' => $combo_operacion,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'fecha_inicio' => $fecha_inicio,
                 'fecha_fin' => $fecha_fin,
                 'area_id' => $area_id,
@@ -1038,6 +1041,7 @@ class GestionOCController extends Controller
                 'operacion_id' => $operacion_id,
 
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'cod_empresa' => $cod_empresa,
                 'listadatos' => $listadatos,
                 'procedencia' => $procedencia,
@@ -1083,6 +1087,7 @@ class GestionOCController extends Controller
                 'combo_operacion' => $combo_operacion,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
 
@@ -1199,6 +1204,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -1700,6 +1706,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2737,6 +2744,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2816,6 +2824,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2888,6 +2897,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -3377,6 +3387,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -4211,6 +4222,7 @@ class GestionOCController extends Controller
                 'rutaorden' => $rutaorden,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -7747,6 +7759,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );
@@ -7849,6 +7862,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );
@@ -7979,6 +7993,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );

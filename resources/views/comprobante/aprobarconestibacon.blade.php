@@ -87,7 +87,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="device_info" id='device_info'>
-
+                                                <input name="intencion" id="intencion" value="Aprobar">
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
                                                 @include('comprobante.form.formaprobarcontestibamoca')

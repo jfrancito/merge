@@ -345,7 +345,7 @@ var _isSafari = function ()
 
 
 // Excel - Pre-defined strings to build a minimal XLSX file
-var excelStrings = {
+window.excelStrings = {
 	"_rels/.rels": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\
 	<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>\
@@ -354,6 +354,7 @@ var excelStrings = {
 	"xl/_rels/workbook.xml.rels": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\
 	<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>\
+	<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>\
 </Relationships>',
 
 	"[Content_Types].xml": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
@@ -363,6 +364,7 @@ var excelStrings = {
 	<Default Extension="jpeg" ContentType="image/jpeg"/>\
 	<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>\
 	<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\
+	<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>\
 </Types>',
 
 	"xl/workbook.xml": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
@@ -382,7 +384,39 @@ var excelStrings = {
 	<sheetData>\
 		__DATA__\
 	</sheetData>\
-</worksheet>'
+	__MERGE__\
+</worksheet>',
+
+	"xl/styles.xml": '<?xml version="1.0" encoding="UTF-8"?>\
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\
+  <fonts count="3">\
+    <font><name val="Calibri"/><sz val="11"/></font>\
+    <font><name val="Calibri"/><sz val="11"/><b/><color rgb="FFFFFFFF"/></font>\
+    <font><name val="Calibri"/><sz val="16"/><b/><color rgb="FFFFFFFF"/></font>\
+  </fonts>\
+  <fills count="4">\
+    <fill><patternFill patternType="none"/></fill>\
+    <fill><patternFill patternType="gray125"/></fill>\
+    <fill><patternFill patternType="solid"><fgColor rgb="FF2563EB"/><bgColor indexed="64"/></patternFill></fill>\
+    <fill><patternFill patternType="solid"><fgColor rgb="FF0F172A"/><bgColor indexed="64"/></patternFill></fill>\
+  </fills>\
+  <borders count="2">\
+    <border><left/><right/><top/><bottom/><diagonal/></border>\
+    <border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border>\
+  </borders>\
+  <cellStyleXfs count="1">\
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>\
+  </cellStyleXfs>\
+  <cellXfs count="4">\
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>\
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>\
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/>\
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>\
+  </cellXfs>\
+  <cellStyles count="1">\
+    <cellStyle name="Normal" xfId="0" builtinId="0"/>\
+  </cellStyles>\
+</styleSheet>'
 };
 
 
@@ -520,13 +554,14 @@ DataTable.ext.buttons.excelHtml5 = {
 		// Set the text
 		var xml = '';
 		var data = dt.buttons.exportData( config.exportOptions );
-		var addRow = function ( row ) {
+		var addRow = function ( row, isHeader ) {
 			var cells = [];
 
 			for ( var i=0, ien=row.length ; i<ien ; i++ ) {
+				var style = isHeader ? ' s="1"' : ' s="2"';
 				cells.push( $.isNumeric( row[i] ) ?
-					'<c t="n"><v>'+row[i]+'</v></c>' :
-					'<c t="inlineStr"><is><t>'+
+					'<c t="n"'+style+'><v>'+row[i]+'</v></c>' :
+					'<c t="inlineStr"'+style+'><is><t>'+
 						row[i].replace(/&(?!amp;)/g, '&amp;')+
 					'</t></is></c>'
 				);
@@ -535,16 +570,30 @@ DataTable.ext.buttons.excelHtml5 = {
 			return '<row>'+cells.join('')+'</row>';
 		};
 
+		if ( config.title && config.title !== '*' ) {
+			var titleText = typeof config.title === 'function' ? config.title() : config.title;
+			if ( titleText !== '' ) {
+				xml += '<row><c t="inlineStr" s="3"><is><t>'+titleText+'</t></is></c></row>';
+			}
+		}
+
 		if ( config.header ) {
-			xml += addRow( data.header );
+			xml += addRow( data.header, true );
 		}
 
 		for ( var i=0, ien=data.body.length ; i<ien ; i++ ) {
-			xml += addRow( data.body[i] );
+			xml += addRow( data.body[i], false );
 		}
 
 		if ( config.footer ) {
 			xml += addRow( data.footer );
+		}
+		
+		var mergeStr = '';
+		if ( config.title && config.title !== '*' && config.title !== '' ) {
+		    var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+		    var endCol = letters[Math.min(data.header.length - 1, 25)];
+		    mergeStr = '<mergeCells count="1"><mergeCell ref="A1:' + endCol + '1"/></mergeCells>';
 		}
 
 		var zip           = new window.JSZip();
@@ -553,14 +602,17 @@ DataTable.ext.buttons.excelHtml5 = {
 		var xl_rels       = zip.folder("xl/_rels");
 		var xl_worksheets = zip.folder("xl/worksheets");
 
-		zip.file(           '[Content_Types].xml', excelStrings['[Content_Types].xml'] );
-		_rels.file(         '.rels',               excelStrings['_rels/.rels'] );
-		xl.file(            'workbook.xml',        excelStrings['xl/workbook.xml'] );
-		xl_rels.file(       'workbook.xml.rels',   excelStrings['xl/_rels/workbook.xml.rels'] );
-		xl_worksheets.file( 'sheet1.xml',          excelStrings['xl/worksheets/sheet1.xml'].replace( '__DATA__', xml ) );
+		zip.file(           '[Content_Types].xml', window.excelStrings['[Content_Types].xml'] );
+		_rels.file(         '.rels',               window.excelStrings['_rels/.rels'] );
+		xl.file(            'workbook.xml',        window.excelStrings['xl/workbook.xml'] );
+		xl.file(            'styles.xml',          window.excelStrings['xl/styles.xml'] );
+		xl_rels.file(       'workbook.xml.rels',   window.excelStrings['xl/_rels/workbook.xml.rels'] );
+		xl_worksheets.file( 'sheet1.xml',          window.excelStrings['xl/worksheets/sheet1.xml'].replace( '__DATA__', xml ).replace( '__MERGE__', mergeStr ) );
 
+		var blob = zip.generate( {type:"blob"} );
+		var excelBlob = new Blob([blob], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 		_saveAs(
-			zip.generate( {type:"blob"} ),
+			excelBlob,
 			_filename( config )
 		);
 	},

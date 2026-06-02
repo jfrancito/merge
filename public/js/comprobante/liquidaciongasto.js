@@ -1,6 +1,139 @@
 $(document).ready(function () {
     let carpeta = $("#carpeta").val();
 
+    function sincronizarCabeceraDesdeUI(arrayCabecera, esReparable = false) {
+        if (!arrayCabecera || !Array.isArray(arrayCabecera) || arrayCabecera.length === 0) return arrayCabecera;
+
+        let sufijo = esReparable ? '_reparable' : '';
+
+        let selectedMoneda = $('#moneda_asiento' + sufijo).val();
+        let tc_value = parseFloat($('#tipo_cambio_asiento' + sufijo).val() || '0') || 0;
+        let periodo = $('#periodo_asiento' + sufijo).val();
+        let fecha = $('#fecha_asiento' + sufijo).val();
+        let glosa = $('#glosa_asiento' + sufijo).val();
+        let tipo_asiento = $('#tipo_asiento' + sufijo).val();
+
+        let empresa_el = document.querySelector('#empresa_asiento' + sufijo);
+        let proveedor = empresa_el ? empresa_el.value : '';
+        let proveedor_txt = '';
+        if (empresa_el && empresa_el.tomselect && empresa_el.tomselect.options && empresa_el.tomselect.options[proveedor]) {
+            proveedor_txt = empresa_el.tomselect.options[proveedor].text;
+        }
+
+        let tipo_doc = $('#tipo_documento_asiento' + sufijo).val();
+        let serie = $('#serie_asiento' + sufijo).val();
+        let numero = $('#numero_asiento' + sufijo).val();
+
+        let tipo_doc_ref = $('#tipo_documento_ref' + sufijo).val();
+        let serie_ref = $('#serie_ref_asiento' + sufijo).val();
+        let numero_ref = $('#numero_ref_asiento' + sufijo).val();
+
+        let tipo_desc = $('#tipo_descuento_asiento' + sufijo).val();
+        let constancia = $('#const_detraccion_asiento' + sufijo).val();
+        let fecha_desc = $('#fecha_detraccion_asiento' + sufijo).val();
+        let porcentaje = parseFloat($('#porcentaje_detraccion' + sufijo).val() || '0') || 0;
+        let total_desc = parseFloat($('#total_detraccion_asiento' + sufijo).val() || '0') || 0;
+
+        arrayCabecera.forEach(item => {
+            if (selectedMoneda !== undefined && selectedMoneda !== null) {
+                item.COD_CATEGORIA_MONEDA = 'MON0000000000001';
+                item.COD_CATEGORIA_MONEDA_CONVERSION = (selectedMoneda === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
+            }
+            if (!isNaN(tc_value)) {
+                item.CAN_TIPO_CAMBIO = tc_value;
+            }
+            if (periodo !== undefined && periodo !== null) {
+                item.COD_PERIODO = periodo;
+            }
+            if (fecha) {
+                item.FEC_ASIENTO = fecha;
+            }
+            if (glosa !== undefined && glosa !== null) {
+                item.TXT_GLOSA = glosa;
+            }
+            if (tipo_asiento !== undefined && tipo_asiento !== null) {
+                item.COD_CATEGORIA_TIPO_ASIENTO = tipo_asiento;
+            }
+            if (proveedor !== undefined && proveedor !== null) {
+                item.COD_EMPR_CLI = proveedor;
+                item.TXT_EMPR_CLI = proveedor_txt;
+            }
+            if (tipo_doc !== undefined && tipo_doc !== null) {
+                item.COD_CATEGORIA_TIPO_DOCUMENTO = tipo_doc;
+            }
+            if (serie !== undefined && serie !== null) {
+                item.NRO_SERIE = serie;
+            }
+            if (numero !== undefined && numero !== null) {
+                item.NRO_DOC = numero;
+            }
+            if (tipo_doc_ref !== undefined && tipo_doc_ref !== null) {
+                item.COD_CATEGORIA_TIPO_DOCUMENTO_REF = tipo_doc_ref;
+            }
+            if (serie_ref !== undefined && serie_ref !== null) {
+                item.NRO_SERIE_REF = serie_ref;
+            }
+            if (numero_ref !== undefined && numero_ref !== null) {
+                item.NRO_DOC_REF = numero_ref;
+            }
+            if (tipo_desc !== undefined && tipo_desc !== null) {
+                item.COD_CATEGORIA_TIPO_DETRACCION = tipo_desc;
+            }
+            if (constancia !== undefined && constancia !== null) {
+                item.NRO_DETRACCION = constancia;
+            }
+            if (fecha_desc) {
+                item.FEC_DETRACCION = fecha_desc;
+            }
+            if (!isNaN(porcentaje)) {
+                item.CAN_DESCUENTO_DETRACCION = porcentaje;
+            }
+            if (!isNaN(total_desc)) {
+                item.CAN_TOTAL_DETRACCION = total_desc;
+            }
+        });
+
+        return arrayCabecera;
+    }
+
+    function ordenarYRenumerarDetalle(arrayDetalle) {
+        if (!arrayDetalle || !Array.isArray(arrayDetalle)) return arrayDetalle;
+        arrayDetalle.sort((a, b) => {
+            let statusA = parseInt(a.COD_ESTADO) || 0;
+            let statusB = parseInt(b.COD_ESTADO) || 0;
+            if (statusA !== statusB) {
+                return statusB - statusA;
+            }
+
+            let isDestA = (parseInt(a.IND_PRODUCTO) === 2 || a.IND_PRODUCTO === '2') ? 1 : 0;
+            let isDestB = (parseInt(b.IND_PRODUCTO) === 2 || b.IND_PRODUCTO === '2') ? 1 : 0;
+            if (isDestA !== isDestB) {
+                return isDestA - isDestB;
+            }
+
+            let hasDebitA = (parseFloat(a.CAN_DEBE_MN) > 0 || parseFloat(a.CAN_DEBE_ME) > 0) ? 1 : 0;
+            let hasDebitB = (parseFloat(b.CAN_DEBE_MN) > 0 || parseFloat(b.CAN_DEBE_ME) > 0) ? 1 : 0;
+            if (hasDebitA !== hasDebitB) {
+                return hasDebitB - hasDebitA;
+            }
+
+            let lineA = parseInt(a.NRO_LINEA) || 9999;
+            let lineB = parseInt(b.NRO_LINEA) || 9999;
+            return lineA - lineB;
+        });
+
+        let activeLineCount = 0;
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                activeLineCount++;
+                item.NRO_LINEA = activeLineCount.toString();
+            }
+        });
+
+        return arrayDetalle;
+    }
+
+
     $('.pnlasientos').hide();
     $('.pnl-asiento-reparable').hide();
 
@@ -71,10 +204,11 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: carpeta + "/obtener-periodo-tipo-cambio",
-            data: {_token: _token, fecha: fecha},
+            data: { _token: _token, fecha: fecha },
             success: function (res) {
                 $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
 
+                $("#anio_asiento_reparable").data('pending-period', res.periodo.trim());
                 window.selects['anio_asiento_reparable'].setSelected(res.anio.trim());
                 $('#anio_asiento_reparable').trigger('change');
 
@@ -217,12 +351,32 @@ $(document).ready(function () {
             alerterrorajax("Seleccione un anio.");
             return false;
         }
-        data = {
+        let data = {
             _token: _token,
             anio: anio
         };
 
-        ajax_normal_combo(data, "/ajax-combo-periodo-xanio-xempresareparable", "ajax_anio_asiento_reparable")
+        $(".ajax_anio_asiento_reparable").html("");
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ajax-combo-periodo-xanio-xempresareparable",
+            data: data,
+            success: function (htmlResponse) {
+                cerrarcargando();
+                $(".ajax_anio_asiento_reparable").html(htmlResponse);
+
+                let pending = $("#anio_asiento_reparable").data('pending-period');
+                if (pending && window.selects['periodo_asiento_reparable']) {
+                    window.selects['periodo_asiento_reparable'].setSelected(pending.trim());
+                    $("#anio_asiento_reparable").removeData('pending-period');
+                }
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                error500(xhr);
+            }
+        });
 
     });
 
@@ -263,6 +417,10 @@ $(document).ready(function () {
                 }
             });
             return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento_reparable").value;
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
@@ -363,14 +521,11 @@ $(document).ready(function () {
             }
         });
 
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+        arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, true);
+        document.getElementById("asiento_cabecera_reparable").value = JSON.stringify(arrayCabecera);
         document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
-
-        let table = $('#asientodetallereparable').DataTable();
-        let row = $(this).closest('tr');
-        table.row(row).remove().draw();
-
-        //$(this).closest("tr").remove();
-
+        verAsientoReparable(arrayCabecera, arrayDetalle);
     });
 
     $(".agregar-linea-reparable").on('click', function (e) {
@@ -454,8 +609,8 @@ $(document).ready(function () {
         let glosa_cuenta = texto.split(" - ")[1];
 
         let asiento_id_editar = $('#asiento_id_editar_reparable').val();
-        let moneda_id_editar = $('#moneda_id_editar_reparable').val();
-        let tc_editar = $('#tc_editar_reparable').val();
+        let moneda_id_editar = $('#moneda_asiento_reparable').val();
+        let tc_editar = parseFloat($('#tipo_cambio_asiento_reparable').val().toString().replace(/,/g, "")) || 0;
 
         let arrayDetalle = null;
         let can_debe_mn = 0.0000;
@@ -549,7 +704,7 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
-                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                     item.TXT_CUENTA_CONTABLE = numero_cuenta;
                     item.TXT_GLOSA = glosa_cuenta;
@@ -568,52 +723,11 @@ $(document).ready(function () {
             }
         });
 
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+        arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, true);
+        document.getElementById("asiento_cabecera_reparable").value = JSON.stringify(arrayCabecera);
         document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
-        // Después de actualizar arrayDetalle
-        let table = $('#asientodetallereparable').DataTable();
-
-        $("#asientodetallereparable tbody tr").each(function () {
-            let fila = $(this);
-            let codAsiento = fila.attr('data_codigo');
-
-            if (codAsiento === asiento_id_editar) {
-                // obtenemos el índice de la fila
-                let rowIdx = table.row(fila).index();
-
-                // actualizamos celdas por columna
-                table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-            }
-        });
-
-// redibujar la tabla → esto dispara footerCallback y recalcula totales
-        table.columns.adjust().draw();
-        /*
-        $("#asientodetallereparable tbody tr").each(function () {
-            let fila = $(this);
-
-            // buscamos en la fila el hidden con el id del asiento
-            let codAsiento = fila.attr('data_codigo');
-
-            if (codAsiento === asiento_id_editar) {
-                // Actualizar las celdas visibles de la tabla
-                fila.find(".col-cuenta").text(numero_cuenta);
-                fila.find(".col-glosa").text(glosa_cuenta);
-                fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-            }
-        });*/
-
-        $('.editarcuentasreparable').toggle("slow");
-        $('.tablageneralreparable').toggle("slow", function () {
-            $('#asientodetallereparable').DataTable().columns.adjust().draw();
-        });
+        verAsientoReparable(arrayCabecera, arrayDetalle);
     });
 
     $(".btn-registrar-movimiento-reparable").on('click', function (e) {
@@ -630,8 +744,8 @@ $(document).ready(function () {
         let glosa_cuenta = texto.split(" - ")[1];
 
         let asiento_id_editar = $('#asiento_id_editar_reparable').val();
-        let moneda_id_editar = $('#moneda_id_editar_reparable').val();
-        let tc_editar = $('#tc_editar_reparable').val();
+        let moneda_id_editar = $('#moneda_asiento_reparable').val();
+        let tc_editar = parseFloat($('#tipo_cambio_asiento_reparable').val().toString().replace(/,/g, "")) || 0;
 
         let arrayDetalle = null;
         let can_debe_mn = 0.0000;
@@ -765,38 +879,11 @@ $(document).ready(function () {
 
         arrayDetalle.push(nuevoMovimiento);
 
-        let table = $('#asientodetallereparable').DataTable();
-
-        // Crear la fila con atributos y estilos
-        let nuevaFila = `
-            <tr class="fila" data_codigo="${asiento_id_editar}"
-                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td class="col-codigo">${asiento_id_editar}</td>
-                <td class="col-cuenta">${numero_cuenta}</td>
-                <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
-                        ✏ Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
-                        🗑 Eliminar
-                    </button>
-                </td>
-            </tr>
-        `;
-
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+        arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, true);
+        document.getElementById("asiento_cabecera_reparable").value = JSON.stringify(arrayCabecera);
         document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
-        // Después de actualizar arrayDetalle
-        table.row.add($(nuevaFila)).draw(false);
-
-        $('.editarcuentasreparable').toggle("slow");
-        $('.tablageneralreparable').toggle("slow", function () {
-            table.columns.adjust().draw();
-        });
+        verAsientoReparable(arrayCabecera, arrayDetalle);
     });
 
     $(".btn-eliminar-asiento-reparable").on('click', function (e) {
@@ -948,17 +1035,17 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Anio", valor: anio_asiento},
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Anio", valor: anio_asiento },
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -1034,7 +1121,8 @@ $(document).ready(function () {
         }
 
         arrayCabecera.forEach(item => {
-            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
+            item.COD_CATEGORIA_MONEDA = 'MON0000000000001'; // Siempre soles
+            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
             item.FEC_ASIENTO = new Date(fecha_asiento);
             item.COD_PERIODO = periodo_asiento;
@@ -1123,10 +1211,11 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: carpeta + "/obtener-periodo-tipo-cambio",
-            data: {_token: _token, fecha: fecha},
+            data: { _token: _token, fecha: fecha },
             success: function (res) {
                 $('#tipo_cambio_asiento').val(res.tipoCambio);
 
+                $("#anio_asiento").data('pending-period', res.periodo.trim());
                 window.selects['anio_asiento'].setSelected(res.anio.trim());
                 $('#anio_asiento').trigger('change');
 
@@ -1533,12 +1622,32 @@ $(document).ready(function () {
             alerterrorajax("Seleccione un anio.");
             return false;
         }
-        data = {
+        let data = {
             _token: _token,
             anio: anio
         };
 
-        ajax_normal_combo(data, "/ajax-combo-periodo-xanio-xempresa", "ajax_anio_asiento")
+        $(".ajax_anio_asiento").html("");
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ajax-combo-periodo-xanio-xempresa",
+            data: data,
+            success: function (htmlResponse) {
+                cerrarcargando();
+                $(".ajax_anio_asiento").html(htmlResponse);
+
+                let pending = $("#anio_asiento").data('pending-period');
+                if (pending && window.selects['periodo_asiento']) {
+                    window.selects['periodo_asiento'].setSelected(pending.trim());
+                    $("#anio_asiento").removeData('pending-period');
+                }
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                error500(xhr);
+            }
+        });
 
     });
 
@@ -1757,17 +1866,17 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            {nombre: "Anio", valor: anio_asiento},
-            {nombre: "Periodo", valor: periodo_asiento},
-            {nombre: "Comprobante", valor: comprobante_asiento},
-            {nombre: "Moneda", valor: moneda_id_editar},
-            {nombre: "Tipo de Cambio", valor: tc_editar},
-            {nombre: "Proveedor", valor: proveedor_asiento},
-            {nombre: "Tipo Asiento", valor: tipo_asiento},
-            {nombre: "Fecha", valor: fecha_asiento},
-            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-            {nombre: "Serie", valor: serie_comprobante},
-            {nombre: "Número", valor: numero_comprobante},
+            { nombre: "Anio", valor: anio_asiento },
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
         ];
 
         // Recorremos y validamos
@@ -1843,7 +1952,8 @@ $(document).ready(function () {
         }
 
         arrayCabecera.forEach(item => {
-            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
+            item.COD_CATEGORIA_MONEDA = 'MON0000000000001'; // Siempre soles
+            item.COD_CATEGORIA_MONEDA_CONVERSION = (moneda_id_editar === 'MON0000000000002') ? 'MON0000000000002' : 'MON0000000000001';
             item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
             item.FEC_ASIENTO = new Date(fecha_asiento);
             item.COD_PERIODO = periodo_asiento;
@@ -1978,13 +2088,18 @@ $(document).ready(function () {
                             },
                             success: function (res) {
                                 debugger;
+                                if (res.status === 'error') {
+                                    crearNotificacion(res.mensaje, res.titulo || 'Error', res.tipo || 'red', res.boton || 'btn-red');
+                                    cerrarcargando();
+                                    return;
+                                }
                                 let asientoUnificado = [
                                     res.cabecera,
                                     res.detalle
                                 ];
                                 $('#tblactivos tbody tr').each(function () {
                                     if ($(this).hasClass('activofl')) {
-                                        if(tipo_operacion === 'C'){
+                                        if (tipo_operacion === 'C') {
                                             $(this).attr('data_asiento_compra', JSON.stringify(asientoUnificado));
                                         } else {
                                             $(this).attr('data_asiento_reversion', JSON.stringify(asientoUnificado));
@@ -2075,8 +2190,8 @@ $(document).ready(function () {
 
         let asiento_id_editar = $('#asiento_id_editar').val();
         let form_id_editar = $('#form_id_editar').val();
-        let moneda_id_editar = $('#moneda_id_editar').val();
-        let tc_editar = $('#tc_editar').val();
+        let moneda_id_editar = $('#moneda_asiento').val();
+        let tc_editar = parseFloat($('#tipo_cambio_asiento').val().toString().replace(/,/g, "")) || 0;
 
         let arrayDetalle = null;
         let arrayCabecera = null;
@@ -2216,11 +2331,11 @@ $(document).ready(function () {
         $.confirm({
             title: '¿Confirmar Registro del Movimiento?',
             content: '¿Está seguro de registrar el movimiento con los siguientes datos?<br><br>' +
-                     '<b>Cuenta Contable:</b> ' + texto + '<br>' +
-                     '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
-                     '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
-                     '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
-                     '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
+                '<b>Cuenta Contable:</b> ' + texto + '<br>' +
+                '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
+                '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
             buttons: {
                 confirmar: function () {
                     arrayDetalle.push(nuevoMovimiento);
@@ -2280,34 +2395,10 @@ $(document).ready(function () {
 
                     total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
 
-                    // Crear la fila con atributos y estilos
-                    let nuevaFila = `
-                        <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
-                            data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                            <td class="col-codigo">${asiento_id_editar}</td>
-                            <td class="col-cuenta">${numero_cuenta}</td>
-                            <td class="col-glosa">${glosa_cuenta}</td>
-                            <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
-                            <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
-                            <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
-                            <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                                    ✏ Editar
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                                    🗑 Eliminar
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-
-                    let table = $('#asientodetalle').DataTable();
-
                     switch (form_id_editar) {
                         case 'C':
                             arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                            // Recorrerlo
+                            arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, false);
                             arrayCabecera.forEach(item => {
                                 item.TOTAL_BASE_IMPONIBLE = base_imponible;
                                 item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
@@ -2319,30 +2410,9 @@ $(document).ready(function () {
                             });
                             document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
                             document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                            // Después de actualizar arrayDetalle
-                            table = $('#asientodetalle').DataTable();
-                            table.row.add($(nuevaFila)).draw(false);
-                            //$("#asientodetalle tbody").append(nuevaFila);
-                            $("#asientototales tbody tr").each(function () {
-                                let fila = $(this);
-
-                                // Actualizar las celdas visibles de la tabla
-                                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                                fila.find(".col-igv").text(number_format(total_igv, 4));
-                                fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                                fila.find(".col-total").text(number_format(total, 4));
-
-                            });
+                            verAsiento(arrayCabecera, arrayDetalle);
                             break;
                     }
-                    $('.editarcuentas').toggle("slow");
-                    $('.tablageneral').toggle("slow", function () {
-                        $('#asientodetalle').DataTable().columns.adjust().draw();
-                    });
                 },
                 cancelar: function () {
                     // Do nothing
@@ -2367,8 +2437,8 @@ $(document).ready(function () {
 
         let asiento_id_editar = $('#asiento_id_editar').val();
         let form_id_editar = $('#form_id_editar').val();
-        let moneda_id_editar = $('#moneda_id_editar').val();
-        let tc_editar = $('#tc_editar').val();
+        let moneda_id_editar = $('#moneda_asiento').val();
+        let tc_editar = parseFloat($('#tipo_cambio_asiento').val().toString().replace(/,/g, "")) || 0;
 
         let arrayDetalle = null;
         let arrayCabecera = null;
@@ -2476,11 +2546,11 @@ $(document).ready(function () {
         $.confirm({
             title: '¿Confirmar Modificación del Movimiento?',
             content: '¿Está seguro de modificar el movimiento con los siguientes datos?<br><br>' +
-                     '<b>Cuenta Contable:</b> ' + texto + '<br>' +
-                     '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
-                     '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
-                     '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
-                     '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
+                '<b>Cuenta Contable:</b> ' + texto + '<br>' +
+                '<b>Partida:</b> ' + ($("#partida_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                '<b>Monto:</b> ' + $('#monto').val() + '<br>' +
+                '<b>Tipo IGV:</b> ' + ($("#tipo_igv_id option:selected").text().trim() || 'No seleccionado') + '<br>' +
+                '<b>% IGV:</b> ' + (porc_afecto_igv && porc_afecto_igv !== '0' ? porc_afecto_igv + '%' : 'No aplica'),
             buttons: {
                 confirmar: function () {
                     let base_imponible = 0.0000;
@@ -2495,7 +2565,7 @@ $(document).ready(function () {
                     // Recorrerlo
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
-                            if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                            if (item.COD_ASIENTO_MOVIMIENTO.trim() === asiento_id_editar.trim()) {
                                 item.COD_CUENTA_CONTABLE = cuenta_contable_id;
                                 item.TXT_CUENTA_CONTABLE = numero_cuenta;
                                 item.TXT_GLOSA = glosa_cuenta;
@@ -2557,7 +2627,7 @@ $(document).ready(function () {
                     switch (form_id_editar) {
                         case 'C':
                             arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                            // Recorrerlo
+                            arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, false);
                             arrayCabecera.forEach(item => {
                                 item.TOTAL_BASE_IMPONIBLE = base_imponible;
                                 item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
@@ -2569,66 +2639,9 @@ $(document).ready(function () {
                             });
                             document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
                             document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                            // Después de actualizar arrayDetalle
-                            let table = $('#asientodetalle').DataTable();
-
-                            $("#asientodetalle tbody tr").each(function () {
-                                let fila = $(this);
-                                let codAsiento = fila.attr('data_codigo');
-
-                                if (codAsiento === asiento_id_editar) {
-                                    // obtenemos el índice de la fila
-                                    let rowIdx = table.row(fila).index();
-
-                                    // actualizamos celdas por columna
-                                    table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
-                                    table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
-                                    table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
-                                    table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
-                                    table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
-                                    table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
-                                }
-                            });
-
-                            // redibujar la tabla → esto dispara footerCallback y recalcula totales
-                            table.columns.adjust().draw();
-                            /*
-                            $("#asientodetalle tbody tr").each(function () {
-                                let fila = $(this);
-
-                                // buscamos en la fila el hidden con el id del asiento
-                                let codAsiento = fila.attr('data_codigo');
-
-                                if (codAsiento === asiento_id_editar) {
-                                    // Actualizar las celdas visibles de la tabla
-                                    fila.find(".col-cuenta").text(numero_cuenta);
-                                    fila.find(".col-glosa").text(glosa_cuenta);
-                                    fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
-                                    fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
-                                    fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
-                                    fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
-                                }
-                            });*/
-                            $("#asientototales tbody tr").each(function () {
-                                let fila = $(this);
-
-                                // Actualizar las celdas visibles de la tabla
-                                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                                fila.find(".col-igv").text(number_format(total_igv, 4));
-                                fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                                fila.find(".col-total").text(number_format(total, 4));
-
-                            });
+                            verAsiento(arrayCabecera, arrayDetalle);
                             break;
                     }
-                    $('.editarcuentas').toggle("slow");
-                    $('.tablageneral').toggle("slow", function () {
-                        $('#asientodetalle').DataTable().columns.adjust().draw();
-                    });
                 },
                 cancelar: function () {
                     // Do nothing
@@ -2793,7 +2806,7 @@ $(document).ready(function () {
         switch (data_asiento) {
             case 'C':
                 arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-                // Recorrerlo
+                arrayCabecera = sincronizarCabeceraDesdeUI(arrayCabecera, false);
                 arrayCabecera.forEach(item => {
                     item.TOTAL_BASE_IMPONIBLE = base_imponible;
                     item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
@@ -2805,28 +2818,9 @@ $(document).ready(function () {
                 });
                 document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
                 document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
-                $("#asientototales tbody tr").each(function () {
-                    let fila = $(this);
-
-                    // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                    fila.find(".col-igv").text(number_format(total_igv, 4));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                    fila.find(".col-total").text(number_format(total, 4));
-
-                });
+                verAsiento(arrayCabecera, arrayDetalle);
                 break;
         }
-
-        let table = $('#asientodetalle').DataTable();
-        let row = $(this).closest('tr');
-        table.row(row).remove().draw();
-
-        //$(this).closest("tr").remove();
 
     });
 
@@ -2861,6 +2855,10 @@ $(document).ready(function () {
                 }
             });
             return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            data_tc = document.getElementById("tipo_cambio_asiento").value;
         }
 
         if (!data_tc || parseFloat(data_tc) === 0) {
@@ -3826,7 +3824,7 @@ $(document).ready(function () {
         cerrarcargando();
     });
 
-    $(".liquidaciongasto").on('click','.filalgvalidar', function(e) {
+    $(".liquidaciongasto").on('click', '.filalgvalidar', function (e) {
         event.preventDefault();
         debugger;
         abrircargando();
@@ -3840,193 +3838,193 @@ $(document).ready(function () {
         cerrarcargando();
     });
 
-  /*
-    $(".liquidaciongasto").on('click', '.filalg', function (e) {
-        event.preventDefault();
-        debugger;
-        abrircargando();
-        $('.dtlg').hide();
-        $('.file-preview-frame').hide();
-        $('.filalg').removeClass("ocultar");
-        const data_valor = $(this).attr('data_valor');
-        $('.' + data_valor).show();
-        $('.filalg').removeClass("activofl");
-        $(this).addClass("activofl");
-        let data_valor_id = $(this).attr('data_valor_id');
-
-        let data_asiento_cabecera = $(this).attr('data_asiento_cabecera');
-        let data_asiento_detalle = $(this).attr('data_asiento_detalle');
-
-        let totallg = $(this).find('td').eq(6).text().trim();
-        $('#total_xml').val(totallg);
-
-        if (data_valor_id === '1' && data_asiento_cabecera !== '') {
-            $('#asiento_cabecera_compra').val(data_asiento_cabecera);
-            $('#asiento_detalle_compra').val(data_asiento_detalle);
-
-            let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-            let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
-
-            // Crear la fila con atributos y estilos
-            let nuevaFila = ``;
-
-            let asiento_id_editar = '';
-            let fecha_asiento = new Date();
-            let periodo_asiento = '';
-            let form_id_editar = 'C';
-            let moneda_id_editar = '';
-            let tc_editar = 0.0000;
-            let comprobante_asiento = '';
-            let proveedor_asiento = '';
-            let proveedor_asiento_txt = '';
-            let tipo_asiento = '';
-
-            let numero_cuenta = '';
-            let glosa_cuenta = '';
-            let can_debe_mn = 0.0000;
-            let can_haber_mn = 0.0000;
-            let can_debe_me = 0.0000;
-            let can_haber_me = 0.0000;
-
-            let base_imponible = 0.0000;
-            let base_imponible_10 = 0.0000;
-            let base_ivap = 0.0000;
-            let base_inafecto = 0.0000;
-            let base_exonerado = 0.0000;
-            let total_igv = 0.0000;
-            let total_ivap = 0.0000;
-            let total = 0.0000;
-            let tipo_comprobante = '';
-            let serie_comprobante = '';
-            let numero_comprobante = '';
-            let tipo_comprobante_ref = '';
-            let serie_comprobante_ref = '';
-            let numero_comprobante_ref = '';
-            let glosa_asiento = '';
-            let tipo_descuento = '';
-            let constancia_des = '';
-            let fecha_des = '';
-            let porcentaje_des = '';
-            let total_des = '';
-
-            arrayCabecera.forEach(item => {
-                moneda_id_editar = item.COD_CATEGORIA_MONEDA;
-                tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
-                fecha_asiento = new Date(item.FEC_ASIENTO);
-                periodo_asiento = item.COD_PERIODO;
-                proveedor_asiento = item.COD_EMPR_CLI;
-                proveedor_asiento_txt = item.TXT_EMPR_CLI;
-                tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
-                tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
-                serie_comprobante = item.NRO_SERIE;
-                numero_comprobante = item.NRO_DOC;
-                tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
-                serie_comprobante_ref = item.NRO_SERIE_REF;
-                numero_comprobante_ref = item.NRO_DOC_REF;
-                glosa_asiento = item.TXT_GLOSA;
-                tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
-                constancia_des = item.NRO_DETRACCION;
-                fecha_des = item.FEC_DETRACCION;
-                porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
-                total_des = item.CAN_TOTAL_DESCUENTO;
-                comprobante_asiento = item.TXT_REFERENCIA + '-' + item.CODIGO_CONTABLE;
-                base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
-                base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
-                base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
-                base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
-                base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
-                total_igv = parseFloat(item.TOTAL_IGV);
-                total_ivap = parseFloat(item.TOTAL_IVAP);
-                total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
-            });
-
-            $("#asientototales tbody tr").each(function () {
-                let fila = $(this);
-
-                // Actualizar las celdas visibles de la tabla
-                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
-                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
-                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
-                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
-                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
-                fila.find(".col-igv").text(number_format(total_igv, 4));
-                fila.find(".col-ivap").text(number_format(total_ivap, 4));
-                fila.find(".col-total").text(number_format(total, 4));
-
-            });
-
-            let table = $('#asientodetalle').DataTable();
-
-            table.clear().draw();
-
-            arrayDetalle.forEach(item => {
-                if (parseInt(item.COD_ESTADO) === 1) {
-                    asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
-                    numero_cuenta = item.TXT_CUENTA_CONTABLE;
-                    glosa_cuenta = item.TXT_GLOSA;
-                    can_debe_mn = parseFloat(item.CAN_DEBE_MN);
-                    can_haber_mn = parseFloat(item.CAN_HABER_MN);
-                    can_debe_me = parseFloat(item.CAN_DEBE_ME);
-                    can_haber_me = parseFloat(item.CAN_HABER_ME);
-                    nuevaFila = `
-            <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
-                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td class="col-codigo">${asiento_id_editar}</td>
-                <td class="col-cuenta">${numero_cuenta}</td>
-                <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                        ✏ Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                        🗑 Eliminar
-                    </button>
-                </td>
-            </tr>
-        `;
-                    table.row.add($(nuevaFila)).draw(false);
-
-                }
-            });
-
-            let anio = fecha_asiento.getFullYear();
-
-            //$('#anio_asiento').val(anio.toString()).trigger('change');
-
-            window.selects['anio_asiento'].setSelected(anio.toString());
-            window.selects['moneda_asiento'].setSelected(moneda_id_editar.trim());
-
-            document.querySelector('#empresa_asiento').tomselect.addOption({
-                id: proveedor_asiento,
-                text: proveedor_asiento_txt
-            });
-            document.querySelector('#empresa_asiento').tomselect.setValue(proveedor_asiento.trim());
-
-            window.selects['tipo_asiento'].setSelected(tipo_asiento.trim());
-            window.selects['tipo_documento_asiento'].setSelected(tipo_comprobante.trim());
-            window.selects['tipo_documento_ref'].setSelected(tipo_comprobante_ref.trim());
-            window.selects['tipo_descuento_asiento'].setSelected(tipo_descuento.trim());
-            $('#anio_asiento').trigger('change');
-            $('#moneda_asiento').trigger('change');
-            $('#tipo_asiento').trigger('change');
-            $('#tipo_documento_asiento').trigger('change');
-            $('#tipo_documento_ref').trigger('change');
-            $('#tipo_descuento_asiento').trigger('change');
-
-            $('#comprobante_asiento').val(comprobante_asiento);
-            $('#tipo_cambio_asiento').val(tc_editar);
-
-            /*
-            $('#comprobante_asiento').val(comprobante_asiento);
-            $('#moneda_asiento').val(moneda_id_editar).trigger('change');
-            $('#tipo_cambio_asiento').val(tc_editar);
-            $('#empresa_asiento').val(proveedor_asiento).trigger('change');
-            $('#tipo_asiento').val(tipo_asiento).trigger('change');
-            */
+    /*
+      $(".liquidaciongasto").on('click', '.filalg', function (e) {
+          event.preventDefault();
+          debugger;
+          abrircargando();
+          $('.dtlg').hide();
+          $('.file-preview-frame').hide();
+          $('.filalg').removeClass("ocultar");
+          const data_valor = $(this).attr('data_valor');
+          $('.' + data_valor).show();
+          $('.filalg').removeClass("activofl");
+          $(this).addClass("activofl");
+          let data_valor_id = $(this).attr('data_valor_id');
+  
+          let data_asiento_cabecera = $(this).attr('data_asiento_cabecera');
+          let data_asiento_detalle = $(this).attr('data_asiento_detalle');
+  
+          let totallg = $(this).find('td').eq(6).text().trim();
+          $('#total_xml').val(totallg);
+  
+          if (data_valor_id === '1' && data_asiento_cabecera !== '') {
+              $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+              $('#asiento_detalle_compra').val(data_asiento_detalle);
+  
+              let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+              let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+  
+              // Crear la fila con atributos y estilos
+              let nuevaFila = ``;
+  
+              let asiento_id_editar = '';
+              let fecha_asiento = new Date();
+              let periodo_asiento = '';
+              let form_id_editar = 'C';
+              let moneda_id_editar = '';
+              let tc_editar = 0.0000;
+              let comprobante_asiento = '';
+              let proveedor_asiento = '';
+              let proveedor_asiento_txt = '';
+              let tipo_asiento = '';
+  
+              let numero_cuenta = '';
+              let glosa_cuenta = '';
+              let can_debe_mn = 0.0000;
+              let can_haber_mn = 0.0000;
+              let can_debe_me = 0.0000;
+              let can_haber_me = 0.0000;
+  
+              let base_imponible = 0.0000;
+              let base_imponible_10 = 0.0000;
+              let base_ivap = 0.0000;
+              let base_inafecto = 0.0000;
+              let base_exonerado = 0.0000;
+              let total_igv = 0.0000;
+              let total_ivap = 0.0000;
+              let total = 0.0000;
+              let tipo_comprobante = '';
+              let serie_comprobante = '';
+              let numero_comprobante = '';
+              let tipo_comprobante_ref = '';
+              let serie_comprobante_ref = '';
+              let numero_comprobante_ref = '';
+              let glosa_asiento = '';
+              let tipo_descuento = '';
+              let constancia_des = '';
+              let fecha_des = '';
+              let porcentaje_des = '';
+              let total_des = '';
+  
+              arrayCabecera.forEach(item => {
+                  moneda_id_editar = item.COD_CATEGORIA_MONEDA;
+                  tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
+                  fecha_asiento = new Date(item.FEC_ASIENTO);
+                  periodo_asiento = item.COD_PERIODO;
+                  proveedor_asiento = item.COD_EMPR_CLI;
+                  proveedor_asiento_txt = item.TXT_EMPR_CLI;
+                  tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
+                  tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
+                  serie_comprobante = item.NRO_SERIE;
+                  numero_comprobante = item.NRO_DOC;
+                  tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
+                  serie_comprobante_ref = item.NRO_SERIE_REF;
+                  numero_comprobante_ref = item.NRO_DOC_REF;
+                  glosa_asiento = item.TXT_GLOSA;
+                  tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
+                  constancia_des = item.NRO_DETRACCION;
+                  fecha_des = item.FEC_DETRACCION;
+                  porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
+                  total_des = item.CAN_TOTAL_DESCUENTO;
+                  comprobante_asiento = item.TXT_REFERENCIA + '-' + item.CODIGO_CONTABLE;
+                  base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
+                  base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
+                  base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
+                  base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
+                  base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
+                  total_igv = parseFloat(item.TOTAL_IGV);
+                  total_ivap = parseFloat(item.TOTAL_IVAP);
+                  total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
+              });
+  
+              $("#asientototales tbody tr").each(function () {
+                  let fila = $(this);
+  
+                  // Actualizar las celdas visibles de la tabla
+                  fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                  fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                  fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                  fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                  fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                  fila.find(".col-igv").text(number_format(total_igv, 4));
+                  fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                  fila.find(".col-total").text(number_format(total, 4));
+  
+              });
+  
+              let table = $('#asientodetalle').DataTable();
+  
+              table.clear().draw();
+  
+              arrayDetalle.forEach(item => {
+                  if (parseInt(item.COD_ESTADO) === 1) {
+                      asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
+                      numero_cuenta = item.TXT_CUENTA_CONTABLE;
+                      glosa_cuenta = item.TXT_GLOSA;
+                      can_debe_mn = parseFloat(item.CAN_DEBE_MN);
+                      can_haber_mn = parseFloat(item.CAN_HABER_MN);
+                      can_debe_me = parseFloat(item.CAN_DEBE_ME);
+                      can_haber_me = parseFloat(item.CAN_HABER_ME);
+                      nuevaFila = `
+              <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                  data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                  <td class="col-codigo">${asiento_id_editar}</td>
+                  <td class="col-cuenta">${numero_cuenta}</td>
+                  <td class="col-glosa">${glosa_cuenta}</td>
+                  <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                  <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                  <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                  <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                  <td>
+                      <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                          ✏ Editar
+                      </button>
+                      <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                          🗑 Eliminar
+                      </button>
+                  </td>
+              </tr>
+          `;
+                      table.row.add($(nuevaFila)).draw(false);
+  
+                  }
+              });
+  
+              let anio = fecha_asiento.getFullYear();
+  
+              //$('#anio_asiento').val(anio.toString()).trigger('change');
+  
+              window.selects['anio_asiento'].setSelected(anio.toString());
+              window.selects['moneda_asiento'].setSelected(moneda_id_editar.trim());
+  
+              document.querySelector('#empresa_asiento').tomselect.addOption({
+                  id: proveedor_asiento,
+                  text: proveedor_asiento_txt
+              });
+              document.querySelector('#empresa_asiento').tomselect.setValue(proveedor_asiento.trim());
+  
+              window.selects['tipo_asiento'].setSelected(tipo_asiento.trim());
+              window.selects['tipo_documento_asiento'].setSelected(tipo_comprobante.trim());
+              window.selects['tipo_documento_ref'].setSelected(tipo_comprobante_ref.trim());
+              window.selects['tipo_descuento_asiento'].setSelected(tipo_descuento.trim());
+              $('#anio_asiento').trigger('change');
+              $('#moneda_asiento').trigger('change');
+              $('#tipo_asiento').trigger('change');
+              $('#tipo_documento_asiento').trigger('change');
+              $('#tipo_documento_ref').trigger('change');
+              $('#tipo_descuento_asiento').trigger('change');
+  
+              $('#comprobante_asiento').val(comprobante_asiento);
+              $('#tipo_cambio_asiento').val(tc_editar);
+  
+              /*
+              $('#comprobante_asiento').val(comprobante_asiento);
+              $('#moneda_asiento').val(moneda_id_editar).trigger('change');
+              $('#tipo_cambio_asiento').val(tc_editar);
+              $('#empresa_asiento').val(proveedor_asiento).trigger('change');
+              $('#tipo_asiento').val(tipo_asiento).trigger('change');
+              */
     /*
             // Formatear a YYYY-MM-DD
             let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
@@ -4084,7 +4082,7 @@ $(document).ready(function () {
 
     });
 
-    $(document).on('change', '.input_asignar', function() {
+    $(document).on('change', '.input_asignar', function () {
         let $checkbox = $(this);
         let $fila = $checkbox.closest('tr');
         let $contenedorForm = $('.pnl-asiento-reparable');
@@ -4226,7 +4224,7 @@ $(document).ready(function () {
                     $.ajax({
                         type: "POST",
                         url: url,
-                        data: {_token: token, detalles: detalles, descripcion: descripcion},
+                        data: { _token: token, detalles: detalles, descripcion: descripcion },
                         success: function (res) {
                             if (res.status === "success") {
                                 $.alert({
@@ -4561,7 +4559,7 @@ $(document).ready(function () {
     function limpiarxml() {
         $('#serie, #numero, #totaldetalle, #fecha_emision').prop('readonly', false);
         $('#fecha_emision').css('pointer-events', 'auto').datetimepicker('enable');
-        $('.input-group-addon').css({'pointer-events': 'auto', 'cursor': 'pointer'});
+        $('.input-group-addon').css({ 'pointer-events': 'auto', 'cursor': 'pointer' });
         $('#empresa_id').prop({
             'readonly': false,
             'disabled': false  // Asegurar que no esté deshabilitado
@@ -4828,7 +4826,7 @@ $(document).ready(function () {
                     return false;
                 }
 
-            }else{
+            } else {
 
                 if (tipodoc_id == 'TDO0000000000070') {
 
@@ -5070,6 +5068,10 @@ $(document).ready(function () {
     });
 
     function verAsientoReparable(arrayCabecera, arrayDetalle) {
+        arrayDetalle = ordenarYRenumerarDetalle(arrayDetalle);
+        if (document.getElementById("asiento_detalle_reparable")) {
+            document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+        }
         const limpiar = (valor, tipo = 'texto') => {
             // Si es null o undefined
             if (valor === null || valor === undefined) {
@@ -5147,7 +5149,12 @@ $(document).ready(function () {
         arrayCabecera.forEach(item => {
             // --- TEXTOS / SELECTS ---
             asiento_id = limpiar(item.COD_ASIENTO);
-            moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            let moneda_conversion = limpiar(item.COD_CATEGORIA_MONEDA_CONVERSION);
+            if (moneda_conversion === 'MON0000000000002') {
+                moneda_id_editar = 'MON0000000000002';
+            } else {
+                moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            }
             periodo_asiento = limpiar(item.COD_PERIODO);
             proveedor_asiento = limpiar(item.COD_EMPR_CLI);
             proveedor_asiento_txt = limpiar(item.TXT_EMPR_CLI);
@@ -5187,6 +5194,15 @@ $(document).ready(function () {
                 total = limpiar(item.CAN_TOTAL_DEBE, 'numero');
             }
         });
+
+        if (moneda_id_editar === '') {
+            let el = document.getElementById("moneda_asiento_reparable");
+            moneda_id_editar = (el && el.value) ? el.value : 'MON0000000000001';
+        }
+        if (tc_editar === 0) {
+            let el = document.getElementById("tipo_cambio_asiento_reparable");
+            tc_editar = (el && el.value) ? parseFloat(el.value) || 0 : 0;
+        }
 
         if (asiento_id === undefined || asiento_id === null || asiento_id === '') {
             $('#operacion_reparable').val('insertar');
@@ -5264,6 +5280,7 @@ $(document).ready(function () {
 
         let anioActual = new Date().getFullYear();
 
+        $("#anio_asiento_reparable").data('pending-period', periodo_asiento);
         window.selects['anio_asiento_reparable'].setSelected(anio !== undefined && anio !== null && anio !== '' ? anio.toString() : anioActual.toString());
         window.selects['moneda_asiento_reparable'].setSelected(moneda_id_editar.trim());
 
@@ -5319,6 +5336,10 @@ $(document).ready(function () {
     }
 
     function verAsiento(arrayCabecera, arrayDetalle) {
+        arrayDetalle = ordenarYRenumerarDetalle(arrayDetalle);
+        if (document.getElementById("asiento_detalle_compra")) {
+            document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+        }
         const limpiar = (valor, tipo = 'texto') => {
             // Si es null o undefined
             if (valor === null || valor === undefined) {
@@ -5396,7 +5417,12 @@ $(document).ready(function () {
         arrayCabecera.forEach(item => {
             // --- TEXTOS / SELECTS ---
             asiento_id = limpiar(item.COD_ASIENTO);
-            moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            let moneda_conversion = limpiar(item.COD_CATEGORIA_MONEDA_CONVERSION);
+            if (moneda_conversion === 'MON0000000000002') {
+                moneda_id_editar = 'MON0000000000002';
+            } else {
+                moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            }
             periodo_asiento = limpiar(item.COD_PERIODO);
             proveedor_asiento = limpiar(item.COD_EMPR_CLI);
             proveedor_asiento_txt = limpiar(item.TXT_EMPR_CLI);
@@ -5436,6 +5462,15 @@ $(document).ready(function () {
                 total = limpiar(item.CAN_TOTAL_DEBE, 'numero');
             }
         });
+
+        if (moneda_id_editar === '') {
+            let el = document.getElementById("moneda_asiento");
+            moneda_id_editar = (el && el.value) ? el.value : 'MON0000000000001';
+        }
+        if (tc_editar === 0) {
+            let el = document.getElementById("tipo_cambio_asiento");
+            tc_editar = (el && el.value) ? parseFloat(el.value) || 0 : 0;
+        }
 
         if (asiento_id === undefined || asiento_id === null || asiento_id === '') {
             $('#operacion').val('insertar');
@@ -5530,6 +5565,7 @@ $(document).ready(function () {
 
         let anioActual = new Date().getFullYear();
 
+        $("#anio_asiento").data('pending-period', periodo_asiento);
         window.selects['anio_asiento'].setSelected(anio !== undefined && anio !== null && anio !== '' ? anio.toString() : anioActual.toString());
         window.selects['moneda_asiento'].setSelected(moneda_id_editar.trim());
 
