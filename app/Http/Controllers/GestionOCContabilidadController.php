@@ -23,6 +23,7 @@ use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\SGDUsuario;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
+use App\Modelos\TESOperacionCaja;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
