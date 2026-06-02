@@ -2088,6 +2088,11 @@ $(document).ready(function () {
                             },
                             success: function (res) {
                                 debugger;
+                                if (res.status === 'error') {
+                                    crearNotificacion(res.mensaje, res.titulo || 'Error', res.tipo || 'red', res.boton || 'btn-red');
+                                    cerrarcargando();
+                                    return;
+                                }
                                 let asientoUnificado = [
                                     res.cabecera,
                                     res.detalle

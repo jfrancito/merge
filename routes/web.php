@@ -705,6 +705,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-combo-periodo-xanio-xempresa', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresa');
 	Route::any('/ajax-combo-periodo-xanio-xempresareparable', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresaReparable');
+	Route::post('/ajax-validar-asiento-duplicado', 'GestionUsuarioContactoController@actionAjaxValidarAsientoDuplicado');
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
 

@@ -17,6 +17,45 @@ $(document).ready(function () {
 
     var carpeta = $("#carpeta").val();
 
+    function validarAsientoDuplicadoYEnviar(callbackSubmit) {
+        let asientosVal = $('#asientosgenerados').val();
+        if (asientosVal && asientosVal !== '[]') {
+            abrircargando();
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/ajax-validar-asiento-duplicado",
+                data: {
+                    _token: $('#token').val(),
+                    asientos: asientosVal
+                },
+                success: function (res) {
+                    cerrarcargando();
+                    if (res.status === 'error') {
+                        $.alert({
+                            title: res.titulo || 'Error',
+                            content: res.mensaje,
+                            type: res.tipo || 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: res.boton || 'btn-red'
+                                }
+                            }
+                        });
+                    } else {
+                        callbackSubmit();
+                    }
+                },
+                error: function (xhr) {
+                    cerrarcargando();
+                    error500(xhr);
+                }
+            });
+        } else {
+            callbackSubmit();
+        }
+    }
+
     function sincronizarCabeceraDesdeUI(arrayCabecera, esReparable = false) {
         if (!arrayCabecera || !Array.isArray(arrayCabecera) || arrayCabecera.length === 0) return arrayCabecera;
         
@@ -4032,20 +4071,20 @@ $(document).ready(function () {
                 }
             }
         }
-
         $.confirm({
             title: '¿Confirma la Aprobacion?',
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $("#formpedidoreparable").submit();
+                    validarAsientoDuplicadoYEnviar(function () {
+                        $("#formpedidoreparable").submit();
+                    });
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
                 }
             }
         });
-
     });
 
     $(document).on('click', '.eliminar-fila', function () {
@@ -4098,7 +4137,9 @@ $(document).ready(function () {
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $("#formpedido").submit();
+                    validarAsientoDuplicadoYEnviar(function () {
+                        $("#formpedido").submit();
+                    });
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -4256,7 +4297,9 @@ $(document).ready(function () {
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $("#formpedido").submit();
+                    validarAsientoDuplicadoYEnviar(function () {
+                        $("#formpedido").submit();
+                    });
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -4396,7 +4439,9 @@ $(document).ready(function () {
             buttons: {
                 confirmar: function () {
                     debugger;
-                    $("#formpedido").submit();
+                    validarAsientoDuplicadoYEnviar(function () {
+                        $("#formpedido").submit();
+                    });
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -4536,7 +4581,9 @@ $(document).ready(function () {
             buttons: {
                 confirmar: function () {
                     debugger;
-                    $("#formpedidocomision").submit();
+                    validarAsientoDuplicadoYEnviar(function () {
+                        $("#formpedidocomision").submit();
+                    });
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');

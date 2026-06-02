@@ -5525,6 +5525,8 @@ class GestionOCContabilidadController extends Controller
                 array_push($asiento_reparable, []);
             }
 
+            $operacion = TESOperacionCaja::where('COD_OPERACION_CAJA','=',$fedocumento->TXT_REFERENCIA)->first();
+
             $array_nivel_pc = $this->pc_array_nivel_cuentas_contable(Session::get('empresas')->COD_EMPR, $anio);
             $combo_nivel_pc = $this->gn_generacion_combo_array('Seleccione nivel', '', $array_nivel_pc);
 
@@ -5605,6 +5607,8 @@ class GestionOCContabilidadController extends Controller
 
                     'funciones' => $funciones,
                     'funcion' => $funciones,
+
+                    'operacion' => $operacion,
 
                 ]);
 
