@@ -940,6 +940,115 @@ trait OrdenPedidoTraits
         return $query;
     }
 
+    public function lg_lista_detalle_consolidado_masivo($ids_consolidados)
+    {
+        $query = DB::connection('sqlsrv')
+            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
+                'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
+            ->select(
+                'D.*',
+                'C.COD_ESTADO',
+                'C.COD_EMPR',
+                'C.COD_CENTRO',
+                DB::raw("
+            STUFF((
+                SELECT 
+                    ' [SEP] ' 
+                    + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
+                    + ' [FLD] ' + OP.ID_PEDIDO
+                    + ' [FLD] ' + OP.TXT_AREA
+                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + CAST(SUM(
+                        COALESCE(
+                            OPD.CAN_MODIF_ADM, 
+                            OPD.CAN_MODIF_GER, 
+                            OPD.CAN_MODIF_JEF_AUT, 
+                            OPD.CANTIDAD
+                        )
+                    ) AS VARCHAR(20))
+                    + ' [FLD] ' + ISNULL((
+                        SELECT ' [DOC] ' + ARCH.NOMBRE_ARCHIVO + ' [URI] ' + ARCH.URL_ARCHIVO
+                        FROM dbo.ARCHIVOS ARCH
+                        WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                        AND ARCH.ACTIVO = 1
+                        FOR XML PATH(''), TYPE
+                    ).value('.', 'NVARCHAR(MAX)'), '')
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP
+                    ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                    ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1
+                    AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                GROUP BY 
+                    OP.FEC_PEDIDO,
+                    OP.ID_PEDIDO,
+                    OP.TXT_AREA,
+                    OP.TXT_GLOSA
+                ORDER BY OP.FEC_PEDIDO
+                FOR XML PATH(''), TYPE
+            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA,
+            STUFF((
+                SELECT DISTINCT ', ' + CEN.NOM_CENTRO
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN ALM.CENTRO CEN ON CEN.COD_CENTRO = OP.COD_CENTRO
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_CENTROS,
+            STUFF((
+                SELECT DISTINCT ', ' + OP.TXT_AREA
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_AREAS,
+            STUFF((
+                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OP.TXT_GLOSA,'')
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                    AND ISNULL(OP.TXT_GLOSA,'') <> ''
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_GLOSAS
+        ")
+            )
+            ->whereIn('D.ID_PEDIDO_CONSOLIDADO', $ids_consolidados)
+            ->orderBy('D.ID_PEDIDO_CONSOLIDADO', 'asc')
+            ->orderBy('D.NOM_PRODUCTO', 'asc')
+            ->get();
+
+        return $query;
+    }
+
     private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_pedido, $anio_pedido)
     {
         $empresa_session_id = Session::get('empresas')->COD_EMPR;

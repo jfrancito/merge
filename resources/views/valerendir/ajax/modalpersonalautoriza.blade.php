@@ -173,7 +173,28 @@
             display: inline-block;
             text-align: left;
             vertical-align: middle;
+            vertical-align: middle;
             margin: 0 auto;
+        }
+
+        /* Título Premium */
+        .premium-heading {
+            font-family: 'Montserrat', 'Poppins', 'Segoe UI', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: bold !important;
+            color: #334155 !important;
+            padding-bottom: 16px !important;
+            margin-bottom: 24px !important;
+            border-bottom: 2px solid #edf2f7 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+        .premium-heading i {
+            color: #2a5298 !important;
+            font-size: 17px !important;
         }
     </style>
 @stop
@@ -184,7 +205,9 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default panel-table">
-                    <div class="panel-heading">Registro Personal Autoriza</div>   
+                    <div class="panel-heading premium-heading">
+                        <i class="mdi mdi-account-multiple"></i> Registro Personal Autoriza
+                    </div>   
 
                     <div class="panel-body selectfiltro">
                         <div class='filtrotabla row'>

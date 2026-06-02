@@ -518,4 +518,96 @@ $(document).ready(function() {
         id_consolidado_seleccionado = '';
     });
 
+    // Validación de Checkboxes para que sean del mismo CENTRO y FAMILIA
+    $(document).on('change', '.chk-consolidado', function() {
+        if ($(this).is(':checked')) {
+            var centroActual = $(this).data('centro');
+            var familiaActual = $(this).data('familia');
+            var diferentes = false;
+            
+            $('.chk-consolidado:checked').each(function() {
+                if ($(this).data('centro') !== centroActual || $(this).data('familia') !== familiaActual) {
+                    diferentes = true;
+                    return false; // break loop
+                }
+            });
+
+            if (diferentes) {
+                $(this).prop('checked', false);
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Selección Inválida',
+                    mensaje: 'Solo puede seleccionar consolidados que pertenezcan al mismo <b>CENTRO</b> y a la misma <b>FAMILIA</b>.',
+                    ancho: '400px'
+                });
+            }
+        }
+        
+        // Sincronizar el "check all" visualmente
+        var total = $('.chk-consolidado').length;
+        var checked = $('.chk-consolidado:checked').length;
+        $('#check-all-consolidados').prop('checked', total === checked && total > 0);
+    });
+
+    $(document).on('change', '#check-all-consolidados', function() {
+        var isChecked = $(this).is(':checked');
+        if (!isChecked) {
+            $('.chk-consolidado').prop('checked', false);
+        } else {
+            var checkboxes = $('.chk-consolidado');
+            if (checkboxes.length > 0) {
+                var primerCentro = checkboxes.first().data('centro');
+                var primeraFamilia = checkboxes.first().data('familia');
+                var todosIguales = true;
+                
+                checkboxes.each(function() {
+                    if ($(this).data('centro') !== primerCentro || $(this).data('familia') !== primeraFamilia) {
+                        todosIguales = false;
+                        return false;
+                    }
+                });
+
+                if (todosIguales) {
+                    checkboxes.prop('checked', true);
+                } else {
+                    $(this).prop('checked', false);
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Selección Inválida',
+                        mensaje: 'No puede seleccionar todos a la vez porque la lista contiene consolidados de <b>diferentes CENTROS o FAMILIAS</b>.',
+                        ancho: '400px'
+                    });
+                }
+            }
+        }
+    });
+
+    // Descargar Excel Masivo
+    $(document).on('click', '#btn-descargar-excel-masivo', function(e) {
+        e.preventDefault();
+        
+        var seleccionados = [];
+        $('.chk-consolidado:checked').each(function() {
+            seleccionados.push($(this).val());
+        });
+
+        if (seleccionados.length === 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Sin Selección',
+                mensaje: 'Debe seleccionar al menos un consolidado marcando su casilla para poder descargar el Excel.',
+                ancho: '400px'
+            });
+            return;
+        }
+
+        var ids_str = seleccionados.join(',');
+        var url = carpeta + '/exportar-excel-masivo-consolidado?ids=' + ids_str;
+        
+        window.open(url, '_blank');
+    });
+
 });

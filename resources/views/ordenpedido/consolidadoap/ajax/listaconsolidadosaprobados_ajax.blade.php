@@ -1,6 +1,9 @@
 <table id="tabla-consolidados-aprobados" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap">
   <thead class="background-th-azul">
     <tr>
+      <th class="text-center" style="width: 40px;">
+          <input type="checkbox" id="check-all-consolidados">
+      </th>
       <th class="text-center">ID CONSOLIDADO</th>
       <th>EMPRESA</th>
       <th>CENTRO</th>
@@ -18,6 +21,9 @@
             $familias = $detalles->unique('COD_CATEGORIA_FAMILIA')->pluck('NOM_CATEGORIA_FAMILIA')->implode(', ');
         @endphp
         <tr class="fila-consolidado-ap-aprobado" data-id="{{$item->ID_PEDIDO_CONSOLIDADO}}" style="cursor: pointer;">
+            <td class="text-center" onclick="event.stopPropagation();">
+                <input type="checkbox" class="chk-consolidado" value="{{$item->ID_PEDIDO_CONSOLIDADO}}" data-centro="{{$item->NOM_CENTRO}}" data-familia="{{$familias}}">
+            </td>
             <td class="text-center">{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->NOM_EMPR}}</td>
             <td>{{$item->NOM_CENTRO}}</td>
