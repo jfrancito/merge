@@ -48,6 +48,7 @@ $(document).ready(function () {
                         } catch (e) {}
 
                         table.clear().draw();
+                        $('.botonera-premium').hide();
 
                        
                         const tipos_linea = response.tipos_linea || window.tipos_linea || {};
@@ -102,7 +103,10 @@ $(document).ready(function () {
                                 allowClear: true,
                                 width: '100%'
                             });
+                            
+                            $('.botonera-premium').show();
                         } else {
+                            $('.botonera-premium').hide();
                             $('.ajaxvacio').html(`
                                 <div class="icon-vacio" style="background: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;">
                                     <i class="fa fa-exclamation-circle" style="font-size: 22px;"></i>
@@ -189,6 +193,7 @@ $(document).ready(function () {
 
                     let table = $('#personalautoriza').DataTable();
                     table.clear().draw();
+                    $('.botonera-premium').hide();
                 } else {
                     mostrarAlertaPremium('error', response.message || 'Error inesperado.');
                 }

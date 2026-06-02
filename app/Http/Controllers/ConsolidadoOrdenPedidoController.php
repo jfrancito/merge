@@ -569,6 +569,77 @@ class ConsolidadoOrdenPedidoController extends Controller
         })->export('xls');
     }
 
+    public function actionExportarExcelMasivoConsolidado(Request $request)
+    {
+        set_time_limit(0);
+
+        $ids_str = $request->input('ids');
+        if (empty($ids_str)) {
+            return redirect()->back()->with('error', 'No se proporcionaron consolidados para exportar.');
+        }
+
+        $ids_array = explode(',', $ids_str);
+        
+        $listadetalle_raw = $this->lg_lista_detalle_consolidado_masivo($ids_array);
+
+        // Agrupación de productos requerida por el usuario
+        $listadetalle = collect($listadetalle_raw)->groupBy('COD_PRODUCTO')->map(function ($items) {
+            $primerItem = $items->first();
+            
+            // IDs de consolidado concatenados
+            $ids_concatenados = $items->pluck('ID_PEDIDO_CONSOLIDADO')->unique()->implode(' - ');
+            
+            // Sumatorias
+            $cantidad = $items->sum('CANTIDAD');
+            $stock = $items->sum('STOCK');
+            $reservado = $items->sum('RESERVADO');
+            $diferencia = $items->sum('DIFERENCIA');
+            
+            $can_comprar = $items->sum(function($item) {
+                if (!is_null($item->CAN_COMPRADA)) return $item->CAN_COMPRADA;
+                return $item->DIFERENCIA < 0 ? 0 : $item->DIFERENCIA;
+            });
+            
+            // Áreas (únicas y concatenadas separadas por coma)
+            $areas = $items->pluck('TXT_AREAS')->map(function($a) {
+                return array_map('trim', explode(',', $a));
+            })->flatten()->filter()->unique()->implode(', ');
+            
+            // Glosas (únicas y concatenadas, ya vienen como "AREA : GLOSA" desde SQL)
+            $glosas = $items->pluck('TXT_GLOSAS')->map(function($g) {
+                return array_map('trim', explode(',', $g));
+            })->flatten()->filter()->unique()->implode(', ');
+
+            return (object)[
+                'ID_PEDIDO_CONSOLIDADO' => $ids_concatenados,
+                'COD_PRODUCTO' => $primerItem->COD_PRODUCTO,
+                'NOM_PRODUCTO' => $primerItem->NOM_PRODUCTO,
+                'NOM_CATEGORIA_MEDIDA' => $primerItem->NOM_CATEGORIA_MEDIDA,
+                'NOM_CATEGORIA_FAMILIA' => $primerItem->NOM_CATEGORIA_FAMILIA,
+                'TXT_CENTROS' => $primerItem->TXT_CENTROS,
+                'TXT_AREAS' => $areas,
+                'TXT_GLOSAS' => $glosas,
+                'CANTIDAD' => $cantidad,
+                'STOCK' => $stock,
+                'RESERVADO' => $reservado,
+                'DIFERENCIA' => $diferencia,
+                'CAN_COMPRADA' => $can_comprar
+            ];
+        })->values();
+
+        $titulo = 'Detalle-Consolidado-Masivo';
+        $fecha_actual = date("Y-m-d");
+
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $ids_array) {
+            $excel->sheet('DETALLE MASIVO', function ($sheet) use ($listadetalle, $ids_array) {
+                $sheet->loadView('ordenpedido.excel.listaconsolidadodetallemasivoexcel', [
+                    'listadetalle' => $listadetalle,
+                    'cantidad_consolidados' => count($ids_array)
+                ]);
+            });
+        })->export('xls');
+    }
+
 }
 
 

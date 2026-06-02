@@ -1031,6 +1031,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-buscar-documento-rg', 'RegistroImporteGastosController@actionListarAjaxBuscarDocumentoRG');
 
+	//REGISTRO-IMPORTE-RUTAS
+	Route::get('/gestion-de-importe-rutas/{idopcion}', 'RegistroImporteRutasController@actionRegistroImporteRutas');
+
 	//PATANLLA 1
 
 	Route::get('/gestionar-personal-autoriza/{idopcion}', 'RegistroPersonalAutorizaController@actionRegistroPersonalAutoriza');
@@ -1141,6 +1144,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-eliminar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionAjaxEliminarConsolidado');
 	Route::post('/ajax-guardar-cantidad-comprada-op', 'ConsolidadoOrdenPedidoController@actionAjaxGuardarCantidadComprada');
 	Route::get('/exportar-excel-consolidado/{id_consolidado}', 'ConsolidadoOrdenPedidoController@actionExportarExcelConsolidado');
+	Route::get('/exportar-excel-masivo-consolidado', 'ConsolidadoOrdenPedidoController@actionExportarExcelMasivoConsolidado');
 	Route::post('/ajax-guardar-cantidad-comprada-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxGuardarCantidadCompradaGeneral');
 
 	Route::get('/consolidado-general-orden-pedido/{idopcion}', 'ConsolidadoGeneralOrdenPedidoController@actionConsolidadoGeneralOrdenPedido');

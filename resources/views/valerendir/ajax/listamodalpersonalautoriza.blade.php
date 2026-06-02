@@ -1,8 +1,8 @@
 <div class="panel-contenedor-premium">
 
     <div class="table-responsive">
-        <table id="personalautoriza" class="table table-bordered tabla-personal-premium display nowrap"
-               cellspacing="0" width="100%">
+        <table id="personalautoriza" class="table table-bordered tabla-personal-premium display nowrap" cellspacing="0"
+            width="100%">
             <thead>
                 <tr>
                     <th>Personal</th>
@@ -10,7 +10,7 @@
                     <th>Gerencia</th>
                     <th>Área</th>
                     <th>Cargo</th>
-                    <th data-searchable="false">Autoriza</th>  
+                    <th data-searchable="false">Autoriza</th>
                 </tr>
             </thead>
             <tbody>
@@ -18,9 +18,9 @@
         </table>
     </div>
 
-    <div class="botonera-premium">
+    <div class="botonera-premium" style="display: none;">
         <button type="button" class="btn-guardar-premium" id="btnGuardarPersonal">
-            <i class="fa fa-save"></i> GUARDAR CAMBIOS
+            <i class="fa fa-save"></i> GUARDAR
         </button>
     </div>
 
@@ -29,9 +29,9 @@
 <style>
     /* Contenedor Premium */
     .panel-contenedor-premium {
-        border: 1px solid #eef2f6; 
-        padding: 24px; 
-        border-radius: 12px; 
+        border: 1px solid #eef2f6;
+        padding: 24px;
+        border-radius: 12px;
         background: #ffffff;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
         margin-top: 15px;
@@ -96,21 +96,21 @@
 
     /* Botón Guardar Premium */
     .botonera-premium {
-        text-align: center; 
-        margin-top: 25px;
+        text-align: right;
+        margin-top: 20px;
     }
 
     .btn-guardar-premium {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+        background: linear-gradient(135deg, #0f766e 0%, #059669 100%) !important;
         color: #ffffff !important;
         border: none !important;
-        padding: 12px 30px !important;
-        font-size: 14px !important;
+        padding: 9px 24px !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
-        letter-spacing: 1px !important;
-        border-radius: 8px !important;
+        letter-spacing: 0.5px !important;
+        border-radius: 6px !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3) !important;
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3) !important;
         transition: all 0.3s ease !important;
         display: inline-flex !important;
         align-items: center !important;
@@ -118,13 +118,13 @@
     }
 
     .btn-guardar-premium i {
-        font-size: 16px !important;
+        font-size: 14px !important;
         transition: transform 0.3s ease !important;
     }
 
     .btn-guardar-premium:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4) !important;
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
         filter: brightness(1.05) !important;
     }
 
@@ -134,7 +134,7 @@
 
     .btn-guardar-premium:active {
         transform: translateY(0) !important;
-        box-shadow: 0 4px 10px rgba(56, 239, 125, 0.2) !important;
+        box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2) !important;
     }
 
     /* Responsividad de Tabla */
@@ -220,32 +220,31 @@
     .select2-container--default .select2-selection--single .select2-selection__clear:hover {
         color: #e53e3e !important;
     }
-
 </style>
 
 <script>
-$('#personalautoriza').DataTable({
-    responsive: true,
-    scrollX: true,
-    autoWidth: false,
-    columnDefs: [
-        {
-            targets: 0, // columna “Personal”
-            render: function(data, type, row, meta){
-                if(type === 'filter' || type === 'sort'){
-                    var tmp = document.createElement('div');
-                    tmp.innerHTML = data;
-                    var span = tmp.querySelector('.nombre-personal');
-                    return span ? span.getAttribute('data-personal') : data;
+    $('#personalautoriza').DataTable({
+        responsive: true,
+        scrollX: true,
+        autoWidth: false,
+        columnDefs: [
+            {
+                targets: 0, // columna “Personal”
+                render: function (data, type, row, meta) {
+                    if (type === 'filter' || type === 'sort') {
+                        var tmp = document.createElement('div');
+                        tmp.innerHTML = data;
+                        var span = tmp.querySelector('.nombre-personal');
+                        return span ? span.getAttribute('data-personal') : data;
+                    }
+                    return data;
                 }
-                return data;
             }
+        ],
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
         }
-    ],
-    language: {
-        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-    }
-});
+    });
 
 
 
