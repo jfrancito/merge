@@ -3138,6 +3138,27 @@ class GestionLiquidacionGastosController extends Controller
                 $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                 $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
+                // Validar duplicados solo al insertar
+                if ($indicador === 'I') {
+                    $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                        ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                        ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                        ->where('COD_ESTADO', '=', 1)
+                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                        ->first();
+
+                    if ($asiento_existente) {
+                        DB::rollback();
+                        return response()->json([
+                            'status' => 'error',
+                            'titulo' => 'ASIENTO DUPLICADO',
+                            'tipo' => 'red',
+                            'boton' => 'btn-red',
+                            'mensaje' => 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $tipo_asiento->NOM_CATEGORIA . '). Código existente: ' . $asiento_existente->COD_ASIENTO
+                        ]);
+                    }
+                }
+
                 $codAsiento = $this->ejecutarAsientosIUDConSalidaSIC(
                     $indicador,
                     $COD_ASIENTO,
