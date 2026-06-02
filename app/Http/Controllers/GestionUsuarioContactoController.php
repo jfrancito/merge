@@ -6494,15 +6494,92 @@ class GestionUsuarioContactoController extends Controller
                         $cod_categoria_tipo_asiento = $cabecera['COD_CATEGORIA_TIPO_ASIENTO'];
                         $txt_categoria_tipo_asiento = $cabecera['TXT_CATEGORIA_TIPO_ASIENTO'];
 
+                        /*
                         $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
                             ->where('TXT_REFERENCIA', '=', $txt_referencia)
                             ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
                             ->where('COD_ESTADO', '=', $cod_estado)
                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
                             ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $txt_categoria_tipo_asiento)
+                            ->first();*/
+
+                        if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                            ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                            ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                            ->where('COD_ESTADO', '=', $cod_estado)
+                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
                             ->first();
 
-                        if ($asiento_existente) {
+                        } else {
+
+                            if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                                    ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                                    ->where('COD_ESTADO', '=', $cod_estado)
+                                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                                    ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
+                                    ->first();
+
+                            } else {
+
+                                if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                                        ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                                        ->where('COD_ESTADO', '=', $cod_estado)
+                                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                                        ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
+                                        ->first();
+
+                                } else {
+
+                                    if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                                            ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                                            ->where('COD_ESTADO', '=', $cod_estado)
+                                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                                            ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                                            ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                                            ->first();
+
+                                    } else {
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                                            ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                                            ->where('COD_ESTADO', '=', $cod_estado)
+                                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                                            ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
+                                            ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                                            ->first();
+                                    }
+                                }
+                            }
+                        }
+
+                        if (empty($asiento_busqueda)) {
+
+                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                    ->where('TXT_REFERENCIA', '=', $txt_referencia)
+                                    ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                                    ->where('COD_ESTADO', '=', $cod_estado)
+                                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                                    ->where('TXT_GLOSA', 'NOT LIKE', "%REPARABLE%")
+                                    ->where('TXT_GLOSA', 'NOT LIKE', '%DEDUCCION%')
+                                    ->where('TXT_GLOSA', 'NOT LIKE', '%PERCEPCION%')
+                                    ->first();
+
+                        }
+
+                        if ($asiento_busqueda) {
                             return response()->json([
                                 'status' => 'error',
                                 'titulo' => 'ASIENTO DUPLICADO',
