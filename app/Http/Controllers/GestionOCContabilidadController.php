@@ -998,6 +998,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -1074,7 +1075,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -2154,6 +2155,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -2230,7 +2232,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -3506,6 +3508,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -3582,7 +3585,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -3889,6 +3892,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -3965,7 +3969,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -4647,6 +4651,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -4723,7 +4728,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -6126,6 +6131,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -6202,7 +6208,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -7053,6 +7059,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -7129,7 +7136,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -7824,6 +7831,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -7900,7 +7908,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -8819,6 +8827,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -8895,7 +8904,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -9646,6 +9655,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -9722,7 +9732,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
@@ -10479,6 +10489,7 @@ class GestionOCContabilidadController extends Controller
 
                     foreach ($cabeceras as $cabecera) {
 
+                        /*
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                             $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -10555,7 +10566,7 @@ class GestionOCContabilidadController extends Controller
 
                         } else {
                             break;
-                        }
+                        }*/
 
                         $COD_ASIENTO = $cabecera['COD_ASIENTO'];
                         $COD_EMPR = $cabecera['COD_EMPR'];
