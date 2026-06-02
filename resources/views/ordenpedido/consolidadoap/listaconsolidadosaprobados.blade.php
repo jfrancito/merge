@@ -33,10 +33,21 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="panel panel-default">
-            <div class="panel-heading" style="background-color: #f5f5f5; border-bottom: 2px solid #34aadc; display: flex; justify-content: space-between; align-items: center;">
+            <div class="panel-heading" style="background-color: #f5f5f5; border-bottom: 2px solid #34aadc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h4 style="font-weight: bold; margin: 0; display: flex; align-items: center; gap: 8px; color: #2c3e50;">
                     <i class="mdi mdi-check-circle" style="color: #27ae60; font-size: 22px;"></i> LISTA DE CONSOLIDADOS APROBADOS
                 </h4>
+                
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select id="filtro-centro-aprobados" class="form-control input-sm" style="width: 180px; border-radius: 20px; font-size: 12px;">
+                        <option value="">-- Todos los Centros --</option>
+                    </select>
+                    
+                    <select id="filtro-periodo-aprobados" class="form-control input-sm" style="width: 180px; border-radius: 20px; font-size: 12px;">
+                        <option value="">-- Todos los Periodos --</option>
+                    </select>
+                </div>
+
                 <button type="button" class="btn-excel-premium" id="btn-descargar-excel-masivo">
                     <i class="mdi mdi-file-excel"></i> DESCARGAR EXCEL MASIVO
                 </button>

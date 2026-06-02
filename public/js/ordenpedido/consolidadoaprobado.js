@@ -159,6 +159,8 @@ $(document).ready(function() {
 
         abrircargando();
         $(".container-detalle-consolidado").html(""); // Limpiar detalle anterior
+        $(".container-detalle-consolidados-aprobado").html(""); // Limpiar detalle anterior de aprobados
+        $("#contenedor-detalle-area-producto").hide(); // Ocultar detalle de área anterior
         id_consolidado_seleccionado = ''; // Resetear ID seleccionado
 
         $.ajax({
@@ -178,9 +180,16 @@ $(document).ready(function() {
                 
                 // Extraer la lista de aprobados del contenido oculto y ponerla en su tab
                 var htmlAprobados = $(".container-lista-consolidado").find(".hidden-aprobados-ajax").html();
+                
+                // Destruir instancia previa de DataTable en la pestaña visible para evitar duplicados/errores
+                if ($.fn.DataTable.isDataTable('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados')) {
+                    $('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados').DataTable().destroy();
+                }
+
                 $(".container-lista-aprobados").html(htmlAprobados);
 
                 App.dataTables();
+                initFiltrosAprobados();
                 $('[data-toggle="tooltip"]').tooltip();
             },
             error: function(data) {
@@ -518,15 +527,14 @@ $(document).ready(function() {
         id_consolidado_seleccionado = '';
     });
 
-    // Validación de Checkboxes para que sean del mismo CENTRO y FAMILIA
+    // Validación de Checkboxes para que sean del mismo CENTRO
     $(document).on('change', '.chk-consolidado', function() {
         if ($(this).is(':checked')) {
             var centroActual = $(this).data('centro');
-            var familiaActual = $(this).data('familia');
             var diferentes = false;
             
             $('.chk-consolidado:checked').each(function() {
-                if ($(this).data('centro') !== centroActual || $(this).data('familia') !== familiaActual) {
+                if ($(this).data('centro') !== centroActual) {
                     diferentes = true;
                     return false; // break loop
                 }
@@ -538,46 +546,46 @@ $(document).ready(function() {
                     tipo: 'error',
                     icono: '❌',
                     titulo: 'Selección Inválida',
-                    mensaje: 'Solo puede seleccionar consolidados que pertenezcan al mismo <b>CENTRO</b> y a la misma <b>FAMILIA</b>.',
+                    mensaje: 'Solo puede seleccionar consolidados que pertenezcan al mismo <b>CENTRO</b>.',
                     ancho: '400px'
                 });
             }
         }
         
-        // Sincronizar el "check all" visualmente
-        var total = $('.chk-consolidado').length;
-        var checked = $('.chk-consolidado:checked').length;
-        $('#check-all-consolidados').prop('checked', total === checked && total > 0);
+        // Sincronizar el "check all" visualmente considerando solo elementos visibles
+        var totalVisible = $('.chk-consolidado:visible').length;
+        var checkedVisible = $('.chk-consolidado:visible:checked').length;
+        $('#check-all-consolidados').prop('checked', totalVisible === checkedVisible && totalVisible > 0);
     });
 
     $(document).on('change', '#check-all-consolidados', function() {
         var isChecked = $(this).is(':checked');
+        var checkboxesVisibles = $('.chk-consolidado:visible');
+        
         if (!isChecked) {
-            $('.chk-consolidado').prop('checked', false);
+            checkboxesVisibles.prop('checked', false);
         } else {
-            var checkboxes = $('.chk-consolidado');
-            if (checkboxes.length > 0) {
-                var primerCentro = checkboxes.first().data('centro');
-                var primeraFamilia = checkboxes.first().data('familia');
+            if (checkboxesVisibles.length > 0) {
+                var primerCentro = checkboxesVisibles.first().data('centro');
                 var todosIguales = true;
                 
-                checkboxes.each(function() {
-                    if ($(this).data('centro') !== primerCentro || $(this).data('familia') !== primeraFamilia) {
+                checkboxesVisibles.each(function() {
+                    if ($(this).data('centro') !== primerCentro) {
                         todosIguales = false;
                         return false;
                     }
                 });
 
                 if (todosIguales) {
-                    checkboxes.prop('checked', true);
+                    checkboxesVisibles.prop('checked', true);
                 } else {
                     $(this).prop('checked', false);
                     modalBonito({
                         tipo: 'error',
                         icono: '❌',
                         titulo: 'Selección Inválida',
-                        mensaje: 'No puede seleccionar todos a la vez porque la lista contiene consolidados de <b>diferentes CENTROS o FAMILIAS</b>.',
-                        ancho: '400px'
+                        mensaje: 'No puede seleccionar todos a la vez porque la lista contiene consolidados de <b>diferentes CENTROS</b>. Utilice el filtro superior para listar solo un Centro antes de seleccionar todo.',
+                        ancho: '450px'
                     });
                 }
             }
@@ -609,5 +617,101 @@ $(document).ready(function() {
         
         window.open(url, '_blank');
     });
+
+    // Filtros de DataTables para Centro y Periodo
+    function initFiltrosAprobados() {
+        var $tabla = $('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados');
+        if ($tabla.length === 0) return;
+
+        // Destruir instancia previa si existe para reinicializar limpiamente
+        if ($.fn.DataTable.isDataTable('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados')) {
+            $tabla.DataTable().destroy();
+        }
+
+        // Inicializar DataTable en la tabla visible con configuración premium en español
+        var table = $tabla.DataTable({
+            "paging": false, // Sin paginación, mostrar todo en una sola vista
+            "order": [[1, "desc"]], // Ordenar por ID CONSOLIDADO descendente por defecto
+            "columnDefs": [
+                { "targets": 0, "orderable": false }, // Checkbox
+                { "targets": 8, "orderable": false }  // Acciones
+            ],
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "zeroRecords": "No se encontraron registros coincidentes",
+                "paginate": {
+                    "first": "Primero",
+                    "previous": "Anterior",
+                    "next": "Siguiente",
+                    "last": "Último"
+                }
+            }
+        });
+
+        // Limpiar detalles automáticamente al realizar cualquier filtrado o búsqueda en la tabla
+        table.on('search.dt', function () {
+            $(".container-detalle-consolidado").html("");
+            $(".container-detalle-consolidados-aprobado").html("");
+            $("#contenedor-detalle-area-producto").hide();
+            $('.fila-consolidado-ap, .fila-consolidado-ap-aprobado').removeClass('background-fila-activa');
+            id_consolidado_seleccionado = '';
+        });
+        
+        var indexCentro = 3;
+        var indexPeriodo = 5;
+
+        // Llenar select Centro
+        var centros = table.column(indexCentro).data().unique().sort();
+        var $selectCentro = $('#filtro-centro-aprobados');
+        $selectCentro.find('option:not(:first)').remove();
+        centros.each(function(d) {
+            var textVal = $('<div>').html(d).text().trim();
+            if(textVal) $selectCentro.append('<option value="'+textVal+'">'+textVal+'</option>');
+        });
+
+        // Llenar select Periodo
+        var periodos = table.column(indexPeriodo).data().unique().sort();
+        var $selectPeriodo = $('#filtro-periodo-aprobados');
+        $selectPeriodo.find('option:not(:first)').remove();
+        periodos.each(function(d) {
+            // Eliminar tags HTML si los hay para el value
+            var textVal = $('<div>').html(d).text().trim();
+            if(textVal) $selectPeriodo.append('<option value="'+textVal+'">'+textVal+'</option>');
+        });
+    }
+
+    // Usar document.on para asegurar que el evento persista y funcione con la tabla actualizada
+    $(document).off('change', '#filtro-centro-aprobados, #filtro-periodo-aprobados').on('change', '#filtro-centro-aprobados, #filtro-periodo-aprobados', function() {
+        var table = $('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados').DataTable();
+        var valCentro = $('#filtro-centro-aprobados').val();
+        var valPeriodo = $('#filtro-periodo-aprobados').val();
+        
+        var indexCentro = 3;
+        var indexPeriodo = 5;
+
+        // Si hay valor, buscamos usando la búsqueda por defecto (smart search) que ignora espacios
+        table.column(indexCentro).search(valCentro);
+        table.column(indexPeriodo).search(valPeriodo);
+        
+        table.draw();
+        
+        // Actualizar checkbox global visible
+        var totalVisible = $('.chk-consolidado:visible').length;
+        var checkedVisible = $('.chk-consolidado:visible:checked').length;
+        $('#check-all-consolidados').prop('checked', totalVisible === checkedVisible && totalVisible > 0);
+    });
+
+    // Inicializar al cargar la vista
+    if ($('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados').length > 0) {
+        if (!$.fn.DataTable.isDataTable('#listacotizacionpedidoaprobados #tabla-consolidados-aprobados')) {
+            initFiltrosAprobados();
+        } else {
+            setTimeout(initFiltrosAprobados, 300);
+        }
+    }
 
 });

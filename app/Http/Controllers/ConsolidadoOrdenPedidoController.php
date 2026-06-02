@@ -553,8 +553,67 @@ class ConsolidadoOrdenPedidoController extends Controller
     {
         set_time_limit(0);
 
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $empresa_sesion = Session::get('empresas');
+
+        // Consultamos el centro del trabajador. Quitamos el filtro de empresa_osiris_id
+        // ya que el centro del trabajador es de catálogo global y en platrabajadores puede 
+        // figurar bajo otra empresa asociada.
+        $planilla = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->where('C.COD_ESTADO', 1)
+            ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
+            ->first();
+
+        $cod_centro_usuario = $planilla ? trim($planilla->COD_CENTRO) : '';
+
         $familia_id = 'TODO';
         $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
+
+        if ($cod_centro_usuario !== '') {
+            $listadetalle = collect($listadetalle)->filter(function ($item) use ($cod_centro_usuario) {
+                // 1. Obtener el código de centro de compra guardado en base de datos
+                $item_cod_centro_compra = trim($item->COD_CENTRO_COMPRA ?? '');
+
+                // 2. Si no tiene código de centro de compra en BD, aplicamos reglas fallback en base a IND_COMPRA o empresa
+                if ($item_cod_centro_compra === '') {
+                    $current_ind_compra = trim($item->IND_COMPRA ?? '');
+                    $current_cod_empr   = trim($item->COD_EMPR ?? '');
+                    $current_cod_centro = trim($item->COD_CENTRO ?? '');
+
+                    if ($current_ind_compra !== '') {
+                        if (strcasecmp($current_ind_compra, 'CHICLAYO') === 0) {
+                            $item_cod_centro_compra = 'CEN0000000000001';
+                        } elseif (strcasecmp($current_ind_compra, 'LIMA') === 0) {
+                            $item_cod_centro_compra = 'CEN0000000000002';
+                        } else {
+                            $item_cod_centro_compra = $current_cod_centro;
+                        }
+                    } else {
+                        if ($current_cod_empr === 'IACHEM0000007086') {
+                            $item_cod_centro_compra = 'CEN0000000000001'; // Chiclayo
+                        } elseif ($current_cod_empr === 'IACHEM0000010394') {
+                            if ($current_cod_centro === 'CEN0000000000002') {
+                                $item_cod_centro_compra = 'CEN0000000000002'; // Lima
+                            } elseif ($current_cod_centro === 'CEN0000000000001') {
+                                $item_cod_centro_compra = 'CEN0000000000001'; // Chiclayo
+                            }
+                        }
+                    }
+                }
+
+                // 3. Fallback final: Si sigue sin asignarse, se asume el centro origen del consolidado
+                if ($item_cod_centro_compra === '') {
+                    $item_cod_centro_compra = trim($item->COD_CENTRO ?? '');
+                }
+
+                // 4. Comparar códigos de centros
+                return $item_cod_centro_compra === $cod_centro_usuario;
+            })->values();
+        }
 
         $titulo = 'Detalle-Consolidado-' . $id_consolidado;
         $fecha_actual = date("Y-m-d");
@@ -568,7 +627,6 @@ class ConsolidadoOrdenPedidoController extends Controller
             });
         })->export('xls');
     }
-
     public function actionExportarExcelMasivoConsolidado(Request $request)
     {
         set_time_limit(0);
@@ -578,9 +636,66 @@ class ConsolidadoOrdenPedidoController extends Controller
             return redirect()->back()->with('error', 'No se proporcionaron consolidados para exportar.');
         }
 
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+
+        // Consultamos el centro del trabajador de catálogo global (sin filtrar por empresa_osiris_id)
+        $planilla = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->where('C.COD_ESTADO', 1)
+            ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
+            ->first();
+
+        $cod_centro_usuario = $planilla ? trim($planilla->COD_CENTRO) : '';
+
         $ids_array = explode(',', $ids_str);
         
         $listadetalle_raw = $this->lg_lista_detalle_consolidado_masivo($ids_array);
+
+        // Filtrar dinámicamente por la zona/sede del usuario logueado usando códigos únicos de centros
+        if ($cod_centro_usuario !== '') {
+            $listadetalle_raw = collect($listadetalle_raw)->filter(function ($item) use ($cod_centro_usuario) {
+                // 1. Obtener el código de centro de compra guardado en base de datos
+                $item_cod_centro_compra = trim($item->COD_CENTRO_COMPRA ?? '');
+
+                // 2. Si no tiene código de centro de compra en BD, aplicamos reglas fallback en base a IND_COMPRA o empresa
+                if ($item_cod_centro_compra === '') {
+                    $current_ind_compra = trim($item->IND_COMPRA ?? '');
+                    $current_cod_empr   = trim($item->COD_EMPR ?? '');
+                    $current_cod_centro = trim($item->COD_CENTRO ?? '');
+
+                    if ($current_ind_compra !== '') {
+                        if (strcasecmp($current_ind_compra, 'CHICLAYO') === 0) {
+                            $item_cod_centro_compra = 'CEN0000000000001';
+                        } elseif (strcasecmp($current_ind_compra, 'LIMA') === 0) {
+                            $item_cod_centro_compra = 'CEN0000000000002';
+                        } else {
+                            $item_cod_centro_compra = $current_cod_centro;
+                        }
+                    } else {
+                        if ($current_cod_empr === 'IACHEM0000007086') {
+                            $item_cod_centro_compra = 'CEN0000000000001'; // Chiclayo
+                        } elseif ($current_cod_empr === 'IACHEM0000010394') {
+                            if ($current_cod_centro === 'CEN0000000000002') {
+                                $item_cod_centro_compra = 'CEN0000000000002'; // Lima
+                            } elseif ($current_cod_centro === 'CEN0000000000001') {
+                                $item_cod_centro_compra = 'CEN0000000000001'; // Chiclayo
+                            }
+                        }
+                    }
+                }
+
+                // 3. Fallback final: Si sigue sin asignarse, se asume el centro origen del consolidado
+                if ($item_cod_centro_compra === '') {
+                    $item_cod_centro_compra = trim($item->COD_CENTRO ?? '');
+                }
+
+                // 4. Comparar códigos de centros
+                return $item_cod_centro_compra === $cod_centro_usuario;
+            })->values();
+        }
 
         // Agrupación de productos requerida por el usuario
         $listadetalle = collect($listadetalle_raw)->groupBy('COD_PRODUCTO')->map(function ($items) {
