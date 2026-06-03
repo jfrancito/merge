@@ -636,10 +636,6 @@ $(document).ready(function () {
         var moneda = $('#moneda_id').val();
         var incluirIGV = $('#incluir_igv').is(':checked');
 
-        // Manejar posibles comas decimales desde el servidor
-        var tc_val = $('#tipo_cambio_actual').val() ? $('#tipo_cambio_actual').val().toString().replace(',', '.') : '0';
-        var tipoCambio = parseFloat(tc_val) || 0;
-
         $('.precio-producto').each(function () {
             var $row = $(this).closest('tr');
             var cantidad = parseFloat($row.find('.cantidad-producto').val()) || 0;
@@ -652,13 +648,6 @@ $(document).ready(function () {
             
             totalFinal += (cantidad * precioUsar);
         });
-
-        // Conversión a Dólares si aplica
-        if (moneda === 'MOM0000000000002') { // Dólares
-            if (tipoCambio > 0) {
-                totalFinal = totalFinal / tipoCambio;
-            }
-        }
 
         $('#total').val(totalFinal.toFixed(2));
     }
