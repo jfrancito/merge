@@ -842,7 +842,7 @@ trait OrdenPedidoTraits
                     + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
                     + ' [FLD] ' + OP.ID_PEDIDO
                     + ' [FLD] ' + OP.TXT_AREA
-                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + ISNULL(OPD.TXT_OBSERVACION,'')
                     + ' [FLD] ' + CAST(SUM(
                         COALESCE(
                             OPD.CAN_MODIF_ADM, 
@@ -875,7 +875,7 @@ trait OrdenPedidoTraits
                     OP.FEC_PEDIDO,
                     OP.ID_PEDIDO,
                     OP.TXT_AREA,
-                    OP.TXT_GLOSA
+                    OPD.TXT_OBSERVACION
                 ORDER BY OP.FEC_PEDIDO
                 FOR XML PATH(''), TYPE
             ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA,
@@ -909,7 +909,7 @@ trait OrdenPedidoTraits
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_AREAS,
             STUFF((
-                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OP.TXT_GLOSA,'')
+                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OPD.TXT_OBSERVACION,'')
                 FROM CMP.REFERENCIA_ASOC RA
                 INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
                 INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
@@ -920,7 +920,7 @@ trait OrdenPedidoTraits
                     AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
                     AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
                     AND OP.COD_PERIODO = '" . $pedido->COD_PERIODO . "'
-                    AND ISNULL(OP.TXT_GLOSA,'') <> ''
+                    AND ISNULL(OPD.TXT_OBSERVACION,'') <> ''
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_GLOSAS
         ")
@@ -1025,7 +1025,7 @@ trait OrdenPedidoTraits
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_AREAS,
             STUFF((
-                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OP.TXT_GLOSA,'')
+                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OPD.TXT_OBSERVACION,'')
                 FROM CMP.REFERENCIA_ASOC RA
                 INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
                 INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
@@ -1036,7 +1036,7 @@ trait OrdenPedidoTraits
                     AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
                     AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
                     AND OP.COD_PERIODO = C.COD_PERIODO
-                    AND ISNULL(OP.TXT_GLOSA,'') <> ''
+                    AND ISNULL(OPD.TXT_OBSERVACION,'') <> ''
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_GLOSAS
         ")
