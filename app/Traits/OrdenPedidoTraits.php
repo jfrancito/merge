@@ -1639,6 +1639,7 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.COD_ANIO,
                 OP.COD_PERIODO,
                 PER.TXT_NOMBRE                       AS NOM_PERIODO,
+                OP.TXT_TIPO_PEDIDO,
                 OP.COD_EMPR,
                 OP.COD_CENTRO,
                 C.NOM_CENTRO,

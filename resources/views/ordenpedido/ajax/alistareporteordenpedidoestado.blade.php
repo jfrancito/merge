@@ -8,6 +8,7 @@
         <th>FECHA PEDIDO</th>
         <th>AÑO</th>
         <th>PERIODO</th>
+        <th>TIPO PEDIDO</th>
         <th>CENTRO</th>
         <th>ESTADO</th>
         <th>SOLICITA</th>
@@ -29,6 +30,7 @@
             <td class="align-center-tb">{{$item->FEC_PEDIDO}}</td>
             <td>{{$item->COD_ANIO}}</td>
             <td>{{$item->NOM_PERIODO}}</td>
+            <td>{{$item->TXT_TIPO_PEDIDO}}</td>
             <td>{{$item->NOM_CENTRO}}</td>
             <td>{{$item->TXT_ESTADO}}</td>
             <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>

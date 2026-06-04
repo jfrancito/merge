@@ -146,6 +146,20 @@ class CotizacionOrdenPedidoController extends Controller
             ->where('ACTIVO', 1)
             ->get();
 
+        // Agrupar por COD_PRODUCTO para evitar duplicados en la vista de detalle
+        $grouped_lista = [];
+        foreach ($lista_detalle as $d) {
+            $key = trim($d->COD_PRODUCTO);
+            $cant_actual = (float) $d->CANTIDAD;
+            if (!isset($grouped_lista[$key])) {
+                $grouped_lista[$key] = $d;
+                $grouped_lista[$key]->CANTIDAD = $cant_actual;
+            } else {
+                $grouped_lista[$key]->CANTIDAD += $cant_actual;
+            }
+        }
+        $lista_detalle = collect(array_values($grouped_lista));
+
         $archivos = DB::table('dbo.ARCHIVOS')
             ->where('ID_DOCUMENTO', $id_cotizacion)
             ->where('ACTIVO', 1)
@@ -226,6 +240,33 @@ class CotizacionOrdenPedidoController extends Controller
             ->where('D.ID_COTIZACION', $id_cotizacion)
             ->where('D.ACTIVO', 1)
             ->get();
+
+        // Agrupar por COD_PRODUCTO para evitar duplicados en la interfaz de edición
+        $grouped = [];
+        foreach ($detalles as $d) {
+            $key = trim($d->COD_PRODUCTO);
+            $cant_actual = (float) $d->CANTIDAD;
+            $saldo_disponible = (float) $d->SALDO_PENDIENTE;
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = $d;
+                $grouped[$key]->CANTIDAD = $cant_actual;
+                $grouped[$key]->SALDO_PENDIENTE = $saldo_disponible;
+                $grouped[$key]->ID_CONSOLIDADOS_LISTA = [trim($d->ID_PEDIDO_CONSOLIDADO_GENERAL)];
+                $grouped[$key]->BREAKDOWN = [
+                    ['id' => trim($d->ID_PEDIDO_CONSOLIDADO_GENERAL), 'cant' => $saldo_disponible]
+                ];
+            } else {
+                $grouped[$key]->CANTIDAD += $cant_actual;
+                $grouped[$key]->SALDO_PENDIENTE += $saldo_disponible;
+                $grouped[$key]->ID_CONSOLIDADOS_LISTA[] = trim($d->ID_PEDIDO_CONSOLIDADO_GENERAL);
+                $grouped[$key]->BREAKDOWN[] = ['id' => trim($d->ID_PEDIDO_CONSOLIDADO_GENERAL), 'cant' => $saldo_disponible];
+            }
+        }
+        foreach ($grouped as $item) {
+            $item->ID_PEDIDO_CONSOLIDADO = implode(' - ', array_unique(array_map('trim', $item->ID_CONSOLIDADOS_LISTA)));
+        }
+        $detalles = collect(array_values($grouped));
 
         // DETERMINAR SI LA COTIZACIÓN ES DE SERVICIO
         $es_servicio = false;
