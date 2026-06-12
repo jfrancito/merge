@@ -732,7 +732,7 @@ $(document).ready(function () {
             var $row = $(this).closest('tr');
             var precio = parseFloat($(this).val()) || 0;
             var precioIGV = incluirIGV ? (precio * multiplier) : 0;
-            $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
+            $row.find('.precio-igv-producto').val(precioIGV.toFixed(4));
         });
         calcularTotal();
         inicializarAlertasPrecio();
@@ -747,7 +747,7 @@ $(document).ready(function () {
 
         var precio = parseFloat($(this).val()) || 0;
         var precioIGV = incluirIGV ? (precio * multiplier) : 0;
-        $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
+        $row.find('.precio-igv-producto').val(precioIGV.toFixed(4));
         calcularTotal();
         verificarPrecioAnterior($(this));
     });
@@ -766,7 +766,7 @@ $(document).ready(function () {
 
         var precioIGV = parseFloat($(this).val()) || 0;
         var precio = precioIGV / divisor;
-        $row.find('.precio-producto').val(precio.toFixed(2));
+        $row.find('.precio-producto').val(precio.toFixed(4));
         calcularTotal();
         verificarPrecioAnterior($row.find('.precio-producto'));
     });

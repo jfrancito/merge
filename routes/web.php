@@ -1033,6 +1033,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	//REGISTRO-IMPORTE-RUTAS
 	Route::get('/gestion-de-importe-rutas/{idopcion}', 'RegistroImporteRutasController@actionRegistroImporteRutas');
+	Route::post('/guardar_matriz_viaticos', 'RegistroImporteRutasController@actionGuardarRegistroImporteRutas');
 
 	//PATANLLA 1
 

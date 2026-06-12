@@ -230,13 +230,6 @@
                                     'id' => 'distrito'
                                 ]) !!}
                             </div>
-                            <div class="col-md-3 col-sm-12 mb-3">
-                                <label class="filter-label">Tipo Importe <span class="text-danger">*</span></label>
-                                {!! Form::select('tipo_importe', $tipo_importe, '', [
-                                    'class' => 'form-control select-premium select2',
-                                    'id' => 'tipo_importe'
-                                ]) !!}
-                            </div>
                         </div>
                     </div>
                     
@@ -247,72 +240,43 @@
                                 <thead>
                                     <tr>
                                         <th>Tipos de Importe \ Línea</th>
-                                        <th>Gerente</th>
-                                        <th>Jefe</th>
-                                        <th>Demás Líneas</th>
+                                        @foreach($tipos_linea as $linea)
+                                            <th>{{ $linea->TXT_LINEA }}</th>
+                                        @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><i class="fa fa-cutlery mr-2"></i> ALIMENTACION</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-hotel mr-2"></i> ALOJAMIENTO</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-car mr-2"></i> MOVILIDAD LOCAL</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-bus mr-2"></i> PASAJES INTERDEPARTAMENTALES</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-bus mr-2"></i> PASAJES INTERPROVINCIAL</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-gas-station mr-2"></i> COMBUSTIBLE</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fa fa-ticket mr-2"></i> PEAJES</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-wrench mr-2"></i> MANTENIMIENTO DE VEHICULOS</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-airplane mr-2"></i> MOVILIDAD AEROPUERTO</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="mdi mdi-parking mr-2"></i> SERVICIOS DE ESTACIONAMIENTO</td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                        <td><input type="text" class="input-importe dinero" placeholder="0.00"></td>
-                                    </tr>
+                                    @foreach($tipo_importe as $cod_motivo => $txt_motivo)
+                                        @if($cod_motivo == '') @continue @endif
+                                        @php
+                                            $icon = 'mdi mdi-check-circle';
+                                            $txt_upper = strtoupper($txt_motivo);
+                                            if (strpos($txt_upper, 'ALIMENTA') !== false) $icon = 'fa fa-cutlery';
+                                            elseif (strpos($txt_upper, 'ALOJA') !== false) $icon = 'mdi mdi-hotel';
+                                            elseif (strpos($txt_upper, 'LOCAL') !== false || strpos($txt_upper, 'MOVILIDAD LOCAL') !== false) $icon = 'mdi mdi-car';
+                                            elseif (strpos($txt_upper, 'DEPARTAMENTAL') !== false) $icon = 'mdi mdi-bus';
+                                            elseif (strpos($txt_upper, 'PROVINCIAL') !== false) $icon = 'mdi mdi-bus';
+                                            elseif (strpos($txt_upper, 'COMBUSTIBLE') !== false) $icon = 'mdi mdi-gas-station';
+                                            elseif (strpos($txt_upper, 'PEAJE') !== false) $icon = 'fa fa-ticket';
+                                            elseif (strpos($txt_upper, 'MANTENIMIENTO') !== false) $icon = 'mdi mdi-wrench';
+                                            elseif (strpos($txt_upper, 'AEROPUERTO') !== false) $icon = 'mdi mdi-airplane';
+                                            elseif (strpos($txt_upper, 'ESTACIONAMIENTO') !== false) $icon = 'mdi mdi-parking';
+                                        @endphp
+                                        <tr>
+                                            <td data-cod-tipo="{{ $cod_motivo }}" data-txt-tipo="{{ $txt_motivo }}">
+                                                <i class="{{ $icon }} mr-2"></i> {{ $txt_motivo }}
+                                            </td>
+                                            @foreach($tipos_linea as $linea)
+                                            <td>
+                                                <input type="text" class="input-importe dinero" placeholder="0.00" 
+                                                       data-cod-linea="{{ $linea->COD_LINEA }}" 
+                                                       data-txt-linea="{{ $linea->TXT_LINEA }}"
+                                                       data-cod-tipo="{{ $cod_motivo }}"
+                                                       data-txt-tipo="{{ $txt_motivo }}">
+                                            </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
