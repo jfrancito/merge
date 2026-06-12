@@ -6556,7 +6556,7 @@ class GestionUsuarioContactoController extends Controller
 
     public function actionAjaxValidarAsientoDuplicado(Request $request)
     {
-        $asientos_json = $request->input('asientos');
+        /*$asientos_json = $request->input('asientos');
         $asientos = json_decode($asientos_json, true);
         
         if (is_array($asientos)) {
@@ -6666,7 +6666,7 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
             }
-        }
+        }*/
         
         return response()->json(['status' => 'success']);
     }
