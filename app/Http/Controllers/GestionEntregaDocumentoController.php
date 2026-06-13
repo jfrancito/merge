@@ -2280,59 +2280,55 @@ class GestionEntregaDocumentoController extends Controller
             $array_retencion                        =   $this->con_si_hay_retencion_lista($folio);
             //modificar las retenciones
 
-            foreach ($array_retencion as $documento) {
+            // foreach ($array_retencion as $documento) {
 
-                //FE_DOCUMENTO
-                FeDocumento::where('ID_DOCUMENTO','=',$documento["ID_DOCUMENTO"])
-                            ->update(
-                                [
-                                    'MONTO_RETENCION'=>(float)$documento["RETENCION"]
-                                ]
-                            );
-                //OC
-                CMPOrden::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
-                            ->update(
-                                [
-                                    'CAN_RETENCION'=>(float)$documento["RETENCION"],
-                                    'CAN_DSCTO'=>3,
-                                    'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . (float) $documento["RETENCION"])
-                                ]
-                            );
+            //     //FE_DOCUMENTO
+            //     FeDocumento::where('ID_DOCUMENTO','=',$documento["ID_DOCUMENTO"])
+            //                 ->update(
+            //                     [
+            //                         'MONTO_RETENCION'=>(float)$documento["RETENCION"]
+            //                     ]
+            //                 );
+            //     //OC
+            //     CMPOrden::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
+            //                 ->update(
+            //                     [
+            //                         'CAN_RETENCION'=>(float)$documento["RETENCION"],
+            //                         'CAN_DSCTO'=>3,
+            //                         'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . (float) $documento["RETENCION"])
+            //                     ]
+            //                 );
 
-                $documento02      =   DB::table('CMP.DOCUMENTO_CTBLE')
-                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
-                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$documento["ID_DOCUMENTO"])
-                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
-                                        'TDO0000000000001',
-                                        'TDO0000000000003',
-                                        'TDO0000000000002'
-                                    ])->first();
+            //     $documento02      =   DB::table('CMP.DOCUMENTO_CTBLE')
+            //                         ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+            //                         ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+            //                         ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+            //                         ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+            //                         ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$documento["ID_DOCUMENTO"])
+            //                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+            //                             'TDO0000000000001',
+            //                             'TDO0000000000003',
+            //                             'TDO0000000000002'
+            //                         ])->first();
 
-                if(count($documento02)>0){
-                    CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                                ->update(
-                                    [
-                                        'CAN_RETENCION'=>(float)$documento["RETENCION"],
-                                        'CAN_DCTO'=>3
-                                    ]
-                                );
-                    CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                                ->update(
-                                    [
-                                        'CAN_RETENCION_MONTO'=>(float)$documento["RETENCION"],
-                                        'CAN_RETENCION_PORCENTAJE'=>3
-                                    ]
-                                );
-                }
+            //     if(count($documento02)>0){
+            //         CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+            //                     ->update(
+            //                         [
+            //                             'CAN_RETENCION'=>(float)$documento["RETENCION"],
+            //                             'CAN_DCTO'=>3
+            //                         ]
+            //                     );
+            //         CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+            //                     ->update(
+            //                         [
+            //                             'CAN_RETENCION_MONTO'=>(float)$documento["RETENCION"],
+            //                             'CAN_RETENCION_PORCENTAJE'=>3
+            //                         ]
+            //                     );
+            //     }
 
-            }
-
-
-
-
+            // }
 
             FeDocumentoEntregable::where('FOLIO','=',$folio)
                         ->update(

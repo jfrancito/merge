@@ -217,6 +217,7 @@ trait ComprobanteTraits
                                     ->where('CAN_IMPUESTO_VTA', '>', 0)
                                     //->where('IND_MATERIAL_SERVICIO', 'M')
                                     ->where('MONTO_DETRACCION_RED', '<=', 0)
+                                    ->where('CMP.ORDEN.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->whereNotIn('RUC_PROVEEDOR', function ($query) {
                                         $query->select('RUC')->from('CON.PROVEEDORES_BCRP');
                                     })
