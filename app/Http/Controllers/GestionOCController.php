@@ -5304,7 +5304,7 @@ class GestionOCController extends Controller
                         if (count($fedocumento_e) > 0) {
                             return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                         }
-
+                        //dd($factura);
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
                         if ($factura->getClient()->getnumDoc() != Session::get('empresas')->NRO_DOCUMENTO) {
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa ' . Session::get('empresas')->NRO_DOCUMENTO);
