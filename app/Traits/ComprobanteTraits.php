@@ -226,10 +226,10 @@ trait ComprobanteTraits
                                     ->selectRaw('RUC_PROVEEDOR, RZ_PROVEEDOR, SUM(MONTO_RETENCION) AS RETENCION_IGV, SUM(TOTAL_VENTA_ORIG) AS TOTAL_VENTA_ORIG')
                                     ->get();
 
-        //dd($listaentrarvalidacion);
 
         $array                  =   array();
         foreach ($listaentrarvalidacion as $index => $item) {
+            
             $ldocumentosretencion  =   DB::table('FE_DOCUMENTO')
                                         ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
                                         ->where('FOLIO_RESERVA', $data_folio)
