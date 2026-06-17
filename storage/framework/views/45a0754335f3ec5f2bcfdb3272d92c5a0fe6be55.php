@@ -1,4 +1,4 @@
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <div class="card shadow-sm pedido-card mb-4">
 
     <div class="pedido-header">
@@ -30,25 +30,25 @@
                 </thead>
 
                 <tbody>
-                @foreach($listapedido as $item)
+                <?php $__currentLoopData = $listapedido; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr class="fila-pedido"
-                            data-id="{{ $item['ID_PEDIDO'] }}"
-                            data-estado="{{ $item['COD_ESTADO'] }}"
+                            data-id="<?php echo e($item['ID_PEDIDO']); ?>"
+                            data-estado="<?php echo e($item['COD_ESTADO']); ?>"
                             style="cursor: pointer;">
-                            <td>{{ $item['ID_PEDIDO'] }}</td>
-                            <td>{{ $item['FEC_PEDIDO'] }}</td>
-                            <td>{{ $item['TXT_NOMBRE'] }}</td>
-                            <td>{{ $item['COD_ANIO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
+                            <td><?php echo e($item['ID_PEDIDO']); ?></td>
+                            <td><?php echo e($item['FEC_PEDIDO']); ?></td>
+                            <td><?php echo e($item['TXT_NOMBRE']); ?></td>
+                            <td><?php echo e($item['COD_ANIO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TIPO_PEDIDO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_SOLICITA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_AREA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_AUTORIZA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_GER']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_ADM']); ?></td>
 
-                            <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
+                            <td class="col-glosa"><?php echo e($item['TXT_GLOSA']); ?></td>
 
-                            <td>@include('comprobante.ajax.estadospedido')</td>
+                            <td><?php echo $__env->make('comprobante.ajax.estadospedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?></td>
 
                             <td class="text-center">
                                 <div class="grupo-acciones">
@@ -56,14 +56,14 @@
                                     <!-- VER DETALLE (SIEMPRE VISIBLE) -->
                                     <button
                                             class="btn btn-sm ver-detalle-pedido btn-detalle-moderno"
-                                            data-id="{{ $item['ID_PEDIDO'] }}">
+                                            data-id="<?php echo e($item['ID_PEDIDO']); ?>">
                                         <i class="fa fa-eye"></i> Detalle
                                     </button>
 
 
 
-                                    @if($item['MULTI_ARCHIVOS'] != '')
-                                        @php
+                                    <?php if($item['MULTI_ARCHIVOS'] != ''): ?>
+                                        <?php 
                                             $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
                                             $archivos = [];
                                             foreach($archivos_raw as $ar) {
@@ -72,47 +72,48 @@
                                                     $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
                                                 }
                                             }
-                                        @endphp
+                                         ?>
 
-                                        @if(count($archivos) > 1)
+                                        <?php if(count($archivos) > 1): ?>
                                             <!-- MÚLTIPLES ARCHIVOS: DROPDOWN -->
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
                                                     <i class="fa fa-download"></i> Archivos <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                    @foreach($archivos as $index => $arch)
+                                                    <?php $__currentLoopData = $archivos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $arch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                         <li>
-                                                            <a href="{{ url('descargar-archivo-informe/'.base64_encode($arch['url'])) }}" target="_blank">
-                                                                {{ ($index + 1) . '. ' . $arch['nombre'] }}
+                                                            <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($arch['url']))); ?>" target="_blank">
+                                                                <?php echo e(($index + 1) . '. ' . $arch['nombre']); ?>
+
                                                             </a>
                                                         </li>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </ul>
                                             </div>
-                                        @elseif(count($archivos) == 1)
+                                        <?php elseif(count($archivos) == 1): ?>
                                             <!-- UN SOLO ARCHIVO -->
-                                            <a href="{{ url('descargar-archivo-informe/'.base64_encode($archivos[0]['url'])) }}"
+                                            <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($archivos[0]['url']))); ?>"
                                                class="btn btn-xs btn-success"
                                                target="_blank"
-                                               title="Descargar: {{ $archivos[0]['nombre'] }}">
+                                               title="Descargar: <?php echo e($archivos[0]['nombre']); ?>">
                                                 <i class="fa fa-download"></i>
                                             </a>
-                                        @endif
-                                    @else
+                                        <?php endif; ?>
+                                    <?php else: ?>
                                         <!-- NO HAY ARCHIVOS: BOTÓN DE SUBIR -->
                                         <button class="btn btn-xs btn-primary subir-archivo"
-                                                data-id="{{$item['ID_PEDIDO']}}">
+                                                data-id="<?php echo e($item['ID_PEDIDO']); ?>">
                                             <i class="fa fa-upload"></i>
                                         </button>
-                                    @endif
+                                    <?php endif; ?>
 
 
 
                                 </div>
                             </td>
                         </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
 
             </table>
