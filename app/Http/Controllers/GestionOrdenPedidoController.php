@@ -228,19 +228,20 @@ class GestionOrdenPedidoController extends Controller
             ->get();
 
 
-        $listapedido = DB::connection('sqlsrv')->select("
-            SELECT OP.*,
-            STUFF((
-                SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
-                FROM dbo.ARCHIVOS ARCH
-                WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
-                AND ARCH.ACTIVO = 1
-                FOR XML PATH(''), TYPE
-            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
-            FROM WEB.ORDEN_PEDIDO OP
-            WHERE OP.ACTIVO = 1
-            ORDER BY OP.FEC_PEDIDO DESC
-        ");
+          $listapedido = DB::connection('sqlsrv')->select("
+              SELECT TOP 200 OP.*,
+              STUFF((
+                  SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                  FROM dbo.ARCHIVOS ARCH
+                  WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                  AND ARCH.ACTIVO = 1
+                  FOR XML PATH(''), TYPE
+              ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
+              FROM WEB.ORDEN_PEDIDO OP
+              WHERE OP.ACTIVO = 1
+              AND OP.COD_TRABAJADOR_SOLICITA = ?
+              ORDER BY OP.FEC_PEDIDO DESC
+          ", [$usuario_solicita]);
 
         // Convertir el resultado a array asociativo para mantener compatibilidad con la vista
         $listapedido = json_decode(json_encode($listapedido), true);

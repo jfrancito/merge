@@ -1365,3 +1365,4 @@ Route::get('buscarclientey', function (Illuminate\Http\Request $request) {
 
 	return \Response::json($valid_tags);
 });
+	Route::post('/eliminar_matriz_viaticos', 'RegistroImporteRutasController@actionEliminarRegistroImporteRutas');

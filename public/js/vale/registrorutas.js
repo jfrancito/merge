@@ -20,61 +20,137 @@ $(document).ready(function () {
     var carpeta = $("#carpeta").val();
     var _token = $('#token').val();
 
-    // EVENTO: Cambio de Departamento
-    $('#departamento').on('change', function () {
-        var cod_departamento = $(this).val();
+    // EVENTO: Cambio de Departamento y Provincia han sido removidos a petición del usuario.
+    // Ahora el combo Distrito carga todo directamente igual que el Origen.
 
-        // Limpiar Provincia y Distrito
-        $('#provincia').empty().append('<option value="">-- Seleccione Provincia --</option>').trigger('change');
-        $('#distrito').empty().append('<option value="">-- Seleccione Distrito --</option>').trigger('change');
-
-        if (cod_departamento) {
-            $.ajax({
-                type: 'POST',
-                url: carpeta + '/obtener_provincia_por_departamento',
-                data: {
-                    _token: _token,
-                    cod_departamento: cod_departamento
-                },
-                success: function (data) {
-                    $.each(data, function (index, element) {
-                        $('#provincia').append('<option value="' + element.cod_categoria + '">' + element.nom_categoria + '</option>');
-                    });
-                    $('#provincia').trigger('change.select2');
-                },
-                error: function () {
-                    console.error("Error al cargar provincias");
-                }
-            });
+    // FUNCIÓN: Mostrar Modal Premium
+    function mostrarAlertaPremium(mensaje, tipo) {
+        var titulo = "Atención";
+        var iconHtml = "";
+        
+        if (tipo === 'success') {
+            titulo = "¡Éxito!";
+            iconHtml = '<div style="animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"><i class="fa fa-check-circle" style="color: #10b981; font-size: 75px; text-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);"></i></div>';
+            $('#modalAlertPremium .btn').removeClass('btn-primary btn-danger').addClass('btn-success').css('background', '#10b981');
+        } else if (tipo === 'error') {
+            titulo = "¡Ups! Ocurrió un problema";
+            iconHtml = '<div style="animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;"><i class="fa fa-times-circle" style="color: #ef4444; font-size: 75px; text-shadow: 0 8px 15px rgba(239, 68, 68, 0.3);"></i></div>';
+            $('#modalAlertPremium .btn').removeClass('btn-primary btn-success').addClass('btn-danger').css('background', '#ef4444');
+        } else if (tipo === 'warning') {
+            titulo = "Aviso Importante";
+            iconHtml = '<div style="animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"><i class="fa fa-exclamation-triangle" style="color: #f59e0b; font-size: 70px; text-shadow: 0 8px 15px rgba(245, 158, 11, 0.3);"></i></div>';
+            $('#modalAlertPremium .btn').removeClass('btn-success btn-danger').addClass('btn-primary').css('background', '#3b82f6');
         }
+        
+        $('#modalAlertTitle').text(titulo);
+        $('#modalAlertMessage').text(mensaje);
+        $('#modalAlertIcon').html(iconHtml);
+        $('#modalAlertPremium').modal('show');
+    }
+
+    // EVENTO: Buscador en tiempo real de Rutas Creadas
+    $('#buscador-rutas').on('keyup', function() {
+        var term = $(this).val().toLowerCase();
+        $('.accordion-premium .panel').each(function() {
+            var text = $(this).find('.route-header-premium').text().toLowerCase();
+            if (text.indexOf(term) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
     });
 
-    // EVENTO: Cambio de Provincia
-    $('#provincia').on('change', function () {
-        var cod_provincia = $(this).val();
+    // EVENTO: Click en Modificar
+    $(document).on('click', '.btn-modificar', function(e) {
+        e.preventDefault();
+        var cod_origen = $(this).data('origen');
+        var cod_destino = $(this).data('destino');
 
-        // Limpiar Distrito
-        $('#distrito').empty().append('<option value="">-- Seleccione Distrito --</option>').trigger('change');
+        // Cargar combos y bloquear
+        $('#origen').val(cod_origen).trigger('change.select2').prop('disabled', true);
+        $('#distrito').val(cod_destino).trigger('change.select2').prop('disabled', true);
 
-        if (cod_provincia) {
+        // Activar modo Edición
+        $('#ind_tipo_operacion').val('U');
+        $('.btn-guardar-matriz').html('<i class="fa fa-save"></i> ACTUALIZAR RUTA');
+        $('.btn-limpiar-ruta').show();
+
+        // Limpiar cajas
+        $('.input-importe').val('');
+
+        // Leer matriz readonly del acordeon
+        var $accordion = $(this).closest('.panel');
+        $accordion.find('.td-matriz-readonly').each(function() {
+            var cod_tipo = $(this).data('cod-tipo');
+            var cod_linea = $(this).data('cod-linea');
+            var importe = $(this).data('importe');
+            
+            if (importe > 0) {
+                // Cargar en la cajita
+                $('.input-importe[data-cod-tipo="'+cod_tipo+'"][data-cod-linea="'+cod_linea+'"]').val(importe).trigger('change'); // trigger change for inputmask
+            }
+        });
+
+        // Cambiar de pestaña usando el evento click personalizado y subir scroll
+        $('.nav-tabs-premium a[href="#tab-configurar"]').trigger('click');
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
+    });
+
+    // EVENTO: Eliminar Ruta
+    $(document).on('click', '.btn-eliminar', function(e) {
+        e.preventDefault();
+        var cod_origen = $(this).data('origen');
+        var cod_destino = $(this).data('destino');
+        var btn = $(this);
+
+        $('#modalConfirmMessage').text('¿Está seguro de que desea eliminar todos los importes de esta ruta? Esta acción es irreversible.');
+        
+        // Asignar el evento al botón de confirmación, quitando previamente cualquier evento anterior
+        $('#btnConfirmAction').off('click').on('click', function() {
+            // Cerrar el modal y bloquear el botón origen
+            $('#modalConfirmPremium').modal('hide');
+            btn.prop('disabled', true);
+            
             $.ajax({
                 type: 'POST',
-                url: carpeta + '/obtener_distrito_por_provincia',
+                url: carpeta + '/eliminar_matriz_viaticos',
                 data: {
                     _token: _token,
-                    cod_provincia: cod_provincia
+                    origen: cod_origen,
+                    distrito: cod_destino
                 },
-                success: function (data) {
-                    $.each(data, function (index, element) {
-                        $('#distrito').append('<option value="' + element.cod_categoria + '">' + element.nom_categoria + '</option>');
-                    });
-                    $('#distrito').trigger('change.select2');
+                success: function(data) {
+                    if (data.success) {
+                        mostrarAlertaPremium(data.message, 'success');
+                        $('#modalAlertPremium').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        mostrarAlertaPremium(data.message, 'error');
+                        btn.prop('disabled', false);
+                    }
                 },
-                error: function () {
-                    console.error("Error al cargar distritos");
+                error: function() {
+                    mostrarAlertaPremium("Ocurrió un error inesperado al eliminar la ruta.", 'error');
+                    btn.prop('disabled', false);
                 }
             });
-        }
+        });
+        
+        // Mostrar el modal
+        $('#modalConfirmPremium').modal('show');
+    });
+
+    // EVENTO: Limpiar / Nueva Ruta
+    $('.btn-limpiar-ruta').on('click', function(e) {
+        e.preventDefault();
+        $('#origen').val('').trigger('change.select2').prop('disabled', false);
+        $('#distrito').val('').trigger('change.select2').prop('disabled', false);
+        $('#ind_tipo_operacion').val('I');
+        $('.btn-guardar-matriz').html('<i class="mdi mdi-content-save"></i> GUARDAR CONFIGURACIÓN');
+        $(this).hide();
+        $('.input-importe').val('');
     });
 
     // EVENTO: Guardar Matriz
@@ -82,15 +158,12 @@ $(document).ready(function () {
         e.preventDefault();
         var origen = $('#origen').val();
         var nom_origen = $('#origen option:selected').text();
-        var departamento = $('#departamento').val();
-        var nom_departamento = $('#departamento option:selected').text();
-        var provincia = $('#provincia').val();
-        var nom_provincia = $('#provincia option:selected').text();
         var distrito = $('#distrito').val();
         var nom_distrito = $('#distrito option:selected').text();
+        var ind_tipo_operacion = $('#ind_tipo_operacion').val();
 
-        if(!origen || !departamento || !provincia || !distrito) {
-            alert("Por favor, complete todos los filtros de ubicación antes de guardar.");
+        if(!origen || !distrito) {
+            mostrarAlertaPremium("Por favor, seleccione el Origen y el Distrito antes de continuar.", 'warning');
             return;
         }
 
@@ -101,22 +174,21 @@ $(document).ready(function () {
                 var val = $(this).val();
                 // Omitir comas del formato de inputmask y parsear a float
                 var floatVal = parseFloat(val.replace(/,/g, ''));
-                if (!isNaN(floatVal) && floatVal > 0) {
-                    datos.push({
-                        cod_tipo: $(this).data('cod-tipo'),
-                        txt_nom_tipo: $(this).data('txt-tipo'),
-                        cod_linea: $(this).data('cod-linea'),
-                        txt_linea: $(this).data('txt-linea'),
-                        importe: floatVal
-                    });
+                
+                // Si está vacío o no es un número, lo guardamos como 0
+                if (isNaN(floatVal)) {
+                    floatVal = 0;
                 }
+                
+                datos.push({
+                    cod_tipo: $(this).data('cod-tipo'),
+                    txt_nom_tipo: $(this).data('txt-tipo'),
+                    cod_linea: $(this).data('cod-linea'),
+                    txt_linea: $(this).data('txt-linea'),
+                    importe: floatVal.toFixed(2)
+                });
             });
         });
-
-        if (datos.length === 0) {
-            alert("Debe ingresar al menos un importe mayor a 0.");
-            return;
-        }
 
         var btn = $(this);
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> GUARDANDO...');
@@ -126,30 +198,29 @@ $(document).ready(function () {
             url: carpeta + '/guardar_matriz_viaticos',
             data: {
                 _token: _token,
+                ind_tipo_operacion: ind_tipo_operacion,
                 origen: origen,
                 nom_origen: nom_origen,
-                departamento: departamento,
-                nom_departamento: nom_departamento,
-                provincia: provincia,
-                nom_provincia: nom_provincia,
                 distrito: distrito,
                 nom_distrito: nom_distrito,
                 datos: datos
             },
             success: function(data) {
                 if(data.success) {
-                    alert(data.message);
-                    // Opcional: limpiar los inputs
-                    // $('.input-importe').val('');
+                    mostrarAlertaPremium(data.message, 'success');
+                    $('#modalAlertPremium').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
                 } else {
-                    alert(data.message);
+                    mostrarAlertaPremium(data.message, 'error');
                 }
             },
             error: function() {
-                alert("Ocurrió un error al guardar la información.");
+                mostrarAlertaPremium("Ocurrió un error al guardar la información. Contacte con sistemas.", 'error');
             },
             complete: function() {
-                btn.prop('disabled', false).html('<i class="mdi mdi-content-save"></i> GUARDAR CONFIGURACIÓN');
+                var btnText = $('#ind_tipo_operacion').val() === 'U' ? 'ACTUALIZAR RUTA' : 'GUARDAR CONFIGURACIÓN';
+                btn.prop('disabled', false).html('<i class="mdi mdi-content-save"></i> ' + btnText);
             }
         });
     });

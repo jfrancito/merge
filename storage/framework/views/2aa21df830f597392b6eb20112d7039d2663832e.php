@@ -1,12 +1,11 @@
-@extends('template_lateral')
-@section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/dataTables.bootstrap.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/responsive.dataTables.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
-@stop
-@section('section')
+<?php $__env->startSection('style'); ?>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datatables/css/dataTables.bootstrap.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datatables/css/responsive.dataTables.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/select2/css/select2.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/bootstrap-slider/css/bootstrap-slider.css')); ?> "/>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('section'); ?>
 
 <style>
     /* Premium Panel Container */
@@ -281,11 +280,11 @@
     }
 
     /* Animaciones para el Modal Premium */
-    @keyframes popIn {
+    @keyframes  popIn {
         0% { transform: scale(0.5); opacity: 0; }
         100% { transform: scale(1); opacity: 1; }
     }
-    @keyframes shake {
+    @keyframes  shake {
         0%, 100% { transform: translateX(0); }
         10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
         20%, 40%, 60%, 80% { transform: translateX(5px); }
@@ -497,8 +496,8 @@
             <div class="col-sm-12">
                 
                 <div class="panel-premium-rutas">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}" id="token">
-                    <input type="hidden" name="carpeta" value="{{$capeta}}" id="carpeta">
+                    <input type="hidden" name="_token" value="<?php echo e(csrf_token()); ?>" id="token">
+                    <input type="hidden" name="carpeta" value="<?php echo e($capeta); ?>" id="carpeta">
                     
                     <!-- Heading -->
                     <div class="heading-rutas">
@@ -528,17 +527,19 @@
                                 <div class="row">
                                     <div class="col-md-6 col-sm-12 mb-3">
                                         <label class="filter-label">Origen <span class="text-danger">*</span></label>
-                                        {!! Form::select('origen', $origenes, '', [
+                                        <?php echo Form::select('origen', $origenes, '', [
                                             'class' => 'form-control select-premium select2',
                                             'id' => 'origen'
-                                        ]) !!}
+                                        ]); ?>
+
                                     </div>
                                     <div class="col-md-6 col-sm-12 mb-3">
                                         <label class="filter-label">Distrito / Destino <span class="text-danger">*</span></label>
-                                        {!! Form::select('distrito', $distritos, '', [
+                                        <?php echo Form::select('distrito', $distritos, '', [
                                             'class' => 'form-control select-premium select2',
                                             'id' => 'distrito'
-                                        ]) !!}
+                                        ]); ?>
+
                                     </div>
                                 </div>
                             </div>
@@ -550,15 +551,15 @@
                                 <thead>
                                     <tr>
                                         <th>Tipos de Importe \ Línea</th>
-                                        @foreach($tipos_linea as $linea)
-                                            <th>{{ $linea->TXT_LINEA }}</th>
-                                        @endforeach
+                                        <?php $__currentLoopData = $tipos_linea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $linea): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <th><?php echo e($linea->TXT_LINEA); ?></th>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($tipo_importe as $cod_motivo => $txt_motivo)
-                                        @if($cod_motivo == '') @continue @endif
-                                        @php
+                                    <?php $__currentLoopData = $tipo_importe; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cod_motivo => $txt_motivo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($cod_motivo == ''): ?> <?php continue; ?> <?php endif; ?>
+                                        <?php 
                                             $icon = 'mdi mdi-check-circle';
                                             $txt_upper = strtoupper($txt_motivo);
                                             if (strpos($txt_upper, 'ALIMENTA') !== false) $icon = 'fa fa-cutlery';
@@ -571,22 +572,23 @@
                                             elseif (strpos($txt_upper, 'MANTENIMIENTO') !== false) $icon = 'mdi mdi-wrench';
                                             elseif (strpos($txt_upper, 'AEROPUERTO') !== false) $icon = 'mdi mdi-airplane';
                                             elseif (strpos($txt_upper, 'ESTACIONAMIENTO') !== false) $icon = 'mdi mdi-parking';
-                                        @endphp
+                                         ?>
                                         <tr>
-                                            <td data-cod-tipo="{{ $cod_motivo }}" data-txt-tipo="{{ $txt_motivo }}">
-                                                <i class="{{ $icon }} mr-2"></i> {{ $txt_motivo }}
+                                            <td data-cod-tipo="<?php echo e($cod_motivo); ?>" data-txt-tipo="<?php echo e($txt_motivo); ?>">
+                                                <i class="<?php echo e($icon); ?> mr-2"></i> <?php echo e($txt_motivo); ?>
+
                                             </td>
-                                            @foreach($tipos_linea as $linea)
+                                            <?php $__currentLoopData = $tipos_linea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $linea): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <td>
                                                 <input type="text" class="input-importe dinero" placeholder="0.00" 
-                                                       data-cod-linea="{{ $linea->COD_LINEA }}" 
-                                                       data-txt-linea="{{ $linea->TXT_LINEA }}"
-                                                       data-cod-tipo="{{ $cod_motivo }}"
-                                                       data-txt-tipo="{{ $txt_motivo }}">
+                                                       data-cod-linea="<?php echo e($linea->COD_LINEA); ?>" 
+                                                       data-txt-linea="<?php echo e($linea->TXT_LINEA); ?>"
+                                                       data-cod-tipo="<?php echo e($cod_motivo); ?>"
+                                                       data-txt-tipo="<?php echo e($txt_motivo); ?>">
                                             </td>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tr>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
                         </div>
@@ -608,7 +610,7 @@
                         <div role="tabpanel" class="tab-pane fade" id="tab-registros">
                             <div class="matrix-section" style="padding-top: 25px !important; background: #ffffff !important;">
                                 
-                                @if(count($rutas_agrupadas) > 0)
+                                <?php if(count($rutas_agrupadas) > 0): ?>
                                     <div class="row">
                                         <div class="col-xs-12">
                                             <div class="search-premium-container pull-right">
@@ -620,21 +622,22 @@
                                     <div class="clearfix"></div>
                                     
                                     <div class="panel-group accordion-premium" id="accordion-rutas" role="tablist" aria-multiselectable="true">
-                                        @php $i = 0; @endphp
-                                        @foreach($rutas_agrupadas as $key => $ruta)
+                                        <?php  $i = 0;  ?>
+                                        <?php $__currentLoopData = $rutas_agrupadas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $ruta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="panel panel-default">
-                                                <div class="panel-heading" role="tab" id="heading-{{ $i }}">
+                                                <div class="panel-heading" role="tab" id="heading-<?php echo e($i); ?>">
                                                     <h4 class="panel-title">
-                                                        <a role="button" data-toggle="collapse" data-parent="#accordion-rutas" href="#collapse-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ $i }}" class="collapsed btn-collapse">
+                                                        <a role="button" data-toggle="collapse" data-parent="#accordion-rutas" href="#collapse-<?php echo e($i); ?>" aria-expanded="false" aria-controls="collapse-<?php echo e($i); ?>" class="collapsed btn-collapse">
                                                             <div class="route-header-premium">
                                                                 <div class="route-number-badge">
-                                                                    {{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}
+                                                                    <?php echo e(str_pad($i + 1, 2, '0', STR_PAD_LEFT)); ?>
+
                                                                 </div>
                                                                 
                                                                 <div class="location-box origin">
                                                                     <span class="location-label">Punto de Origen</span>
                                                                     <div class="location-name">
-                                                                        <span>{{ $ruta['origen'] }}</span>
+                                                                        <span><?php echo e($ruta['origen']); ?></span>
                                                                         <i class="mdi mdi-map-marker-outline"></i>
                                                                     </div>
                                                                 </div>
@@ -648,37 +651,37 @@
                                                                     <span class="location-label">Punto de Destino</span>
                                                                     <div class="location-name">
                                                                         <i class="mdi mdi-map-marker"></i>
-                                                                        <span>{{ $ruta['destino'] }}</span>
+                                                                        <span><?php echo e($ruta['destino']); ?></span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </a>
                                                         <div class="action-buttons">
-                                                            <button type="button" class="btn-action-ruta btn-modificar" data-origen="{{ $ruta['cod_origen'] }}" data-destino="{{ $ruta['cod_destino'] }}" title="Modificar Ruta">
+                                                            <button type="button" class="btn-action-ruta btn-modificar" data-origen="<?php echo e($ruta['cod_origen']); ?>" data-destino="<?php echo e($ruta['cod_destino']); ?>" title="Modificar Ruta">
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
-                                                            <button type="button" class="btn-action-ruta btn-eliminar" data-origen="{{ $ruta['cod_origen'] }}" data-destino="{{ $ruta['cod_destino'] }}" title="Eliminar Ruta">
+                                                            <button type="button" class="btn-action-ruta btn-eliminar" data-origen="<?php echo e($ruta['cod_origen']); ?>" data-destino="<?php echo e($ruta['cod_destino']); ?>" title="Eliminar Ruta">
                                                                 <i class="fa fa-trash"></i>
                                                             </button>
                                                         </div>
                                                     </h4>
                                                 </div>
-                                                <div id="collapse-{{ $i }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-{{ $i }}">
+                                                <div id="collapse-<?php echo e($i); ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-<?php echo e($i); ?>">
                                                     <div class="panel-body">
                                                         <div class="table-responsive">
                                                             <table class="table-matrix table-readonly">
                                                                 <thead>
                                                                     <tr>
                                                                         <th>Tipos de Importe \ Línea</th>
-                                                                        @foreach($tipos_linea as $linea)
-                                                                            <th class="text-center">{{ $linea->TXT_LINEA }}</th>
-                                                                        @endforeach
+                                                                        <?php $__currentLoopData = $tipos_linea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $linea): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <th class="text-center"><?php echo e($linea->TXT_LINEA); ?></th>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    @foreach($tipo_importe as $cod_motivo => $txt_motivo)
-                                                                        @if($cod_motivo == '') @continue @endif
-                                                                        @php
+                                                                    <?php $__currentLoopData = $tipo_importe; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cod_motivo => $txt_motivo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php if($cod_motivo == ''): ?> <?php continue; ?> <?php endif; ?>
+                                                                        <?php 
                                                                             $icon = 'mdi mdi-check-circle';
                                                                             $txt_upper = strtoupper($txt_motivo);
                                                                             if (strpos($txt_upper, 'ALIMENTA') !== false) $icon = 'fa fa-cutlery';
@@ -691,36 +694,38 @@
                                                                             elseif (strpos($txt_upper, 'MANTENIMIENTO') !== false) $icon = 'mdi mdi-wrench';
                                                                             elseif (strpos($txt_upper, 'AEROPUERTO') !== false) $icon = 'mdi mdi-airplane';
                                                                             elseif (strpos($txt_upper, 'ESTACIONAMIENTO') !== false) $icon = 'mdi mdi-parking';
-                                                                        @endphp
+                                                                         ?>
                                                                         <tr>
                                                                             <td>
-                                                                                <i class="{{ $icon }} mr-2 text-primary" style="font-size:18px; vertical-align:middle;"></i> {{ $txt_motivo }}
+                                                                                <i class="<?php echo e($icon); ?> mr-2 text-primary" style="font-size:18px; vertical-align:middle;"></i> <?php echo e($txt_motivo); ?>
+
                                                                             </td>
-                                                                            @foreach($tipos_linea as $linea)
-                                                                                @php
+                                                                            <?php $__currentLoopData = $tipos_linea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $linea): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                <?php 
                                                                                     $importe = isset($ruta['matriz'][$txt_motivo][$linea->TXT_LINEA]) ? $ruta['matriz'][$txt_motivo][$linea->TXT_LINEA] : 0;
-                                                                                @endphp
-                                                                                <td class="text-center td-matriz-readonly {{ $importe > 0 ? 'has-value' : 'is-zero' }}" data-cod-tipo="{{ $cod_motivo }}" data-cod-linea="{{ $linea->COD_LINEA }}" data-importe="{{ $importe }}">
-                                                                                    {{ $importe > 0 ? 'S/ ' . number_format($importe, 2) : '-' }}
+                                                                                 ?>
+                                                                                <td class="text-center td-matriz-readonly <?php echo e($importe > 0 ? 'has-value' : 'is-zero'); ?>" data-cod-tipo="<?php echo e($cod_motivo); ?>" data-cod-linea="<?php echo e($linea->COD_LINEA); ?>" data-importe="<?php echo e($importe); ?>">
+                                                                                    <?php echo e($importe > 0 ? 'S/ ' . number_format($importe, 2) : '-'); ?>
+
                                                                                 </td>
-                                                                            @endforeach
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                         </tr>
-                                                                    @endforeach
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            @php $i++; @endphp
-                                        @endforeach
+                                            <?php  $i++;  ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
-                                @else
+                                <?php else: ?>
                                     <div class="alert alert-info text-center" style="font-size: 16px; padding: 30px;">
                                         <i class="mdi mdi-information-outline" style="font-size: 32px; display: block; margin-bottom: 10px;"></i>
                                         Aún no hay rutas configuradas. Agregue una ruta desde la pestaña de Configuración de Matriz.
                                     </div>
-                                @endif
+                                <?php endif; ?>
 
                             </div>
                         </div> <!-- Fin div tab-registros -->
@@ -733,37 +738,37 @@
     </div> 
 </div> 
 
-@stop
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
 
 
 
-    <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}"
+    <script src="<?php echo e(asset('public/js/general/inputmask/inputmask.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/js/general/inputmask/inputmask.extensions.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/js/general/inputmask/inputmask.numeric.extensions.js')); ?>"
             type="text/javascript"></script>
-    <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}"
+    <script src="<?php echo e(asset('public/js/general/inputmask/inputmask.date.extensions.js')); ?>"
             type="text/javascript"></script>
-    <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/js/general/inputmask/jquery.inputmask.js')); ?>" type="text/javascript"></script>
 
-    <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}"
+    <script src="<?php echo e(asset('public/lib/datatables/js/jquery.dataTables.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/datatables/js/dataTables.bootstrap.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js')); ?>"
             type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/js/dataTables.responsive.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/js/responsive.bootstrap.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/app-tables-datatables.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/datatables/js/dataTables.responsive.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/datatables/js/responsive.bootstrap.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/js/app-tables-datatables.js?v='.$version)); ?>" type="text/javascript"></script>
 
 
-    <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js') }}"
+    <script src="<?php echo e(asset('public/lib/jquery-ui/jquery-ui.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/jquery.nestable/jquery.nestable.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/moment.js/min/moment.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js')); ?>"
             type="text/javascript"></script>
-    <script src="{{ asset('public/lib/select2/js/select2.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/bootstrap-slider/js/bootstrap-slider.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/select2/js/select2.min.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/bootstrap-slider/js/bootstrap-slider.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/js/app-form-elements.js')); ?>" type="text/javascript"></script>
+    <script src="<?php echo e(asset('public/lib/parsley/parsley.js')); ?>" type="text/javascript"></script>
 
     <script type="text/javascript">
     $(document).ready(function () {
@@ -847,5 +852,6 @@
     </div>
 </div>
 
-    <script src="{{ asset('public/js/vale/registrorutas.js?v='.$version) }}" type="text/javascript"></script>
-@stop
+    <script src="<?php echo e(asset('public/js/vale/registrorutas.js?v='.$version)); ?>" type="text/javascript"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('template_lateral', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

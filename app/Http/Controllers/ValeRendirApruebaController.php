@@ -274,6 +274,7 @@ class ValeRendirApruebaController extends Controller
                             ->where('COD_EMPR', $cod_empr)
                             ->where('COD_CENTRO' , $centrovale)
                             ->where('COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
+                            ->where ('COD_CATEGORIA_ESTADO_CONTRATO','ECO0000000000001')
                             ->where('COD_EMPR_CLIENTE', $codemprcliente)
                             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
                             ->select(
