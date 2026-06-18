@@ -780,7 +780,7 @@ $(document).ready(function () {
        =============================== */
     $(document).on('change', '#moneda_id', function (e) {
         var moneda = $(this).val();
-        var simbolo = moneda === 'MOM0000000000001' ? 'S/' : '$';
+        var simbolo = moneda === 'MON0000000000001' ? 'S/' : '$';
         $('.moneda-simbolo').text(simbolo);
         calcularTotal();
     });
