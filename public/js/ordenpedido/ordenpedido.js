@@ -537,15 +537,12 @@ $(document).ready(function () {
     /* ===============================
        FILTRO POR TIPO DE PRODUCTO
        =============================== */
-    var originalProductos = null;
-
-    // Al inicio, vaciar productos para cumplir pedido
-    setTimeout(() => {
-        if (!originalProductos) {
-            originalProductos = $('#producto_id option').clone();
-        }
-        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').trigger('change');
-    }, 1000);
+    
+    // Inicializar Select2 local estándar en #producto_id
+    $('#producto_id').select2({
+        placeholder: 'Buscar producto...',
+        width: '100%'
+    });
 
     $(document).on('select2:opening', '#producto_id', function (e) {
         var tipo = $('#tipo_material_servicio').val();
@@ -561,9 +558,6 @@ $(document).ready(function () {
     });
 
     $(document).on('change', '#tipo_material_servicio', function () {
-        if (!originalProductos) {
-            originalProductos = $('#producto_id option').clone();
-        }
         var tipo = $(this).val();
 
         // VALIDACIÓN: Si es SERVICIO (S), cantidad = 1 y bloqueado
@@ -573,27 +567,67 @@ $(document).ready(function () {
             $('#cantidad').val('').prop('disabled', false);
         }
 
-        $('#producto_id').empty();
-        $('#producto_id').append('<option value="">Buscar producto...</option>');
+        // Limpiar el producto seleccionado y vaciar opciones anteriores
+        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').val(null).trigger('change');
 
-        if (tipo !== "") {
-            originalProductos.each(function () {
-                var ind = $(this).data('indmaterialservicio');
-                if (ind == tipo) {
-                    $('#producto_id').append($(this).clone());
-                }
-            });
-
-            // Cambiar nombre del botón según el tipo
-            if (tipo === 'M') {
-                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Material');
-            } else if (tipo === 'S') {
-                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
-            }
+        // Cambiar nombre del botón según el tipo
+        if (tipo === 'M') {
+            $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Material');
+        } else if (tipo === 'S') {
+            $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
         } else {
             $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Producto');
         }
-        $('#producto_id').trigger('change');
+
+        if (tipo) {
+            // Deshabilitar temporalmente el combo mientras carga
+            $('#producto_id').prop('disabled', true).trigger('change');
+            
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/ajax-obtener-productos-tipo",
+                data: {
+                    tipo: tipo,
+                    _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (productos) {
+                    $('#producto_id').empty().append('<option value="">Buscar producto...</option>');
+
+                    $.each(productos, function (i, item) {
+                        let opt = $('<option>', {
+                            value: item.COD_PRODUCTO,
+                            text: item.COD_PRODUCTO + ' - ' + item.NOM_PRODUCTO
+                        });
+                        
+                        // Guardar datos en data attributes para la lógica existente
+                        opt.data('nombre', item.NOM_PRODUCTO);
+                        opt.data('unidad', item.UNIDAD);
+                        opt.data('codcategoria', item.COD_UNIDAD);
+                        opt.data('precio', parseFloat(item.PRECIO || 0).toFixed(2));
+                        opt.data('indmaterialservicio', item.IND_MATERIAL_SERVICIO);
+
+                        $('#producto_id').append(opt);
+                    });
+
+                    // Reactivar e inicializar select2
+                    $('#producto_id').prop('disabled', false);
+                    $('#producto_id').select2('destroy').select2({
+                        placeholder: 'Buscar producto...',
+                        width: '100%'
+                    }).trigger('change');
+                },
+                error: function (xhr) {
+                    console.error("Error al obtener productos:", xhr);
+                    $('#producto_id').prop('disabled', false).trigger('change');
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: 'Ocurrió un error al cargar la lista de productos.'
+                    });
+                }
+            });
+        }
     });
 
     $(document).on('change', '#producto_id', function () {

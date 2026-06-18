@@ -351,17 +351,6 @@
                 </label>
                 <select id="producto_id" class="form-control select2 select2-lg" style="width: 100%;">
                     <option value="">Buscar producto...</option>
-                    <?php $__currentLoopData = $producto; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($prd->COD_PRODUCTO); ?>"
-                                data-nombre="<?php echo e($prd->NOM_PRODUCTO); ?>"
-                                data-unidad="<?php echo e($prd->UNIDAD); ?>"
-                                data-codcategoria="<?php echo e($prd->COD_UNIDAD); ?>"
-                                data-precio="<?php echo e(number_format($prd->PRECIO, 2, '.', '')); ?>"
-                                data-indmaterialservicio="<?php echo e($prd->IND_MATERIAL_SERVICIO); ?>">
-                            <?php echo e($prd->COD_PRODUCTO); ?> - <?php echo e($prd->NOM_PRODUCTO); ?>
-
-                        </option>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
 
