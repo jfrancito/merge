@@ -218,10 +218,7 @@ class GestionOrdenPedidoController extends Controller
          'CAT.NOM_CATEGORIA as UNIDAD')
          ->get();*/
 
-        $producto = DB::select(
-            "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
-            [$empresa]
-        );
+        $producto = [];
         $registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
             ->where('COD_ESTADO', 1)
             ->orderBy('MONTO', 'asc')
@@ -774,5 +771,22 @@ class GestionOrdenPedidoController extends Controller
     public function actionBuscarProductoCompra(Request $request)
     {
         return $this->actionAjaxBuscarProducto($request);
+    }
+
+    public function actionAjaxObtenerProductosTipo(Request $request)
+    {
+        $tipo = $request->input('tipo'); // 'M' o 'S' (Material o Servicio)
+        $empresa = Session::get('empresas')->COD_EMPR;
+
+        $productos_raw = DB::select(
+            "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
+            [$empresa]
+        );
+
+        $productos = collect($productos_raw)->filter(function ($item) use ($tipo) {
+            return $item->IND_MATERIAL_SERVICIO === $tipo;
+        })->values();
+
+        return response()->json($productos);
     }
 }

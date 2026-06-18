@@ -1102,6 +1102,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-pedido-editar', 'GestionOrdenPedidoController@actionAjaxPedidoEditar');
 	Route::post('/ajax-obtener-correlativo-pedido', 'GestionOrdenPedidoController@actionAjaxObtenerCorrelativoPedido');
 	Route::post('/ajax-buscar-producto', 'GestionOrdenPedidoController@actionAjaxBuscarProducto');
+	Route::post('/ajax-obtener-productos-tipo', 'GestionOrdenPedidoController@actionAjaxObtenerProductosTipo');
 	Route::get('/buscarproductocompra', 'GestionOrdenPedidoController@actionBuscarProductoCompra');
 
 	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');

@@ -350,16 +350,6 @@
                 </label>
                 <select id="producto_id" class="form-control select2 select2-lg" style="width: 100%;">
                     <option value="">Buscar producto...</option>
-                    @foreach($producto as $prd)
-                        <option value="{{ $prd->COD_PRODUCTO }}"
-                                data-nombre="{{ $prd->NOM_PRODUCTO }}"
-                                data-unidad="{{ $prd->UNIDAD }}"
-                                data-codcategoria="{{ $prd->COD_UNIDAD }}"
-                                data-precio="{{ number_format($prd->PRECIO, 2, '.', '') }}"
-                                data-indmaterialservicio="{{ $prd->IND_MATERIAL_SERVICIO }}">
-                            {{ $prd->COD_PRODUCTO }} - {{ $prd->NOM_PRODUCTO }}
-                        </option>
-                    @endforeach
                 </select>
             </div>
 
