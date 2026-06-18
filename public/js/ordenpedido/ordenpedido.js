@@ -538,10 +538,46 @@ $(document).ready(function () {
        FILTRO POR TIPO DE PRODUCTO
        =============================== */
     
-    // Inicializar Select2 local estándar en #producto_id
+    // Inicializar Select2 con búsqueda AJAX en #producto_id
     $('#producto_id').select2({
+        ajax: {
+            url: carpeta + '/ajax-buscar-producto',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term,
+                    tipo: $('#tipo_material_servicio').val(),
+                    _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content')
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        },
         placeholder: 'Buscar producto...',
+        minimumInputLength: 1,
         width: '100%'
+    });
+
+    // Mapear los datos del producto al seleccionarlo
+    $('#producto_id').on('select2:select', function (e) {
+        let data = e.params.data;
+        let option = $('#producto_id option:selected');
+        
+        // Asignar data attributes dinámicamente para compatibilidad con la lógica existente
+        option.data('nombre', data.NOM_PRODUCTO);
+        option.data('unidad', data.UNIDAD);
+        option.data('codcategoria', data.COD_UNIDAD);
+        option.data('precio', data.PRECIO);
+        option.data('indmaterialservicio', data.IND_MATERIAL_SERVICIO);
+
+        // Disparar el evento change para actualizar la UI
+        $('#producto_id').trigger('change');
     });
 
     $(document).on('select2:opening', '#producto_id', function (e) {
@@ -577,56 +613,6 @@ $(document).ready(function () {
             $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
         } else {
             $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Producto');
-        }
-
-        if (tipo) {
-            // Deshabilitar temporalmente el combo mientras carga
-            $('#producto_id').prop('disabled', true).trigger('change');
-            
-            $.ajax({
-                type: "POST",
-                url: carpeta + "/ajax-obtener-productos-tipo",
-                data: {
-                    tipo: tipo,
-                    _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (productos) {
-                    $('#producto_id').empty().append('<option value="">Buscar producto...</option>');
-
-                    $.each(productos, function (i, item) {
-                        let opt = $('<option>', {
-                            value: item.COD_PRODUCTO,
-                            text: item.COD_PRODUCTO + ' - ' + item.NOM_PRODUCTO
-                        });
-                        
-                        // Guardar datos en data attributes para la lógica existente
-                        opt.data('nombre', item.NOM_PRODUCTO);
-                        opt.data('unidad', item.UNIDAD);
-                        opt.data('codcategoria', item.COD_UNIDAD);
-                        opt.data('precio', parseFloat(item.PRECIO || 0).toFixed(2));
-                        opt.data('indmaterialservicio', item.IND_MATERIAL_SERVICIO);
-
-                        $('#producto_id').append(opt);
-                    });
-
-                    // Reactivar e inicializar select2
-                    $('#producto_id').prop('disabled', false);
-                    $('#producto_id').select2('destroy').select2({
-                        placeholder: 'Buscar producto...',
-                        width: '100%'
-                    }).trigger('change');
-                },
-                error: function (xhr) {
-                    console.error("Error al obtener productos:", xhr);
-                    $('#producto_id').prop('disabled', false).trigger('change');
-                    modalBonito({
-                        tipo: 'error',
-                        icono: '❌',
-                        titulo: 'Error',
-                        mensaje: 'Ocurrió un error al cargar la lista de productos.'
-                    });
-                }
-            });
         }
     });
 

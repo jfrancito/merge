@@ -737,44 +737,6 @@ class GestionOrdenPedidoController extends Controller
     public function actionAjaxBuscarProducto(Request $request)
     {
         $term = $request->input('term');
-        $tipo = $request->input('tipo'); // Material o Servicio
-        $empresa = Session::get('empresas')->COD_EMPR;
-
-        $productos = DB::table('ALM.PRODUCTO as PRD')
-            ->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
-            ->where('PRD.COD_EMPR', $empresa)
-            ->where('PRD.COD_ESTADO', 1)
-            ->when($term, function ($query) use ($term) {
-                $query->where(function ($sub) use ($term) {
-                    $sub->where('PRD.NOM_PRODUCTO', 'LIKE', '%' . $term . '%')
-                        ->orWhere('PRD.COD_PRODUCTO', 'LIKE', '%' . $term . '%');
-                });
-            })
-            ->when($tipo, function ($query) use ($tipo) {
-                $query->where('PRD.IND_MATERIAL_SERVICIO', $tipo);
-            })
-            ->select(
-                'PRD.COD_PRODUCTO as id',
-                DB::raw("PRD.COD_PRODUCTO + ' - ' + PRD.NOM_PRODUCTO as text"),
-                'PRD.NOM_PRODUCTO',
-                'CAT.NOM_CATEGORIA as UNIDAD',
-                'CAT.COD_CATEGORIA as COD_UNIDAD',
-                DB::raw("CAST(PRD.CAN_PRECIO AS FLOAT) as PRECIO"),
-                'PRD.IND_MATERIAL_SERVICIO'
-            )
-            ->limit(100)
-            ->get();
-
-        return response()->json($productos);
-    }
-
-    public function actionBuscarProductoCompra(Request $request)
-    {
-        return $this->actionAjaxBuscarProducto($request);
-    }
-
-    public function actionAjaxObtenerProductosTipo(Request $request)
-    {
         $tipo = $request->input('tipo'); // 'M' o 'S' (Material o Servicio)
         $empresa = Session::get('empresas')->COD_EMPR;
 
@@ -783,10 +745,36 @@ class GestionOrdenPedidoController extends Controller
             [$empresa]
         );
 
-        $productos = collect($productos_raw)->filter(function ($item) use ($tipo) {
-            return $item->IND_MATERIAL_SERVICIO === $tipo;
+        $productos = collect($productos_raw)->filter(function ($item) use ($tipo, $term) {
+            // Filtrar por tipo
+            if ($tipo && $item->IND_MATERIAL_SERVICIO !== $tipo) {
+                return false;
+            }
+            // Filtrar por término
+            if ($term) {
+                $term_lower = strtolower(trim($term));
+                $nom_lower = strtolower($item->NOM_PRODUCTO);
+                $cod_lower = strtolower($item->COD_PRODUCTO);
+                return (strpos($nom_lower, $term_lower) !== false) || (strpos($cod_lower, $term_lower) !== false);
+            }
+            return true;
+        })->map(function ($item) {
+            return [
+                'id' => $item->COD_PRODUCTO,
+                'text' => $item->COD_PRODUCTO . ' - ' . $item->NOM_PRODUCTO,
+                'NOM_PRODUCTO' => $item->NOM_PRODUCTO,
+                'UNIDAD' => $item->UNIDAD,
+                'COD_UNIDAD' => $item->COD_UNIDAD,
+                'PRECIO' => $item->PRECIO,
+                'IND_MATERIAL_SERVICIO' => $item->IND_MATERIAL_SERVICIO
+            ];
         })->values();
 
         return response()->json($productos);
+    }
+
+    public function actionBuscarProductoCompra(Request $request)
+    {
+        return $this->actionAjaxBuscarProducto($request);
     }
 }
