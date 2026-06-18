@@ -29,7 +29,7 @@ class CotizacionOrdenPedidoController extends Controller
         $combo_tipo_pago = ['' => 'Seleccione tipo de pago'] + $combo_tipo_pago;
 
         $combo_moneda = DB::table('CMP.CATEGORIA')
-            ->whereIn('COD_CATEGORIA', ['MOM0000000000001', 'MOM0000000000002'])
+            ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
         $combo_moneda = ['' => 'Seleccione moneda'] + $combo_moneda;
