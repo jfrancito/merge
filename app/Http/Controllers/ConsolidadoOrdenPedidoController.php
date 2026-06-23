@@ -412,6 +412,8 @@ class ConsolidadoOrdenPedidoController extends Controller
                         'CAN_COMPRADA' => $det['cantidad'],
                         'IND_COMPRA' => $det['ind_compra'] ?? null,
                         'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
+                        'COD_ALMACEN' => $det['cod_almacen'] ?? null,
+                        'NOM_ALMACEN' => $det['nom_almacen'] ?? null,
                         'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id // Guardamos el ID del usuario
                     ]);
             }
@@ -450,6 +452,8 @@ class ConsolidadoOrdenPedidoController extends Controller
                             'CAN_COMPRADA' => $det['cantidad'],
                             'IND_COMPRA' => $det['ind_compra'],
                             'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
+                            'COD_ALMACEN' => $det['cod_almacen'] ?? null,
+                            'NOM_ALMACEN' => $det['nom_almacen'] ?? null,
                             'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
                             'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
                         ]);
@@ -755,6 +759,28 @@ class ConsolidadoOrdenPedidoController extends Controller
         })->export('xls');
     }
 
+    public function actionAjaxObtenerAlmacenesProductoCentro(Request $request)
+    {
+        $cod_producto = $request->input('cod_producto');
+        $cod_centro = $request->input('cod_centro');
+        $cod_empr = $request->input('cod_empr') ?: Session::get('empresas')->COD_EMPR;
+
+        $almacenes = DB::connection('sqlsrv')
+            ->table('ALM.REFERENCIA_ALMACEN as RA')
+            ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
+            ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
+            ->join('ALM.CENTRO as CE', 'CE.COD_CENTRO', '=', 'AL.COD_CENTRO')
+            ->where('RA.TXT_TABLA_ASOC', 'ALM.PRODUCTO')
+            ->where('RA.COD_TABLA_ASOC', $cod_producto)
+            ->where('AL.COD_EMPR', $cod_empr)
+            ->where('CE.COD_CENTRO', $cod_centro)
+            ->where('RA.COD_ESTADO', 1)
+            ->select('AL.COD_ALMACEN', 'AL.NOM_ALMACEN')
+            ->orderBy('AL.NOM_ALMACEN', 'asc')
+            ->get();
+
+        return response()->json($almacenes);
+    }
 }
 
 

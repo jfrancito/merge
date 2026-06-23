@@ -303,7 +303,9 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_AUTORIZA',
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
+                'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
                 'OP.COD_USUARIO_MODIF_AUD',
                 'U.nombre as USUARIO_MODIF',
@@ -395,7 +397,9 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_AUTORIZA',
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
+                'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
                 'OP.COD_ESTADO_TEMP',
                 'OP.TXT_ESTADO_TEMP'
@@ -1648,6 +1652,7 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.TXT_TRABAJADOR_SOLICITA,
                 OP.TXT_GLOSA,
                 OP.TXT_TRABAJADOR_APRUEBA_ADM,
+                OP.COD_TRABAJADOR_APRUEBA_ADM,
                 STUFF((
                     SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
                     FROM dbo.ARCHIVOS ARCH

@@ -56,8 +56,12 @@
                                                             <span class="badge badge-danger"><?php echo e($item['TXT_ESTADO']); ?></span>
 
                                                         <?php else: ?>
-                                                            <?php if($item['COD_ESTADO'] == 'ETM0000000000015'): ?> 
-                                                                <span class="badge badge-warning"><?php echo e($item['TXT_ESTADO']); ?></span>
+                                                             <?php if($item['COD_ESTADO'] == 'ETM0000000000015'): ?> 
+                                                                 <?php if(isset($item['COD_TRABAJADOR_APRUEBA_ADM']) && $item['COD_TRABAJADOR_APRUEBA_ADM'] == 'IITR000000000391'): ?>
+                                                                     <span class="badge" style="background-color: #f57c00; color: #fff;">POR APROBAR GERENCIA ADM</span>
+                                                                 <?php else: ?>
+                                                                     <span class="badge badge-warning"><?php echo e($item['TXT_ESTADO']); ?></span>
+                                                                 <?php endif; ?>
 
                                                             <?php else: ?>
                                                                 <span class="badge badge-default"><?php echo e($item['TXT_ESTADO'] ?? 'SIN ESTADO'); ?></span>

@@ -75,7 +75,8 @@ class GestionOrdenPedidoController extends Controller
                 $query->where('cadcargo', 'LIKE', '%JEFE%')
                     ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
                     ->orWhere('COD_TRAB', 'IITR000000000391')
-                    ->orWhere('COD_TRAB', 'ICTR000000000250');
+                    ->orWhere('COD_TRAB', 'ICTR000000000250')
+                    ->orWhere('COD_TRAB', 'IATR000000000097');
             })
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->whereIn('empresa_osiris_id', [
@@ -776,5 +777,45 @@ class GestionOrdenPedidoController extends Controller
     public function actionBuscarProductoCompra(Request $request)
     {
         return $this->actionAjaxBuscarProducto($request);
+    }
+
+    public function actionAjaxVerificarAlmacenProducto(Request $request)
+    {
+        $cod_producto = $request->input('cod_producto');
+        $cod_centro = $request->input('cod_centro');
+        $cod_empr = $request->input('cod_empr');
+
+        // Obtener columnas de ALM.ALMACEN y ALM.CENTRO para determinar el campo de empresa dinámicamente
+        $schema = DB::connection('sqlsrv')->getSchemaBuilder();
+        $cols_almacen = $schema->getColumnListing('ALM.ALMACEN');
+        $cols_centro = $schema->getColumnListing('ALM.CENTRO');
+
+        $query = DB::connection('sqlsrv')->table('ALM.REFERENCIA_ALMACEN as RA')
+            ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
+            ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
+            ->join('ALM.CENTRO as CE', 'CE.COD_CENTRO', '=', 'AL.COD_CENTRO')
+            ->where('RA.TXT_TABLA_ASOC', 'ALM.PRODUCTO')
+            ->where('RA.COD_TABLA_ASOC', $cod_producto)
+            ->where('CE.COD_CENTRO', $cod_centro)
+            ->where('RA.COD_ESTADO', 1);
+
+        if (in_array('COD_EMPR', $cols_almacen)) {
+            $query->where('AL.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_almacen)) {
+            $query->where('AL.COD_EMPRESA', $cod_empr);
+        }
+
+        if (in_array('COD_EMPR', $cols_centro)) {
+            $query->where('CE.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_centro)) {
+            $query->where('CE.COD_EMPRESA', $cod_empr);
+        }
+
+        $existe = $query->exists();
+
+        return response()->json([
+            'success' => true,
+            'tiene_almacen' => $existe
+        ]);
     }
 }
