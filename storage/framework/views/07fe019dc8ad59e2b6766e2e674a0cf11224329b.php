@@ -95,23 +95,24 @@
     <div class="panel-heading" style="background-color: #f5f5f5; border-bottom: 2px solid #34aadc;">
         <h4 style="font-weight: bold; margin: 0;">
             <i class="mdi mdi-view-list"></i> PRODUCTOS DEL CONSOLIDADO:
-            {{$listadetalle->first()->ID_PEDIDO_CONSOLIDADO ?? ''}}
+            <?php echo e($listadetalle->first()->ID_PEDIDO_CONSOLIDADO ?? ''); ?>
+
         </h4>
     </div>
     <div class="panel-body">
         <div class="row" style="margin-bottom: 10px;">
             <div class="col-xs-12 text-right">
-                @if(($listadetalle->first()->COD_ESTADO ?? '') != 'ETM0000000000005')
+                <?php if(($listadetalle->first()->COD_ESTADO ?? '') != 'ETM0000000000005'): ?>
                     <button type="button" class="btn btn-success" id="btn-aprobar-consolidado-ap"
                         style="width: 200px; display: inline-flex; align-items: center; justify-content: center; height: 38px; font-weight: bold;">
                         <i class="mdi mdi-check" style="font-size: 18px; margin-right: 8px;"></i> Aprobar Consolidado
                     </button>
-                @else
+                <?php else: ?>
                     <span class="label label-success"
                         style="font-size: 14px; padding: 8px 15px; background-color: #27ae60; display: inline-block;">
                         <i class="mdi mdi-check-all"></i> ESTE CONSOLIDADO YA SE ENCUENTRA APROBADO
                     </span>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
         <div class="table-responsive">
@@ -135,19 +136,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($listadetalle as $index => $item)
-                        <tr class="fila-detalle-consolidado-ap" data-id="{{ $item->COD_PRODUCTO }}"
-                            data-nombre="{{ $item->NOM_PRODUCTO }}" data-detalle="{{ $item->DETALLE_POR_AREA }}"
+                    <?php $__empty_1 = true; $__currentLoopData = $listadetalle; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr class="fila-detalle-consolidado-ap" data-id="<?php echo e($item->COD_PRODUCTO); ?>"
+                            data-nombre="<?php echo e($item->NOM_PRODUCTO); ?>" data-detalle="<?php echo e($item->DETALLE_POR_AREA); ?>"
                             style="cursor: pointer;">
-                            <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $item->COD_PRODUCTO }}</td>
-                            <td>{{ $item->NOM_PRODUCTO }}</td>
-                            <!-- DEBUG: COD_EMPR: {{ $item->COD_EMPR ?? 'NULL' }} | IND_COMPRA: {{ $item->IND_COMPRA ?? 'NULL' }} -->
+                            <td class="text-center"><?php echo e($index + 1); ?></td>
+                            <td><?php echo e($item->COD_PRODUCTO); ?></td>
+                            <td><?php echo e($item->NOM_PRODUCTO); ?></td>
+                            <!-- DEBUG: COD_EMPR: <?php echo e($item->COD_EMPR ?? 'NULL'); ?> | IND_COMPRA: <?php echo e($item->IND_COMPRA ?? 'NULL'); ?> -->
                             <td class="text-center">
                                 <select class="form-control input-sm combo-compra-moderno combo-compra-ap"
-                                    data-empresa="{{ trim($item->COD_EMPR ?? '') }}"
-                                    @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') disabled @endif>
-                                    @php
+                                    data-empresa="<?php echo e(trim($item->COD_EMPR ?? '')); ?>"
+                                    <?php if(($item->COD_ESTADO ?? '') == 'ETM0000000000005'): ?> disabled <?php endif; ?>>
+                                    <?php 
                                         $current_ind_compra = trim($item->IND_COMPRA ?? '');
                                         $current_cod_empr   = trim($item->COD_EMPR ?? '');
                                         $current_cod_centro = trim($item->COD_CENTRO ?? '');
@@ -165,58 +166,61 @@
                                                 }
                                             }
                                         }
-                                    @endphp
+                                     ?>
 
                                     <option value="">Seleccione...</option>
-                                    {{-- 1. Centro origen del Consolidado (ej. RIOJA) --}}
-                                    @if($current_nom_centro != '' && $current_nom_centro != 'CHICLAYO' && $current_nom_centro != 'LIMA')
-                                        <option value="{{ $current_nom_centro }}" data-codigo="{{ $current_cod_centro }}" {{ $selected_compra == $current_nom_centro ? 'selected' : '' }}>
-                                            {{ $current_nom_centro }}
+                                    
+                                    <?php if($current_nom_centro != '' && $current_nom_centro != 'CHICLAYO' && $current_nom_centro != 'LIMA'): ?>
+                                        <option value="<?php echo e($current_nom_centro); ?>" data-codigo="<?php echo e($current_cod_centro); ?>" <?php echo e($selected_compra == $current_nom_centro ? 'selected' : ''); ?>>
+                                            <?php echo e($current_nom_centro); ?>
+
                                         </option>
-                                    @endif
-                                    {{-- 2. Chiclayo --}}
-                                    <option value="CHICLAYO" data-codigo="CEN0000000000001" {{ $selected_compra == 'CHICLAYO' ? 'selected' : '' }}>
+                                    <?php endif; ?>
+                                    
+                                    <option value="CHICLAYO" data-codigo="CEN0000000000001" <?php echo e($selected_compra == 'CHICLAYO' ? 'selected' : ''); ?>>
                                         CHICLAYO
                                     </option>
-                                    {{-- 3. Lima (Si aplica) --}}
-                                    @if($selected_compra == 'LIMA' || $current_nom_centro == 'LIMA')
-                                        <option value="LIMA" data-codigo="CEN0000000000002" {{ $selected_compra == 'LIMA' ? 'selected' : '' }}>
+                                    
+                                    <?php if($selected_compra == 'LIMA' || $current_nom_centro == 'LIMA'): ?>
+                                        <option value="LIMA" data-codigo="CEN0000000000002" <?php echo e($selected_compra == 'LIMA' ? 'selected' : ''); ?>>
                                             LIMA
                                         </option>
-                                    @endif
-                                    {{-- 4. Caso especial: Valor guardado diferente a los anteriores --}}
-                                    @if($current_ind_compra != '' && $current_ind_compra != 'CHICLAYO' && $current_ind_compra != 'LIMA' && $current_ind_compra != $current_nom_centro)
-                                        <option value="{{ $current_ind_compra }}" data-codigo="" selected>
-                                            {{ $current_ind_compra }}
+                                    <?php endif; ?>
+                                    
+                                    <?php if($current_ind_compra != '' && $current_ind_compra != 'CHICLAYO' && $current_ind_compra != 'LIMA' && $current_ind_compra != $current_nom_centro): ?>
+                                        <option value="<?php echo e($current_ind_compra); ?>" data-codigo="" selected>
+                                            <?php echo e($current_ind_compra); ?>
+
                                         </option>
-                                    @endif
+                                    <?php endif; ?>
                                 </select>
                             </td>
                             <td class="text-center">
                                 <select class="form-control input-sm select2-almacen-ap combo-almacen-ap" 
-                                    data-almacen-actual="{{ trim($item->COD_ALMACEN ?? '') }}"
-                                    @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') disabled @endif>
+                                    data-almacen-actual="<?php echo e(trim($item->COD_ALMACEN ?? '')); ?>"
+                                    <?php if(($item->COD_ESTADO ?? '') == 'ETM0000000000005'): ?> disabled <?php endif; ?>>
                                     <option value="">Seleccione...</option>
                                 </select>
                             </td>
-                            <td class="text-center">{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
-                            <td class="text-center">{{ number_format($item->CANTIDAD, 2) }}</td>
-                            <td class="text-center">{{ number_format($item->STOCK, 2) }}</td>
-                            <td class="text-center">{{ number_format($item->RESERVADO, 2) }}</td>
-                            <td class="text-center" style="font-weight: bold;">{{ number_format($item->DIFERENCIA, 2) }}
+                            <td class="text-center"><?php echo e($item->NOM_CATEGORIA_MEDIDA); ?></td>
+                            <td class="text-center"><?php echo e(number_format($item->CANTIDAD, 2)); ?></td>
+                            <td class="text-center"><?php echo e(number_format($item->STOCK, 2)); ?></td>
+                            <td class="text-center"><?php echo e(number_format($item->RESERVADO, 2)); ?></td>
+                            <td class="text-center" style="font-weight: bold;"><?php echo e(number_format($item->DIFERENCIA, 2)); ?>
+
                             </td>
                             <td class="text-center">
                                 <input type="text" class="form-control input-sm input-cantidad-moderno input-cantidad-ap inputmask-mil"
-                                    value="{{ (int) (!is_null($item->CAN_COMPRADA) ? ($item->CAN_COMPRADA) : ($item->DIFERENCIA < 0 ? 0 : $item->DIFERENCIA)) }}"
-                                    @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') readonly @endif>
+                                    value="<?php echo e((int) (!is_null($item->CAN_COMPRADA) ? ($item->CAN_COMPRADA) : ($item->DIFERENCIA < 0 ? 0 : $item->DIFERENCIA))); ?>"
+                                    <?php if(($item->COD_ESTADO ?? '') == 'ETM0000000000005'): ?> readonly <?php endif; ?>>
                             </td>
-                            <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
+                            <td><?php echo e($item->NOM_CATEGORIA_FAMILIA); ?></td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="12" class="text-center text-muted">No se encontraron productos.</td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

@@ -14,7 +14,13 @@
     <td style="background-color:#eeeeee; border : 1px solid #000000 ; text-align:center;"><b>N° PEDIDO</b></td>
     <td style="border : 1px solid #000000">{{ $cab->ID_PEDIDO }}</td>
     <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>ESTADO</b></td>
-    <td colspan="2" style="border : 1px solid #000000" >{{ $cab->TXT_ESTADO }}</td>
+    <td colspan="2" style="border : 1px solid #000000" >
+        @if(isset($cab->COD_ESTADO) && $cab->COD_ESTADO == 'ETM0000000000015' && isset($cab->COD_TRABAJADOR_APRUEBA_ADM) && $cab->COD_TRABAJADOR_APRUEBA_ADM == 'IITR000000000391')
+            POR APROBAR GERENCIA ADM
+        @else
+            {{ $cab->TXT_ESTADO }}
+        @endif
+    </td>
 </tr>
 
 <tr>

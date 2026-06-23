@@ -73,6 +73,8 @@
             <td>
                 @if(isset($item->TXT_ESTADO_TEMP) && $item->TXT_ESTADO_TEMP != '')
                     <span class="badge badge-success">{{ $item->TXT_ESTADO_TEMP }}</span>
+                @elseif(isset($item->COD_ESTADO) && $item->COD_ESTADO == 'ETM0000000000015' && isset($item->COD_TRABAJADOR_APRUEBA_ADM) && $item->COD_TRABAJADOR_APRUEBA_ADM == 'IITR000000000391')
+                    <span class="badge" style="background-color: #f57c00; color: #fff;">POR APROBAR GERENCIA ADM</span>
                 @else
                    <span class="badge {{ $clase }}">
                     {{ $item->TXT_ESTADO }}

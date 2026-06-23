@@ -258,8 +258,10 @@ $(document).ready(function() {
             let cod_producto = $(this).data('id');
             let cantidad     = $(this).find('.input-cantidad-ap').val().replace(/,/g, '');
             let ind_compra   = $(this).find('.combo-compra-ap').val();
+            let cod_almacen  = $(this).find('.combo-almacen-ap').val();
+            let nom_almacen  = (cod_almacen !== '' && cod_almacen !== null) ? $(this).find('.combo-almacen-ap option:selected').text() : null;
 
-            if (ind_compra === '' || ind_compra === null) {
+            if (ind_compra === '' || ind_compra === null || cod_almacen === '' || cod_almacen === null) {
                 validacion = false;
             }
 
@@ -270,7 +272,9 @@ $(document).ready(function() {
                 cod_producto: cod_producto,
                 cantidad: cantidad,
                 ind_compra: ind_compra,
-                cod_centro_compra: cod_centro_compra
+                cod_centro_compra: cod_centro_compra,
+                cod_almacen: cod_almacen,
+                nom_almacen: nom_almacen
             });
         });
 
@@ -279,7 +283,7 @@ $(document).ready(function() {
                 tipo: 'error',
                 icono: '❌',
                 titulo: 'Campos Incompletos',
-                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> para todos los productos.'
+                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> y el <b>ALMACEN</b> para todos los productos.'
             });
             return;
         }
@@ -347,8 +351,10 @@ $(document).ready(function() {
             let cod_producto = $(this).data('id');
             let cantidad     = $(this).find('.input-cantidad-ap').val().replace(/,/g, '');
             let ind_compra   = $(this).find('.combo-compra-ap').val();
+            let cod_almacen  = $(this).find('.combo-almacen-ap').val();
+            let nom_almacen  = (cod_almacen !== '' && cod_almacen !== null) ? $(this).find('.combo-almacen-ap option:selected').text() : null;
 
-            if (ind_compra === '' || ind_compra === null) {
+            if (ind_compra === '' || ind_compra === null || cod_almacen === '' || cod_almacen === null) {
                 validacion = false;
             }
 
@@ -359,7 +365,9 @@ $(document).ready(function() {
                 cod_producto: cod_producto,
                 cantidad: cantidad,
                 ind_compra: ind_compra,
-                cod_centro_compra: cod_centro_compra
+                cod_centro_compra: cod_centro_compra,
+                cod_almacen: cod_almacen,
+                nom_almacen: nom_almacen
             });
         });
 
@@ -368,7 +376,7 @@ $(document).ready(function() {
                 tipo: 'error',
                 icono: '❌',
                 titulo: 'Campos Incompletos',
-                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> para todos los productos.'
+                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> y el <b>ALMACEN</b> para todos los productos.'
             });
             return;
         }
