@@ -118,8 +118,15 @@ $(document).ready(function () {
 
 
     /* ===============================
-       BUSCAR PROVEEDOR POR RUC
+       BUSCAR PROVEEDOR POR RUC O NOMBRE
        =============================== */
+    $(document).on('keypress', '#ruc_proveedor', function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('.btn-search-premium').trigger('click');
+        }
+    });
+
     $(document).on('click', '.btn-search-premium', function (e) {
 
         var ruc = $('#ruc_proveedor').val();
@@ -130,7 +137,7 @@ $(document).ready(function () {
                 tipo: 'warn',
                 icono: '⚠️',
                 titulo: 'Campo Obligatorio',
-                mensaje: 'Debe de Ingresar RUC para poder realizar la búsqueda.',
+                mensaje: 'Debe ingresar el RUC o Nombre para poder realizar la búsqueda.',
                 ancho: '400px'
             });
 
@@ -158,6 +165,7 @@ $(document).ready(function () {
                     if (data.nombre) $('#nombre_proveedor').val(data.nombre);
                     if (data.direccion) $('#direccion').val(data.direccion);
                     if (data.telefono) $('#telefono').val(data.telefono);
+                    if (data.ruc) $('#ruc_proveedor').val(data.ruc);
 
                     $('.premium-input').addClass('success-pulse');
                     setTimeout(() => $('.premium-input').removeClass('success-pulse'), 1500);
@@ -168,7 +176,7 @@ $(document).ready(function () {
                         tipo: 'error',
                         icono: '❌',
                         titulo: 'No encontrado',
-                        mensaje: 'No se encontró ningún proveedor con el RUC ingresado.',
+                        mensaje: 'No se encontró ningún proveedor con el RUC o Nombre ingresado.',
                         ancho: '400px'
                     });
 

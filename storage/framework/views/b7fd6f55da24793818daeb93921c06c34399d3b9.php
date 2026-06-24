@@ -101,7 +101,7 @@
                                 <label>RUC / Documento</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control premium-input" id="ruc_proveedor"
-                                        placeholder="Buscar RUC...">
+                                        placeholder="Buscar RUC o Nombre...">
                                     <span class="input-group-btn">
                                         <button class="btn btn-primary btn-search-premium" type="button">
                                             <i class="mdi mdi-search"></i>
