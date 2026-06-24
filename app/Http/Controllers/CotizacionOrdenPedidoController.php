@@ -307,13 +307,23 @@ class CotizacionOrdenPedidoController extends Controller
 
     public function actionAjaxBuscarProveedorRuc(Request $request)
     {
-        $ruc = $request->input('ruc');
+        $ruc = trim($request->input('ruc'));
 
+        // 1. Intentar buscar por RUC exacto
         $empresa = DB::table('STD.EMPRESA')
             ->where('NRO_DOCUMENTO', $ruc)
             ->where('IND_PROVEEDOR', 1)
             ->where('COD_ESTADO', 1)
             ->first();
+
+        // 2. Si no se encuentra, intentar buscar por Nombre de la Empresa (coincidencia parcial)
+        if (!$empresa) {
+            $empresa = DB::table('STD.EMPRESA')
+                ->where('NOM_EMPR', 'like', '%' . $ruc . '%')
+                ->where('IND_PROVEEDOR', 1)
+                ->where('COD_ESTADO', 1)
+                ->first();
+        }
 
         if ($empresa) {
             $direccion = DB::table('STD.EMPRESA_DIRECCION')
@@ -324,9 +334,10 @@ class CotizacionOrdenPedidoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'nombre' => $empresa->NOM_EMPR,
-                'telefono' => $empresa->TXT_TELEFONO,
-                'direccion' => $direccion ? $direccion->NOM_DIRECCION : ''
+                'nombre' => trim($empresa->NOM_EMPR),
+                'telefono' => trim($empresa->TXT_TELEFONO),
+                'direccion' => $direccion ? trim($direccion->NOM_DIRECCION) : '',
+                'ruc' => trim($empresa->NRO_DOCUMENTO)
             ]);
         }
 
