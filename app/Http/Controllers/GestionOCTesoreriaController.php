@@ -1191,6 +1191,11 @@ class GestionOCTesoreriaController extends Controller
         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
         $documento_top = $this->gn_lista_comision_asociados_top($lotes);
 
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $idoc)
+            ->where('ACTIVO', '=', 1)
+            ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+            ->get();
+
         //dd($documento_asociados);
         return View::make('comision/registrocomprobantecomisionadministrator',
             [
@@ -1217,6 +1222,7 @@ class GestionOCTesoreriaController extends Controller
                 'funcion' => $funcion,
                 'fereftop1' => $fereftop1,
                 'idopcion' => $idopcion,
+                'archivospdf' => $archivospdf,
             ]);
     }
 

@@ -92,18 +92,32 @@
         });
     </script>
 
-    <script type="text/javascript">
-        @foreach($tarchivos as $index => $item)
-
-        $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
-            theme: 'fa5',
-            language: 'es',
-            allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
-        });
-
-        @endforeach
-
-
+    <script type="application/json" id="tarchivos-data">
+    [
+      @foreach($tarchivos as $index => $item)
+        @php
+            $categoria_pdfs = isset($archivospdf) ? $archivospdf->where('TIPO_ARCHIVO', $item->COD_CATEGORIA_DOCUMENTO) : collect();
+            $initialPreview = [];
+            $initialPreviewConfig = [];
+            foreach ($categoria_pdfs as $pdf) {
+                $nombre_archivo = $pdf->NOMBRE_ARCHIVO;
+                $url = route('serve-fileestiba', ['file' => '']) . $nombre_archivo;
+                $initialPreview[] = $url;
+                $initialPreviewConfig[] = [
+                    'type' => 'pdf',
+                    'caption' => $nombre_archivo,
+                    'downloadUrl' => $url
+                ];
+            }
+        @endphp
+        {
+            "cod_categoria": "{{ $item->COD_CATEGORIA_DOCUMENTO }}",
+            "formato": "{{ $item->TXT_FORMATO }}",
+            "initialPreview": {!! json_encode($initialPreview) !!},
+            "initialPreviewConfig": {!! json_encode($initialPreviewConfig) !!}
+        }@if(!$loop->last),@endif
+      @endforeach
+    ]
     </script>
     <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/comprobante/hextorno.js?v='.$version) }}" type="text/javascript"></script>

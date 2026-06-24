@@ -7,27 +7,29 @@
                     </div>
                     <div class="panel-body panel-body-contrast">
                         <form method="POST"
-                              action="{{ url('subir-xml-cargar-datos-comision-administrator/'.$idopcion.'/'.$idoc) }}"
+                              action="<?php echo e(url('subir-xml-cargar-datos-comision-administrator/'.$idopcion.'/'.$idoc)); ?>"
                               name="formcargardatos" id="formcargardatos" enctype="multipart/form-data">
-                            {{ csrf_field() }}
+                            <?php echo e(csrf_field()); ?>
+
                             <input type="hidden" name="device_info" id='device_info'>
                             <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
 
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label labelleft">Documento :</label>
                                     <div class="col-sm-12 abajocaja">
-                                        {!! Form::select( 'documento_id', $combodocumento, array($documento_id),
+                                        <?php echo Form::select( 'documento_id', $combodocumento, array($documento_id),
                                                           [
                                                             'class'       => 'select2 form-control control input-sm' ,
                                                             'id'          => 'documento_id',
                                                             'required'    => '',
                                                             'data-aw'     => '1',
-                                                          ]) !!}
+                                                          ]); ?>
+
                                     </div>
                                 </div>
                             </div>
                             <input type="hidden" name="operacion_id" id="operacion_id"
-                                   value="{{$fereftop1->OPERACION}}">
+                                   value="<?php echo e($fereftop1->OPERACION); ?>">
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label labelleft">Archivo :</label>
@@ -54,30 +56,32 @@
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
                     </div>
                     <div class="panel-body panel-body-contrast">
-                        @if(count($fedocumento)<=0)
+                        <?php if(count($fedocumento)<=0): ?>
                             <div class="col-sm-12">
                                 <b>CARGAR XML</b>
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="col-sm-12">
-                                <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
+                                <p style="margin:0px;"><b>Respuesta Sunat</b> : <?php echo e($fedocumento->message); ?></p>
                                 <p style="margin:0px;"
-                                   class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado
+                                   class='<?php if($fedocumento->estadoCp == 1): ?> msjexitoso <?php else: ?> msjerror <?php endif; ?>'><b>Estado
                                         Comprobante</b> :
-                                    {{$fedocumento->nestadoCp}}
+                                    <?php echo e($fedocumento->nestadoCp); ?>
+
                                 </p>
-                                <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
-                                <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
-                                <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
+                                <p style="margin:0px;"><b>Estado Ruc</b> : <?php echo e($fedocumento->nestadoRuc); ?></p>
+                                <p style="margin:0px;"><b>Estado Domicilio</b> : <?php echo e($fedocumento->ncondDomiRuc); ?></p>
+                                <p style="margin:0px;"><b>Respuesta CDR</b> : <?php echo e($fedocumento->RESPUESTA_CDR); ?></p>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                 <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DOCUMENTOS ASOCIADOS
-                        {{number_format($documento_asociados->sum('MONTOATENDIDOREAL'), 2, '.', ',')}}
+                        <?php echo e(number_format($documento_asociados->sum('MONTOATENDIDOREAL'), 2, '.', ',')); ?>
+
                     </div>
                     <div class="panel-body panel-body-contrast">
 
@@ -92,15 +96,15 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($documento_asociados as $index => $item)
+                            <?php $__currentLoopData = $documento_asociados; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td>{{$index + 1}}</td>
-                                    <td>{{$item->COD_OPERACION_CAJA}}</td>
-                                    <td>{{$item->NOMBRE_BANCO_CAJA}}</td>
-                                    <td>{{$item->NRO_CUENTA_BANCARIA}}</td>
-                                    <td>{{$item->MONTOATENDIDOREAL}}</td>
+                                    <td><?php echo e($index + 1); ?></td>
+                                    <td><?php echo e($item->COD_OPERACION_CAJA); ?></td>
+                                    <td><?php echo e($item->NOMBRE_BANCO_CAJA); ?></td>
+                                    <td><?php echo e($item->NRO_CUENTA_BANCARIA); ?></td>
+                                    <td><?php echo e($item->MONTOATENDIDOREAL); ?></td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
 
@@ -110,20 +114,22 @@
         </div>
 
 
-        @if(count($fedocumento)>0)
-            <form method="POST" action="{{ url('validar-xml-oc-comision-administrator/'.$idopcion.'/'.$idoc) }}"
+        <?php if(count($fedocumento)>0): ?>
+            <form method="POST" action="<?php echo e(url('validar-xml-oc-comision-administrator/'.$idopcion.'/'.$idoc)); ?>"
                   name="formguardardatos" id="formguardardatos" enctype="multipart/form-data">
-                {{ csrf_field() }}
+                <?php echo e(csrf_field()); ?>
+
                 <input type="hidden" name="device_info" id='device_info'>
 
-                <input type="hidden" name="rutaorden" id='rutaorden' value='{{$rutaorden}}'>
+                <input type="hidden" name="rutaorden" id='rutaorden' value='<?php echo e($rutaorden); ?>'>
                 
                 <div class="row">
 
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="panel panel-default panel-contrast">
                             <div class="panel-heading"
-                                 style="background: #1d3a6d;color: #fff;">{{$fereftop1->OPERACION}}
+                                 style="background: #1d3a6d;color: #fff;"><?php echo e($fereftop1->OPERACION); ?>
+
                             </div>
                             <div class="panel-body panel-body-contrast">
                                 <table class="table table-condensed table-striped">
@@ -138,36 +144,37 @@
 
                                     <tr>
                                         <td><b>RUC</b></td>
-                                        <td><p class='subtitulomerge'>{{$documento_top->RUC}}</p></td>
+                                        <td><p class='subtitulomerge'><?php echo e($documento_top->RUC); ?></p></td>
                                         <td class="">
-                                            <div class='subtitulomerge @if($fedocumento->ind_ruc == 1) msjexitoso @else msjerror @endif'>
-                                                <b>{{$fedocumento->RUC_PROVEEDOR}}</b>
+                                            <div class='subtitulomerge <?php if($fedocumento->ind_ruc == 1): ?> msjexitoso <?php else: ?> msjerror <?php endif; ?>'>
+                                                <b><?php echo e($fedocumento->RUC_PROVEEDOR); ?></b>
                                             </div>
                                         </td>
                                     </tr>
 
                                     <tr>
                                         <td><b>Moneda</b></td>
-                                        <td><p class='subtitulomerge'>{{$documento_top->MONEDA}}</p></td>
+                                        <td><p class='subtitulomerge'><?php echo e($documento_top->MONEDA); ?></p></td>
                                         <td>
-                                            <div class='subtitulomerge @if($fedocumento->ind_moneda == 1) msjexitoso @else msjerror @endif'>
+                                            <div class='subtitulomerge <?php if($fedocumento->ind_moneda == 1): ?> msjexitoso <?php else: ?> msjerror <?php endif; ?>'>
                                                 <b>
-                                                    @if($fedocumento->MONEDA == 'PEN')
+                                                    <?php if($fedocumento->MONEDA == 'PEN'): ?>
                                                         SOLES
-                                                    @else
-                                                        {{$fedocumento->MONEDA}}
-                                                    @endif</b>
+                                                    <?php else: ?>
+                                                        <?php echo e($fedocumento->MONEDA); ?>
+
+                                                    <?php endif; ?></b>
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td><b>Total</b></td>
                                         <td>
-                                            <p class='subtitulomerge'>{{number_format($documento_asociados->sum('MONTOATENDIDOREAL'), 4, '.', ',')}}</p>
+                                            <p class='subtitulomerge'><?php echo e(number_format($documento_asociados->sum('MONTOATENDIDOREAL'), 4, '.', ',')); ?></p>
                                         </td>
                                         <td>
-                                            <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
-                                                <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>
+                                            <div class='subtitulomerge <?php if($fedocumento->ind_total == 1): ?> msjexitoso <?php else: ?> msjerror <?php endif; ?>'>
+                                                <b><?php echo e(number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')); ?></b>
                                             </div>
                                         </td>
                                     </tr>
@@ -199,10 +206,10 @@
                                                 </thead>
                                                 <tbody>
                                                 <tr>
-                                                    <td>{{$fedocumento->SERIE}}</td>
-                                                    <td>{{$fedocumento->NUMERO}}</td>
-                                                    <td>{{$fedocumento->FEC_VENTA}}</td>
-                                                    <td>{{$fedocumento->FORMA_PAGO}}</td>
+                                                    <td><?php echo e($fedocumento->SERIE); ?></td>
+                                                    <td><?php echo e($fedocumento->NUMERO); ?></td>
+                                                    <td><?php echo e($fedocumento->FEC_VENTA); ?></td>
+                                                    <td><?php echo e($fedocumento->FORMA_PAGO); ?></td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -220,16 +227,16 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                @foreach($detallefedocumento as $index => $item)
+                                                <?php $__currentLoopData = $detallefedocumento; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
-                                                        <td>{{$item->CODPROD}}</td>
-                                                        <td>{{$item->PRODUCTO}}</td>
-                                                        <td>{{$item->UND_PROD}}</td>
-                                                        <td>{{number_format($item->CANTIDAD, 4, '.', ',')}}</td>
-                                                        <td>{{number_format($item->PRECIO_ORIG, 4, '.', ',')}}</td>
-                                                        <td>{{number_format($item->VAL_VENTA_ORIG, 4, '.', ',')}}</td>
+                                                        <td><?php echo e($item->CODPROD); ?></td>
+                                                        <td><?php echo e($item->PRODUCTO); ?></td>
+                                                        <td><?php echo e($item->UND_PROD); ?></td>
+                                                        <td><?php echo e(number_format($item->CANTIDAD, 4, '.', ',')); ?></td>
+                                                        <td><?php echo e(number_format($item->PRECIO_ORIG, 4, '.', ',')); ?></td>
+                                                        <td><?php echo e(number_format($item->VAL_VENTA_ORIG, 4, '.', ',')); ?></td>
                                                     </tr>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
 
@@ -251,31 +258,32 @@
                             <div class="panel-body panel-body-contrast">
 
                                 <div class="row">
-                                    @if($rutaorden != '')
+                                    <?php if($rutaorden != ''): ?>
                                         <div><b>LOS ARCHIVOS DE CONTRATOS Y GUIAS RELACIONADAS SE CARGARAN DESPUES DE
                                                 GUARDAR</b></div><br>
-                                    @endif
-                                    @foreach($tarchivos as $index => $item)
-                                        @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000048')
-                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026')
+                                    <?php endif; ?>
+                                    <?php $__currentLoopData = $tarchivos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000048'): ?>
+                                            <?php if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026'): ?>
                                                 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
                                                     <label class="col-sm-12 control-label"
-                                                           style="text-align: left; height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
-                                                            ({{$item->TXT_FORMATO}})</b>
-                                                        @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005')
+                                                           style="text-align: left; height: 50px;"><b><?php echo e($item->NOM_CATEGORIA_DOCUMENTO); ?>
+
+                                                            (<?php echo e($item->TXT_FORMATO); ?>)</b>
+                                                        <?php if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005'): ?>
                                                             <b>(Descargue el pdf de este enlace <a
                                                                         href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
                                                                         target="_blank">Sunat</a> y subalo para que pueda
                                                                 aprobar</b>)
-                                                        @endif </label>
+                                                        <?php endif; ?> </label>
                                                     <div class="form-group sectioncargarimagen">
 
 
                                                         <div class="col-sm-12">
                                                             <div class="file-loading">
                                                                 <input
-                                                                        id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
-                                                                        name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
+                                                                        id="file-<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>"
+                                                                        name="<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>[]"
                                                                         class="file-es"
                                                                         type="file"
                                                                         multiple data-max-file-count="1"
@@ -284,8 +292,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @else
-                                                @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
+                                            <?php else: ?>
+                                                <?php if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009'): ?>
 
                                                     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion"
                                                          style="margin-top:15px;">
@@ -293,15 +301,15 @@
                                                             <label class="col-sm-12 control-label"
                                                                    style="text-align: left;height: 50px;">
                                                                 <div class="tooltipfr">
-                                                                    <b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
+                                                                    <b><?php echo e($item->NOM_CATEGORIA_DOCUMENTO); ?> <?php echo e($item->TXT_FORMATO); ?></b>
                                                                     <span class="tooltiptext">Solo subir si selecciono que usted pagara la detracion</span>
                                                                 </div>
                                                             </label>
                                                             <div class="col-sm-12">
                                                                 <div class="file-loading">
                                                                     <input
-                                                                            id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
-                                                                            name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
+                                                                            id="file-<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>"
+                                                                            name="<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>[]"
                                                                             class="file-es"
                                                                             type="file"
                                                                             multiple data-max-file-count="1">
@@ -309,25 +317,26 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @ELSE
+                                                <?php else: ?>
                                                     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3"
                                                          style="margin-top:15px;">
                                                         <label class="col-sm-12 control-label"
-                                                               style="text-align: left;height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
-                                                                ({{$item->TXT_FORMATO}})</b>
-                                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005')
+                                                               style="text-align: left;height: 50px;"><b><?php echo e($item->NOM_CATEGORIA_DOCUMENTO); ?>
+
+                                                                (<?php echo e($item->TXT_FORMATO); ?>)</b>
+                                                            <?php if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005'): ?>
                                                                 <b>(Descargue el pdf de este enlace <a
                                                                             href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
                                                                             target="_blank">Sunat</a> y subalo para que
                                                                     pueda aprobar</b>)
-                                                            @else @endif </label>
+                                                            <?php else: ?> <?php endif; ?> </label>
                                                         <div class="form-group sectioncargarimagen">
 
                                                             <div class="col-sm-12">
                                                                 <div class="file-loading">
                                                                     <input
-                                                                            id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
-                                                                            name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
+                                                                            id="file-<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>"
+                                                                            name="<?php echo e($item->COD_CATEGORIA_DOCUMENTO); ?>[]"
                                                                             class="file-es"
                                                                             type="file"
                                                                             multiple data-max-file-count="1"
@@ -336,32 +345,32 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @ENDIF
-                                            @endif
-                                        @endif
-                                    @endforeach
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                    @php
+                                    <?php 
                                         $otros_documentos_item = $tarchivos->where('COD_CATEGORIA_DOCUMENTO', 'DCC0000000000048')->first();
-                                    @endphp
-                                    @if(isset($otros_documentos_item))
-                                        @php
+                                     ?>
+                                    <?php if(isset($otros_documentos_item)): ?>
+                                        <?php 
                                             $uploaded_pdfs = isset($archivospdf) ? $archivospdf->where('TIPO_ARCHIVO', 'DCC0000000000048') : collect();
                                             $has_uploaded = $uploaded_pdfs->count() > 0;
-                                        @endphp
+                                         ?>
                                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 25px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
                                             <div class="panel panel-default panel-contrast" style="box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 6px;">
                                                 <div class="panel-heading" style="background: #2b4c7e; color: #fff; font-weight: 600; font-size: 15px; border-top-left-radius: 6px; border-top-right-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
                                                     <span>
                                                         <i class="mdi mdi-folder-multiple" style="margin-right: 8px;"></i>
-                                                        {{$otros_documentos_item->NOM_CATEGORIA_DOCUMENTO}} ({{$otros_documentos_item->TXT_FORMATO}} MASIVOS)
+                                                        <?php echo e($otros_documentos_item->NOM_CATEGORIA_DOCUMENTO); ?> (<?php echo e($otros_documentos_item->TXT_FORMATO); ?> MASIVOS)
                                                     </span>
-                                                    <span class="badge" id="badge-pdf-count" data-initial="{{$uploaded_pdfs->count()}}" style="background: #ff5722; color: #fff; font-size: 12px; font-weight: 600;">{{$uploaded_pdfs->count()}} Archivos Cargados</span>
+                                                    <span class="badge" id="badge-pdf-count" data-initial="<?php echo e($uploaded_pdfs->count()); ?>" style="background: #ff5722; color: #fff; font-size: 12px; font-weight: 600;"><?php echo e($uploaded_pdfs->count()); ?> Archivos Cargados</span>
                                                 </div>
                                                 <div class="panel-body panel-body-contrast" style="padding: 20px;">
                                                     <div class="row">
                                                         <!-- Zona de Carga de Archivos -->
-                                                        <div class="{{ $has_uploaded ? 'col-xs-12 col-sm-5 col-md-5 col-lg-5' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }}">
+                                                        <div class="<?php echo e($has_uploaded ? 'col-xs-12 col-sm-5 col-md-5 col-lg-5' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12'); ?>">
                                                             <label class="control-label" style="text-align: left; margin-bottom: 10px; font-weight: 700; color: #333;">
                                                                 Subir nuevos documentos:
                                                             </label>
@@ -375,14 +384,14 @@
                                                                                 type="file"
                                                                                 multiple
                                                                                 data-max-file-count="100"
-                                                                                @if(!$has_uploaded) required @endif
+                                                                                <?php if(!$has_uploaded): ?> required <?php endif; ?>
                                                                                 >
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         
-                                                        @if($has_uploaded)
+                                                        <?php if($has_uploaded): ?>
                                                             <!-- Explorador de Archivos (Derecha) -->
                                                             <div class="col-xs-12 col-sm-7 col-md-7 col-lg-7" style="border-left: 1px solid #eee; padding-left: 25px;">
                                                                 <label class="control-label" style="text-align: left; margin-bottom: 10px; font-weight: 700; color: #333; display: flex; align-items: center; justify-content: space-between;">
@@ -400,38 +409,38 @@
                                                                 
                                                                 <div class="document-explorer-container" style="max-height: 380px; overflow-y: auto; padding-right: 5px;">
                                                                     <div class="list-group" id="pdf-list-container">
-                                                                        @foreach($uploaded_pdfs as $pdfIndex => $pdf)
-                                                                            @php
+                                                                        <?php $__currentLoopData = $uploaded_pdfs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pdfIndex => $pdf): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <?php 
                                                                                 $url = route('serve-fileestiba', ['file' => $pdf->NOMBRE_ARCHIVO]);
-                                                                            @endphp
-                                                                            <div class="list-group-item pdf-item" data-nombre="{{$pdf->NOMBRE_ARCHIVO}}" data-url="{{$url}}" data-index="{{$pdfIndex}}" style="border-radius: 4px; margin-bottom: 8px; border: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#2b4c7e'; this.style.background='#fcfdfe';" onmouseout="this.style.borderColor='#e0e0e0'; this.style.background='#fff';">
+                                                                             ?>
+                                                                            <div class="list-group-item pdf-item" data-nombre="<?php echo e($pdf->NOMBRE_ARCHIVO); ?>" data-url="<?php echo e($url); ?>" data-index="<?php echo e($pdfIndex); ?>" style="border-radius: 4px; margin-bottom: 8px; border: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#2b4c7e'; this.style.background='#fcfdfe';" onmouseout="this.style.borderColor='#e0e0e0'; this.style.background='#fff';">
                                                                                 <div style="display: flex; align-items: center; width: 60%; overflow: hidden;">
                                                                                     <i class="mdi mdi-file-pdf" style="font-size: 28px; color: #d32f2f; margin-right: 12px; flex-shrink: 0;"></i>
                                                                                     <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;">
-                                                                                        <span style="font-weight: 600; color: #333; font-size: 13px;" title="{{$pdf->NOMBRE_ARCHIVO}}">{{$pdf->NOMBRE_ARCHIVO}}</span>
+                                                                                        <span style="font-weight: 600; color: #333; font-size: 13px;" title="<?php echo e($pdf->NOMBRE_ARCHIVO); ?>"><?php echo e($pdf->NOMBRE_ARCHIVO); ?></span>
                                                                                         <br>
-                                                                                        <span style="font-size: 11px; color: #777;">Tamaño: {{ number_format($pdf->SIZE / 1024, 2) }} KB</span>
+                                                                                        <span style="font-size: 11px; color: #777;">Tamaño: <?php echo e(number_format($pdf->SIZE / 1024, 2)); ?> KB</span>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div style="display: flex; gap: 5px;">
-                                                                                    <button type="button" class="btn btn-xs btn-primary btn-preview-pdf" data-url="{{$url}}" data-name="{{$pdf->NOMBRE_ARCHIVO}}" data-index="{{$pdfIndex}}" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: #1d3a6d; border-color: #1d3a6d;">
+                                                                                    <button type="button" class="btn btn-xs btn-primary btn-preview-pdf" data-url="<?php echo e($url); ?>" data-name="<?php echo e($pdf->NOMBRE_ARCHIVO); ?>" data-index="<?php echo e($pdfIndex); ?>" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: #1d3a6d; border-color: #1d3a6d;">
                                                                                         <i class="icon mdi mdi-eye" style="font-size: 14px;"></i> Previsualizar
                                                                                     </button>
-                                                                                    <a href="{{$url}}" download class="btn btn-xs btn-default" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-color: #ccc; color: #555;">
+                                                                                    <a href="<?php echo e($url); ?>" download class="btn btn-xs btn-default" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-color: #ccc; color: #555;">
                                                                                         <i class="icon mdi mdi-download" style="font-size: 14px;"></i> Descargar
                                                                                     </a>
                                                                                 </div>
                                                                             </div>
-                                                                        @endforeach
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
@@ -442,7 +451,7 @@
                                                 <div class="col-sm-12 abajocaja">
                                                     <input type="text" name="contacto_nombre" id='contacto_nombre'
                                                            class="form-control control input-sm"
-                                                           value='{{$usuario->NOM_TRABAJADOR}}' readonly>
+                                                           value='<?php echo e($usuario->NOM_TRABAJADOR); ?>' readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -457,18 +466,18 @@
                                         <div class="col-xs-6">
                                             <p class="text-right">
                                                 <input type="hidden" name="idopcion" id='idopcion'
-                                                       value='{{$idopcion}}'>
+                                                       value='<?php echo e($idopcion); ?>'>
                                                 <input type="hidden" name="te" id='te'
-                                                       value='{{$fedocumento->ind_errototal}}'>
+                                                       value='<?php echo e($fedocumento->ind_errototal); ?>'>
                                                 <input type="hidden" name="valor_igv" id='valor_igv'
-                                                       value='{{(float)$fedocumento->VALOR_IGV_ORIG}}'>
+                                                       value='<?php echo e((float)$fedocumento->VALOR_IGV_ORIG); ?>'>
                                                 <input type="hidden" name="monto_total" id='monto_total'
-                                                       value='{{$fedocumento->TOTAL_VENTA_ORIG}}'>
+                                                       value='<?php echo e($fedocumento->TOTAL_VENTA_ORIG); ?>'>
                                                 <input type="hidden" name="tipo_documento_id" id='tipo_documento_id'
-                                                       value='{{$fedocumento->ID_TIPO_DOC}}'>
-                                                <input type="hidden" name="orden_id" id='orden_id' value='{{$idoc}}'>
+                                                       value='<?php echo e($fedocumento->ID_TIPO_DOC); ?>'>
+                                                <input type="hidden" name="orden_id" id='orden_id' value='<?php echo e($idoc); ?>'>
                                                 <input type="hidden" name="contacto_id" id='contacto_id'
-                                                       value='{{$usuario->COD_TRABAJADOR}}'>
+                                                       value='<?php echo e($usuario->COD_TRABAJADOR); ?>'>
                                                 <button type="submit"
                                                         class="btn btn-space btn-success btn-guardar-xml-comision">
                                                     Guardar
@@ -484,7 +493,7 @@
                     </div>
                 </div>
             </form>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
