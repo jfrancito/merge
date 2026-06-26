@@ -1400,22 +1400,43 @@ class CotizacionOrdenPedidoController extends Controller
     public function actionAjaxProductosConsolidadoSinCotizar(Request $request)
     {
         $id_consolidado = $request->input('id_consolidado');
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
-        // Buscar productos del consolidado que no están cotizados en WEB.ORDEN_COTIZACION_DETALLE
-        $productos = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+        // Obtener el centro del trabajador logueado
+        $centro = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->where('C.COD_ESTADO', 1)
+            ->select('C.COD_CENTRO')
+            ->first();
+
+        $cod_centro_usuario = $centro ? trim($centro->COD_CENTRO) : '---';
+
+        // 1. Obtener todos los productos activos del consolidado asignados al centro del usuario
+        $productos_todos = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
             ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
             ->where('D.ACTIVO', 1)
             ->where('D.CAN_COMPRADA', '>', 0)
-            ->whereNotExists(function ($query) use ($id_consolidado) {
-                $query->select(DB::raw(1))
-                    ->from('WEB.ORDEN_COTIZACION_DETALLE as CD')
-                    ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
-                    ->where('RA.COD_TABLA', $id_consolidado)
-                    ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
-                    ->whereRaw('CD.COD_PRODUCTO = D.COD_PRODUCTO')
-                    ->where('CD.ACTIVO', 1);
-            })
+            ->where('D.COD_CENTRO_COMPRA', '=', $cod_centro_usuario)
             ->get();
+
+        // 2. Obtener los saldos pendientes de los productos del consolidado
+        $codigos_productos = $productos_todos->pluck('COD_PRODUCTO')->unique()->toArray();
+        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, null);
+
+        // 3. Filtrar aquellos productos que tengan saldo pendiente > 0
+        $productos = $productos_todos->filter(function ($prod) use ($saldos, $id_consolidado) {
+            $cod_prod = trim($prod->COD_PRODUCTO);
+            $id_cons = trim($id_consolidado);
+            $saldo = isset($saldos[$cod_prod][$id_cons]) ? $saldos[$cod_prod][$id_cons] : 0;
+            
+            // Adjuntar el saldo calculado al objeto
+            $prod->SALDO_PENDIENTE = $saldo;
+            
+            return $saldo > 0;
+        });
 
         return view('ordenpedido.modal.ajax.lista_productos_deshabilitar', [
             'productos' => $productos,
