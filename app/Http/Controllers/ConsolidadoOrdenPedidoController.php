@@ -775,6 +775,10 @@ class ConsolidadoOrdenPedidoController extends Controller
             ->where('AL.COD_EMPR', $cod_empr)
             ->where('CE.COD_CENTRO', $cod_centro)
             ->where('RA.COD_ESTADO', 1)
+            ->where(function($query) {
+                $query->where('AL.NOM_ALMACEN', 'like', '%ALMACEN SUMINISTROS%')
+                      ->orWhere('AL.NOM_ALMACEN', 'like', '%ACTIVO FIJO%');
+            })
             ->select('AL.COD_ALMACEN', 'AL.NOM_ALMACEN')
             ->orderBy('AL.NOM_ALMACEN', 'asc')
             ->get();

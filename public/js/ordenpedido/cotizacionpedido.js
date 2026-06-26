@@ -1684,4 +1684,72 @@ $(document).ready(function () {
         }
     });
 
+    // Confirmar deshabilitación de productos del consolidado
+    $(document).on('click', '.btn-confirmar-deshabilitar-productos', function (e) {
+        var id_consolidado = $('#id_consolidado_desh').val();
+        var productos_seleccionados = [];
+
+        $('.check-producto-desh:checked').each(function () {
+            productos_seleccionados.push($(this).val());
+        });
+
+        if (productos_seleccionados.length === 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Sin Selección',
+                mensaje: 'Debe seleccionar al menos un producto para deshabilitar.',
+                ancho: '420px'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-deshabilitar-productos-consolidado',
+            data: {
+                _token: _token,
+                id_consolidado: id_consolidado,
+                productos: productos_seleccionados
+            },
+            success: function (res) {
+                cerrarcargando();
+                if (res.success) {
+                    $('#modal-deshabilitar-productos').niftyModal('hide');
+                    
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Éxito',
+                        mensaje: res.mensaje,
+                        ancho: '400px'
+                    });
+                    
+                    // Recargar el listado de consolidados generales para actualizar la ventana principal
+                    $('.btn-seleccionar-consolidados').click(); 
+                } else {
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: res.mensaje,
+                        ancho: '400px'
+                    });
+                }
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo procesar la solicitud en el servidor.',
+                    ancho: '400px'
+                });
+            }
+        });
+    });
+
 });

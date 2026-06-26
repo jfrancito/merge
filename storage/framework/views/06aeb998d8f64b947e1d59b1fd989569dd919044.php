@@ -32,35 +32,36 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($lista_consolidado as $item)
+            <?php $__currentLoopData = $lista_consolidado; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
                     <td class="text-center">
                         <div class="xs-check">
-                            <input id="check-{{ $item->ID_PEDIDO_CONSOLIDADO }}" type="checkbox"
+                            <input id="check-<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" type="checkbox"
                                 name="id_pedido_consolidado[]" class="check-consolidado"
-                                value="{{ $item->ID_PEDIDO_CONSOLIDADO }}" data-familia="{{ $item->NOM_CATEGORIA_FAMILIA }}"
-                                data-centro="{{ trim($item->NOM_CENTRO) }}">
-                            <label for="check-{{ $item->ID_PEDIDO_CONSOLIDADO }}"></label>
+                                value="<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" data-familia="<?php echo e($item->NOM_CATEGORIA_FAMILIA); ?>"
+                                data-centro="<?php echo e(trim($item->NOM_CENTRO)); ?>">
+                            <label for="check-<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>"></label>
                         </div>
                     </td>
-                    <td class="font-bold">{{ $item->ID_PEDIDO_CONSOLIDADO }}</td>
-                    <td class="text-primary" style="font-size: 11px; font-weight: 700;">{{ $item->NOM_CENTRO }}</td>
-                    <td style="color: #666; font-size: 11px;">{{ $item->ID_PEDIDOS }}</td>
-                    <td>{{ date('d-m-Y', strtotime($item->FEC_PEDIDO)) }}</td>
-                    <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
+                    <td class="font-bold"><?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?></td>
+                    <td class="text-primary" style="font-size: 11px; font-weight: 700;"><?php echo e($item->NOM_CENTRO); ?></td>
+                    <td style="color: #666; font-size: 11px;"><?php echo e($item->ID_PEDIDOS); ?></td>
+                    <td><?php echo e(date('d-m-Y', strtotime($item->FEC_PEDIDO))); ?></td>
+                    <td><?php echo e($item->NOM_CATEGORIA_FAMILIA); ?></td>
                     <td>
                         <span class="label label-success shadow-soft" style="background:#28a745; font-size: 11px;">
-                            <i class="mdi mdi-check-circle" style="margin-right: 3px;"></i> {{ $item->TXT_ESTADO }}
+                            <i class="mdi mdi-check-circle" style="margin-right: 3px;"></i> <?php echo e($item->TXT_ESTADO); ?>
+
                         </span>
                     </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-xs btn-danger btn-deshabilitar-consolidado"
-                            data-id="{{ $item->ID_PEDIDO_CONSOLIDADO }}" title="DESHABILITAR PRODUCTO">
+                            data-id="<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" title="DESHABILITAR PRODUCTO">
                             DESHABILITAR PRODUCTO
                         </button>
                     </td>
                 </tr>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
     </table>
 </div>
