@@ -1922,6 +1922,7 @@ trait LiquidacionGastoTraits
 
         $listadatos         =   LqgLiquidacionGasto::leftJoin('CMP.DOCUMENTO_CTBLE', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'LQG_LIQUIDACION_GASTO.COD_OSIRIS')
                                 ->select(DB::raw("LQG_LIQUIDACION_GASTO.*, CMP.DOCUMENTO_CTBLE.NRO_SERIE,CMP.DOCUMENTO_CTBLE.NRO_DOC,CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE"))
+                                ->where('LQG_LIQUIDACION_GASTO.ACTIVO', '=', 1)
                                 ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                 ->whereRaw("CAST(LQG_LIQUIDACION_GASTO.FECHA_EMI AS DATE) >= ? and CAST(LQG_LIQUIDACION_GASTO.FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->ProveedorLG($proveedor_id)

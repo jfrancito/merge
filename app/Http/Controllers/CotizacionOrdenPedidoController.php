@@ -255,7 +255,7 @@ class CotizacionOrdenPedidoController extends Controller
                 $grouped[$cod_producto] = $d;
                 $grouped[$cod_producto]->CANTIDAD = $cant_actual;
                 $grouped[$cod_producto]->ID_CONSOLIDADOS_LISTA = $ref_ids;
-                
+
                 // Calcular Saldo Pendiente del producto sobre todos los consolidados/pedidos referenciados
                 $saldo_disponible = 0;
                 $breakdown = [];
@@ -267,12 +267,12 @@ class CotizacionOrdenPedidoController extends Controller
                         $breakdown[] = ['id' => trim($ref_id), 'cant' => $saldo_ref];
                     }
                 }
-                
+
                 // Si por alguna razón el desglose queda vacío, ponemos uno por defecto
                 if (count($breakdown) == 0 && count($ref_ids) > 0) {
                     $breakdown[] = ['id' => trim($ref_ids[0]), 'cant' => 0.0];
                 }
-                
+
                 $grouped[$cod_producto]->SALDO_PENDIENTE = $saldo_disponible;
                 $grouped[$cod_producto]->BREAKDOWN = $breakdown;
             } else {
@@ -591,7 +591,7 @@ class CotizacionOrdenPedidoController extends Controller
                 'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
                 'D.COD_CATEGORIA as COD_CATEGORIA_MEDIDA',
                 'D.NOM_CATEGORIA as NOM_CATEGORIA_MEDIDA',
-                'D.ID_PEDIDO as ID_PEDIDO_CONSOLIDADO', 
+                'D.ID_PEDIDO as ID_PEDIDO_CONSOLIDADO',
                 DB::raw("(SELECT TOP 1 DP.CAN_PRECIO_UNIT_IGV 
                           FROM CMP.ORDEN OC 
                           INNER JOIN CMP.DETALLE_PRODUCTO DP ON OC.COD_ORDEN = DP.COD_TABLA 
@@ -701,10 +701,10 @@ class CotizacionOrdenPedidoController extends Controller
 
             // --- Conexión para réplica en Zonas ---
             $conexionbd = 'sqlsrv';
-            if($cod_centro == 'CEN0000000000004'){
+            if ($cod_centro == 'CEN0000000000004') {
                 $conexionbd = 'sqlsrv_r';
-            }else{
-                if($cod_centro == 'CEN0000000000006'){
+            } else {
+                if ($cod_centro == 'CEN0000000000006') {
                     $conexionbd = 'sqlsrv_b';
                 }
             }
@@ -776,25 +776,25 @@ class CotizacionOrdenPedidoController extends Controller
                         $grouped_detalles[$key] = $det;
                     } else {
                         // Sumar cantidades
-                        $grouped_detalles[$key]['cantidad'] = (float)$grouped_detalles[$key]['cantidad'] + (float)$det['cantidad'];
-                        
+                        $grouped_detalles[$key]['cantidad'] = (float) $grouped_detalles[$key]['cantidad'] + (float) $det['cantidad'];
+
                         // Combinar breakdowns
                         $old_bd = isset($grouped_detalles[$key]['breakdown']) ? $grouped_detalles[$key]['breakdown'] : [];
                         $new_bd = isset($det['breakdown']) ? $det['breakdown'] : [];
-                        
+
                         $bd_by_id = [];
                         foreach ($old_bd as $b) {
-                            $bd_by_id[trim($b['id'])] = (float)$b['cant'];
+                            $bd_by_id[trim($b['id'])] = (float) $b['cant'];
                         }
                         foreach ($new_bd as $b) {
                             $id_b = trim($b['id']);
                             if (isset($bd_by_id[$id_b])) {
-                                $bd_by_id[$id_b] += (float)$b['cant'];
+                                $bd_by_id[$id_b] += (float) $b['cant'];
                             } else {
-                                $bd_by_id[$id_b] = (float)$b['cant'];
+                                $bd_by_id[$id_b] = (float) $b['cant'];
                             }
                         }
-                        
+
                         $merged_bd = [];
                         foreach ($bd_by_id as $id_b => $cant) {
                             $merged_bd[] = ['id' => $id_b, 'cant' => $cant];
@@ -895,9 +895,9 @@ class CotizacionOrdenPedidoController extends Controller
                         // 3. Actualizar estado de TXT_COTIZACION en el consolidado (SOLO SI ES MATERIAL)
                         if (!$es_tipo_servicio) {
                             $saldos_actuales = $this->obtenerSaldosPendientesConsolidados([$det['cod_producto']], null);
-                            $saldo_cons = isset($saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea]) 
-                                          ? $saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea] 
-                                          : 0;
+                            $saldo_cons = isset($saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea])
+                                ? $saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea]
+                                : 0;
 
                             if ($saldo_cons <= 0) {
                                 DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
@@ -1000,10 +1000,10 @@ class CotizacionOrdenPedidoController extends Controller
             $cod_centro = $cot ? $cot->COD_CENTRO : '';
 
             $conexionbd = 'sqlsrv';
-            if($cod_centro == 'CEN0000000000004'){
+            if ($cod_centro == 'CEN0000000000004') {
                 $conexionbd = 'sqlsrv_r';
-            }else{
-                if($cod_centro == 'CEN0000000000006'){
+            } else {
+                if ($cod_centro == 'CEN0000000000006') {
                     $conexionbd = 'sqlsrv_b';
                 }
             }
@@ -1244,7 +1244,7 @@ class CotizacionOrdenPedidoController extends Controller
                 $grouped_cotizaciones[$key] = [
                     'id_cotizacion' => $row->ID_COTIZACION,
                     'cod_producto' => trim($row->COD_PRODUCTO),
-                    'cantidad' => (float)$row->CANTIDAD,
+                    'cantidad' => (float) $row->CANTIDAD,
                     'consolidados' => [trim($row->ID_PEDIDO_CONSOLIDADO)]
                 ];
             } else {
@@ -1259,7 +1259,7 @@ class CotizacionOrdenPedidoController extends Controller
         foreach ($consolidado_detalles as $det) {
             $cod_prod = trim($det->COD_PRODUCTO);
             $id_cons = trim($det->ID_PEDIDO_CONSOLIDADO);
-            $saldos[$cod_prod][$id_cons] = (float)$det->CAN_COMPRADA;
+            $saldos[$cod_prod][$id_cons] = (float) $det->CAN_COMPRADA;
         }
 
         // Aplicar FIFO
@@ -1351,7 +1351,7 @@ class CotizacionOrdenPedidoController extends Controller
                 $grouped_cotizaciones[$key] = [
                     'id_cotizacion' => $row->ID_COTIZACION,
                     'cod_producto' => trim($row->COD_PRODUCTO),
-                    'cantidad' => (float)$row->CANTIDAD,
+                    'cantidad' => (float) $row->CANTIDAD,
                     'pedidos' => [trim($row->ID_PEDIDO)]
                 ];
             } else {
@@ -1366,7 +1366,7 @@ class CotizacionOrdenPedidoController extends Controller
         foreach ($pedido_detalles as $det) {
             $cod_prod = trim($det->COD_PRODUCTO);
             $id_ped = trim($det->ID_PEDIDO);
-            $saldos[$cod_prod][$id_ped] = (float)$det->CANTIDAD;
+            $saldos[$cod_prod][$id_ped] = (float) $det->CANTIDAD;
         }
 
         // Aplicar FIFO
@@ -1396,4 +1396,81 @@ class CotizacionOrdenPedidoController extends Controller
 
         return $saldos;
     }
+
+    public function actionAjaxProductosConsolidadoSinCotizar(Request $request)
+    {
+        $id_consolidado = $request->input('id_consolidado');
+
+        // Buscar productos del consolidado que no están cotizados en WEB.ORDEN_COTIZACION_DETALLE
+        $productos = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+            ->where('D.ACTIVO', 1)
+            ->where('D.CAN_COMPRADA', '>', 0)
+            ->whereNotExists(function ($query) use ($id_consolidado) {
+                $query->select(DB::raw(1))
+                    ->from('WEB.ORDEN_COTIZACION_DETALLE as CD')
+                    ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
+                    ->where('RA.COD_TABLA', $id_consolidado)
+                    ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+                    ->whereRaw('CD.COD_PRODUCTO = D.COD_PRODUCTO')
+                    ->where('CD.ACTIVO', 1);
+            })
+            ->get();
+
+        return view('ordenpedido.modal.ajax.lista_productos_deshabilitar', [
+            'productos' => $productos,
+            'id_consolidado' => $id_consolidado
+        ]);
+    }
+
+    public function actionAjaxDeshabilitarProductosConsolidado(Request $request)
+    {
+        $id_consolidado = $request->input('id_consolidado');
+        $productos = $request->input('productos');
+
+        if (empty($productos) || !is_array($productos)) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se seleccionaron productos.'
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Actualizar en base de datos principal
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                ->whereIn('COD_PRODUCTO', $productos)
+                ->update(['ACTIVO' => 0]);
+
+            // 2. Replicar la desactivación a las zonas
+            foreach (['sqlsrv_r', 'sqlsrv_b'] as $conn) {
+                try {
+                    DB::connection($conn)->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                        ->whereIn('COD_PRODUCTO', $productos)
+                        ->update(['ACTIVO' => 0]);
+                } catch (\Exception $ez) {
+                    Log::error("Error al desactivar productos en zona ($conn): " . $ez->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Productos deshabilitados correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error al deshabilitar productos del consolidado: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error en el servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
 }
+

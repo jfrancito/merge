@@ -65,6 +65,7 @@
     </div>
     <?php echo $__env->make('ordenpedido.modal.modal_seleccionar_consolidado_general', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
     <?php echo $__env->make('ordenpedido.modal.modal_seleccionar_pedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <?php echo $__env->make('ordenpedido.modal.modal_deshabilitar_productos', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
 </div>
 
 <?php $__env->stopSection(); ?>
