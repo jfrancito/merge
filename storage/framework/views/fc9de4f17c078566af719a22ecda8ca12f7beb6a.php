@@ -1,61 +1,70 @@
 <div class="card shadow-sm mb-4">
 
-    <div class="panel panel-default panel-contrast">
+  <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
             LISTA ORDEN DE PEDIDO
         </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="table-pedidos-ger-rechazados" class="table table-hover table-striped mb-0 listatabla">
+            <table id="table-pedidos-pendientes" class="table table-hover table-striped mb-0 listatabla">
                 <thead class="thead-dark">
-                <tr>
-                    <th>ID PEDIDO</th>
-                    <th>FECHA</th>
-                    <th>MES</th>
-                    <th>AÑO</th>
-                    <th>TIPO PEDIDO</th>
-                    <th>SOLICITA</th>
-                    <th>AREA</th>
-                    <th>AUTORIZA</th>
-                    <th>APRUEBA GER</th>
-                    <th>APRUEBA ADM</th>
-                    <th>GLOSA</th>
-                    <th>ESTADO</th>
-                    <th>VER DETALLE</th>
-                    <th>ARCHIVO</th>
-                </tr>
+                    <tr>
+                        <th>ID PEDIDO</th>
+                        <th>FECHA</th>
+                        <th>MES</th>
+                        <th>AÑO</th>
+                        <th>TIPO PEDIDO</th>
+                        <th>SOLICITA</th>
+                        <th>AREA</th>
+                        <th>AUTORIZA</th>
+                        <th>APRUEBA GER</th>
+                        <th>APRUEBA ADM</th>
+                        <th>GLOSA</th>
+                        <th>ESTADO</th>
+                        <th>VER DETALLE</th>
+                        <th>ARCHIVO</th>
+                    </tr>
                 </thead>
-                <tbody>
-                @foreach($listapedido as $index => $item)
-                    @if ($item['COD_ESTADO'] === 'ETM0000000000006'&& trim($item['COD_USUARIO_MODIF_AUD']) === trim($cod_usuario_modifica))
+               <tbody>
+                <?php $__currentLoopData = $listapedido; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+
+                    <?php if($item['COD_ESTADO'] === 'ETM0000000000010'
+                        && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id): ?>
+
                         <tr class="align-middle">
-                            <td>{{ $item['ID_PEDIDO'] }}</td>
-                            <td>{{ $item['FEC_PEDIDO'] }}</td>
-                            <td>{{ $item['TXT_NOMBRE'] }}</td>
-                            <td>{{ $item['COD_ANIO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
-                            <td>{{ $item['TXT_GLOSA'] }}</td>
-                            <td>@include('comprobante.ajax.estadospedido')</td>
+                            <td><?php echo e($item['ID_PEDIDO']); ?></td>
+                            <td><?php echo e($item['FEC_PEDIDO']); ?></td>
+                            <td><?php echo e($item['TXT_NOMBRE']); ?></td>
+                            <td><?php echo e($item['COD_ANIO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TIPO_PEDIDO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_SOLICITA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_AREA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_AUTORIZA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_GER']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_ADM']); ?></td>
+                            <td class="col-glosa"><?php echo e($item['TXT_GLOSA']); ?></td>
+
+                            <!-- ESTADO -->
+                            <td><?php echo $__env->make('comprobante.ajax.estadospedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?></td>
+
+                            <!-- ACCIONES -->
                             <td class="text-center">
                                 <div class="grupo-acciones">
 
-                                    <!-- VER DETALLE (SIEMPRE VISIBLE) -->
                                     <button
-                                            class="btn btn-sm ver-detalle-pedido-ger btn-detalle-moderno"
-                                            data-id="{{ $item['ID_PEDIDO'] }}">
-                                        <i class="fa fa-eye"></i> Detalle
+                                        class="btn btn-sm ver-detalle-pedido-aut btn-detalle-moderno"
+                                        data-id="<?php echo e($item['ID_PEDIDO']); ?>"
+                                        title="Ver detalle del pedido">
+                                        <i class="fa fa-eye"></i>
+                                        Detalle
                                     </button>
+
                                 </div>
                             </td>
                             <td class="align-center-tb">
-                                @if($item['MULTI_ARCHIVOS'] != '')
-                                    @php
+                                <?php if($item['MULTI_ARCHIVOS'] != ''): ?>
+                                    <?php 
                                         $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
                                         $archivos = [];
                                         foreach($archivos_raw as $ar) {
@@ -64,46 +73,51 @@
                                                 $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
                                             }
                                         }
-                                    @endphp
+                                     ?>
 
-                                    @if(count($archivos) > 1)
+                                    <?php if(count($archivos) > 1): ?>
                                         <!-- MÚLTIPLES ARCHIVOS: DROPDOWN -->
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
                                                 <i class="fa fa-download"></i> Archivos <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                @foreach($archivos as $index => $arch)
+                                                <?php $__currentLoopData = $archivos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $arch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <li>
-                                                        <a href="{{ url('descargar-archivo-informe/'.base64_encode($arch['url'])) }}" target="_blank">
-                                                            {{ ($index + 1) . '. ' . $arch['nombre'] }}
+                                                        <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($arch['url']))); ?>" target="_blank">
+                                                            <?php echo e(($index + 1) . '. ' . $arch['nombre']); ?>
+
                                                         </a>
                                                     </li>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </ul>
                                         </div>
-                                    @elseif(count($archivos) == 1)
+                                    <?php elseif(count($archivos) == 1): ?>
                                         <!-- UN SOLO ARCHIVO -->
-                                        <a href="{{ url('descargar-archivo-informe/'.base64_encode($archivos[0]['url'])) }}"
+                                        <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($archivos[0]['url']))); ?>"
                                            class="btn btn-xs btn-success"
                                            target="_blank"
-                                           title="Descargar: {{ $archivos[0]['nombre'] }}">
+                                           title="Descargar: <?php echo e($archivos[0]['nombre']); ?>">
                                             <i class="fa fa-download"></i>
                                         </a>
-                                    @endif
-                                @else
+                                    <?php endif; ?>
+                                <?php else: ?>
                                     <span class="text-muted">—</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
 
                         </tr>
-                    @endif
-                @endforeach
-                </tbody>
+
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </tbody>
             </table>
         </div>
     </div>
 </div>
+
+
+
 
 <style>
     .pedido-card {
@@ -189,19 +203,6 @@
         gap: 4px;
     }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

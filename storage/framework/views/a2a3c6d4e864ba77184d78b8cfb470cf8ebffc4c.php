@@ -24,13 +24,13 @@
         <div class="tab-content">
            
                 <div id="pendientes" class="tab-pane cont active">
-                   @include('ordenpedido.ajax.alistaordenpedidoapgerenciapendiente')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidoapgerenciapendiente', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
                 <div id="autorizados" class="tab-pane cont">
-                   @include('ordenpedido.ajax.alistaordenpedidoaprobadoger')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidoaprobadoger', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
                  <div id="rechazados" class="tab-pane cont">
-                   @include('ordenpedido.ajax.alistaordenpedidorechazogerencia')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidorechazogerencia', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
            
         </div>
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-@if(isset($ajax))
+<?php if(isset($ajax)): ?>
     <script type="text/javascript">
         $(document).ready(function () {
             if (typeof inicializarTablasAprobacionGer === 'function') {
@@ -46,7 +46,7 @@
             }
         });
     </script>
-@endif
+<?php endif; ?>
 
 
 

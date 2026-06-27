@@ -12,6 +12,45 @@
             background-color: #d9edf7 !important;
             border-left: 4px solid #34aadc;
         }
+        /* Estilos para el selector de cantidad de registros y controles de DataTable */
+        .dataTables_length {
+            margin-bottom: 15px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .dataTables_length label {
+            font-weight: 600;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dataTables_length select {
+            border-radius: 8px !important;
+            border: 1px solid #d0dcfc !important;
+            padding: 5px 10px !important;
+            height: 34px !important;
+            background-color: #f8f9fc !important;
+            color: #1d3a6d !important;
+            font-weight: bold !important;
+            outline: none !important;
+            transition: all 0.3s ease !important;
+            display: inline-block !important;
+            width: auto !important;
+        }
+        .dataTables_length select:focus {
+            border-color: #4e73df !important;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15) !important;
+        }
+        .dataTables_info {
+            padding-top: 15px !important;
+            font-weight: 500 !important;
+            color: #777 !important;
+        }
+        .dataTables_paginate {
+            padding-top: 10px !important;
+        }
     </style>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('section'); ?>

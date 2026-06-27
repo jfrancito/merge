@@ -1,12 +1,11 @@
-@extends('template_lateral')
-@section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/dataTables.bootstrap.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/responsive.dataTables.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
-@stop
-@section('section')
+<?php $__env->startSection('style'); ?>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datatables/css/dataTables.bootstrap.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datatables/css/responsive.dataTables.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/select2/css/select2.min.css')); ?> "/>
+    <link rel="stylesheet" type="text/css" href="<?php echo e(asset('public/lib/bootstrap-slider/css/bootstrap-slider.css')); ?> "/>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('section'); ?>
     <div class="be-content ordenpedidoprincipal">
         <div class="main-content container-fluid">
             <div class="row">
@@ -30,7 +29,7 @@
                             <!-- LISTADO PRINCIPAL -->
                             <div id="ordenpedidoautoriza" class="tab-pane fade in active cont">
                                 <div class='listajax'>    
-                                    @include('ordenpedido.ajax.alistaordenpedidoautoriza')
+                                    <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidoautoriza', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                                 </div>
                             </div>
 
@@ -50,41 +49,41 @@
             </div>
         </div>
         <input type="text" id="vale_rendir_id" hidden>
-        @include('ordenpedido.modal.modalsolicitud')
+        <?php echo $__env->make('ordenpedido.modal.modalsolicitud', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
     </div>
 
-@stop
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
 
-<script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/js/general/inputmask/inputmask.js')); ?>" type="text/javascript"></script> 
+<script src="<?php echo e(asset('public/js/general/inputmask/inputmask.extensions.js')); ?>" type="text/javascript"></script> 
+<script src="<?php echo e(asset('public/js/general/inputmask/inputmask.numeric.extensions.js')); ?>" type="text/javascript"></script> 
+<script src="<?php echo e(asset('public/js/general/inputmask/inputmask.date.extensions.js')); ?>" type="text/javascript"></script> 
+<script src="<?php echo e(asset('public/js/general/inputmask/jquery.inputmask.js')); ?>" type="text/javascript"></script>
 
-<script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>        
-<script src="{{ asset('public/lib/select2/js/select2.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/select2/js/i18n/es.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/bootstrap-slider/js/bootstrap-slider.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/jquery-ui/jquery-ui.min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/jquery.nestable/jquery.nestable.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/moment.js/min/moment.min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js')); ?>" type="text/javascript"></script>        
+<script src="<?php echo e(asset('public/lib/select2/js/select2.min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/select2/js/i18n/es.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/bootstrap-slider/js/bootstrap-slider.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/js/app-form-elements.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/parsley/parsley.js')); ?>" type="text/javascript"></script>
 
-<script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.print.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/js/app-tables-datatables.js') }}" type="text/javascript"></script>
-<script src="{{ asset('public/lib/raphael/raphael-min.js')}}" type="text/javascript"></script>
-<script src="{{ asset('public/lib//chartjs/Chart.min.js')}}" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/js/jquery.dataTables.min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/js/dataTables.bootstrap.min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/buttons.print.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/js/app-tables-datatables.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/raphael/raphael-min.js')); ?>" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib//chartjs/Chart.min.js')); ?>" type="text/javascript"></script>
 
-<script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
+<script src="<?php echo e(asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js')); ?>" type="text/javascript"></script>
 
 <script type="text/javascript">
 
@@ -113,7 +112,6 @@
                 var config = {
                     "pageLength": 10,
                     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-                    "order": [[0, "desc"]],
                     "language": {
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -157,5 +155,6 @@
 
       });
     </script> 
-<script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>
-@stop
+<script src="<?php echo e(asset('public/js/ordenpedido/ordenpedido.js?v='.$version)); ?>" type="text/javascript"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('template_lateral', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
