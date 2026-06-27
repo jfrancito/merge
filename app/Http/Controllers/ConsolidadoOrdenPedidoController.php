@@ -765,7 +765,15 @@ class ConsolidadoOrdenPedidoController extends Controller
         $cod_centro = $request->input('cod_centro');
         $cod_empr = $request->input('cod_empr') ?: Session::get('empresas')->COD_EMPR;
 
-        $almacenes = DB::connection('sqlsrv')
+        // Determinar dinámicamente la conexión según el centro de compra
+        $conexionbd = 'sqlsrv';
+        if ($cod_centro == 'CEN0000000000004') { // Rioja
+            $conexionbd = 'sqlsrv_r';
+        } elseif ($cod_centro == 'CEN0000000000006') { // Bellavista
+            $conexionbd = 'sqlsrv_b';
+        }
+
+        $almacenes = DB::connection($conexionbd)
             ->table('ALM.REFERENCIA_ALMACEN as RA')
             ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
             ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
