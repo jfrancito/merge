@@ -10,7 +10,7 @@
             <li class="negrita">
                 <a href="#autorizados" data-toggle="tab">
                     <span class="badge badge-success" style="margin-right: 8px; font-size: 16px;">&nbsp;&nbsp;</span>
-                    APROBADO 
+                    APROBADO
                 </a>
             </li>
             <li class="negrita">
@@ -24,13 +24,13 @@
         <div class="tab-content">
            
                 <div id="pendientes" class="tab-pane cont active">
-                   @include('ordenpedido.ajax.alistaordenpedidoapgerenciapendiente')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidoapadminpendiente', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
                 <div id="autorizados" class="tab-pane cont">
-                   @include('ordenpedido.ajax.alistaordenpedidoaprobadoger')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidoaprobadoadm', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
                  <div id="rechazados" class="tab-pane cont">
-                   @include('ordenpedido.ajax.alistaordenpedidorechazogerencia')
+                   <?php echo $__env->make('ordenpedido.ajax.alistaordenpedidorechazoadm', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                 </div>
            
         </div>
@@ -38,15 +38,15 @@
     </div>
 </div>
 
-@if(isset($ajax))
+<?php if(isset($ajax)): ?>
     <script type="text/javascript">
         $(document).ready(function () {
-            if (typeof inicializarTablasAprobacionGer === 'function') {
-                inicializarTablasAprobacionGer();
+            if (typeof inicializarTablasAprobacionAdm === 'function') {
+                inicializarTablasAprobacionAdm();
             }
         });
     </script>
-@endif
+<?php endif; ?>
 
 
 

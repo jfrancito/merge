@@ -1522,14 +1522,44 @@ $(document).ready(function () {
         $(this).val('');
     });
 
+    /* =======================================
+       INICIALIZACIÓN DATATABLE COTIZACIONES
+       ======================================= */
+    var tabla_cotizaciones = $('#tabla_cotizaciones').DataTable({
+        "pageLength": 20,
+        "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "Todos"]],
+        "dom": "ltip", // Ocultamos el buscador nativo "f" de DataTable
+        "order": [[1, "desc"]], // Ordenar descendente por ID COTIZACIÓN (columna 1)
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando del 0 al 0 de 0 registros",
+            "sInfoFiltered":   "(filtrado de _MAX_ registros)",
+            "sSearch":         "Buscar:",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+
     /* ===============================
        BUSCADOR PRINCIPAL DE COTIZACIONES
        =============================== */
     $(document).on('keyup', '#buscar_cotizacion_principal', function () {
-        var valor = $(this).val().toLowerCase();
-        $("#tabla_cotizaciones tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1);
-        });
+        var valor = $(this).val();
+        tabla_cotizaciones.search(valor).draw();
     });
 
     /* =================================
