@@ -151,6 +151,8 @@ class ConsolidadoPedidoAprobadoController extends Controller
                         'CAN_COMPRADA' => $det['cantidad'],
                         'IND_COMPRA'   => $det['ind_compra'] ?? null,
                         'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
+                        'COD_ALMACEN' => $det['cod_almacen'] ?? null,
+                        'NOM_ALMACEN' => $det['nom_almacen'] ?? null,
                         'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
                     ]);
             }
@@ -189,6 +191,8 @@ class ConsolidadoPedidoAprobadoController extends Controller
                             'CAN_COMPRADA' => $det['cantidad'],
                             'IND_COMPRA'   => $det['ind_compra'],
                             'COD_CENTRO_COMPRA' => $det['cod_centro_compra'] ?? null,
+                            'COD_ALMACEN' => $det['cod_almacen'] ?? null,
+                            'NOM_ALMACEN' => $det['nom_almacen'] ?? null,
                             'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
                             'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
                         ]);

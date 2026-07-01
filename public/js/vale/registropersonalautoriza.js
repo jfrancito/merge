@@ -1,3 +1,18 @@
+function mostrarAlertaPremium(tipo, mensaje) {
+    let titulo = tipo === 'success' ? '¡Bien Hecho!' : '¡Error!';
+    let iconoHtml = tipo === 'success' 
+        ? '<i class="mdi mdi-check"></i>' 
+        : '<i class="mdi mdi-close"></i>';
+    
+    let iconoClase = tipo === 'success' ? 'success' : 'error';
+    
+    $('#iconoPremiumAlerta').removeClass('success error').addClass(iconoClase).html(iconoHtml);
+    $('#tituloPremiumAlerta').text(titulo);
+    $('#mensajePremiumAlerta').text(mensaje);
+    
+    $('#modalPremiumAlerta').modal('show');
+}
+
 $(document).ready(function () {
         var carpeta = $("#carpeta").val();
 
@@ -8,6 +23,11 @@ $(document).ready(function () {
                 let sede     = $('#sede_select').val();
                 let gerencia = $('#gerencia_select').val();
                 let area     = $('#area_select').val();
+
+                if (!sede || !gerencia || !area) {
+                    mostrarAlertaPremium('error', 'Debe completar todos los campos (Sede, Gerencia y Área) para poder filtrar.');
+                    return false;
+                }
 
             $.ajax({
                     type: "POST",
@@ -20,11 +40,20 @@ $(document).ready(function () {
                     },
                     success: function(response) {
                         let table = $('#personalautoriza').DataTable();
-                        table.clear().draw();
 
-                      
+                        // Destruir select2 previos
+                        try {
+                            $('#personalautoriza .select-personal').select2('destroy');
+                            $('#personalautoriza .select-tipo-linea').select2('destroy');
+                        } catch (e) {}
+
+                        table.clear().draw();
+                        $('.botonera-premium').hide();
+
+                       
                         const tipos_linea = response.tipos_linea || window.tipos_linea || {};
                         const data = response.data || response || [];
+                        const todos_los_trabajadores = response.todos_los_trabajadores || [];
 
                         if (data.length > 0) {
                             data.forEach(function(item) {
@@ -42,10 +71,10 @@ $(document).ready(function () {
 
 
                                
-                                let opciones = '<select class="form-control select-personal">';
+                                let opciones = '<select class="form-control select-personal" style="width:100%; min-width:220px;">';
                                 opciones += '<option value="">-- Seleccionar --</option>';
-                                data.forEach(function(opt) {
-                                    const nombreOpt = `${opt.nombres} ${opt.apellidopaterno} ${opt.apellidomaterno}`;
+                                todos_los_trabajadores.forEach(function(opt) {
+                                    const nombreOpt = `${opt.apellidopaterno} ${opt.apellidomaterno} ${opt.nombres}`;
                                     const selected = (opt.cod_trab === item.cod_autorizado) ? 'selected' : '';
                                     opciones += `<option value="${opt.cod_trab}" ${selected}>${nombreOpt}</option>`;
                                 });
@@ -61,12 +90,33 @@ $(document).ready(function () {
                                     opciones
                                 ]).draw(false);
                             });
+
+                            // Inicializar select2 con buscador interactivo
+                            $('#personalautoriza .select-personal').select2({
+                                placeholder: "-- Seleccionar --",
+                                allowClear: true,
+                                width: '100%'
+                            });
+
+                            $('#personalautoriza .select-tipo-linea').select2({
+                                placeholder: "-- Seleccionar --",
+                                allowClear: true,
+                                width: '100%'
+                            });
+                            
+                            $('.botonera-premium').show();
                         } else {
-                            $('.ajaxvacio').html("No se encontraron resultados con los filtros seleccionados.");
+                            $('.botonera-premium').hide();
+                            $('.ajaxvacio').html(`
+                                <div class="icon-vacio" style="background: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;">
+                                    <i class="fa fa-exclamation-circle" style="font-size: 22px;"></i>
+                                </div>
+                                <p style="color: #e53e3e; font-weight: 600; margin: 0;">No se encontraron trabajadores activos con los filtros seleccionados.</p>
+                            `);
                         }
                     },
                     error: function () {
-                        alerterrorajax('Error al filtrar personal');
+                        mostrarAlertaPremium('error', 'Error al filtrar personal');
                  }
              });
         });
@@ -120,7 +170,7 @@ $(document).ready(function () {
         });
 
         if (dataAGuardar.length === 0) {
-            alerterrorajax('Debe seleccionar al menos un responsable para autorizar.');
+            mostrarAlertaPremium('error', 'Debe seleccionar al menos un responsable para autorizar.');
             return;
         }
 
@@ -134,7 +184,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
-                    alertajax('Registros guardados correctamente.');
+                    mostrarAlertaPremium('success', 'Registros guardados correctamente.');
 
                     // Limpia filtros
                     $('#sede_select').val('').trigger('change');
@@ -143,12 +193,13 @@ $(document).ready(function () {
 
                     let table = $('#personalautoriza').DataTable();
                     table.clear().draw();
+                    $('.botonera-premium').hide();
                 } else {
-                    alerterrorajax(response.message || 'Error inesperado.');
+                    mostrarAlertaPremium('error', response.message || 'Error inesperado.');
                 }
             },
             error: function () {
-                alerterrorajax('Error al guardar los datos.');
+                mostrarAlertaPremium('error', 'Error al guardar los datos.');
             }
         });
     });

@@ -32,6 +32,7 @@
         <th class='tabladp'>FECHA PEDIDO</th>
         <th class='tabladp'>AÑO</th>
         <th class='tabladp'>PERIODO</th>
+        <th class='tabladp'>TIPO PEDIDO</th>
         <th class='tabladp'>CENTRO</th>
         <th class='tabladp'>ESTADO</th>
         <th class='tabladp'>CONSOLIDADO SEDE</th>
@@ -46,8 +47,15 @@
             <td>{{$item->FEC_PEDIDO}}</td>
             <td>{{$item->COD_ANIO}}</td>
             <td>{{$item->NOM_PERIODO}}</td>
+            <td>{{$item->TXT_TIPO_PEDIDO}}</td>
             <td>{{$item->NOM_CENTRO}}</td>
-            <td>{{$item->TXT_ESTADO}}</td>
+            <td>
+                @if(isset($item->COD_ESTADO) && $item->COD_ESTADO == 'ETM0000000000015' && isset($item->COD_TRABAJADOR_APRUEBA_ADM) && $item->COD_TRABAJADOR_APRUEBA_ADM == 'IITR000000000391')
+                    POR APROBAR GERENCIA ADM
+                @else
+                    {{$item->TXT_ESTADO}}
+                @endif
+            </td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO_GENERAL}}</td>
         </tr>

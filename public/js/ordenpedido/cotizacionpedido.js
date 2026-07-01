@@ -118,8 +118,15 @@ $(document).ready(function () {
 
 
     /* ===============================
-       BUSCAR PROVEEDOR POR RUC
+       BUSCAR PROVEEDOR POR RUC O NOMBRE
        =============================== */
+    $(document).on('keypress', '#ruc_proveedor', function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('.btn-search-premium').trigger('click');
+        }
+    });
+
     $(document).on('click', '.btn-search-premium', function (e) {
 
         var ruc = $('#ruc_proveedor').val();
@@ -130,7 +137,7 @@ $(document).ready(function () {
                 tipo: 'warn',
                 icono: '⚠️',
                 titulo: 'Campo Obligatorio',
-                mensaje: 'Debe de Ingresar RUC para poder realizar la búsqueda.',
+                mensaje: 'Debe ingresar el RUC o Nombre para poder realizar la búsqueda.',
                 ancho: '400px'
             });
 
@@ -158,6 +165,7 @@ $(document).ready(function () {
                     if (data.nombre) $('#nombre_proveedor').val(data.nombre);
                     if (data.direccion) $('#direccion').val(data.direccion);
                     if (data.telefono) $('#telefono').val(data.telefono);
+                    if (data.ruc) $('#ruc_proveedor').val(data.ruc);
 
                     $('.premium-input').addClass('success-pulse');
                     setTimeout(() => $('.premium-input').removeClass('success-pulse'), 1500);
@@ -168,7 +176,7 @@ $(document).ready(function () {
                         tipo: 'error',
                         icono: '❌',
                         titulo: 'No encontrado',
-                        mensaje: 'No se encontró ningún proveedor con el RUC ingresado.',
+                        mensaje: 'No se encontró ningún proveedor con el RUC o Nombre ingresado.',
                         ancho: '400px'
                     });
 
@@ -636,10 +644,6 @@ $(document).ready(function () {
         var moneda = $('#moneda_id').val();
         var incluirIGV = $('#incluir_igv').is(':checked');
 
-        // Manejar posibles comas decimales desde el servidor
-        var tc_val = $('#tipo_cambio_actual').val() ? $('#tipo_cambio_actual').val().toString().replace(',', '.') : '0';
-        var tipoCambio = parseFloat(tc_val) || 0;
-
         $('.precio-producto').each(function () {
             var $row = $(this).closest('tr');
             var cantidad = parseFloat($row.find('.cantidad-producto').val()) || 0;
@@ -652,13 +656,6 @@ $(document).ready(function () {
             
             totalFinal += (cantidad * precioUsar);
         });
-
-        // Conversión a Dólares si aplica
-        if (moneda === 'MOM0000000000002') { // Dólares
-            if (tipoCambio > 0) {
-                totalFinal = totalFinal / tipoCambio;
-            }
-        }
 
         $('#total').val(totalFinal.toFixed(2));
     }
@@ -743,7 +740,7 @@ $(document).ready(function () {
             var $row = $(this).closest('tr');
             var precio = parseFloat($(this).val()) || 0;
             var precioIGV = incluirIGV ? (precio * multiplier) : 0;
-            $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
+            $row.find('.precio-igv-producto').val(precioIGV.toFixed(4));
         });
         calcularTotal();
         inicializarAlertasPrecio();
@@ -758,7 +755,7 @@ $(document).ready(function () {
 
         var precio = parseFloat($(this).val()) || 0;
         var precioIGV = incluirIGV ? (precio * multiplier) : 0;
-        $row.find('.precio-igv-producto').val(precioIGV.toFixed(2));
+        $row.find('.precio-igv-producto').val(precioIGV.toFixed(4));
         calcularTotal();
         verificarPrecioAnterior($(this));
     });
@@ -777,7 +774,7 @@ $(document).ready(function () {
 
         var precioIGV = parseFloat($(this).val()) || 0;
         var precio = precioIGV / divisor;
-        $row.find('.precio-producto').val(precio.toFixed(2));
+        $row.find('.precio-producto').val(precio.toFixed(4));
         calcularTotal();
         verificarPrecioAnterior($row.find('.precio-producto'));
     });
@@ -791,7 +788,7 @@ $(document).ready(function () {
        =============================== */
     $(document).on('change', '#moneda_id', function (e) {
         var moneda = $(this).val();
-        var simbolo = moneda === 'MOM0000000000001' ? 'S/' : '$';
+        var simbolo = moneda === 'MON0000000000001' ? 'S/' : '$';
         $('.moneda-simbolo').text(simbolo);
         calcularTotal();
     });
@@ -1525,14 +1522,44 @@ $(document).ready(function () {
         $(this).val('');
     });
 
+    /* =======================================
+       INICIALIZACIÓN DATATABLE COTIZACIONES
+       ======================================= */
+    var tabla_cotizaciones = $('#tabla_cotizaciones').DataTable({
+        "pageLength": 20,
+        "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "Todos"]],
+        "dom": "ltip", // Ocultamos el buscador nativo "f" de DataTable
+        "order": [[1, "desc"]], // Ordenar descendente por ID COTIZACIÓN (columna 1)
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando del 0 al 0 de 0 registros",
+            "sInfoFiltered":   "(filtrado de _MAX_ registros)",
+            "sSearch":         "Buscar:",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+
     /* ===============================
        BUSCADOR PRINCIPAL DE COTIZACIONES
        =============================== */
     $(document).on('keyup', '#buscar_cotizacion_principal', function () {
-        var valor = $(this).val().toLowerCase();
-        $("#tabla_cotizaciones tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1);
-        });
+        var valor = $(this).val();
+        tabla_cotizaciones.search(valor).draw();
     });
 
     /* =================================
@@ -1685,6 +1712,74 @@ $(document).ready(function () {
         } else {
             container.hide();
         }
+    });
+
+    // Confirmar deshabilitación de productos del consolidado
+    $(document).on('click', '.btn-confirmar-deshabilitar-productos', function (e) {
+        var id_consolidado = $('#id_consolidado_desh').val();
+        var productos_seleccionados = [];
+
+        $('.check-producto-desh:checked').each(function () {
+            productos_seleccionados.push($(this).val());
+        });
+
+        if (productos_seleccionados.length === 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Sin Selección',
+                mensaje: 'Debe seleccionar al menos un producto para deshabilitar.',
+                ancho: '420px'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-deshabilitar-productos-consolidado',
+            data: {
+                _token: _token,
+                id_consolidado: id_consolidado,
+                productos: productos_seleccionados
+            },
+            success: function (res) {
+                cerrarcargando();
+                if (res.success) {
+                    $('#modal-deshabilitar-productos').niftyModal('hide');
+                    
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Éxito',
+                        mensaje: res.mensaje,
+                        ancho: '400px'
+                    });
+                    
+                    // Recargar el listado de consolidados generales para actualizar la ventana principal
+                    $('.btn-seleccionar-consolidados').click(); 
+                } else {
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: res.mensaje,
+                        ancho: '400px'
+                    });
+                }
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo procesar la solicitud en el servidor.',
+                    ancho: '400px'
+                });
+            }
+        });
     });
 
 });

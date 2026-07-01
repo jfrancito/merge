@@ -380,6 +380,10 @@
                 overlaySelector: '.modal-overlay',
                 closeSelector: '.modal-close',
                 classAddAfterOpen: 'modal-show',
+                afterClose: function(modal, e) {
+                    $('body').css('overflow', 'auto');
+                    $('.be-wrapper').css('filter', 'none');
+                }
             });
 
             @if($fedocumento->OPERACION === 'ORDEN_COMPRA_ANTICIPO')

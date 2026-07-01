@@ -75,7 +75,13 @@
          @foreach($listaordenpedido as $index => $item) 
         <tr>
             <td>{{ $item->ID_PEDIDO }}</td>
-            <td>{{ $item->TXT_ESTADO }}</td>
+            <td>
+                @if(isset($item->COD_ESTADO) && $item->COD_ESTADO == 'ETM0000000000015' && isset($item->COD_TRABAJADOR_APRUEBA_ADM) && $item->COD_TRABAJADOR_APRUEBA_ADM == 'IITR000000000391')
+                    POR APROBAR GERENCIA ADM
+                @else
+                    {{ $item->TXT_ESTADO }}
+                @endif
+            </td>
             <td>{{ $item->FEC_PEDIDO }}</td>
             <td>{{ $item->TXT_AREA }}</td>
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>

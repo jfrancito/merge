@@ -107,6 +107,54 @@
         'prefix': '', 
         'placeholder': '0'});
 
+        // Inicializar tablas de autorización
+        if (typeof inicializarTablasAutorizacion === 'undefined') {
+            window.inicializarTablasAutorizacion = function() {
+                var config = {
+                    "pageLength": 10,
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    "order": [[0, "desc"]],
+                    "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando del 0 al 0 de 0 registros",
+                        "sInfoFiltered":   "(filtrado de _MAX_ registros)",
+                        "sSearch":         "Buscar:",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    }
+                };
+
+                // Destruir instancias previas si existen para evitar errores al recargar con AJAX
+                if ($.fn.DataTable.isDataTable('#table-pedidos-pendientes')) {
+                    $('#table-pedidos-pendientes').DataTable().destroy();
+                }
+                if ($.fn.DataTable.isDataTable('#table-pedidos-autorizados')) {
+                    $('#table-pedidos-autorizados').DataTable().destroy();
+                }
+                if ($.fn.DataTable.isDataTable('#table-pedidos-rechazados')) {
+                    $('#table-pedidos-rechazados').DataTable().destroy();
+                }
+
+                $('#table-pedidos-pendientes, #table-pedidos-autorizados, #table-pedidos-rechazados').dataTable(config);
+            };
+        }
+
+        inicializarTablasAutorizacion();
+
       });
     </script> 
 <script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>

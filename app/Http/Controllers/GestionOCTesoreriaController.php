@@ -42,7 +42,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 use App\Traits\ComprobanteProvisionTraits;
-
+use App\Traits\UserTraits;
 
 use Storage;
 use ZipArchive;
@@ -58,6 +58,7 @@ class GestionOCTesoreriaController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
+    use UserTraits;
 
     public function actionEliminacionLoteComision(Request $request)
     {
@@ -385,7 +386,7 @@ class GestionOCTesoreriaController extends Controller
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR TESORERIA');
                 //geolocalización
-
+                $this->update_serie_correlativo_cpe();
 
 
                 DB::commit();
@@ -1190,6 +1191,11 @@ class GestionOCTesoreriaController extends Controller
         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
         $documento_top = $this->gn_lista_comision_asociados_top($lotes);
 
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $idoc)
+            ->where('ACTIVO', '=', 1)
+            ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+            ->get();
+
         //dd($documento_asociados);
         return View::make('comision/registrocomprobantecomisionadministrator',
             [
@@ -1216,6 +1222,7 @@ class GestionOCTesoreriaController extends Controller
                 'funcion' => $funcion,
                 'fereftop1' => $fereftop1,
                 'idopcion' => $idopcion,
+                'archivospdf' => $archivospdf,
             ]);
     }
 

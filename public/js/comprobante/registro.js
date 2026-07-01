@@ -915,7 +915,187 @@ $(document).ready(function(){
         abrircargando();
     });
 
+    // Inicializar fileinputs de comisiones
+    var tarchivosDataEl = document.getElementById('tarchivos-data');
+    if (tarchivosDataEl) {
+        var tarchivos = JSON.parse(tarchivosDataEl.textContent);
+        tarchivos.forEach(function(item) {
+            var options = {
+                theme: 'fa5',
+                language: 'es',
+                allowedFileExtensions: [item.formato]
+            };
+            if (item.initialPreview && item.initialPreview.length > 0) {
+                options.initialPreview = item.initialPreview;
+                options.initialPreviewAsData = true;
+                options.initialPreviewFileType = 'pdf';
+                options.initialPreviewConfig = item.initialPreviewConfig;
+                options.overwriteInitial = false;
+            }
+            $('#file-' + item.cod_categoria).fileinput(options);
+        });
+    }
 
+    // =========================================================================
+    // VISOR DE PDFS MASIVOS Y BUSCADOR EN TIEMPO REAL
+    // =========================================================================
+
+    var visiblePdfs = [];
+    var currentPdfIndex = -1;
+
+    // Función para actualizar la lista de PDFs que están visibles en la interfaz
+    function actualizarPdfsVisibles() {
+        visiblePdfs = [];
+        $('.pdf-item').each(function() {
+            var item = $(this);
+            if (item.css('display') !== 'none') {
+                visiblePdfs.push({
+                    nombre: item.attr('data-nombre'),
+                    url: item.attr('data-url'),
+                    originalIndex: parseInt(item.attr('data-index'))
+                });
+            }
+        });
+    }
+
+    // Función para previsualizar un PDF específico dentro de la lista visible
+    function mostrarPdf(index) {
+        if (index < 0 || index >= visiblePdfs.length) {
+            return;
+        }
+
+        currentPdfIndex = index;
+        var pdf = visiblePdfs[currentPdfIndex];
+
+        // Actualizar datos del visor en el modal
+        $('#previewPdfTitle').text(pdf.nombre);
+        $('#pdfPreviewIframe').attr('src', pdf.url);
+        $('#btnDownloadPdf').attr('href', pdf.url);
+        $('#previewPdfCounter').text('Doc ' + (currentPdfIndex + 1) + ' de ' + visiblePdfs.length);
+
+        // Habilitar/Deshabilitar botones de navegación secuencial
+        if (currentPdfIndex === 0) {
+            $('#btnPrevPdf').prop('disabled', true).addClass('disabled').css('opacity', '0.5');
+        } else {
+            $('#btnPrevPdf').prop('disabled', false).removeClass('disabled').css('opacity', '1');
+        }
+
+        if (currentPdfIndex === visiblePdfs.length - 1) {
+            $('#btnNextPdf').prop('disabled', true).addClass('disabled').css('opacity', '0.5');
+        } else {
+            $('#btnNextPdf').prop('disabled', false).removeClass('disabled').css('opacity', '1');
+        }
+    }
+
+    // Evento al hacer clic en el botón de Previsualizar
+    $(".registrocomprobante").on('click', '.btn-preview-pdf', function(e) {
+        e.preventDefault();
+        var originalIndex = parseInt($(this).attr('data-index'));
+        
+        // Recalcular los PDFs visibles basados en el buscador
+        actualizarPdfsVisibles();
+
+        // Encontrar la posición del archivo seleccionado en el subconjunto de archivos visibles
+        var visibleIndex = visiblePdfs.findIndex(function(pdf) {
+            return pdf.originalIndex === originalIndex;
+        });
+
+        if (visibleIndex !== -1) {
+            mostrarPdf(visibleIndex);
+            $('#previewPdfModal').modal('show');
+        }
+    });
+
+    // Controladores de navegación secuencial (Anterior / Siguiente)
+    $('#btnPrevPdf').on('click', function(e) {
+        e.preventDefault();
+        if (currentPdfIndex > 0) {
+            mostrarPdf(currentPdfIndex - 1);
+        }
+    });
+
+    $('#btnNextPdf').on('click', function(e) {
+        e.preventDefault();
+        if (currentPdfIndex < visiblePdfs.length - 1) {
+            mostrarPdf(currentPdfIndex + 1);
+        }
+    });
+
+    // Soporte para navegación con atajos de teclado (Flechas Izquierda / Derecha)
+    $(document).on('keydown', function(e) {
+        if ($('#previewPdfModal').hasClass('in') || $('#previewPdfModal').is(':visible')) {
+            if (e.keyCode === 37) { // Flecha Izquierda (Anterior)
+                if (currentPdfIndex > 0) {
+                    mostrarPdf(currentPdfIndex - 1);
+                }
+            } else if (e.keyCode === 39) { // Flecha Derecha (Siguiente)
+                if (currentPdfIndex < visiblePdfs.length - 1) {
+                    mostrarPdf(currentPdfIndex + 1);
+                }
+            }
+        }
+    });
+
+    // Limpiar el recurso del iframe al cerrar el modal para liberar memoria y detener la descarga
+    $('#previewPdfModal').on('hide.bs.modal', function() {
+        $('#pdfPreviewIframe').attr('src', '');
+    });
+
+    // Lógica del buscador en tiempo real
+    $('.registrocomprobante').on('keyup', '#buscar-pdf-input', function() {
+        var query = $(this).val().toLowerCase().trim();
+        var totalEncontrados = 0;
+
+        $('.pdf-item').each(function() {
+            var item = $(this);
+            var nombreArchivo = item.attr('data-nombre').toLowerCase();
+
+            if (nombreArchivo.indexOf(query) > -1) {
+                item.show();
+                totalEncontrados++;
+            } else {
+                item.hide();
+            }
+        });
+
+        // Mostrar un mensaje si no se encontraron documentos coincidentes
+        $('#no-pdfs-found-alert').remove();
+        if (totalEncontrados === 0) {
+            $('#pdf-list-container').append(
+                '<div id="no-pdfs-found-alert" style="text-align: center; padding: 25px 15px; color: #888;">' +
+                '<i class="mdi mdi-alert-circle-outline" style="font-size: 32px; display: block; margin-bottom: 5px; color: #ff5722;"></i>' +
+                'No se encontraron documentos con ese nombre.' +
+                '</div>'
+            );
+        }
+    });
+
+    // Actualizar el contador de archivos seleccionados (nuevos por subir) en tiempo real
+    $('.registrocomprobante').on('change', '#file-DCC0000000000048', function() {
+        var badge = $('#badge-pdf-count');
+        if (badge.length > 0) {
+            var initialCount = parseInt(badge.attr('data-initial')) || 0;
+            var selectedCount = this.files ? this.files.length : 0;
+            
+            if (selectedCount > 0) {
+                badge.text(initialCount + ' Guardados + ' + selectedCount + ' por Guardar');
+                badge.css('background', '#4caf50'); // Verde para indicar archivos pendientes de guardar
+            } else {
+                badge.text(initialCount + ' Archivos Cargados');
+                badge.css('background', '#ff5722'); // Color naranja original
+            }
+        }
+    });
+
+    // Restaurar badge si se limpian los archivos seleccionados en el plugin
+    $('.registrocomprobante').on('filecleared', '#file-DCC0000000000048', function() {
+        var badge = $('#badge-pdf-count');
+        if (badge.length > 0) {
+            var initialCount = parseInt(badge.attr('data-initial')) || 0;
+            badge.text(initialCount + ' Archivos Cargados');
+            badge.css('background', '#ff5722');
+        }
+    });
 
 });
 

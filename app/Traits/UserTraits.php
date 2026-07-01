@@ -1350,11 +1350,13 @@ trait UserTraits
         $listadocumentos = DB::table('FE_DOCUMENTO as FE')
             ->join('ARCHIVOS as AR', 'FE.ID_DOCUMENTO', '=', 'AR.ID_DOCUMENTO')
             ->where('FE.OPERACION', '=', 'COMISION')
-            ->whereIn('FE.COD_ESTADO', ['ETM0000000000008', 'ETM0000000000005'])
+            ->whereIn('FE.COD_ESTADO', ['ETM0000000000008', 'ETM0000000000005', 'ETM0000000000003', 'ETM0000000000004'])
             ->where('FE.OPERACION_DET', '=', 'SIN_XML')
             ->where('AR.TIPO_ARCHIVO', '=', 'DCC0000000000048')
+            //->where('FE.ID_DOCUMENTO','=','00009692')
             ->select('FE.ID_DOCUMENTO', 'FE.DOCUMENTO_ITEM', 'AR.URL_ARCHIVO', 'AR.TIPO_ARCHIVO', 'FE.RUC_PROVEEDOR')
             ->get();
+
 
         foreach ($listadocumentos as $item) {
 
@@ -1385,8 +1387,15 @@ trait UserTraits
                     }
                 }
 
+
+
+
                 // 2. Extraer del contenido del PDF usando pdftotext
                 $texto_pdf = $this->extraer_texto_pdf($ruta_pdf);
+
+                    $serie = null;
+                    $correlativo = null;
+                    $fecha = null;
 
                 if ($texto_pdf != '') {
                     // Buscar RUC (11 dígitos, suele empezar con 10, 15, 17, 20)
@@ -1394,15 +1403,21 @@ trait UserTraits
                         $ruc_ext = $ruc_matches[0];
                     }
 
-                    // Buscar serie (F, B o E + 3 alfanum) y correlativo (separado por guion o espacio)
-                    // Ejemplos: F029-537165, F001 00000123
-                    if (preg_match('/([FBE][A-Z0-9]{3})[\s-]*(\d{1,10})/i', $texto_pdf, $matches)) {
-                        // Solo sobreescribir si lo que encontramos en el PDF parece una serie válida (4 caracteres)
+
+                    // El \b al inicio evita que coincida con "MOREYRA" porque exige que sea una palabra nueva.
+                    // El \b al final asegura que capture el número completo.
+                    if (preg_match('/\b([FBE][A-Z0-9]{3})[\s-]*(\d{1,10})\b/i', $texto_pdf, $matches)) {
                         if (strlen($matches[1]) == 4) {
                             $serie = strtoupper($matches[1]);
                             $correlativo = $matches[2];
                         }
                     }
+                    // La opción definitiva: 
+                    // "Fecha" + ".*?" (ignora cualquier basura en el medio) + "(\d{2}\/\d{2}\/\d{4})" (atrapa la fecha)
+                    if (preg_match('/Fecha.*?(\d{2}\/\d{2}\/\d{4})/i', $texto_pdf, $matches_fecha)) {
+                        $fecha = $matches_fecha[1];
+                    }
+                           // dd($fecha);
                 }
 
                 // Validación final antes de actualizar
@@ -1414,6 +1429,7 @@ trait UserTraits
                     $update_data = [
                         'SERIE' => $serie,
                         'NUMERO' => $correlativo_pad,
+                        'FEC_VENTA' => $fecha,
                         'OPERACION_DET' => 'CON_PDF'
                     ];
 
@@ -1441,20 +1457,32 @@ trait UserTraits
 
     private function extraer_texto_pdf($ruta_archivo)
     {
+        // 1. Normalizar la ruta de red para evitar conflictos con barras invertidas
+        $ruta_archivo = str_replace('\\', '/', $ruta_archivo);
+
+        // 2. Validar que PHP vea el archivo en la red local
+        if (!file_exists($ruta_archivo)) {
+            return "ERROR_ARCHIVO: PHP no encuentra el archivo o falta de permisos para la ruta: " . $ruta_archivo;
+        }
+
         $output = '';
         try {
+            // 3. Tu ruta exacta al ejecutable envuelta en comillas dobles
+            $ruta_pdftotext = '"C:\xpdf-tools-win-4.06\bin64\pdftotext.exe"'; 
+
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                // pdftotext.exe está en el path de Git Bash usualmente
-                $comando = 'pdftotext -layout "' . $ruta_archivo . '" -';
+                // Se concatena la ruta del ejecutable con los parámetros y la ruta del PDF
+                $comando = $ruta_pdftotext . ' -layout "' . $ruta_archivo . '" - 2>&1';
                 $output = shell_exec($comando);
             } else {
-                $comando = 'pdftotext -layout ' . escapeshellarg($ruta_archivo) . ' -';
+                // Para tu futuro servidor en producción (Linux)
+                $comando = 'pdftotext -layout ' . escapeshellarg($ruta_archivo) . ' - 2>&1';
                 $output = shell_exec($comando);
             }
         } catch (\Exception $e) {
-            $output = '';
+            $output = 'EXCEPCIÓN_PHP: ' . $e->getMessage();
         }
-        return $output;
-    }
 
+        return trim($output);
+    }
 }

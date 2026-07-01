@@ -51,6 +51,44 @@
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
         outline: none;
     }
+
+    /* Select2 Personalizado Redondeado */
+    .select2-container--default .select2-selection--single {
+        border-radius: 14px !important;
+        height: 28px !important;
+        border: 2px solid #cbd5e1 !important;
+        background-color: #ffffff !important;
+        transition: all 0.3s ease;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 24px !important;
+        font-weight: normal !important;
+        color: #334155;
+        text-align: center;
+        padding-left: 15px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 26px !important;
+    }
+    .select2-container--open .select2-dropdown--below, 
+    .select2-container--open .select2-dropdown--above {
+        border-radius: 14px !important;
+        border: 2px solid #cbd5e1 !important;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        margin-top: 5px;
+    }
+    .select2-results__option {
+        padding: 6px 12px !important;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    #tabla-detalle-consolidado-ap_wrapper {
+        width: 100% !important;
+        overflow-x: auto !important;
+        padding-bottom: 10px;
+    }
 </style>
 
 <div class="panel panel-default" style="margin-top: 20px;">
@@ -86,6 +124,7 @@
                         <th>COD_PRODUCTO</th>
                         <th>PRODUCTO</th>
                         <th class="text-center">COMPRA(LOCAL/SEDE)</th>
+                        <th class="text-center" style="min-width: 240px;">ALMACEN</th>
                         <th class="text-center">UNIDAD MEDIDA</th>
                         <th class="text-center">CANTIDAD</th>
                         <th class="text-center">STOCK</th>
@@ -106,6 +145,7 @@
                             <!-- DEBUG: COD_EMPR: {{ $item->COD_EMPR ?? 'NULL' }} | IND_COMPRA: {{ $item->IND_COMPRA ?? 'NULL' }} -->
                             <td class="text-center">
                                 <select class="form-control input-sm combo-compra-moderno combo-compra-ap"
+                                    data-empresa="{{ trim($item->COD_EMPR ?? '') }}"
                                     @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') disabled @endif>
                                     @php
                                         $current_ind_compra = trim($item->IND_COMPRA ?? '');
@@ -152,6 +192,13 @@
                                     @endif
                                 </select>
                             </td>
+                            <td class="text-center">
+                                <select class="form-control input-sm select2-almacen-ap combo-almacen-ap" 
+                                    data-almacen-actual="{{ trim($item->COD_ALMACEN ?? '') }}"
+                                    @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') disabled @endif>
+                                    <option value="">Seleccione...</option>
+                                </select>
+                            </td>
                             <td class="text-center">{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
                             <td class="text-center">{{ number_format($item->CANTIDAD, 2) }}</td>
                             <td class="text-center">{{ number_format($item->STOCK, 2) }}</td>
@@ -167,7 +214,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center text-muted">No se encontraron productos.</td>
+                            <td colspan="12" class="text-center text-muted">No se encontraron productos.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -206,8 +253,10 @@
 </div>
 
 <script type="text/javascript">
+    $(document).ready(function() {
         $('#tabla-detalle-consolidado-ap').DataTable({
-            responsive: true,
+            scrollX: true,
+            responsive: false,
             language: {
                 search: "Buscar:",
                 lengthMenu: "Mostrar _MENU_ registros",
@@ -219,6 +268,76 @@
                     previous: "Anterior"
                 }
             }
+        });
+
+        $('.select2-almacen-ap').select2({
+            minimumResultsForSearch: Infinity,
+            width: '240px'
+        });
+
+        function cargarAlmacenesFilaAp($tr) {
+            let cod_producto = $tr.data('id');
+            let $selectCompra = $tr.find('.combo-compra-ap');
+            let $selectAlmacen = $tr.find('.combo-almacen-ap');
+            let cod_centro = $selectCompra.find('option:selected').data('codigo') || '';
+            let cod_empr = $selectCompra.data('empresa') || '';
+            let almacen_actual = $selectAlmacen.data('almacen-actual') || '';
+
+            if (cod_centro === '') {
+                $selectAlmacen.html('<option value="">Seleccione...</option>').trigger('change');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/ajax-obtener-almacenes-producto-centro',
+                data: {
+                    _token: $('#token').val(),
+                    cod_producto: cod_producto,
+                    cod_centro: cod_centro,
+                    cod_empr: cod_empr
+                },
+                success: function(res) {
+                    let html = '<option value="">Seleccione...</option>';
+                    
+                    let valor_seleccionado = '';
+                    if (almacen_actual.trim() !== '') {
+                        let existeGuardado = res.some(function(alm) {
+                            return alm.COD_ALMACEN.trim() === almacen_actual.trim();
+                        });
+                        if (existeGuardado) {
+                            valor_seleccionado = almacen_actual.trim();
+                        }
+                    }
+                    
+                    if (valor_seleccionado === '' && res.length === 1) {
+                        valor_seleccionado = res[0].COD_ALMACEN.trim();
+                    }
+
+                    res.forEach(function(alm) {
+                        let cod_alm = alm.COD_ALMACEN.trim();
+                        let selected = (cod_alm === valor_seleccionado) ? 'selected' : '';
+                        html += '<option value="' + cod_alm + '" ' + selected + '>' + alm.NOM_ALMACEN + '</option>';
+                    });
+                    $selectAlmacen.html(html).trigger('change');
+                },
+                error: function(e) {
+                    console.error('Error al obtener almacenes:', e);
+                }
+            });
+        }
+
+        // Cargar almacenes inicialmente para cada fila
+        let table = $('#tabla-detalle-consolidado-ap').DataTable();
+        table.rows().nodes().to$().each(function() {
+            cargarAlmacenesFilaAp($(this));
+        });
+
+        // Escuchar cambios en el combo de compra
+        $(document).on('change', '.combo-compra-ap', function() {
+            let $tr = $(this).closest('tr');
+            $tr.find('.combo-almacen-ap').data('almacen-actual', '');
+            cargarAlmacenesFilaAp($tr);
         });
 
         $('.inputmask-mil').inputmask('decimal', {

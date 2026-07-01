@@ -537,15 +537,48 @@ $(document).ready(function () {
     /* ===============================
        FILTRO POR TIPO DE PRODUCTO
        =============================== */
-    var originalProductos = null;
+    
+    // Inicializar Select2 con búsqueda AJAX en #producto_id
+    $('#producto_id').select2({
+        ajax: {
+            url: carpeta + '/ajax-buscar-producto',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term,
+                    tipo: $('#tipo_material_servicio').val(),
+                    _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content')
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Buscar producto...',
+        minimumInputLength: 1,
+        width: '100%'
+    });
 
-    // Al inicio, vaciar productos para cumplir pedido
-    setTimeout(() => {
-        if (!originalProductos) {
-            originalProductos = $('#producto_id option').clone();
-        }
-        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').trigger('change');
-    }, 1000);
+    // Mapear los datos del producto al seleccionarlo
+    $('#producto_id').on('select2:select', function (e) {
+        let data = e.params.data;
+        let option = $('#producto_id option:selected');
+        
+        // Asignar data attributes dinámicamente para compatibilidad con la lógica existente
+        option.data('nombre', data.NOM_PRODUCTO);
+        option.data('unidad', data.UNIDAD);
+        option.data('codcategoria', data.COD_UNIDAD);
+        option.data('precio', data.PRECIO);
+        option.data('indmaterialservicio', data.IND_MATERIAL_SERVICIO);
+
+        // Disparar el evento change para actualizar la UI
+        $('#producto_id').trigger('change');
+    });
 
     $(document).on('select2:opening', '#producto_id', function (e) {
         var tipo = $('#tipo_material_servicio').val();
@@ -561,9 +594,6 @@ $(document).ready(function () {
     });
 
     $(document).on('change', '#tipo_material_servicio', function () {
-        if (!originalProductos) {
-            originalProductos = $('#producto_id option').clone();
-        }
         var tipo = $(this).val();
 
         // VALIDACIÓN: Si es SERVICIO (S), cantidad = 1 y bloqueado
@@ -573,27 +603,17 @@ $(document).ready(function () {
             $('#cantidad').val('').prop('disabled', false);
         }
 
-        $('#producto_id').empty();
-        $('#producto_id').append('<option value="">Buscar producto...</option>');
+        // Limpiar el producto seleccionado y vaciar opciones anteriores
+        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').val(null).trigger('change');
 
-        if (tipo !== "") {
-            originalProductos.each(function () {
-                var ind = $(this).data('indmaterialservicio');
-                if (ind == tipo) {
-                    $('#producto_id').append($(this).clone());
-                }
-            });
-
-            // Cambiar nombre del botón según el tipo
-            if (tipo === 'M') {
-                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Material');
-            } else if (tipo === 'S') {
-                $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
-            }
+        // Cambiar nombre del botón según el tipo
+        if (tipo === 'M') {
+            $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Material');
+        } else if (tipo === 'S') {
+            $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Servicio');
         } else {
             $('#agregar_producto').html('<i class="fa fa-plus"></i> Agregar Producto');
         }
-        $('#producto_id').trigger('change');
     });
 
     $(document).on('change', '#producto_id', function () {
@@ -2501,11 +2521,13 @@ $(document).ready(function () {
             let cod_producto = $(this).data('id');
             let cantidad = $(this).find('.input-descontar').val();
             let ind_compra = $(this).find('.combo-compra').val();
+            let cod_almacen = $(this).find('.combo-almacen').val();
+            let nom_almacen = (cod_almacen !== '' && cod_almacen !== null) ? $(this).find('.combo-almacen option:selected').text() : null;
 
             let $selected = $(this).find('.combo-compra option:selected');
             let cod_centro_compra = $selected.data('codigo') || null;
 
-            if (ind_compra === '' || ind_compra === null) {
+            if (ind_compra === '' || ind_compra === null || cod_almacen === '' || cod_almacen === null) {
                 validacion = false;
             }
 
@@ -2513,7 +2535,9 @@ $(document).ready(function () {
                 cod_producto: cod_producto,
                 cantidad: cantidad,
                 ind_compra: ind_compra,
-                cod_centro_compra: cod_centro_compra
+                cod_centro_compra: cod_centro_compra,
+                cod_almacen: cod_almacen,
+                nom_almacen: nom_almacen
             });
         });
 
@@ -2522,7 +2546,7 @@ $(document).ready(function () {
                 tipo: 'error',
                 icono: '❌',
                 titulo: 'Selección requerida',
-                mensaje: 'Debe seleccionar el lugar de COMPRA (LOCAL o SEDE) para todos los productos en la lista.'
+                mensaje: 'Debe seleccionar el lugar de COMPRA (LOCAL o SEDE) y el ALMACEN para todos los productos en la lista.'
             });
             return;
         }
@@ -2599,11 +2623,13 @@ $(document).ready(function () {
             let cod_producto = $(this).data('id');
             let cantidad = $(this).find('.input-descontar').val().replace(/,/g, '');
             let ind_compra = $(this).find('.combo-compra').val();
+            let cod_almacen = $(this).find('.combo-almacen').val();
+            let nom_almacen = (cod_almacen !== '' && cod_almacen !== null) ? $(this).find('.combo-almacen option:selected').text() : null;
 
             let $selected = $(this).find('.combo-compra option:selected');
             let cod_centro_compra = $selected.data('codigo') || null;
 
-            if (ind_compra === '' || ind_compra === null) {
+            if (ind_compra === '' || ind_compra === null || cod_almacen === '' || cod_almacen === null) {
                 validacion = false;
             }
 
@@ -2611,7 +2637,9 @@ $(document).ready(function () {
                 cod_producto: cod_producto,
                 cantidad: cantidad,
                 ind_compra: ind_compra,
-                cod_centro_compra: cod_centro_compra
+                cod_centro_compra: cod_centro_compra,
+                cod_almacen: cod_almacen,
+                nom_almacen: nom_almacen
             });
         });
 
@@ -2620,7 +2648,7 @@ $(document).ready(function () {
                 tipo: 'error',
                 icono: '❌',
                 titulo: 'Campos Incompletos',
-                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> para todos los productos en la lista.'
+                mensaje: 'Debe seleccionar el lugar de <b>COMPRA (LOCAL o SEDE)</b> y el <b>ALMACEN</b> para todos los productos en la lista.'
             });
             return;
         }

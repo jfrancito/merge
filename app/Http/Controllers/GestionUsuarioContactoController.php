@@ -6414,9 +6414,9 @@ class GestionUsuarioContactoController extends Controller
 
     public function actionAjaxValidarAsientoDuplicado(Request $request)
     {
-        $asientos_json = $request->input('asientos');
+        /*$asientos_json = $request->input('asientos');
         $asientos = json_decode($asientos_json, true);
-
+        
         if (is_array($asientos)) {
             foreach ($asientos as $detalle) {
                 $cabeceras = json_decode($detalle['cabecera'], true);
@@ -6428,14 +6428,13 @@ class GestionUsuarioContactoController extends Controller
                         $cod_categoria_tipo_asiento = $cabecera['COD_CATEGORIA_TIPO_ASIENTO'];
                         $txt_categoria_tipo_asiento = $cabecera['TXT_CATEGORIA_TIPO_ASIENTO'];
 
-                        /*
-                        $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
-                            ->where('TXT_REFERENCIA', '=', $txt_referencia)
-                            ->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
-                            ->where('COD_ESTADO', '=', $cod_estado)
-                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
-                            ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $txt_categoria_tipo_asiento)
-                            ->first();*/
+                        --$asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                            --->where('TXT_REFERENCIA', '=', $txt_referencia)
+                            --->where('TXT_TIPO_REFERENCIA', '=', $txt_tipo_referencia)
+                            --->where('COD_ESTADO', '=', $cod_estado)
+                           -- ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cod_categoria_tipo_asiento)
+                           -- ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $txt_categoria_tipo_asiento)
+                            --->first();
 
                         if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
@@ -6525,8 +6524,8 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
             }
-        }
-
+        }*/
+        
         return response()->json(['status' => 'success']);
     }
 
