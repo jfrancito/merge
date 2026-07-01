@@ -1634,7 +1634,7 @@ class GestionOCContabilidadController extends Controller
 
         $anio = $this->anio;
         $empresa = Session::get('empresas')->COD_EMPR;
-        $cod_contable = $fedocumento->ID_DOCUMENTO;
+        $cod_contable = $idoc;
         $ind_anulado = 0;
         $igv = 0;
         $ind_recalcular = 0;
