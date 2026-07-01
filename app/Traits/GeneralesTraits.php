@@ -401,6 +401,7 @@ trait GeneralesTraits
     $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
                     ->where('ACTIVO', 1)
                     ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->whereRaw("ARENDIR_ID IS NOT NULL AND ARENDIR_ID != ''")
                     ->where('USUARIO_CREA', Session::get('usuario')->id)
                     ->pluck('ARENDIR_ID')
                     ->toArray();
@@ -410,6 +411,7 @@ trait GeneralesTraits
                     ->join('TES.AUTORIZACION_DETALLE as AUD', 'AUT.COD_AUTORIZACION', '=', 'AUD.COD_AUTORIZACION')
                     ->join('CMP.DOCUMENTO_CTBLE as DOC', 'AUD.COD_DOC_CTBLE', '=', 'DOC.COD_DOCUMENTO_CTBLE')
                     ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
+                    //->where('VR.ID','=','IILMAU0000000439')
                     ->where('DOC.CAN_SALDO', '>', 0)
                     ->where('COD_MONEDA',$moneda_sel_c_id)
                     ->whereNotIn('ID', $liquidaciones)
@@ -422,7 +424,7 @@ trait GeneralesTraits
                     ->orderBy('VR.ID', 'asc')
                     ->pluck('MONTO', 'VR.ID')
                     ->toArray();
-
+        //DD($array);
         $combo = array('' => 'Seleccione un arendir') + $array;
         return $combo;
     }
