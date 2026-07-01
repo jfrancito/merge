@@ -35,7 +35,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Año :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'anio_asiento', isset($array_anio) ? $array_anio : [], '',
+                                {!! Form::select( 'anio_asiento', isset($array_anio) ? $array_anio : [], isset($defecto_anio) ? $defecto_anio : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'anio_asiento',
@@ -50,7 +50,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Periodo
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'periodo_asiento', isset($array_periodo) ? $array_periodo : [], '',
+                                {!! Form::select( 'periodo_asiento', isset($array_periodo) ? $array_periodo : [], isset($defecto_periodo) ? $defecto_periodo : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'periodo_asiento',
@@ -121,8 +121,10 @@
                     </div>
 
                     <script>
-                        let defaultId = "{{ '' }}";
-                        let defaultText = "{{ '' }}";
+                        var defaultId = "{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->COD_EMPR : (!empty($fedocumento) ? $fedocumento->RUC_PROVEEDOR : '')) }}";
+                        var defaultText = "{!! !empty($asiento_compra[1]) ? str_replace('"', '\"', $asiento_compra[1][0]['TXT_EMPR_CLI']) : (!empty($empresa_doc_fe) ? str_replace('"', '\"', $empresa_doc_fe->NOM_EMPR) : (!empty($fedocumento) ? str_replace('"', '\"', $fedocumento->RZ_PROVEEDOR) : '')) !!}";
+                        window.defaultId = defaultId;
+                        window.defaultText = defaultText;
                     </script>
 
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
@@ -146,7 +148,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input id="fecha_asiento" name="fecha_asiento"
                                        class="form-control control input-sm" type="date"
-                                       value="{{ date("Ymd") }}">
+                                       value="{{ date("Y-m-d") }}">
                             </div>
                         </div>
                     </div>
@@ -291,7 +293,7 @@
                         <div class="col-sm-12 abajocaja">
                             <input id="fecha_detraccion_asiento" name="fecha_detraccion_asiento"
                                    class="form-control control input-sm" type="date"
-                                   value="{{ date("Ymd") }}">
+                                   value="{{ date("Y-m-d") }}">
                         </div>
                     </div>
                 </div>
