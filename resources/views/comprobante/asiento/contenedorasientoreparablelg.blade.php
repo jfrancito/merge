@@ -30,7 +30,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Año :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'anio_asiento_reparable', $array_anio, '',
+                                {!! Form::select( 'anio_asiento_reparable', $array_anio, isset($defecto_anio) ? $defecto_anio : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'anio_asiento_reparable',
@@ -46,7 +46,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Periodo
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'periodo_asiento_reparable', $array_periodo, '',
+                                {!! Form::select( 'periodo_asiento_reparable', $array_periodo, isset($defecto_periodo) ? $defecto_periodo : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'periodo_asiento_reparable',
@@ -120,8 +120,10 @@
                     </div>
 
                     <script>
-                        let defaultIdReparable = "{{ !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : '' }}";
-                        let defaultTextReparable = "{{ !empty($asiento_reparable) ? $asiento_reparable[1][0]['TXT_EMPR_CLI'] : '' }}";
+                        var defaultIdReparable = "{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->COD_EMPR : (!empty($fedocumento) ? $fedocumento->RUC_PROVEEDOR : '')) }}";
+                        var defaultTextReparable = "{!! !empty($asiento_reparable[1]) ? str_replace('"', '\"', $asiento_reparable[1][0]['TXT_EMPR_CLI']) : (!empty($empresa_doc_fe) ? str_replace('"', '\"', $empresa_doc_fe->NOM_EMPR) : (!empty($fedocumento) ? str_replace('"', '\"', $fedocumento->RZ_PROVEEDOR) : '')) !!}";
+                        window.defaultIdReparable = defaultIdReparable;
+                        window.defaultTextReparable = defaultTextReparable;
                     </script>
 
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
@@ -147,7 +149,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="fecha_asiento_reparable" name="fecha_asiento_reparable"
                                        class="form-control control input-sm" type="date"
-                                       value="">
+                                       value="{{ !empty($asiento_reparable[1]) ? date('Y-m-d', strtotime($asiento_reparable[1][0]['FEC_ASIENTO'])) : (!empty($fedocumento->FEC_VENTA) ? date('Y-m-d', strtotime($fedocumento->FEC_VENTA)) : '') }}">
                             </div>
                         </div>
                     </div>

@@ -15,7 +15,7 @@ function toggleContent() {
 
 $(document).ready(function () {
 
-    var carpeta = $("#carpeta").val();
+    // var carpeta = $("#carpeta").val();
 
     function validarAsientoDuplicadoYEnviar(callbackSubmit) {
         let asientosVal = $('#asientosgenerados').val();
@@ -58,37 +58,37 @@ $(document).ready(function () {
 
     function sincronizarCabeceraDesdeUI(arrayCabecera, esReparable = false) {
         if (!arrayCabecera || !Array.isArray(arrayCabecera) || arrayCabecera.length === 0) return arrayCabecera;
-        
+
         let sufijo = esReparable ? '_reparable' : '';
-        
+
         let selectedMoneda = $('#moneda_asiento' + sufijo).val();
         let tc_value = parseFloat($('#tipo_cambio_asiento' + sufijo).val() || '0') || 0;
         let periodo = $('#periodo_asiento' + sufijo).val();
         let fecha = $('#fecha_asiento' + sufijo).val();
         let glosa = $('#glosa_asiento' + sufijo).val();
         let tipo_asiento = $('#tipo_asiento' + sufijo).val();
-        
+
         let empresa_el = document.querySelector('#empresa_asiento' + sufijo);
         let proveedor = empresa_el ? empresa_el.value : '';
         let proveedor_txt = '';
         if (empresa_el && empresa_el.tomselect && empresa_el.tomselect.options && empresa_el.tomselect.options[proveedor]) {
             proveedor_txt = empresa_el.tomselect.options[proveedor].text;
         }
-        
+
         let tipo_doc = $('#tipo_documento_asiento' + sufijo).val();
         let serie = $('#serie_asiento' + sufijo).val();
         let numero = $('#numero_asiento' + sufijo).val();
-        
+
         let tipo_doc_ref = $('#tipo_documento_ref' + sufijo).val();
         let serie_ref = $('#serie_ref_asiento' + sufijo).val();
         let numero_ref = $('#numero_ref_asiento' + sufijo).val();
-        
+
         let tipo_desc = $('#tipo_descuento_asiento' + sufijo).val();
         let constancia = $('#const_detraccion_asiento' + sufijo).val();
         let fecha_desc = $('#fecha_detraccion_asiento' + sufijo).val();
         let porcentaje = parseFloat($('#porcentaje_detraccion' + sufijo).val() || '0') || 0;
         let total_desc = parseFloat($('#total_detraccion_asiento' + sufijo).val() || '0') || 0;
-        
+
         arrayCabecera.forEach(item => {
             if (selectedMoneda !== undefined && selectedMoneda !== null) {
                 item.COD_CATEGORIA_MONEDA = 'MON0000000000001';
@@ -147,7 +147,7 @@ $(document).ready(function () {
                 item.CAN_TOTAL_DETRACCION = total_desc;
             }
         });
-        
+
         return arrayCabecera;
     }
 
@@ -189,6 +189,7 @@ $(document).ready(function () {
     }
 
     function renderAsientoDetalle(arrayDetalle, form_id_editar, moneda_id_editar, tc_editar) {
+        inicializarAsientosDataTables();
         let tableId = '';
         switch (form_id_editar) {
             case 'C': tableId = '#asientodetalle'; break;
@@ -205,7 +206,7 @@ $(document).ready(function () {
             if (parseInt(item.COD_ESTADO) === 1) {
                 let ind_producto = parseInt(item.IND_PRODUCTO || 0);
                 let acciones = '';
-                
+
                 if (ind_producto !== 2) {
                     acciones = `
                         <button type="button" class="btn btn-sm btn-primary editar-cuenta">
@@ -247,6 +248,7 @@ $(document).ready(function () {
     }
 
     function renderAsientoReparableDetalle(arrayDetalle, moneda_id_editar, tc_editar) {
+        inicializarAsientosDataTables();
         let table = $('#asientodetallereparable').DataTable();
         table.clear().draw();
 
@@ -254,7 +256,7 @@ $(document).ready(function () {
             if (parseInt(item.COD_ESTADO) === 1) {
                 let ind_producto = parseInt(item.IND_PRODUCTO || 0);
                 let acciones = '';
-                
+
                 if (ind_producto !== 2) {
                     acciones = `
                         <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
@@ -376,7 +378,20 @@ $(document).ready(function () {
             url: carpeta + "/obtener-periodo-tipo-cambio",
             data: { _token: _token, fecha: fecha },
             success: function (res) {
-                $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
+                if (!res.existeTipoCambio) {
+                    $.alert({
+                        title: 'Alerta',
+                        content: 'Se debe agregar tipo de cambio para el día seleccionado.',
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                text: 'OK',
+                                btnClass: 'btn-red',
+                            }
+                        }
+                    });
+                }
+                $('#tipo_cambio_asiento_reparable').val(res.tipoCambio).trigger('keyup');
 
                 $("#anio_asiento_reparable").data('pending-period', res.periodo.trim());
                 window.selects['anio_asiento_reparable'].setSelected(res.anio.trim());
@@ -553,7 +568,7 @@ $(document).ready(function () {
             success: function (htmlResponse) {
                 cerrarcargando();
                 $(".ajax_anio_asiento_reparable").html(htmlResponse);
-                
+
                 let pending = $("#anio_asiento_reparable").data('pending-period');
                 if (pending && window.selects['periodo_asiento_reparable']) {
                     window.selects['periodo_asiento_reparable'].setSelected(pending.trim());
@@ -568,7 +583,7 @@ $(document).ready(function () {
 
     });
 
-    $(".btn-regresar-lista-reparable").on('click', function (e) {
+    $(document).on('click', ".btn-regresar-lista-reparable", function (e) {
         $('.editarcuentasreparable').toggle("slow");
         $('.tablageneralreparable').toggle("slow", function () {
             $('#asientodetallereparable').DataTable().columns.adjust().draw();
@@ -681,7 +696,7 @@ $(document).ready(function () {
         $('#tipo_igv_id_reparable').trigger('change');
         $('#porc_tipo_igv_id_reparable').trigger('change');
 
-        $('#monto_reparable').val(monto);
+        $('#monto_reparable').val(monto).trigger('keyup');
 
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
@@ -717,7 +732,7 @@ $(document).ready(function () {
 
     });
 
-    $(".agregar-linea-reparable").on('click', function (e) {
+    $(document).on('click', ".agregar-linea-reparable", function (e) {
 
         let data_codigo = 'ASTMOV';
         let data_moneda = document.getElementById("moneda_asiento_reparable").value;
@@ -771,7 +786,7 @@ $(document).ready(function () {
         $('#partida_id_reparable').trigger('change');
         $('#tipo_igv_id_reparable').trigger('change');
         $('#porc_tipo_igv_id_reparable').trigger('change');
-        $('#monto_reparable').val(monto);
+        $('#monto_reparable').val(monto).trigger('keyup');
 
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
@@ -784,7 +799,7 @@ $(document).ready(function () {
 
     });
 
-    $(".btn-editar-movimiento-reparable").on('click', function (e) {
+    $(document).on('click', ".btn-editar-movimiento-reparable", function (e) {
 
         let cuenta_contable_id = $('#cuenta_contable_id_reparable').val();
         let afecto_igv = $('#tipo_igv_id_reparable').val();
@@ -983,7 +998,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".btn-registrar-movimiento-reparable").on('click', function (e) {
+    $(document).on('click', ".btn-registrar-movimiento-reparable", function (e) {
 
         let cuenta_contable_id = $('#cuenta_contable_id_reparable').val();
         let afecto_igv = $('#tipo_igv_id_reparable').val();
@@ -1203,7 +1218,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".diferencia-montos-reparable").on('click', function (e) {
+    $(document).on('click', ".diferencia-montos-reparable", function (e) {
         let totalDebeMN = 0;
         let totalHaberMN = 0;
         let totalDebeME = 0;
@@ -1505,7 +1520,7 @@ $(document).ready(function () {
     //nuevo reparable
     //no reparable
 
-    $(".diferencia-montos").on('click', function (e) {
+    $(document).on('click', ".diferencia-montos", function (e) {
         let totalDebeMN = 0;
         let totalHaberMN = 0;
         let totalDebeME = 0;
@@ -2077,7 +2092,20 @@ $(document).ready(function () {
             url: carpeta + "/obtener-periodo-tipo-cambio",
             data: { _token: _token, fecha: fecha },
             success: function (res) {
-                $('#tipo_cambio_asiento').val(res.tipoCambio);
+                if (!res.existeTipoCambio) {
+                    $.alert({
+                        title: 'Alerta',
+                        content: 'Se debe agregar tipo de cambio para el día seleccionado.',
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                text: 'OK',
+                                btnClass: 'btn-red',
+                            }
+                        }
+                    });
+                }
+                $('#tipo_cambio_asiento').val(res.tipoCambio).trigger('keyup');
 
                 $("#anio_asiento").data('pending-period', res.periodo.trim());
                 window.selects['anio_asiento'].setSelected(res.anio.trim());
@@ -2096,7 +2124,7 @@ $(document).ready(function () {
 
     });
 
-    $(".btn-guardar-asiento").on('click', function () {
+    $(document).on('click', ".btn-guardar-asiento", function () {
 
         let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
         let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
@@ -2206,10 +2234,9 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
-                if (
-                    item.COD_CUENTA_CONTABLE === null && item.COD_CUENTA_CONTABLE === '' &&
-                    item.TXT_CUENTA_CONTABLE === null && item.TXT_CUENTA_CONTABLE === ''
-                ) {
+                let codCuenta = (item.COD_CUENTA_CONTABLE || '').toString().trim();
+                let txtCuenta = (item.TXT_CUENTA_CONTABLE || '').toString().trim();
+                if (codCuenta === '' || txtCuenta === '') {
                     no_existe_cuenta_contable = true;
                 }
                 switch (item.COD_DOC_CTBLE_REF) {
@@ -2519,8 +2546,29 @@ $(document).ready(function () {
         actualizarGlosaAsiento();
     });
 
-    $('a[href="#astdetgeneral"]').on('shown.bs.tab', function () {
-        $('#asientodetalle').DataTable().columns.adjust().draw();
+    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+        let href = $(this).attr('href');
+        if (href === '#astdetgeneral' || href === '#astcompra') {
+            if ($.fn.DataTable.isDataTable('#asientodetalle')) {
+                $('#asientodetalle').DataTable().columns.adjust().draw();
+            }
+        } else if (href === '#astdetgeneralreparable') {
+            if ($.fn.DataTable.isDataTable('#asientodetallereparable')) {
+                $('#asientodetallereparable').DataTable().columns.adjust().draw();
+            }
+        } else if (href === '#astreversion') {
+            if ($.fn.DataTable.isDataTable('#asientodetallereversion')) {
+                $('#asientodetallereversion').DataTable().columns.adjust().draw();
+            }
+        } else if (href === '#astdeduccion') {
+            if ($.fn.DataTable.isDataTable('#asientodetallededuccion')) {
+                $('#asientodetallededuccion').DataTable().columns.adjust().draw();
+            }
+        } else if (href === '#astpercepcion') {
+            if ($.fn.DataTable.isDataTable('#asientodetallepercepcion')) {
+                $('#asientodetallepercepcion').DataTable().columns.adjust().draw();
+            }
+        }
     });
 
     $(document).on('click', ".ver-asiento", function (e) {
@@ -2682,7 +2730,7 @@ $(document).ready(function () {
         //$('#anio_asiento').val(anio.toString()).trigger('change');
         $('#comprobante_asiento').val(comprobante_asiento);
         //$('#moneda_asiento').val(moneda_id_editar).trigger('change');
-        $('#tipo_cambio_asiento').val(tc_editar);
+        $('#tipo_cambio_asiento').val(tc_editar).trigger('keyup');
         //$('#empresa_asiento').val(proveedor_asiento).trigger('change');
         //$('#tipo_asiento').val(tipo_asiento).trigger('change');
 
@@ -2724,14 +2772,14 @@ $(document).ready(function () {
 
     });
 
-    $(".btn-regresar-lista").on('click', function (e) {
+    $(document).on('click', ".btn-regresar-lista", function (e) {
         $('.editarcuentas').toggle("slow");
         $('.tablageneral').toggle("slow", function () {
             $('#asientodetalle').DataTable().columns.adjust().draw();
         });
     });
 
-    $(".btn-registrar-movimiento").on('click', function (e) {
+    $(document).on('click', ".btn-registrar-movimiento", function (e) {
 
         let cuenta_contable_id = $('#cuenta_contable_id').val();
         let afecto_igv = $('#tipo_igv_id').val();
@@ -3118,7 +3166,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".btn-editar-movimiento").on('click', function (e) {
+    $(document).on('click', ".btn-editar-movimiento", function (e) {
 
         let cuenta_contable_id = $('#cuenta_contable_id').val();
         let afecto_igv = $('#tipo_igv_id').val();
@@ -3361,9 +3409,9 @@ $(document).ready(function () {
                                         total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                                     }
                                 }
-                        }
-                        arrayDetalle = ordenarYRenumerarDetalle(arrayDetalle);
-                    });
+                            }
+                            arrayDetalle = ordenarYRenumerarDetalle(arrayDetalle);
+                        });
 
                         total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
 
@@ -3378,7 +3426,7 @@ $(document).ready(function () {
                                     item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
                                     item.TOTAL_BASE_INAFECTA = base_inafecto;
                                     item.TOTAL_BASE_EXONERADA = base_exonerado;
-                    item.TOTAL_IGV = total_igv;
+                                    item.TOTAL_IGV = total_igv;
                                     item.TOTAL_AFECTO_IVAP = base_ivap;
                                     item.TOTAL_IVAP = total_ivap;
                                 });
@@ -3456,7 +3504,7 @@ $(document).ready(function () {
         });
     });
 
-    $(".agregar-linea").on('click', function (e) {
+    $(document).on('click', ".agregar-linea", function (e) {
 
         let data_codigo = 'ASTMOV';
         let data_asiento = $(this).attr("data");
@@ -3530,7 +3578,7 @@ $(document).ready(function () {
         $('#partida_id').trigger('change');
         $('#tipo_igv_id').trigger('change');
         $('#porc_tipo_igv_id').trigger('change');
-        $('#monto').val(monto);
+        $('#monto').val(monto).trigger('keyup');
 
         $('#asiento_id_editar').val(data_codigo);
         $('#form_id_editar').val(data_asiento);
@@ -3820,7 +3868,7 @@ $(document).ready(function () {
         $('#tipo_igv_id').trigger('change');
         $('#porc_tipo_igv_id').trigger('change');
 
-        $('#monto').val(monto);
+        $('#monto').val(monto).trigger('keyup');
 
         $('#asiento_id_editar').val(data_codigo);
         $('#form_id_editar').val(data_asiento);
@@ -3858,7 +3906,7 @@ $(document).ready(function () {
             success: function (htmlResponse) {
                 cerrarcargando();
                 $(".ajax_anio_asiento").html(htmlResponse);
-                
+
                 let pending = $("#anio_asiento").data('pending-period');
                 if (pending && window.selects['periodo_asiento']) {
                     window.selects['periodo_asiento'].setSelected(pending.trim());
@@ -4610,7 +4658,7 @@ $(document).ready(function () {
 
     });
 
-    $('.btn-eliminar-asiento').on('click', function (event) {
+    $(document).on('click', '.btn-eliminar-asiento', function (event) {
         event.preventDefault();
         $.confirm({
             title: '¿Confirma la Eliminación?',
@@ -5384,5 +5432,89 @@ $(document).ready(function () {
 
         console.log("Input actualizado con " + listaAsientos.length + " asientos.");
     }
+
+    function inicializarAsientosDataTables() {
+        let tablesConfig = [
+            { id: '#asientodetalle' },
+            { id: '#asientodetallereparable' },
+            { id: '#asientodetallereversion' },
+            { id: '#asientodetallededuccion' },
+            { id: '#asientodetallepercepcion' }
+        ];
+
+        tablesConfig.forEach(function (t) {
+            let $el = $(t.id);
+            if ($el.length > 0) {
+                if ($.fn.DataTable.isDataTable(t.id)) {
+                    $(t.id).DataTable().destroy();
+                }
+                $el.dataTable({
+                    destroy: true,
+                    responsive: true,
+                    autoWidth: false,
+                    lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+                    scrollX: true,
+                    scrollY: "200px",
+                    ordering: false,
+                    searching: false,
+                    footerCallback: function (row, data, start, end, display) {
+                        let api = this.api();
+
+                        // helper para convertir texto a número
+                        let intVal = function (i) {
+                            return typeof i === 'string'
+                                ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                                : typeof i === 'number'
+                                    ? i
+                                    : 0;
+                        };
+
+                        // columnas numéricas a sumar (basado en tu orden)
+                        let cols = [3, 4, 5, 6];
+
+                        cols.forEach(function (colIdx) {
+                            let total = api
+                                .column(colIdx, { page: 'current' })
+                                .data()
+                                .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                            // mostrar con 4 decimales
+                            $(api.column(colIdx).footer()).html(number_format(total, 4));
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Registrar interceptor ajax para cuando se carga el contenedor de asientos
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        if (settings.url && settings.url.indexOf('ajax-generar-asientos-general') !== -1) {
+            // Inicializar DataTables de los asientos
+            inicializarAsientosDataTables();
+
+            // Formatear campos dinero que no hayan sido inicializados
+            if ($.fn.inputmask) {
+                $('.dinero:not(.dinero-initialized)').each(function() {
+                    $(this).addClass('dinero-initialized').inputmask({
+                        'alias': 'numeric',
+                        'groupSeparator': ',', 'autoGroup': true, 'digits': 4,
+                        'digitsOptional': false,
+                        'prefix': '',
+                        'placeholder': '0'
+                    });
+                });
+            } else if ($.fn.priceFormat) {
+                $('.dinero:not(.dinero-initialized)').each(function() {
+                    $(this).addClass('dinero-initialized').priceFormat({
+                        prefix: '',
+                        centsSeparator: ',',
+                        thousandsSeparator: '.',
+                        centsLimit: 4
+                    });
+                });
+            }
+        }
+    });
 
 });

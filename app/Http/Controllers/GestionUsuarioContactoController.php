@@ -1723,17 +1723,103 @@ class GestionUsuarioContactoController extends Controller
                             $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
                             // Validar duplicados antes de insertar
-                            $asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                            /*$asiento_existente = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
                                 ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
                                 ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
                                 ->where('COD_ESTADO', '=', $COD_ESTADO)
                                 ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
                                 ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $TXT_CATEGORIA_TIPO_ASIENTO)
+                                ->first();*/
+                            
+                            if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
                                 ->first();
 
-                            if ($asiento_existente) {
+                            } else {
+
+                                if (stripos($cabecera['TXT_GLOSA'], 'DEDUCCION')) {
+
+                                    $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                        ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                        ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                        ->where('TXT_GLOSA', 'LIKE', '%DEDUCCION%')
+                                        ->first();
+
+                                } else {
+
+                                    if (stripos($cabecera['TXT_GLOSA'], 'PERCEPCION')) {
+
+                                        $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                            ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                            ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                            ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                            ->where('TXT_GLOSA', 'LIKE', '%PERCEPCION%')
+                                            ->first();
+
+                                    } else {
+
+                                        if (stripos($cabecera['TXT_GLOSA'], 'REPARABLE') and stripos($cabecera['TXT_GLOSA'], 'REVERSION') === false) {
+
+                                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                                ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                                ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                                ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                                ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                                ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                                                ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                                                ->first();
+
+                                        } else {
+
+                                            $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                                ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                                ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                                ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                                ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                                ->where('TXT_GLOSA', 'LIKE', "%REVERSION%")
+                                                ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                                                ->first();
+                                        }
+                                    }
+                                }
+                            }
+
+                            //if (!empty($asiento_busqueda)) {
+                            //    DB::rollback();
+                            //    return Redirect::back()->withInput()->with('errorurl', '1 - ' . empty($asiento_busqueda) . ' | ' . $TXT_REFERENCIA. ' - '. $TXT_TIPO_REFERENCIA. ' - '. $COD_CATEGORIA_TIPO_ASIENTO . ' ' . $COD_ESTADO);
+                            //}
+
+                            if (empty($asiento_busqueda)) {
+
+                                $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                                        ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
+                                        ->where('TXT_TIPO_REFERENCIA', '=', $TXT_TIPO_REFERENCIA)
+                                        ->where('COD_ESTADO', '=', $COD_ESTADO)
+                                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $COD_CATEGORIA_TIPO_ASIENTO)
+                                        ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                                        ->where('TXT_GLOSA', 'NOT LIKE', "%REPARABLE%")
+                                        ->where('TXT_GLOSA', 'NOT LIKE', '%DEDUCCION%')
+                                        ->where('TXT_GLOSA', 'NOT LIKE', '%PERCEPCION%')
+                                        ->first();
+
+                            }
+
+                            //if (!empty($asiento_busqueda)) {
+                            //    DB::rollback();
+                            //    return Redirect::back()->withInput()->with('errorurl', '2 - ' . empty($asiento_busqueda) . ' | ' . $TXT_REFERENCIA. ' - '. $TXT_TIPO_REFERENCIA. ' - '. $COD_CATEGORIA_TIPO_ASIENTO . ' ' . $COD_ESTADO);
+                            //}
+                            
+                            if ($asiento_busqueda) {
                                 DB::rollback();
-                                return Redirect::back()->withInput()->with('errorurl', 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $TXT_CATEGORIA_TIPO_ASIENTO . '). Código existente: ' . $asiento_existente->COD_ASIENTO);
+                                return Redirect::back()->withInput()->with('errorurl', 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $TXT_CATEGORIA_TIPO_ASIENTO . '). Código existente: ' . $asiento_busqueda->COD_ASIENTO);
                             }
 
                             if ($generar) {
@@ -1958,165 +2044,13 @@ class GestionUsuarioContactoController extends Controller
             $sel_tipo_descuento = '';
             $combo_descuento = $this->co_generacion_combo_detraccion('DESCUENTO', 'Seleccione tipo descuento', '');
 
-            $anio = $this->anio;
-            $empresa = Session::get('empresas')->COD_EMPR;
-            $cod_contable = $fedocumento->ID_DOCUMENTO;
-            $ind_anulado = 0;
-            $igv = 0;
-            $ind_recalcular = 0;
-            $centro_costo = '';
-            $ind_igv = 0;
-            $usuario = Session::get('usuario')->id;
+            $asiento_compra = [[], [], []];
+            $asiento_reparable_reversion = [[], [], []];
+            $asiento_deduccion = [[], [], []];
+            $asiento_percepcion = [[], [], []];
+            $asiento_reparable = [[], [], []];
 
-            $asiento_compra = $this->ejecutarSP(
-                "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
-                @anio = :anio,
-                @empresa = :empresa,
-                @cod_contable = :cod_contable,
-                @ind_anulado = :ind_anulado,
-                @igv = :igv,
-                @ind_recalcular = :ind_recalcular,
-                @centro_costo = :centro_costo,
-                @ind_igv = :ind_igv,
-                @cod_usuario_registra = :usuario",
-                [
-                    ':anio' => $anio,
-                    ':empresa' => $empresa,
-                    ':cod_contable' => $cod_contable,
-                    ':ind_anulado' => $ind_anulado,
-                    ':igv' => $igv,
-                    ':ind_recalcular' => $ind_recalcular,
-                    ':centro_costo' => $centro_costo,
-                    ':ind_igv' => $ind_igv,
-                    ':usuario' => $usuario
-                ]
-            );
-
-            $respuesta = '';
-
-            if (!empty($asiento_compra)) {
-                $respuesta = $asiento_compra[0][0]['RESPUESTA'];
-            }
-
-            if (count($asiento_compra) <= 2) {
-                array_push($asiento_compra, []);
-            }
-
-            //if ($respuesta === 'ASIENTO CORRECTO') {
-            if (!empty($asiento_compra)) {
-
-                $ind_reversion = 'R';
-
-                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
-                    ->where('COD_ESTADO', 1)
-                    ->where('TXT_REFERENCIA', $cod_contable)
-                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
-                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
-                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
-                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
-                    ->first();
-
-                if ($asiento_existe_reparable) {
-                    $asiento_reparable_reversion = $this->ejecutarSP(
-                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
-                @anio = :anio,
-                @empresa = :empresa,
-                @cod_contable = :cod_contable,
-                @ind_anulado = :ind_anulado,
-                @ind_recalcular = :ind_recalcular,
-                @ind_reversion = :ind_reversion,
-                @cod_usuario_registra = :usuario",
-                        [
-                            ':anio' => $anio,
-                            ':empresa' => $empresa,
-                            ':cod_contable' => $cod_contable,
-                            ':ind_anulado' => $ind_anulado,
-                            ':ind_recalcular' => $ind_recalcular,
-                            ':ind_reversion' => $ind_reversion,
-                            ':usuario' => $usuario
-                        ]
-                    );
-                } else {
-                    $asiento_reparable_reversion = [[], [], []];
-                }
-
-                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
-                    $asiento_deduccion = $this->ejecutarSP(
-                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
-                @anio = :anio,
-                @empresa = :empresa,
-                @cod_contable = :cod_contable,
-                @ind_anulado = :ind_anulado,
-                @igv = :igv,
-                @ind_recalcular = :ind_recalcular,
-                @centro_costo = :centro_costo,
-                @ind_igv = :ind_igv,
-                @cod_usuario_registra = :usuario",
-                        [
-                            ':anio' => $anio,
-                            ':empresa' => $empresa,
-                            ':cod_contable' => $cod_contable,
-                            ':ind_anulado' => $ind_anulado,
-                            ':igv' => $igv,
-                            ':ind_recalcular' => $ind_recalcular,
-                            ':centro_costo' => $centro_costo,
-                            ':ind_igv' => $ind_igv,
-                            ':usuario' => $usuario
-                        ]
-                    );
-                } else {
-                    $asiento_deduccion = [[], [], []];
-                }
-
-                if ($fedocumento->PERCEPCION > 0.0000) {
-                    $asiento_percepcion = $this->ejecutarSP(
-                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
-                @anio = :anio,
-                @empresa = :empresa,
-                @cod_contable = :cod_contable,
-                @ind_anulado = :ind_anulado,
-                @ind_recalcular = :ind_recalcular,
-                @cod_usuario_registra = :usuario",
-                        [
-                            ':anio' => $anio,
-                            ':empresa' => $empresa,
-                            ':cod_contable' => $cod_contable,
-                            ':ind_anulado' => $ind_anulado,
-                            ':ind_recalcular' => $ind_recalcular,
-                            ':usuario' => $usuario
-                        ]
-                    );
-                } else {
-                    $asiento_percepcion = [[], [], []];
-                }
-            }
-
-            $ind_reversion = 'N';
-
-            $asiento_reparable = $this->ejecutarSP(
-                "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
-                @anio = :anio,
-                @empresa = :empresa,
-                @cod_contable = :cod_contable,
-                @ind_anulado = :ind_anulado,
-                @ind_recalcular = :ind_recalcular,
-                @ind_reversion = :ind_reversion,
-                @cod_usuario_registra = :usuario",
-                [
-                    ':anio' => $anio,
-                    ':empresa' => $empresa,
-                    ':cod_contable' => $cod_contable,
-                    ':ind_anulado' => $ind_anulado,
-                    ':ind_recalcular' => $ind_recalcular,
-                    ':ind_reversion' => $ind_reversion,
-                    ':usuario' => $usuario
-                ]
-            );
-
-            if (count($asiento_reparable) <= 2) {
-                array_push($asiento_reparable, []);
-            }
-            //dd($asiento_compra, $asiento_reparable, $asiento_percepcion, $asiento_reparable_reversion, $asiento_deduccion);
+            $anio = $anio_defecto;
 
             $array_nivel_pc = $this->pc_array_nivel_cuentas_contable(Session::get('empresas')->COD_EMPR, $anio);
             $combo_nivel_pc = $this->gn_generacion_combo_array('Seleccione nivel', '', $array_nivel_pc);

@@ -170,113 +170,99 @@
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.js"></script>
-
-    <script type="text/javascript">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.js"></script>    <script type="text/javascript">
         $(document).ready(function () {
             //initialize the javascript
             App.init();
             //App.formElements();
             App.dataTables();
             $('form').parsley();
+
+            @if($fedocumento->OPERACION === 'ORDEN_COMPRA_ANTICIPO')
+            $('#contenedor-asientos-async').hide();
+            @else
+            // Carga asíncrona de los asientos
+            let urlAsync = "{{ url('/ajax-generar-asientos-general/estiba-comision/'.$idopcion.'/0/0/'.$lote) }}";
+
+            $('#contenedor-asientos-async').load(urlAsync, function(response, status, xhr) {
+                if (status === "error") {
+                    $('#contenedor-asientos-async').html(
+                        '<div class="alert alert-danger" style="margin-top: 15px;">' +
+                        '<strong>Error al cargar asientos:</strong> No se pudo generar la simulación contable (' + xhr.status + ' ' + xhr.statusText + ').' +
+                        '</div>'
+                    );
+                } else {
+                    inicializarAsientosEventos();
+                }
+            });
+            @endif
         });
     </script>
 
     <script type="text/javascript">
 
-        document.addEventListener("DOMContentLoaded", function () {
-
+        function inicializarAsientosEventos() {
             let carpeta = $("#carpeta").val();
             let _token = $("#token").val();
             let link = '/buscar-proveedor';
 
+            if ($("#empresa_asiento").length > 0) {
+                let select = new TomSelect("#empresa_asiento", {
+                    valueField: 'id',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: "Escriba para buscar...",
+                    preload: true, // carga inicial
+                    load: function (query, callback) {
+                        let data = {
+                            _token: _token,
+                            busqueda: query
+                        };
+                        fetch(carpeta + link, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(json => {
+                                callback(json);
+                            })
+                            .catch(() => {
+                                callback();
+                            });
+                    }
+                });
+
+                // ✅ Si hay valor por defecto, lo insertamos
+                if (typeof defaultId !== 'undefined' && defaultId) {
+                    select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                    select.setValue(defaultId); // la selecciona
+                }
+            }
+
+            if (!window.selects) window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function (el) {
+                if (!window.selects[el.id]) {
+                    window.selects[el.id] = new SlimSelect({
+                        select: el,
+                        placeholder: 'Seleccione...',
+                        allowDeselect: true
+                    });
+                }
+            });
+
+            $('.pnlasientos').hide();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
             //siempre que uses nifty modal usar esta libreria para poder abrir los modales
             $.fn.niftyModal('setDefaults', {
                 overlaySelector: '.modal-overlay',
                 closeSelector: '.modal-close',
                 classAddAfterOpen: 'modal-show',
             });
-
-            let select = new TomSelect("#empresa_asiento", {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: 'text',
-                placeholder: "Escriba para buscar...",
-                preload: true, // carga inicial
-                load: function (query, callback) {
-                    let data = {
-                        _token: _token,
-                        busqueda: query
-                    };
-                    fetch(carpeta + link, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    })
-                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(json => {
-                            callback(json);
-                        })
-                        .catch(() => {
-                            callback();
-                        });
-                }
-            });
-/*
-            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: 'text',
-                placeholder: "Escriba para buscar...",
-                preload: true, // carga inicial
-                load: function (query, callback) {
-                    let data = {
-                        _token: _token,
-                        busqueda: query
-                    };
-                    fetch(carpeta + link, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    })
-                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(json => {
-                            callback(json);
-                        })
-                        .catch(() => {
-                            callback();
-                        });
-                }
-            });*/
-
-            // ✅ Si hay valor por defecto, lo insertamos
-            if (defaultId) {
-                select.addOption({id: defaultId, text: defaultText}); // añade la opción
-                select.setValue(defaultId); // la selecciona
-            }
-/*
-            if (defaultIdReparable) {
-                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
-                select_reparable.setValue(defaultIdReparable); // la selecciona
-            }*/
-
-            window.selects = {};
-            document.querySelectorAll("select.slim").forEach(function (el) {
-                window.selects[el.id] = new SlimSelect({
-                    select: el,
-                    placeholder: 'Seleccione...',
-                    allowDeselect: true
-                })
-            })
-
-            $('.pnlasientos').hide();
-
         });
 
         $('#file-pdf').fileinput({

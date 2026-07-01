@@ -885,6 +885,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-observacion-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionNotaDebito');
 
 	Route::any('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAprobarContabilidadLiquidacionCompraAnticipo');
+	Route::any('/ajax-generar-asientos-general/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAjaxGenerarAsientosGeneral');
 	Route::any('/agregar-observacion-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadLiquidacionCompraAnticipo');
 
 

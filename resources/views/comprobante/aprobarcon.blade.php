@@ -270,12 +270,111 @@
 
     <script type="text/javascript">
 
+        //let carpeta = $("#carpeta").val();
+        let _token = $("#token").val();
+        let link = '/buscar-proveedor';
+
+        function inicializarAsientosEventos() {
+            if ($("#empresa_asiento").length > 0) {
+                let select = new TomSelect("#empresa_asiento", {
+                    valueField: 'id',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: "Escriba para buscar...",
+                    preload: true,
+                    load: function (query, callback) {
+                        let data = {
+                            _token: _token,
+                            busqueda: query
+                        };
+                        fetch(carpeta + link, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(json => {
+                                callback(json);
+                            })
+                            .catch(() => {
+                                callback();
+                            });
+                    }
+                });
+
+                if (typeof defaultId !== 'undefined' && defaultId) {
+                    select.addOption({id: defaultId, text: defaultText});
+                    select.setValue(defaultId);
+                }
+            }
+
+            document.querySelectorAll("#contenedor-asientos-async select.slim").forEach(function (el) {
+                if (!window.selects) window.selects = {};
+                if (!window.selects[el.id]) {
+                    window.selects[el.id] = new SlimSelect({
+                        select: el,
+                        placeholder: 'Seleccione...',
+                        allowDeselect: true
+                    });
+                }
+            });
+
+            $('.pnlasientos').hide();
+        }
+
+        function inicializarAsientosReparableEventos() {
+            if ($("#empresa_asiento_reparable").length > 0) {
+                let select_reparable = new TomSelect("#empresa_asiento_reparable", {
+                    valueField: 'id',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: "Escriba para buscar...",
+                    preload: true,
+                    load: function (query, callback) {
+                        let data = {
+                            _token: _token,
+                            busqueda: query
+                        };
+                        fetch(carpeta + link, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(json => {
+                                callback(json);
+                            })
+                            .catch(() => {
+                                callback();
+                            });
+                    }
+                });
+
+                if (typeof defaultIdReparable !== 'undefined' && defaultIdReparable) {
+                    select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable});
+                    select_reparable.setValue(defaultIdReparable);
+                }
+            }
+
+            document.querySelectorAll("#contenedor-asientos-reparable-async select.slim").forEach(function (el) {
+                if (!window.selects) window.selects = {};
+                if (!window.selects[el.id]) {
+                    window.selects[el.id] = new SlimSelect({
+                        select: el,
+                        placeholder: 'Seleccione...',
+                        allowDeselect: true
+                    });
+                }
+            });
+
+            $('.pnlasientos').hide();
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
-
-            let carpeta = $("#carpeta").val();
-            let _token = $("#token").val();
-            let link = '/buscar-proveedor';
-
             //siempre que uses nifty modal usar esta libreria para poder abrir los modales
             $.fn.niftyModal('setDefaults', {
                 overlaySelector: '.modal-overlay',
@@ -283,86 +382,44 @@
                 classAddAfterOpen: 'modal-show',
             });
 
-            let select = new TomSelect("#empresa_asiento", {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: 'text',
-                placeholder: "Escriba para buscar...",
-                preload: true, // carga inicial
-                load: function (query, callback) {
-                    let data = {
-                        _token: _token,
-                        busqueda: query
-                    };
-                    fetch(carpeta + link, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    })
-                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(json => {
-                            callback(json);
-                        })
-                        .catch(() => {
-                            callback();
-                        });
-                }
-            });
-
-            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: 'text',
-                placeholder: "Escriba para buscar...",
-                preload: true, // carga inicial
-                load: function (query, callback) {
-                    let data = {
-                        _token: _token,
-                        busqueda: query
-                    };
-                    fetch(carpeta + link, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    })
-                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(json => {
-                            callback(json);
-                        })
-                        .catch(() => {
-                            callback();
-                        });
-                }
-            });
-
-            // ✅ Si hay valor por defecto, lo insertamos
-            if (defaultId) {
-                select.addOption({id: defaultId, text: defaultText}); // añade la opción
-                select.setValue(defaultId); // la selecciona
+            @if($fedocumento->OPERACION === 'ORDEN_COMPRA_ANTICIPO')
+            $('#contenedor-asientos-async').hide();
+            $('#contenedor-asientos-reparable-async').hide();
+            @else
+            // Cargar asientos de compras de forma asíncrona
+            if ($('#contenedor-asientos-async').length > 0) {
+                let urlAsync = "{{ url('/ajax-generar-asientos-general/compras/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}";
+                urlAsync += (urlAsync.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
+                $('#contenedor-asientos-async').load(urlAsync, function(response, status, xhr) {
+                    if (status === "error") {
+                        $('#contenedor-asientos-async').html(
+                            '<div class="alert alert-danger" style="margin-top: 15px;">' +
+                            '<strong>Error al cargar asientos:</strong> No se pudo generar la simulación contable (' + xhr.status + ' ' + xhr.statusText + ').' +
+                            '</div>'
+                        );
+                    } else {
+                        inicializarAsientosEventos();
+                    }
+                });
             }
 
-            if (defaultIdReparable) {
-                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
-                select_reparable.setValue(defaultIdReparable); // la selecciona
+            // Cargar asientos reparables de forma asíncrona
+            if ($('#contenedor-asientos-reparable-async').length > 0) {
+                let urlAsyncReparable = "{{ url('/ajax-generar-asientos-general/reparable-form/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}";
+                urlAsyncReparable += (urlAsyncReparable.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
+                $('#contenedor-asientos-reparable-async').load(urlAsyncReparable, function(response, status, xhr) {
+                    if (status === "error") {
+                        $('#contenedor-asientos-reparable-async').html(
+                            '<div class="alert alert-danger" style="margin-top: 15px;">' +
+                            '<strong>Error al cargar asiento reparable:</strong> No se pudo generar la simulación contable (' + xhr.status + ' ' + xhr.statusText + ').' +
+                            '</div>'
+                        );
+                    } else {
+                        inicializarAsientosReparableEventos();
+                    }
+                });
             }
-
-            window.selects = {};
-            document.querySelectorAll("select.slim").forEach(function (el) {
-                window.selects[el.id] = new SlimSelect({
-                    select: el,
-                    placeholder: 'Seleccione...',
-                    allowDeselect: true
-                })
-            })
-
-            $('.pnlasientos').hide();
-
+            @endif
         });
 
         $('#file-otros').fileinput({

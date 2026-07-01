@@ -209,8 +209,13 @@
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <input type="hidden" id="nro_cuenta_contable" name="nro_cuenta_contable" value="">
-            @include('comprobante.asiento.listaasientotabla')
-            @include('comprobante.asiento.contenedorasientoorden')
+            @if($fedocumento->OPERACION !== 'ORDEN_COMPRA_ANTICIPO')
+            <div id="contenedor-asientos-async">
+                <div class="text-center" style="padding: 20px;">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i> Cargando asientos contables...
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -281,8 +286,13 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <input type="hidden" id="contabilidadfisico" name="contabilidadfisico" value="1">
                 <input type="hidden" id="nro_cuenta_contable" name="nro_cuenta_contable" value="">
-                @include('comprobante.asiento.listaasientotabla')
-                @include('comprobante.asiento.contenedorasientoorden')
+                @if($fedocumento->OPERACION !== 'ORDEN_COMPRA_ANTICIPO')
+                <div id="contenedor-asientos-async">
+                    <div class="text-center" style="padding: 20px;">
+                        <i class="fa fa-spinner fa-spin fa-2x"></i> Cargando asientos contables...
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     @else
