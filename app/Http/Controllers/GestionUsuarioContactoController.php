@@ -1731,7 +1731,7 @@ class GestionUsuarioContactoController extends Controller
                                 ->where('TXT_CATEGORIA_TIPO_ASIENTO', '=', $TXT_CATEGORIA_TIPO_ASIENTO)
                                 ->first();*/
                             
-                            if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
+                            /*if ($cabecera['COD_CATEGORIA_TIPO_ASIENTO'] === 'TAS0000000000004') {
 
                                 $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
                                 ->where('TXT_REFERENCIA', '=', $TXT_REFERENCIA)
@@ -1792,11 +1792,6 @@ class GestionUsuarioContactoController extends Controller
                                 }
                             }
 
-                            //if (!empty($asiento_busqueda)) {
-                            //    DB::rollback();
-                            //    return Redirect::back()->withInput()->with('errorurl', '1 - ' . empty($asiento_busqueda) . ' | ' . $TXT_REFERENCIA. ' - '. $TXT_TIPO_REFERENCIA. ' - '. $COD_CATEGORIA_TIPO_ASIENTO . ' ' . $COD_ESTADO);
-                            //}
-
                             if (empty($asiento_busqueda)) {
 
                                 $asiento_busqueda = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
@@ -1812,15 +1807,10 @@ class GestionUsuarioContactoController extends Controller
 
                             }
 
-                            //if (!empty($asiento_busqueda)) {
-                            //    DB::rollback();
-                            //    return Redirect::back()->withInput()->with('errorurl', '2 - ' . empty($asiento_busqueda) . ' | ' . $TXT_REFERENCIA. ' - '. $TXT_TIPO_REFERENCIA. ' - '. $COD_CATEGORIA_TIPO_ASIENTO . ' ' . $COD_ESTADO);
-                            //}
-                            
-                            if ($asiento_busqueda) {
+                            if ($asiento_existente) {
                                 DB::rollback();
                                 return Redirect::back()->withInput()->with('errorurl', 'Ya existe un asiento registrado con la misma referencia (' . $TXT_REFERENCIA . '), tipo de referencia (' . $TXT_TIPO_REFERENCIA . ') y tipo de asiento (' . $TXT_CATEGORIA_TIPO_ASIENTO . '). Código existente: ' . $asiento_busqueda->COD_ASIENTO);
-                            }
+                            }*/
 
                             if ($generar) {
                                 $codAsiento = $this->ejecutarAsientosIUDConSalida(
@@ -2044,13 +2034,165 @@ class GestionUsuarioContactoController extends Controller
             $sel_tipo_descuento = '';
             $combo_descuento = $this->co_generacion_combo_detraccion('DESCUENTO', 'Seleccione tipo descuento', '');
 
-            $asiento_compra = [[], [], []];
-            $asiento_reparable_reversion = [[], [], []];
-            $asiento_deduccion = [[], [], []];
-            $asiento_percepcion = [[], [], []];
-            $asiento_reparable = [[], [], []];
+            $anio = $this->anio;
+            $empresa = Session::get('empresas')->COD_EMPR;
+            $cod_contable = $fedocumento->ID_DOCUMENTO;
+            $ind_anulado = 0;
+            $igv = 0;
+            $ind_recalcular = 0;
+            $centro_costo = '';
+            $ind_igv = 0;
+            $usuario = Session::get('usuario')->id;
 
-            $anio = $anio_defecto;
+            $asiento_compra = $this->ejecutarSP(
+                "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @ind_recalcular = :ind_recalcular,
+                @centro_costo = :centro_costo,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+                [
+                    ':anio' => $anio,
+                    ':empresa' => $empresa,
+                    ':cod_contable' => $cod_contable,
+                    ':ind_anulado' => $ind_anulado,
+                    ':igv' => $igv,
+                    ':ind_recalcular' => $ind_recalcular,
+                    ':centro_costo' => $centro_costo,
+                    ':ind_igv' => $ind_igv,
+                    ':usuario' => $usuario
+                ]
+            );
+
+            $respuesta = '';
+
+            if (!empty($asiento_compra)) {
+                $respuesta = $asiento_compra[0][0]['RESPUESTA'];
+            }
+
+            if (count($asiento_compra) <= 2) {
+                array_push($asiento_compra, []);
+            }
+
+            //if ($respuesta === 'ASIENTO CORRECTO') {
+            if (!empty($asiento_compra)) {
+
+                $ind_reversion = 'R';
+
+                $asiento_existe_reparable = WEBAsiento::from(DB::raw('WEB.asientos WITH (NOLOCK)'))
+                    ->where('COD_ESTADO', 1)
+                    ->where('TXT_REFERENCIA', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', '%REVERSION%')
+                    ->where('TXT_GLOSA', 'LIKE', '%REPARABLE%')
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', '%NAVASOFT%')
+                    ->first();
+
+                if ($asiento_existe_reparable) {
+                    $asiento_reparable_reversion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':ind_reversion' => $ind_reversion,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_reparable_reversion = [[], [], []];
+                }
+
+                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                    $asiento_deduccion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @ind_recalcular = :ind_recalcular,
+                @centro_costo = :centro_costo,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':igv' => $igv,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':centro_costo' => $centro_costo,
+                            ':ind_igv' => $ind_igv,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_deduccion = [[], [], []];
+                }
+
+                if ($fedocumento->PERCEPCION > 0.0000) {
+                    $asiento_percepcion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_percepcion = [[], [], []];
+                }
+            }
+
+            $ind_reversion = 'N';
+
+            $asiento_reparable = $this->ejecutarSP(
+                "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @cod_usuario_registra = :usuario",
+                [
+                    ':anio' => $anio,
+                    ':empresa' => $empresa,
+                    ':cod_contable' => $cod_contable,
+                    ':ind_anulado' => $ind_anulado,
+                    ':ind_recalcular' => $ind_recalcular,
+                    ':ind_reversion' => $ind_reversion,
+                    ':usuario' => $usuario
+                ]
+            );
+
+            if (count($asiento_reparable) <= 2) {
+                array_push($asiento_reparable, []);
+            }
+            //dd($asiento_compra, $asiento_reparable, $asiento_percepcion, $asiento_reparable_reversion, $asiento_deduccion);
 
             $array_nivel_pc = $this->pc_array_nivel_cuentas_contable(Session::get('empresas')->COD_EMPR, $anio);
             $combo_nivel_pc = $this->gn_generacion_combo_array('Seleccione nivel', '', $array_nivel_pc);

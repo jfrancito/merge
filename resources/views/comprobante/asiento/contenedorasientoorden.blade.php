@@ -23,7 +23,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Año :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'anio_asiento', $array_anio, isset($defecto_anio) ? $defecto_anio : '',
+                                {!! Form::select( 'anio_asiento', $array_anio, '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'anio_asiento',
@@ -39,7 +39,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Periodo
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'periodo_asiento', $array_periodo, isset($defecto_periodo) ? $defecto_periodo : '',
+                                {!! Form::select( 'periodo_asiento', $array_periodo, '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'periodo_asiento',
@@ -113,10 +113,8 @@
                     </div>
 
                     <script>
-                        var defaultId = "{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->COD_EMPR : (!empty($fedocumento) ? $fedocumento->RUC_PROVEEDOR : '')) }}";
-                        var defaultText = "{!! !empty($asiento_compra[1]) ? str_replace('"', '\"', $asiento_compra[1][0]['TXT_EMPR_CLI']) : (!empty($empresa_doc_fe) ? str_replace('"', '\"', $empresa_doc_fe->NOM_EMPR) : (!empty($fedocumento) ? str_replace('"', '\"', $fedocumento->RZ_PROVEEDOR) : '')) !!}";
-                        window.defaultId = defaultId;
-                        window.defaultText = defaultText;
+                        let defaultId = "{{ '' }}";
+                        let defaultText = "{{ '' }}";
                     </script>
 
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
@@ -141,7 +139,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="fecha_asiento" name="fecha_asiento"
                                        class="form-control control input-sm" type="date"
-                                       value="{{ date("Y-m-d") }}">
+                                       value="{{ date("Ymd") }}">
                             </div>
                         </div>
                     </div>
@@ -391,7 +389,7 @@
                         <div class="col-sm-12 abajocaja">
                             <input id="fecha_detraccion_asiento" name="fecha_detraccion_asiento"
                                    class="form-control control input-sm" type="date"
-                                   value="{{ date("Y-m-d") }}">
+                                   value="{{ date("Ymd") }}">
                         </div>
                     </div>
                 </div>

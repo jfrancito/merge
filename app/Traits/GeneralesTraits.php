@@ -247,21 +247,18 @@ trait GeneralesTraits
         $array = CONPeriodo::where('COD_ESTADO', '=', 1)
             ->where('COD_EMPR', '=', $cod_empresa)
             ->orderBy('TXT_CODIGO', 'DESC')
-            ->select('COD_PERIODO', 'TXT_CODIGO')
-            ->get();
-
-        $array_trimmed = [];
-        foreach ($array as $item) {
-            $array_trimmed[trim($item->COD_PERIODO)] = trim($item->TXT_CODIGO);
-        }
+            ->pluck('TXT_CODIGO', 'COD_PERIODO')
+            ->toArray();
 
         if ($todo == 'TODO') {
-            $combo = array('' => $titulo, $todo => $todo) + $array_trimmed;
+            $combo = array('' => $titulo, $todo => $todo) + $array;
         } else {
-            $combo = array('' => $titulo) + $array_trimmed;
+            $combo = array('' => $titulo) + $array;
         }
 
         return $combo;
+
+
     }
 
 
@@ -271,21 +268,18 @@ trait GeneralesTraits
             ->where('COD_ANIO', '=', $anio)
             ->where('COD_EMPR', '=', $cod_empresa)
             ->orderBy('COD_MES', 'DESC')
-            ->select('COD_PERIODO', 'TXT_NOMBRE')
-            ->get();
-
-        $array_trimmed = [];
-        foreach ($array as $item) {
-            $array_trimmed[trim($item->COD_PERIODO)] = trim($item->TXT_NOMBRE);
-        }
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
 
         if ($todo == 'TODO') {
-            $combo = array('' => $titulo, $todo => $todo) + $array_trimmed;
+            $combo = array('' => $titulo, $todo => $todo) + $array;
         } else {
-            $combo = array('' => $titulo) + $array_trimmed;
+            $combo = array('' => $titulo) + $array;
         }
 
         return $combo;
+
+
     }
 
     public function gn_combo_usuarios()

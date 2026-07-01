@@ -117,17 +117,10 @@
         </div>
 
     </div>
-    @if($fedocumento->OPERACION !== 'ORDEN_COMPRA_ANTICIPO')
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="contenedor-asientos-async">
-        <div class="panel panel-default" style="text-align: center; padding: 30px; border: 1px dashed #ccc;">
-            <div class="panel-body">
-                <i class="fa fa-spinner fa-spin fa-2x" style="color: #1d3a6d;"></i>
-                <h4 style="margin-top: 15px; color: #1d3a6d; font-weight: bold;">Generando simulación de asientos...</h4>
-                <p class="text-muted">Por favor, espere mientras se ejecutan los cálculos contables.</p>
-            </div>
-        </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        @include('comprobante.asiento.listaasientotabla')
+        @include('comprobante.asiento.contenedorasientoorden')
     </div>
-    @endif
     {{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.contenedorasiento')

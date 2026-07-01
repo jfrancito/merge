@@ -300,81 +300,51 @@
             }
 */
 
-            function inicializarAsientosEventos() {
-                if ($("#empresa_asiento").length > 0 && !document.getElementById("empresa_asiento").tomselect) {
-                    let select = new TomSelect("#empresa_asiento", {
-                        valueField: 'id',
-                        labelField: 'text',
-                        searchField: 'text',
-                        placeholder: "Escriba para buscar...",
-                        preload: true, // carga inicial
-                        load: function (query, callback) {
-                            let data = {
-                                _token: _token,
-                                busqueda: query
-                            };
-                            fetch(carpeta + link, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(data)
-                            })
-                                .then(response => response.json())
-                                .then(json => {
-                                    callback(json);
-                                })
-                                .catch(() => {
-                                    callback();
-                                });
-                        }
-                    });
-
-                    // ✅ Si hay valor por defecto, lo insertamos
-                    if (typeof defaultId !== 'undefined' && defaultId) {
-                        select.addOption({id: defaultId, text: defaultText}); // añade la opción
-                        select.setValue(defaultId); // la selecciona
-                    }
-                }
-
-                if (!window.selects) window.selects = {};
-                document.querySelectorAll("select.slim").forEach(function (el) {
-                    if (!window.selects[el.id]) {
-                        window.selects[el.id] = new SlimSelect({
-                            select: el,
-                            placeholder: 'Seleccione...',
-                            allowDeselect: true
+            let select = new TomSelect("#empresa_asiento", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function (query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
                         });
-                    }
-                });
-                $('.pnlasientos').hide();
+                }
+            });
+
+            // ✅ Si hay valor por defecto, lo insertamos
+            if (defaultId) {
+                select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select.setValue(defaultId); // la selecciona
             }
+
+            window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function (el) {
+                window.selects[el.id] = new SlimSelect({
+                    select: el,
+                    placeholder: 'Seleccione...',
+                    allowDeselect: true
+                })
+            })
 
             $('.pnlasientos').hide();
-
-            @if($fedocumento->OPERACION === 'ORDEN_COMPRA_ANTICIPO')
-            $('#contenedor-asientos-async').hide();
-            @else
-            // Cargar asientos de forma asíncrona
-            if ($('#contenedor-asientos-async').length > 0) {
-                let urlAsync = "{{ url('/ajax-generar-asientos-general/reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}";
-                $('#contenedor-asientos-async').load(urlAsync, function(response, status, xhr) {
-                    if (status == "error") {
-                        $('#contenedor-asientos-async').html(
-                            '<div class="alert alert-danger alert-dismissible" role="alert">' +
-                            '<button type="button" data-dismiss="alert" aria-label="Close" class="close">' +
-                            '<span aria-hidden="true" class="mdi mdi-close"></span>' +
-                            '</button>' +
-                            '<div class="icon"><span class="mdi mdi-close-circle-o"></span></div>' +
-                            '<div class="message"><strong>Error!</strong> Ocurrió un error al cargar los asientos. Inténtelo de nuevo.</div>' +
-                            '</div>'
-                        );
-                    } else {
-                        inicializarAsientosEventos();
-                    }
-                });
-            }
-            @endif
 
         });
 

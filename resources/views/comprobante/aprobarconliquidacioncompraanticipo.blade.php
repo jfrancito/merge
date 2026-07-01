@@ -168,70 +168,57 @@
             //App.formElements();
             App.dataTables();
             $('form').parsley();
-
-            @if($fedocumento->OPERACION === 'ORDEN_COMPRA_ANTICIPO')
-            $('#contenedor-asientos-async').hide();
-            @else
-            // Carga asíncrona de los asientos
-            let urlAsync = "{{ url('/ajax-generar-asientos-general/liquidacion-compra-anticipo/'.$idopcion.'/'.$linea.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}";
-
-            $('#contenedor-asientos-async').load(urlAsync, function(response, status, xhr) {
-                if (status === "error") {
-                    $('#contenedor-asientos-async').html(
-                        '<div class="alert alert-danger" style="margin-top: 15px;">' +
-                        '<strong>Error al cargar asientos:</strong> No se pudo generar la simulación contable (' + xhr.status + ' ' + xhr.statusText + ').' +
-                        '</div>'
-                    );
-                } else {
-                    // Inicializar TomSelect, SlimSelect, etc. después de cargar el HTML
-                    inicializarAsientosEventos();
-                }
-            });
-            @endif
         });
     </script>
 
     <script type="text/javascript">
 
-        function inicializarAsientosEventos() {
+        document.addEventListener("DOMContentLoaded", function () {
+
             let carpeta = $("#carpeta").val();
             let _token = $("#token").val();
             let link = '/buscar-proveedor';
 
-            if ($("#empresa_asiento").length > 0) {
-                let select = new TomSelect("#empresa_asiento", {
-                    valueField: 'id',
-                    labelField: 'text',
-                    searchField: 'text',
-                    placeholder: "Escriba para buscar...",
-                    preload: true, // carga inicial
-                    load: function (query, callback) {
-                        let data = {
-                            _token: _token,
-                            busqueda: query
-                        };
-                        fetch(carpeta + link, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(data)
-                        })
-                            .then(response => response.json())
-                            .then(json => {
-                                callback(json);
-                            })
-                            .catch(() => {
-                                callback();
-                            });
-                    }
-                });
+            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+            $.fn.niftyModal('setDefaults', {
+                overlaySelector: '.modal-overlay',
+                closeSelector: '.modal-close',
+                classAddAfterOpen: 'modal-show',
+            });
 
-                // ✅ Si hay valor por defecto, lo insertamos
-                if (typeof defaultId !== 'undefined' && defaultId) {
-                    select.addOption({id: defaultId, text: defaultText}); // añade la opción
-                    select.setValue(defaultId); // la selecciona
+            let select = new TomSelect("#empresa_asiento", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function (query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
                 }
+            });
+
+            // ✅ Si hay valor por defecto, lo insertamos
+            if (defaultId) {
+                select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select.setValue(defaultId); // la selecciona
             }
 
             window.selects = {};
@@ -241,19 +228,9 @@
                     placeholder: 'Seleccione...',
                     allowDeselect: true
                 })
-            });
+            })
 
             $('.pnlasientos').hide();
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
-            $.fn.niftyModal('setDefaults', {
-                overlaySelector: '.modal-overlay',
-                closeSelector: '.modal-close',
-                classAddAfterOpen: 'modal-show',
-            });
 
         });
 

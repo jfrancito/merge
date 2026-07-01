@@ -151,20 +151,10 @@
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="contenedor-asientos-async">
-        <div class="panel panel-default" style="border-left: 5px solid #2563eb; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
-            <div class="panel-body text-center" style="padding: 40px;">
-                <div style="font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 10px;">
-                    <i class="fa fa-spinner fa-spin fa-2x" style="color: #2563eb; margin-right: 10px; vertical-align: middle;"></i>
-                    Generando pre-asientos contables...
-                </div>
-                <div style="color: #64748b; font-size: 13px;">
-                    Este proceso ejecuta validaciones contables y simula los asientos en tiempo real.
-                </div>
-            </div>
-        </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        @include('comprobante.asiento.listaasientotabla')
+        @include('comprobante.asiento.contenedorasientoorden')
     </div>
-</div>
 
 </div>
 

@@ -3057,41 +3057,6 @@ class GestionLiquidacionGastosController extends Controller
             $detalle_asiento = json_decode($request['detalle'], true);
             $generar = true;
 
-            // Validar campos obligatorios en cabecera y detalle
-            if ($operacion === 'insertar' || $operacion === 'modificar') {
-                foreach ($cabeceras as $cabecera) {
-                    $COD_PERIODO_VAL = trim($cabecera['COD_PERIODO'] ?? '');
-                    if ($COD_PERIODO_VAL === '') {
-                        DB::rollback();
-                        return response()->json([
-                            'status' => 'error',
-                            'titulo' => 'VALOR REQUERIDO',
-                            'tipo' => 'red',
-                            'boton' => 'btn-red',
-                            'mensaje' => 'El campo Periodo es obligatorio.'
-                        ]);
-                    }
-                }
-
-                foreach ($detalle_asiento as $movimiento) {
-                    $COD_ESTADO = (int)($movimiento['COD_ESTADO'] ?? 0);
-                    if ($COD_ESTADO === 1) {
-                        $COD_CUENTA_CONTABLE = trim($movimiento['COD_CUENTA_CONTABLE'] ?? '');
-                        $TXT_CUENTA_CONTABLE = trim($movimiento['TXT_CUENTA_CONTABLE'] ?? '');
-                        if ($COD_CUENTA_CONTABLE === '' || $TXT_CUENTA_CONTABLE === '') {
-                            DB::rollback();
-                            return response()->json([
-                                'status' => 'error',
-                                'titulo' => 'VALOR REQUERIDO',
-                                'tipo' => 'red',
-                                'boton' => 'btn-red',
-                                'mensaje' => 'El código de cuenta y la cuenta contable son campos obligatorios.'
-                            ]);
-                        }
-                    }
-                }
-            }
-
             foreach ($cabeceras as $cabecera) {
 
                 $COD_ASIENTO = $cabecera['COD_ASIENTO'];

@@ -51,7 +51,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="comprobante_asiento" name="comprobante_asiento"
                                        class="form-control control input-sm" type="text" readonly
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['TXT_REFERENCIA'] : $fedocumento->ID_DOCUMENTO }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['TXT_REFERENCIA'] : $fedocumento->ID_DOCUMENTO }}">
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Moneda :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'moneda_asiento', $combo_moneda_asiento, !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002'),
+                                {!! Form::select( 'moneda_asiento', $combo_moneda_asiento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002'),
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'moneda_asiento',
@@ -79,7 +79,7 @@
 
                                 <input type="text" required
                                        id="tipo_cambio_asiento" name='tipo_cambio_asiento'
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] : 0.0000 }}"
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] : 0.0000 }}"
                                        placeholder="Tipo de cambio"
                                        autocomplete="off" class="form-control dinero input-sm" data-aw="5"/>
 
@@ -107,17 +107,15 @@
                     </div>
 
                     <script>
-                        var defaultId = "{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->COD_EMPR : (!empty($fedocumento) ? $fedocumento->RUC_PROVEEDOR : '')) }}";
-                        var defaultText = "{!! !empty($asiento_compra[1]) ? str_replace('"', '\"', $asiento_compra[1][0]['TXT_EMPR_CLI']) : (!empty($empresa_doc_fe) ? str_replace('"', '\"', $empresa_doc_fe->NOM_EMPR) : (!empty($fedocumento) ? str_replace('"', '\"', $fedocumento->RZ_PROVEEDOR) : '')) !!}";
-                        window.defaultId = defaultId;
-                        window.defaultText = defaultText;
+                        let defaultId = "{{ !empty($asiento_compra) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : '' }}";
+                        let defaultText = "{{ !empty($asiento_compra) ? $asiento_compra[1][0]['TXT_EMPR_CLI'] : '' }}";
                     </script>
 
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Asiento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_asiento', $combo_tipo_asiento, !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : '',
+                                {!! Form::select( 'tipo_asiento', $combo_tipo_asiento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'tipo_asiento',
@@ -135,7 +133,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="fecha_asiento" name="fecha_asiento"
                                        class="form-control control input-sm" type="date"
-                                       value="{{ !empty($asiento_compra[1]) ? date('Y-m-d', strtotime($asiento_compra[1][0]['FEC_ASIENTO'])) : (!empty($fedocumento->FEC_VENTA) ? date('Y-m-d', strtotime($fedocumento->FEC_VENTA)) : '') }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['FEC_ASIENTO'] : $fedocumento->FEC_VENTA }}">
                             </div>
                         </div>
                     </div>
@@ -149,7 +147,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Documento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_documento_asiento', $combo_tipo_documento, !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'] : '',
+                                {!! Form::select( 'tipo_documento_asiento', $combo_tipo_documento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'] : '',
                                                   [
                                                       'class'       => 'slim',
                                                       'id'          => 'tipo_documento_asiento',
@@ -167,7 +165,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="serie_asiento" name="serie_asiento"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['NRO_SERIE'] : $fedocumento->SERIE }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['NRO_SERIE'] : $fedocumento->SERIE }}">
                             </div>
                         </div>
                     </div>
@@ -179,7 +177,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="numero_asiento" name="numero_asiento"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['NRO_DOC'] : $fedocumento->NUMERO }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['NRO_DOC'] : $fedocumento->NUMERO }}">
                             </div>
                         </div>
                     </div>
@@ -191,7 +189,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Documento Ref.:</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_documento_ref', $combo_tipo_documento, !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO_REF'] : '',
+                                {!! Form::select( 'tipo_documento_ref', $combo_tipo_documento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO_REF'] : '',
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'tipo_documento_ref',
@@ -209,7 +207,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input id="serie_ref_asiento" name="serie_ref_asiento"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['NRO_SERIE_REF'] : ''  }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['NRO_SERIE_REF'] : ''  }}">
                             </div>
                         </div>
                     </div>
@@ -221,7 +219,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input id="numero_ref_asiento" name="numero_ref_asiento"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['NRO_DOC_REF'] : ''  }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['NRO_DOC_REF'] : ''  }}">
                             </div>
                         </div>
                     </div>
@@ -236,7 +234,7 @@
                             <div class="col-sm-12 abajocaja">
                                 <input required id="glosa_asiento" name="glosa_asiento"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['TXT_GLOSA'] : ((!empty($tipo_doc_fe) ? $tipo_doc_fe->NOM_CATEGORIA : '').': '.$fedocumento->SERIE.'-'.$fedocumento->NUMERO.'//'.$fedocumento->FEC_VENTA.'//'.($fedocumento->MONEDA === 'PEN' ? 'SOLES' : 'DOLARES').'//'.(!empty($empresa_doc_fe) ? $empresa_doc_fe->NOM_EMPR : '').'//CANJE: '.$fedocumento->ID_DOCUMENTO) }}">
+                                       value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['TXT_GLOSA'] : ($tipo_doc_fe->NOM_CATEGORIA.': '.$fedocumento->SERIE.'-'.$fedocumento->NUMERO.'//'.$fedocumento->FEC_VENTA.'//'.($fedocumento->MONEDA === 'PEN' ? 'SOLES' : 'DOLARES').'//'.$empresa_doc_fe->NOM_EMPR.'//CANJE: '.$fedocumento->ID_DOCUMENTO) }}">
                             </div>
                         </div>
                     </div>
@@ -355,7 +353,7 @@
                             Descuento
                             :</label>
                         <div class="col-sm-12 abajocaja">
-                            {!! Form::select( 'tipo_descuento_asiento', $combo_descuento, !empty($asiento_compra[1]) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? 'DCT0000000000002' : ''),
+                            {!! Form::select( 'tipo_descuento_asiento', $combo_descuento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? 'DCT0000000000002' : ''),
                                               [
                                                 'class'       => 'slim',
                                                 'id'          => 'tipo_descuento_asiento',
@@ -372,7 +370,7 @@
                         <div class="col-sm-12 abajocaja">
                             <input id="const_detraccion_asiento" name="const_detraccion_asiento"
                                    class="form-control control input-sm" type="text"
-                                   value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['NRO_DETRACCION'] : '' }}">
+                                   value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['NRO_DETRACCION'] : '' }}">
                         </div>
                     </div>
                 </div>
@@ -384,7 +382,7 @@
                         <div class="col-sm-12 abajocaja">
                             <input id="fecha_detraccion_asiento" name="fecha_detraccion_asiento"
                                    class="form-control control input-sm" type="date"
-                                   value="{{ !empty($asiento_compra[1]) ? date('Y-m-d', strtotime($asiento_compra[1][0]['FEC_DETRACCION'])) : (!empty($fedocumento->FEC_VENTA) ? date('Y-m-d', strtotime($fedocumento->FEC_VENTA)) : '') }}">
+                                   value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['FEC_DETRACCION'] : $fedocumento->FEC_VENTA }}">
                         </div>
                     </div>
                 </div>
@@ -397,9 +395,9 @@
 
                             <input type="text"
                                    id="porcentaje_detraccion"
-                                   data_valor="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['CAN_DESCUENTO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->PORC_DETRACCION : 0.00) }}"
+                                   data_valor="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['CAN_DESCUENTO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->PORC_DETRACCION : 0.00) }}"
                                    name='porcentaje_detraccion'
-                                   value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['CAN_DESCUENTO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->PORC_DETRACCION : 0.00) }}"
+                                   value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['CAN_DESCUENTO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->PORC_DETRACCION : 0.00) }}"
                                    placeholder="0.00"
                                    autocomplete="off"
                                    class="form-control input-sm dinero"
@@ -416,9 +414,9 @@
 
                             <input type="text"
                                    id="total_detraccion_asiento"
-                                   data_valor="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['CAN_TOTAL_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->MONTO_DETRACCION_RED : 0.00) }}"
+                                   data_valor="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['CAN_TOTAL_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->MONTO_DETRACCION_RED : 0.00) }}"
                                    name='total_detraccion_asiento'
-                                   value="{{ !empty($asiento_compra[1]) ? $asiento_compra[1][0]['CAN_TOTAL_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->MONTO_DETRACCION_RED : 0.00) }}"
+                                   value="{{ !empty($asiento_compra) ? $asiento_compra[1][0]['CAN_TOTAL_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? $fedocumento->MONTO_DETRACCION_RED : 0.00) }}"
                                    placeholder="0.00"
                                    autocomplete="off"
                                    class="form-control input-sm dinero"
@@ -438,22 +436,22 @@
         <div class="tab-container tablageneral">
             <ul class="nav nav-tabs">
                 <li class="active negrita"><a href="#astcompra" data-toggle="tab">COMPRA</a></li>
-                @if(!empty($asiento_reparable_reversion[1]))
+                @if(!empty($asiento_reparable_reversion))
                     <li class="negrita "><a href="#astreversion" data-toggle="tab">DIARIO REVERSION REPARABLE</a></li>
                 @endif
-                @if(!empty($asiento_deduccion[1]))
+                @if(!empty($asiento_deduccion))
                     <li class="negrita"><a href="#astdeduccion" data-toggle="tab">DIARIO DEDUCCIÓN ANTICIPO</a></li>
                 @endif
-                @if(!empty($asiento_percepcion[1]))
+                @if(!empty($asiento_percepcion))
                     <li class="negrita"><a href="#astpercepcion" data-toggle="tab">COMPRA - PERCEPCIÓN</a></li>
                 @endif
             </ul>
             <div class="tab-content">
                 <div id="astcompra" class="tab-pane active cont">
                     <input type="hidden" id="asiento_cabecera_compra" name="asiento_cabecera_compra"
-                           value="{{ json_encode(!empty($asiento_compra[1]) ? $asiento_compra[1] : []) }}"/>
+                           value="{{ json_encode(!empty($asiento_compra) ? $asiento_compra[1] : []) }}"/>
                     <input type="hidden" id="asiento_detalle_compra" name="asiento_detalle_compra"
-                           value="{{ json_encode(!empty($asiento_compra[2]) ? $asiento_compra[2] : []) }}"/>
+                           value="{{ json_encode(!empty($asiento_compra) ? $asiento_compra[2] : []) }}"/>
                     <table id="asientototales"
                            class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
                            cellspacing="0" width="100%">
@@ -550,7 +548,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if(!empty($asiento_compra[2]))
+                        @if(!empty($asiento_compra))
                             @foreach($asiento_compra[2] as $key => $asiento_movimiento)
                                 <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
                                     data_asiento="C"
@@ -596,14 +594,14 @@
                     </table>
 
                 </div>
-                @if(!empty($asiento_reparable_reversion[1]))
+                @if(!empty($asiento_reparable_reversion))
                     <div id="astreversion" class="tab-pane cont">
                         <input type="hidden" id="asiento_cabecera_reparable_reversion"
                                name="asiento_cabecera_reparable_reversion"
-                               value="{{ json_encode(!empty($asiento_reparable_reversion[1]) ? $asiento_reparable_reversion[1] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[1] : []) }}"/>
                         <input type="hidden" id="asiento_detalle_reparable_reversion"
                                name="asiento_detalle_reparable_reversion"
-                               value="{{ json_encode(!empty($asiento_reparable_reversion[2]) ? $asiento_reparable_reversion[2] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[2] : []) }}"/>
                         {{--
                         <button data="RV" type="button" class="btn btn-success agregar-linea">
                             Agregar línea
@@ -637,7 +635,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @if(!empty($asiento_reparable_reversion[2]))
+                            @if(!empty($asiento_reparable_reversion))
                                 @foreach($asiento_reparable_reversion[2] as $key => $asiento_movimiento)
                                     <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
                                         data_asiento="RV"
@@ -684,12 +682,12 @@
 
                     </div>
                 @endif
-                @if(!empty($asiento_deduccion[1]))
+                @if(!empty($asiento_deduccion))
                     <div id="astdeduccion" class="tab-pane cont">
                         <input type="hidden" id="asiento_cabecera_deduccion" name="asiento_cabecera_deduccion"
-                               value="{{ json_encode(!empty($asiento_deduccion[1]) ? $asiento_deduccion[1] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[1] : []) }}"/>
                         <input type="hidden" id="asiento_detalle_deduccion" name="asiento_detalle_deduccion"
-                               value="{{ json_encode(!empty($asiento_deduccion[2]) ? $asiento_deduccion[2] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[2] : []) }}"/>
                         {{--
                         <button data="D" type="button" class="btn btn-success agregar-linea">
                             Agregar línea
@@ -723,7 +721,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @if(!empty($asiento_deduccion[2]))
+                            @if(!empty($asiento_deduccion))
                                 @foreach($asiento_deduccion[2] as $key => $asiento_movimiento)
                                     <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
                                         data_asiento="D"
@@ -770,12 +768,12 @@
 
                     </div>
                 @endif
-                @if(!empty($asiento_percepcion[1]))
+                @if(!empty($asiento_percepcion))
                     <div id="astpercepcion" class="tab-pane cont">
                         <input type="hidden" id="asiento_cabecera_percepcion" name="asiento_cabecera_percepcion"
-                               value="{{ json_encode(!empty($asiento_percepcion[1]) ? $asiento_percepcion[1] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[1] : []) }}"/>
                         <input type="hidden" id="asiento_detalle_percepcion" name="asiento_detalle_percepcion"
-                               value="{{ json_encode(!empty($asiento_percepcion[2]) ? $asiento_percepcion[2] : []) }}"/>
+                               value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[2] : []) }}"/>
                         <table id="asiento_totales_percepcion"
                                class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
                                cellspacing="0" width="100%">
@@ -873,7 +871,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @if(!empty($asiento_percepcion[2]))
+                            @if(!empty($asiento_percepcion))
                                 @foreach($asiento_percepcion[2] as $key => $asiento_movimiento)
                                     <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
                                         data_asiento="P"

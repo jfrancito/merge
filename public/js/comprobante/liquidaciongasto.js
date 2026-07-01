@@ -206,19 +206,6 @@ $(document).ready(function () {
             url: carpeta + "/obtener-periodo-tipo-cambio",
             data: { _token: _token, fecha: fecha },
             success: function (res) {
-                if (!res.existeTipoCambio) {
-                    $.alert({
-                        title: 'Alerta',
-                        content: 'Se debe agregar tipo de cambio para el día seleccionado.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
-                        }
-                    });
-                }
                 $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
 
                 $("#anio_asiento_reparable").data('pending-period', res.periodo.trim());
@@ -1081,9 +1068,10 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
-                let codCuenta = (item.COD_CUENTA_CONTABLE || '').toString().trim();
-                let txtCuenta = (item.TXT_CUENTA_CONTABLE || '').toString().trim();
-                if (codCuenta === '' || txtCuenta === '') {
+                if (
+                    item.COD_CUENTA_CONTABLE === null && item.COD_CUENTA_CONTABLE === '' &&
+                    item.TXT_CUENTA_CONTABLE === null && item.TXT_CUENTA_CONTABLE === ''
+                ) {
                     no_existe_cuenta_contable = true;
                 }
                 switch (item.COD_DOC_CTBLE_REF) {
@@ -1225,19 +1213,6 @@ $(document).ready(function () {
             url: carpeta + "/obtener-periodo-tipo-cambio",
             data: { _token: _token, fecha: fecha },
             success: function (res) {
-                if (!res.existeTipoCambio) {
-                    $.alert({
-                        title: 'Alerta',
-                        content: 'Se debe agregar tipo de cambio para el día seleccionado.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
-                        }
-                    });
-                }
                 $('#tipo_cambio_asiento').val(res.tipoCambio);
 
                 $("#anio_asiento").data('pending-period', res.periodo.trim());
@@ -1924,9 +1899,10 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
-                let codCuenta = (item.COD_CUENTA_CONTABLE || '').toString().trim();
-                let txtCuenta = (item.TXT_CUENTA_CONTABLE || '').toString().trim();
-                if (codCuenta === '' || txtCuenta === '') {
+                if (
+                    item.COD_CUENTA_CONTABLE === null && item.COD_CUENTA_CONTABLE === '' &&
+                    item.TXT_CUENTA_CONTABLE === null && item.TXT_CUENTA_CONTABLE === ''
+                ) {
                     no_existe_cuenta_contable = true;
                 }
                 switch (item.COD_DOC_CTBLE_REF) {
