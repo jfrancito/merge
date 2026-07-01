@@ -531,8 +531,9 @@ class ValeRendirController extends Controller
                     }
 
                 } elseif (
-                    in_array($areacomercial, ['MARKETING Y DESARROLLO', 'GERENCIA GENERAL'])
-                ) {
+                     in_array($areacomercial, ['MARKETING Y DESARROLLO', 'GERENCIA GENERAL'])
+                        || $cod_usuario_registro === '1CIX00000401'
+                    ) {
                     // MARKETING y GERENCIA → hasta 3 vales
                     if ($pendienteCount >= 3) {
                         return response()->json([

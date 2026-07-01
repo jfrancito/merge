@@ -256,71 +256,20 @@
                                                 GUARDAR</b></div><br>
                                     @endif
                                     @foreach($tarchivos as $index => $item)
-                                        @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026')
-                                            <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                                <label class="col-sm-12 control-label"
-                                                       style="text-align: left; height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
-                                                        ({{$item->TXT_FORMATO}})</b>
-                                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005')
-                                                        <b>(Descargue el pdf de este enlace <a
-                                                                    href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
-                                                                    target="_blank">Sunat</a> y subalo para que pueda
-                                                            aprobar</b>)
-                                                    @endif </label>
-                                                <div class="form-group sectioncargarimagen">
-
-
-                                                    <div class="col-sm-12">
-                                                        <div class="file-loading">
-                                                            <input
-                                                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
-                                                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
-                                                                    class="file-es"
-                                                                    type="file"
-                                                                    multiple data-max-file-count="1"
-                                                                    required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @else
-                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
-
-                                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion"
-                                                     style="margin-top:15px;">
-                                                    <div class="form-group sectioncargarimagen">
-                                                        <label class="col-sm-12 control-label"
-                                                               style="text-align: left;height: 50px;">
-                                                            <div class="tooltipfr">
-                                                                <b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
-                                                                <span class="tooltiptext">Solo subir si selecciono que usted pagara la detracion</span>
-                                                            </div>
-                                                        </label>
-                                                        <div class="col-sm-12">
-                                                            <div class="file-loading">
-                                                                <input
-                                                                        id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
-                                                                        name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
-                                                                        class="file-es"
-                                                                        type="file"
-                                                                        multiple data-max-file-count="1">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @ELSE
-                                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3"
-                                                     style="margin-top:15px;">
+                                        @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000048')
+                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026')
+                                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
                                                     <label class="col-sm-12 control-label"
-                                                           style="text-align: left;height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
+                                                           style="text-align: left; height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
                                                             ({{$item->TXT_FORMATO}})</b>
                                                         @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005')
                                                             <b>(Descargue el pdf de este enlace <a
                                                                         href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
-                                                                        target="_blank">Sunat</a> y subalo para que
-                                                                pueda aprobar</b>)
-                                                        @else @endif </label>
+                                                                        target="_blank">Sunat</a> y subalo para que pueda
+                                                                aprobar</b>)
+                                                        @endif </label>
                                                     <div class="form-group sectioncargarimagen">
+
 
                                                         <div class="col-sm-12">
                                                             <div class="file-loading">
@@ -335,9 +284,154 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @ENDIF
+                                            @else
+                                                @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
+
+                                                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion"
+                                                         style="margin-top:15px;">
+                                                        <div class="form-group sectioncargarimagen">
+                                                            <label class="col-sm-12 control-label"
+                                                                   style="text-align: left;height: 50px;">
+                                                                <div class="tooltipfr">
+                                                                    <b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
+                                                                    <span class="tooltiptext">Solo subir si selecciono que usted pagara la detracion</span>
+                                                                </div>
+                                                            </label>
+                                                            <div class="col-sm-12">
+                                                                <div class="file-loading">
+                                                                    <input
+                                                                            id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
+                                                                            name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
+                                                                            class="file-es"
+                                                                            type="file"
+                                                                            multiple data-max-file-count="1">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @ELSE
+                                                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3"
+                                                         style="margin-top:15px;">
+                                                        <label class="col-sm-12 control-label"
+                                                               style="text-align: left;height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}
+                                                                ({{$item->TXT_FORMATO}})</b>
+                                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005')
+                                                                <b>(Descargue el pdf de este enlace <a
+                                                                            href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
+                                                                            target="_blank">Sunat</a> y subalo para que
+                                                                    pueda aprobar</b>)
+                                                            @else @endif </label>
+                                                        <div class="form-group sectioncargarimagen">
+
+                                                            <div class="col-sm-12">
+                                                                <div class="file-loading">
+                                                                    <input
+                                                                            id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}"
+                                                                            name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]"
+                                                                            class="file-es"
+                                                                            type="file"
+                                                                            multiple data-max-file-count="1"
+                                                                            required>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @ENDIF
+                                            @endif
                                         @endif
                                     @endforeach
+
+                                    @php
+                                        $otros_documentos_item = $tarchivos->where('COD_CATEGORIA_DOCUMENTO', 'DCC0000000000048')->first();
+                                    @endphp
+                                    @if(isset($otros_documentos_item))
+                                        @php
+                                            $uploaded_pdfs = isset($archivospdf) ? $archivospdf->where('TIPO_ARCHIVO', 'DCC0000000000048') : collect();
+                                            $has_uploaded = $uploaded_pdfs->count() > 0;
+                                        @endphp
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 25px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                                            <div class="panel panel-default panel-contrast" style="box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 6px;">
+                                                <div class="panel-heading" style="background: #2b4c7e; color: #fff; font-weight: 600; font-size: 15px; border-top-left-radius: 6px; border-top-right-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
+                                                    <span>
+                                                        <i class="mdi mdi-folder-multiple" style="margin-right: 8px;"></i>
+                                                        {{$otros_documentos_item->NOM_CATEGORIA_DOCUMENTO}} ({{$otros_documentos_item->TXT_FORMATO}} MASIVOS)
+                                                    </span>
+                                                    <span class="badge" id="badge-pdf-count" data-initial="{{$uploaded_pdfs->count()}}" style="background: #ff5722; color: #fff; font-size: 12px; font-weight: 600;">{{$uploaded_pdfs->count()}} Archivos Cargados</span>
+                                                </div>
+                                                <div class="panel-body panel-body-contrast" style="padding: 20px;">
+                                                    <div class="row">
+                                                        <!-- Zona de Carga de Archivos -->
+                                                        <div class="{{ $has_uploaded ? 'col-xs-12 col-sm-5 col-md-5 col-lg-5' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }}">
+                                                            <label class="control-label" style="text-align: left; margin-bottom: 10px; font-weight: 700; color: #333;">
+                                                                Subir nuevos documentos:
+                                                            </label>
+                                                            <div class="form-group sectioncargarimagen">
+                                                                <div class="col-sm-12" style="padding: 0;">
+                                                                    <div class="file-loading">
+                                                                        <input
+                                                                                id="file-DCC0000000000048"
+                                                                                name="DCC0000000000048[]"
+                                                                                class="file-es"
+                                                                                type="file"
+                                                                                multiple
+                                                                                data-max-file-count="100"
+                                                                                @if(!$has_uploaded) required @endif
+                                                                                >
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        @if($has_uploaded)
+                                                            <!-- Explorador de Archivos (Derecha) -->
+                                                            <div class="col-xs-12 col-sm-7 col-md-7 col-lg-7" style="border-left: 1px solid #eee; padding-left: 25px;">
+                                                                <label class="control-label" style="text-align: left; margin-bottom: 10px; font-weight: 700; color: #333; display: flex; align-items: center; justify-content: space-between;">
+                                                                    <span>Documentos subidos anteriormente:</span>
+                                                                    <small class="text-muted" style="font-weight: normal;">Haga clic en previsualizar para ver el PDF al instante</small>
+                                                                </label>
+
+                                                                <!-- Buscador de Archivos en Tiempo Real -->
+                                                                <div class="form-group" style="margin-bottom: 15px;">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon" style="background: #2b4c7e; color: #fff; border-color: #2b4c7e; padding: 6px 12px;"><i class="mdi mdi-search" style="font-size: 16px;"></i></span>
+                                                                        <input type="text" id="buscar-pdf-input" class="form-control" placeholder="Buscar PDF por nombre..." style="border-color: #2b4c7e; height: 34px;">
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="document-explorer-container" style="max-height: 380px; overflow-y: auto; padding-right: 5px;">
+                                                                    <div class="list-group" id="pdf-list-container">
+                                                                        @foreach($uploaded_pdfs as $pdfIndex => $pdf)
+                                                                            @php
+                                                                                $url = route('serve-fileestiba', ['file' => $pdf->NOMBRE_ARCHIVO]);
+                                                                            @endphp
+                                                                            <div class="list-group-item pdf-item" data-nombre="{{$pdf->NOMBRE_ARCHIVO}}" data-url="{{$url}}" data-index="{{$pdfIndex}}" style="border-radius: 4px; margin-bottom: 8px; border: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; transition: all 0.2s ease; background: #fff;" onmouseover="this.style.borderColor='#2b4c7e'; this.style.background='#fcfdfe';" onmouseout="this.style.borderColor='#e0e0e0'; this.style.background='#fff';">
+                                                                                <div style="display: flex; align-items: center; width: 60%; overflow: hidden;">
+                                                                                    <i class="mdi mdi-file-pdf" style="font-size: 28px; color: #d32f2f; margin-right: 12px; flex-shrink: 0;"></i>
+                                                                                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;">
+                                                                                        <span style="font-weight: 600; color: #333; font-size: 13px;" title="{{$pdf->NOMBRE_ARCHIVO}}">{{$pdf->NOMBRE_ARCHIVO}}</span>
+                                                                                        <br>
+                                                                                        <span style="font-size: 11px; color: #777;">Tamaño: {{ number_format($pdf->SIZE / 1024, 2) }} KB</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div style="display: flex; gap: 5px;">
+                                                                                    <button type="button" class="btn btn-xs btn-primary btn-preview-pdf" data-url="{{$url}}" data-name="{{$pdf->NOMBRE_ARCHIVO}}" data-index="{{$pdfIndex}}" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: #1d3a6d; border-color: #1d3a6d;">
+                                                                                        <i class="icon mdi mdi-eye" style="font-size: 14px;"></i> Previsualizar
+                                                                                    </button>
+                                                                                    <a href="{{$url}}" download class="btn btn-xs btn-default" style="border-radius: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-color: #ccc; color: #555;">
+                                                                                        <i class="icon mdi mdi-download" style="font-size: 14px;"></i> Descargar
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
@@ -393,5 +487,39 @@
         @endif
     </div>
 </div>
+
+<!-- Modal de Previsualización de PDF con Navegación Secuencial -->
+<div id="previewPdfModal" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" style="display: none; z-index: 9999;">
+    <div class="modal-dialog modal-lg" style="width: 90%; max-width: 1200px; margin: 30px auto;">
+        <div class="modal-content" style="border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; border: none;">
+            <div class="modal-header" style="background: #1d3a6d; color: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                <div style="display: flex; align-items: center; gap: 15px; width: 50%; overflow: hidden;">
+                    <h4 class="modal-title" id="previewPdfTitle" style="margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px;">
+                        Previsualización de Documento
+                    </h4>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                    <span id="previewPdfCounter" class="label label-default" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 3px; font-weight: 600;">
+                        Doc 0 de 0
+                    </span>
+                    <button type="button" class="btn btn-xs btn-warning" id="btnPrevPdf" style="font-weight: 600; border-radius: 3px; background: #ff5722; border-color: #ff5722; padding: 5px 12px; color: #fff;">
+                        <i class="mdi mdi-chevron-left" style="font-size: 14px; vertical-align: middle;"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-xs btn-warning" id="btnNextPdf" style="font-weight: 600; border-radius: 3px; background: #ff5722; border-color: #ff5722; padding: 5px 12px; color: #fff;">
+                        Siguiente <i class="mdi mdi-chevron-right" style="font-size: 14px; vertical-align: middle;"></i>
+                    </button>
+                    <a href="#" id="btnDownloadPdf" download class="btn btn-xs btn-success" style="font-weight: 600; border-radius: 3px; padding: 5px 12px; background: #4caf50; border-color: #4caf50; color: #fff; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="mdi mdi-download" style="font-size: 14px;"></i> Descargar
+                    </a>
+                    <button type="button" class="close" data-dismiss="modal" style="color: #fff; opacity: 0.8; font-size: 24px; line-height: 1; margin: 0; padding: 0; background: none; border: none; cursor: pointer;">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0; background: #f4f4f4; height: calc(85vh - 50px);">
+                <iframe id="pdfPreviewIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 

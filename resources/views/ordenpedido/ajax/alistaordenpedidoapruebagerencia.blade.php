@@ -41,7 +41,9 @@
 @if(isset($ajax))
     <script type="text/javascript">
         $(document).ready(function () {
-            App.dataTables();
+            if (typeof inicializarTablasAprobacionGer === 'function') {
+                inicializarTablasAprobacionGer();
+            }
         });
     </script>
 @endif

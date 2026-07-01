@@ -1,0 +1,168 @@
+<!-- BARRA DE BÚSQUEDA -->
+<div class="row" style="margin-bottom: 15px; padding: 0 5px;">
+    <div class="col-md-12">
+        <div class="input-group shadow-soft" style="border-radius: 25px; overflow: hidden;">
+            <span class="input-group-addon" style="background: #1d3a6d; color: #fff; border: none;">
+                <i class="mdi mdi-magnify" style="font-size: 20px; vertical-align: middle;"></i>
+            </span>
+            <input type="text" id="buscar_consolidado_modal" class="form-control"
+                placeholder="Escribe para buscar por ID o Categoría..."
+                style="border: none; height: 45px; font-weight: 500; font-size: 14px;">
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+    <table id="table-consolidado-aprobado" class="table table-striped table-hover table-fw-widget listatabla">
+        <thead>
+            <tr>
+                <th class="text-center" width="50">
+                    <div class="xs-check">
+                        <input id="check-all-consolidados" type="checkbox">
+                        <label for="check-all-consolidados"></label>
+                    </div>
+                </th>
+                <th>ID CONSOLIDADO</th>
+                <th>CENTRO</th>
+                <th>ID PEDIDO</th>
+                <th>FECHA</th>
+                <th>CATEGORÍA FAMILIA</th>
+                <th>ESTADO</th>
+                <th class="text-center">ACCION</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $__currentLoopData = $lista_consolidado; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                    <td class="text-center">
+                        <div class="xs-check">
+                            <input id="check-<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" type="checkbox"
+                                name="id_pedido_consolidado[]" class="check-consolidado"
+                                value="<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" data-familia="<?php echo e($item->NOM_CATEGORIA_FAMILIA); ?>"
+                                data-centro="<?php echo e(trim($item->NOM_CENTRO)); ?>">
+                            <label for="check-<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>"></label>
+                        </div>
+                    </td>
+                    <td class="font-bold"><?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?></td>
+                    <td class="text-primary" style="font-size: 11px; font-weight: 700;"><?php echo e($item->NOM_CENTRO); ?></td>
+                    <td style="color: #666; font-size: 11px;"><?php echo e($item->ID_PEDIDOS); ?></td>
+                    <td><?php echo e(date('d-m-Y', strtotime($item->FEC_PEDIDO))); ?></td>
+                    <td><?php echo e($item->NOM_CATEGORIA_FAMILIA); ?></td>
+                    <td>
+                        <span class="label label-success shadow-soft" style="background:#28a745; font-size: 11px;">
+                            <i class="mdi mdi-check-circle" style="margin-right: 3px;"></i> <?php echo e($item->TXT_ESTADO); ?>
+
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-xs btn-danger btn-deshabilitar-consolidado"
+                            data-id="<?php echo e($item->ID_PEDIDO_CONSOLIDADO); ?>" title="DESHABILITAR PRODUCTO">
+                            DESHABILITAR PRODUCTO
+                        </button>
+                    </td>
+                </tr>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        // Seleccionar todos los checkboxes
+        $('#check-all-consolidados').on('change', function () {
+            $('.check-consolidado').prop('checked', $(this).prop('checked'));
+        });
+
+        // Filtrar consolidados en tiempo real
+        $('#buscar_consolidado_modal').on('keyup', function () {
+            var value = $(this).val().toLowerCase();
+            $("#table-consolidado-aprobado tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // Al hacer clic en una fila, seleccionar el checkbox (UX mejorada)
+        $('#table-consolidado-aprobado tbody tr').on('click', function (e) {
+            if ($(e.target).is('input') || $(e.target).is('label') || $(e.target).hasClass('btn-deshabilitar-consolidado') || $(e.target).closest('.btn-deshabilitar-consolidado').length > 0) return;
+            var cb = $(this).find('.check-consolidado');
+            cb.prop('checked', !cb.prop('checked'));
+        });
+
+        // Evento al hacer clic en el botón Deshabilitar
+        $(document).on('click', '.btn-deshabilitar-consolidado', function (e) {
+            e.stopPropagation(); // Evitar que se dispare el click de la fila y seleccione el checkbox
+            var id = $(this).data('id');
+
+            abrircargando();
+
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/ajax-productos-consolidado-sin-cotizar',
+                data: {
+                    _token: $('#token').val() || (typeof _token !== 'undefined' ? _token : ''),
+                    id_consolidado: id
+                },
+                success: function (data) {
+                    cerrarcargando();
+                    $('.modal-deshabilitar-productos-container').html(data);
+
+                    // Activar botón de confirmación en el footer
+                    $('.btn-confirmar-deshabilitar-productos').prop('disabled', false).removeClass('disabled');
+
+                    $('#modal-deshabilitar-productos').niftyModal('show');
+                },
+                error: function () {
+                    cerrarcargando();
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: 'No se pudo cargar la lista de productos del consolidado.',
+                        ancho: '400px'
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+
+<style>
+    .xs-check {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .xs-check input {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .xs-check label {
+        cursor: pointer;
+        display: block;
+        height: 18px;
+        width: 18px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .xs-check input:checked+label {
+        background: #1d3a6d;
+        border-color: #1d3a6d;
+    }
+
+    .xs-check input:checked+label:after {
+        content: '\2714';
+        position: absolute;
+        top: -1px;
+        left: 2px;
+        color: white;
+        font-size: 12px;
+    }
+</style>

@@ -112,6 +112,53 @@
         'prefix': '', 
         'placeholder': '0'});
 
+        // Inicializar tablas de aprobación gerencia
+        if (typeof inicializarTablasAprobacionGer === 'undefined') {
+            window.inicializarTablasAprobacionGer = function() {
+                var config = {
+                    "pageLength": 10,
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    "order": [[0, "desc"]],
+                    "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando del 0 al 0 de 0 registros",
+                        "sInfoFiltered":   "(filtrado de _MAX_ registros)",
+                        "sSearch":         "Buscar:",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    }
+                };
+
+                if ($.fn.DataTable.isDataTable('#table-pedidos-ger-pendientes')) {
+                    $('#table-pedidos-ger-pendientes').DataTable().destroy();
+                }
+                if ($.fn.DataTable.isDataTable('#table-pedidos-ger-aprobados')) {
+                    $('#table-pedidos-ger-aprobados').DataTable().destroy();
+                }
+                if ($.fn.DataTable.isDataTable('#table-pedidos-ger-rechazados')) {
+                    $('#table-pedidos-ger-rechazados').DataTable().destroy();
+                }
+
+                $('#table-pedidos-ger-pendientes, #table-pedidos-ger-aprobados, #table-pedidos-ger-rechazados').dataTable(config);
+            };
+        }
+
+        inicializarTablasAprobacionGer();
+
       });
     </script> 
 <script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>

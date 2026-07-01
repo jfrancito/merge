@@ -303,7 +303,9 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_AUTORIZA',
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
+                'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
                 'OP.COD_USUARIO_MODIF_AUD',
                 'U.nombre as USUARIO_MODIF',
@@ -395,7 +397,9 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_AUTORIZA',
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
+                'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
                 'OP.COD_ESTADO_TEMP',
                 'OP.TXT_ESTADO_TEMP'
@@ -842,7 +846,7 @@ trait OrdenPedidoTraits
                     + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
                     + ' [FLD] ' + OP.ID_PEDIDO
                     + ' [FLD] ' + OP.TXT_AREA
-                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + ISNULL(OPD.TXT_OBSERVACION,'')
                     + ' [FLD] ' + CAST(SUM(
                         COALESCE(
                             OPD.CAN_MODIF_ADM, 
@@ -875,7 +879,7 @@ trait OrdenPedidoTraits
                     OP.FEC_PEDIDO,
                     OP.ID_PEDIDO,
                     OP.TXT_AREA,
-                    OP.TXT_GLOSA
+                    OPD.TXT_OBSERVACION
                 ORDER BY OP.FEC_PEDIDO
                 FOR XML PATH(''), TYPE
             ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA,
@@ -909,7 +913,7 @@ trait OrdenPedidoTraits
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_AREAS,
             STUFF((
-                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OP.TXT_GLOSA,'')
+                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OPD.TXT_OBSERVACION,'')
                 FROM CMP.REFERENCIA_ASOC RA
                 INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
                 INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
@@ -920,7 +924,7 @@ trait OrdenPedidoTraits
                     AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
                     AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
                     AND OP.COD_PERIODO = '" . $pedido->COD_PERIODO . "'
-                    AND ISNULL(OP.TXT_GLOSA,'') <> ''
+                    AND ISNULL(OPD.TXT_OBSERVACION,'') <> ''
                 FOR XML PATH('')
             ), 1, 2, '') AS TXT_GLOSAS
         ")
@@ -936,6 +940,115 @@ trait OrdenPedidoTraits
             ->get();
 
         //DD($id_consolidado);
+
+        return $query;
+    }
+
+    public function lg_lista_detalle_consolidado_masivo($ids_consolidados)
+    {
+        $query = DB::connection('sqlsrv')
+            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
+                'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
+            ->select(
+                'D.*',
+                'C.COD_ESTADO',
+                'C.COD_EMPR',
+                'C.COD_CENTRO',
+                DB::raw("
+            STUFF((
+                SELECT 
+                    ' [SEP] ' 
+                    + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
+                    + ' [FLD] ' + OP.ID_PEDIDO
+                    + ' [FLD] ' + OP.TXT_AREA
+                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + CAST(SUM(
+                        COALESCE(
+                            OPD.CAN_MODIF_ADM, 
+                            OPD.CAN_MODIF_GER, 
+                            OPD.CAN_MODIF_JEF_AUT, 
+                            OPD.CANTIDAD
+                        )
+                    ) AS VARCHAR(20))
+                    + ' [FLD] ' + ISNULL((
+                        SELECT ' [DOC] ' + ARCH.NOMBRE_ARCHIVO + ' [URI] ' + ARCH.URL_ARCHIVO
+                        FROM dbo.ARCHIVOS ARCH
+                        WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                        AND ARCH.ACTIVO = 1
+                        FOR XML PATH(''), TYPE
+                    ).value('.', 'NVARCHAR(MAX)'), '')
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP
+                    ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                    ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1
+                    AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                GROUP BY 
+                    OP.FEC_PEDIDO,
+                    OP.ID_PEDIDO,
+                    OP.TXT_AREA,
+                    OP.TXT_GLOSA
+                ORDER BY OP.FEC_PEDIDO
+                FOR XML PATH(''), TYPE
+            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA,
+            STUFF((
+                SELECT DISTINCT ', ' + CEN.NOM_CENTRO
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN ALM.CENTRO CEN ON CEN.COD_CENTRO = OP.COD_CENTRO
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_CENTROS,
+            STUFF((
+                SELECT DISTINCT ', ' + OP.TXT_AREA
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_AREAS,
+            STUFF((
+                SELECT DISTINCT ', ' + OP.TXT_AREA + ' : ' + ISNULL(OPD.TXT_OBSERVACION,'')
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1 AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = C.COD_PERIODO
+                    AND ISNULL(OPD.TXT_OBSERVACION,'') <> ''
+                FOR XML PATH('')
+            ), 1, 2, '') AS TXT_GLOSAS
+        ")
+            )
+            ->whereIn('D.ID_PEDIDO_CONSOLIDADO', $ids_consolidados)
+            ->orderBy('D.ID_PEDIDO_CONSOLIDADO', 'asc')
+            ->orderBy('D.NOM_PRODUCTO', 'asc')
+            ->get();
 
         return $query;
     }
@@ -1530,6 +1643,7 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.COD_ANIO,
                 OP.COD_PERIODO,
                 PER.TXT_NOMBRE                       AS NOM_PERIODO,
+                OP.TXT_TIPO_PEDIDO,
                 OP.COD_EMPR,
                 OP.COD_CENTRO,
                 C.NOM_CENTRO,
@@ -1538,6 +1652,7 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.TXT_TRABAJADOR_SOLICITA,
                 OP.TXT_GLOSA,
                 OP.TXT_TRABAJADOR_APRUEBA_ADM,
+                OP.COD_TRABAJADOR_APRUEBA_ADM,
                 STUFF((
                     SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
                     FROM dbo.ARCHIVOS ARCH

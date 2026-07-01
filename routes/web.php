@@ -135,7 +135,11 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/ajax-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldos');
     Route::any('/descargar-archivo-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldosExcel');
 
-
+	// GESTION ACTIVOS FIJOS (VALE A RENDIR)
+	Route::any('/gestion-de-obras/{idopcion}', 'ValeRendirAdministracionController@actionListar');
+	Route::any('/ajax-listar-activos-fijos', 'ValeRendirAdministracionController@actionAjaxListar');
+	Route::any('/agregar-modificar-activo-fijo', 'ValeRendirAdministracionController@actionAgregarModificar');
+	Route::any('/eliminar-activo-fijo', 'ValeRendirAdministracionController@actionEliminar');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');
@@ -1028,6 +1032,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-buscar-documento-rg', 'RegistroImporteGastosController@actionListarAjaxBuscarDocumentoRG');
 
+	//REGISTRO-IMPORTE-RUTAS
+	Route::get('/gestion-de-importe-rutas/{idopcion}', 'RegistroImporteRutasController@actionRegistroImporteRutas');
+	Route::post('/guardar_matriz_viaticos', 'RegistroImporteRutasController@actionGuardarRegistroImporteRutas');
+
 	//PATANLLA 1
 
 	Route::get('/gestionar-personal-autoriza/{idopcion}', 'RegistroPersonalAutorizaController@actionRegistroPersonalAutoriza');
@@ -1095,6 +1103,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-pedido-editar', 'GestionOrdenPedidoController@actionAjaxPedidoEditar');
 	Route::post('/ajax-obtener-correlativo-pedido', 'GestionOrdenPedidoController@actionAjaxObtenerCorrelativoPedido');
 	Route::post('/ajax-buscar-producto', 'GestionOrdenPedidoController@actionAjaxBuscarProducto');
+	Route::post('/ajax-verificar-almacen-producto', 'GestionOrdenPedidoController@actionAjaxVerificarAlmacenProducto');
 	Route::get('/buscarproductocompra', 'GestionOrdenPedidoController@actionBuscarProductoCompra');
 
 	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');
@@ -1138,6 +1147,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-eliminar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionAjaxEliminarConsolidado');
 	Route::post('/ajax-guardar-cantidad-comprada-op', 'ConsolidadoOrdenPedidoController@actionAjaxGuardarCantidadComprada');
 	Route::get('/exportar-excel-consolidado/{id_consolidado}', 'ConsolidadoOrdenPedidoController@actionExportarExcelConsolidado');
+	Route::get('/exportar-excel-masivo-consolidado', 'ConsolidadoOrdenPedidoController@actionExportarExcelMasivoConsolidado');
 	Route::post('/ajax-guardar-cantidad-comprada-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxGuardarCantidadCompradaGeneral');
 
 	Route::get('/consolidado-general-orden-pedido/{idopcion}', 'ConsolidadoGeneralOrdenPedidoController@actionConsolidadoGeneralOrdenPedido');
@@ -1162,6 +1172,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/cotizacion-orden-pedido/{idopcion}', 'CotizacionOrdenPedidoController@actionCotizacionOrdenPedido');
 	Route::post('/ajax-buscar-proveedor-ruc', 'CotizacionOrdenPedidoController@actionAjaxBuscarProveedorRuc');
 	Route::post('/ajax-listar-consolidado-general-aprobado', 'CotizacionOrdenPedidoController@actionAjaxListarConsolidadoGeneralAprobado');
+	Route::post('/ajax-productos-consolidado-sin-cotizar', 'CotizacionOrdenPedidoController@actionAjaxProductosConsolidadoSinCotizar');
+	Route::post('/ajax-deshabilitar-productos-consolidado', 'CotizacionOrdenPedidoController@actionAjaxDeshabilitarProductosConsolidado');
 	Route::post('/ajax-listar-pedidos-aprobados-servicio', 'CotizacionOrdenPedidoController@actionAjaxListarPedidosAprobadosServicio');
 	Route::post('/ajax-listar-detalle-consolidado-general-seleccionado', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleConsolidadoGeneralSeleccionado');
 	Route::post('/ajax-listar-detalle-pedidos-aprobados-seleccionados', 'CotizacionOrdenPedidoController@actionAjaxListarDetallePedidosAprobadosSeleccionados');
@@ -1357,3 +1369,6 @@ Route::get('buscarclientey', function (Illuminate\Http\Request $request) {
 
 	return \Response::json($valid_tags);
 });
+	Route::post('/eliminar_matriz_viaticos', 'RegistroImporteRutasController@actionEliminarRegistroImporteRutas');
+
+Route::post('/ajax-obtener-almacenes-producto-centro', 'ConsolidadoOrdenPedidoController@actionAjaxObtenerAlmacenesProductoCentro');

@@ -305,6 +305,7 @@ class GestionOCController extends Controller
                 'documentohistorial' => $documentohistorial,
                 'data_cod_extorno' => $data_cod_extorno,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'ajax' => true,
             ]
         );
@@ -318,7 +319,9 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20602740278-04-E001-15252.xml";
+        $path = storage_path() . "/exports/20551002251-01-F001-10185.xml";
+        //$path = storage_path() . "/exports/20612526754-01-F001-00000046.xml";
+
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -722,6 +725,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -852,6 +856,7 @@ class GestionOCController extends Controller
                 'combo_operacion' => $combo_operacion,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'fecha_inicio' => $fecha_inicio,
                 'fecha_fin' => $fecha_fin,
                 'area_id' => $area_id,
@@ -1038,6 +1043,7 @@ class GestionOCController extends Controller
                 'operacion_id' => $operacion_id,
 
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                 'cod_empresa' => $cod_empresa,
                 'listadatos' => $listadatos,
                 'procedencia' => $procedencia,
@@ -1083,6 +1089,7 @@ class GestionOCController extends Controller
                 'combo_operacion' => $combo_operacion,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
 
@@ -1199,6 +1206,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -1700,6 +1708,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2737,6 +2746,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2816,6 +2826,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -2888,6 +2899,7 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -3377,6 +3389,7 @@ class GestionOCController extends Controller
 
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -4211,6 +4224,7 @@ class GestionOCController extends Controller
                 'rutaorden' => $rutaorden,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
     }
@@ -5292,7 +5306,7 @@ class GestionOCController extends Controller
                         if (count($fedocumento_e) > 0) {
                             return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                         }
-
+                        //dd($factura);
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
                         if ($factura->getClient()->getnumDoc() != Session::get('empresas')->NRO_DOCUMENTO) {
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa ' . Session::get('empresas')->NRO_DOCUMENTO);
@@ -7747,6 +7761,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );
@@ -7849,6 +7864,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );
@@ -7979,6 +7995,7 @@ class GestionOCController extends Controller
                     'totalarchivos' => $totalarchivos,
                     'tp' => $tp,
                     'idopcion' => $idopcion,
+                'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
                     'idoc' => $idoc,
                 ]
             );

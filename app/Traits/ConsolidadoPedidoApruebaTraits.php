@@ -159,7 +159,7 @@ trait ConsolidadoPedidoApruebaTraits
                     + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
                     + ' [FLD] ' + OP.ID_PEDIDO
                     + ' [FLD] ' + OP.TXT_AREA
-                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + ISNULL(OPD.TXT_OBSERVACION,'')
                     + ' [FLD] ' + CAST(SUM(
                         COALESCE(
                             OPD.CAN_MODIF_ADM, 
@@ -192,7 +192,7 @@ trait ConsolidadoPedidoApruebaTraits
                     OP.FEC_PEDIDO,
                     OP.ID_PEDIDO,
                     OP.TXT_AREA,
-                    OP.TXT_GLOSA
+                    OPD.TXT_OBSERVACION
                 ORDER BY OP.FEC_PEDIDO
                 FOR XML PATH(''), TYPE
             ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA

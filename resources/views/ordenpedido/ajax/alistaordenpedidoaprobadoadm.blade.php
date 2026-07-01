@@ -7,7 +7,7 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0">
+            <table id="table-pedidos-adm-aprobados" class="table table-hover table-striped mb-0 listatabla">
                 <thead class="thead-dark">
                 <tr>
                     <th>ID PEDIDO</th>

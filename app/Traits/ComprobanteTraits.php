@@ -217,6 +217,7 @@ trait ComprobanteTraits
                                     ->where('CAN_IMPUESTO_VTA', '>', 0)
                                     //->where('IND_MATERIAL_SERVICIO', 'M')
                                     ->where('MONTO_DETRACCION_RED', '<=', 0)
+                                    ->where('CMP.ORDEN.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->whereNotIn('RUC_PROVEEDOR', function ($query) {
                                         $query->select('RUC')->from('CON.PROVEEDORES_BCRP');
                                     })
@@ -225,10 +226,10 @@ trait ComprobanteTraits
                                     ->selectRaw('RUC_PROVEEDOR, RZ_PROVEEDOR, SUM(MONTO_RETENCION) AS RETENCION_IGV, SUM(TOTAL_VENTA_ORIG) AS TOTAL_VENTA_ORIG')
                                     ->get();
 
-        //dd($listaentrarvalidacion);
 
         $array                  =   array();
         foreach ($listaentrarvalidacion as $index => $item) {
+            
             $ldocumentosretencion  =   DB::table('FE_DOCUMENTO')
                                         ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
                                         ->where('FOLIO_RESERVA', $data_folio)
@@ -944,6 +945,9 @@ trait ComprobanteTraits
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+
+
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
@@ -973,6 +977,7 @@ trait ComprobanteTraits
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
@@ -3738,16 +3743,27 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_tes_sp($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
+        $codigosOrden = DB::table('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION')
+            ->select('COD_ORDEN')
+            ->distinct()  // Si quieres evitar duplicados
+            ->pluck('COD_ORDEN')
+            ->toArray();
+
+
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            ->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+                            //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                             ->select(DB::raw('FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->Fecha('RE',$fecha_inicio,$fecha_fin)
+                            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $codigosOrden)  // Filtro con el array
                             ->ProveedorFE($proveedor_id)
                             ->orderBy('fecha_uc','desc')
                             ->get();
+
+        //dd($listadatos); 
+
 
         return  $listadatos;
     }
@@ -3755,14 +3771,22 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_tes_contrato_sp($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
+        $codigosOrden = DB::table('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION')
+            ->select('COD_ORDEN')
+            ->distinct()  // Si quieres evitar duplicados
+            ->pluck('COD_ORDEN')
+            ->toArray();
+
+
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+                            //->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                             ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->ProveedorFE($proveedor_id)
                             ->Fecha('RE',$fecha_inicio,$fecha_fin)
+                            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $codigosOrden)  // Filtro con el array
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->orderBy('fecha_uc','desc')
                             ->get();
@@ -9070,57 +9094,6 @@ trait ComprobanteTraits
 
 
 
-            // //dd($documentosdetraccion);
-            foreach($documentosdetraccion as $index => $item){
-
-                $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
-                //FE_DOCUMENTO
-                FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                            ->update(
-                                [
-                                    'MONTO_RETENCION'=>$retencionigv
-                                ]
-                            );
-                //OC
-                CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                            ->update(
-                                [
-                                    'CAN_RETENCION'=>$retencionigv,
-                                    'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
-                                ]
-                            );
-
-
-                $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
-                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                        ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
-                                        ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
-                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                        ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
-                                        ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
-                                            'TDO0000000000001',
-                                            'TDO0000000000003',
-                                            'TDO0000000000010',
-                                            'TDO0000000000002'
-                                        ])->first();
-
-                if(count($documento02)>0){
-                    CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                                ->update(
-                                    [
-                                        'CAN_RETENCION'=>$retencionigv,
-                                        'CAN_DCTO'=>3
-                                    ]
-                                );
-                    CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                                ->update(
-                                    [
-                                        'CAN_RETENCION_MONTO'=>$retencionigv,
-                                        'CAN_RETENCION_PORCENTAJE'=>3
-                                    ]
-                                );
-                }
-            }
 
             ////////////////////////////////////
 

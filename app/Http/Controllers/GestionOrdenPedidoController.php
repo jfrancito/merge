@@ -75,7 +75,8 @@ class GestionOrdenPedidoController extends Controller
                 $query->where('cadcargo', 'LIKE', '%JEFE%')
                     ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
                     ->orWhere('COD_TRAB', 'IITR000000000391')
-                    ->orWhere('COD_TRAB', 'ICTR000000000250');
+                    ->orWhere('COD_TRAB', 'ICTR000000000250')
+                    ->orWhere('COD_TRAB', 'IATR000000000097');
             })
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->whereIn('empresa_osiris_id', [
@@ -218,29 +219,27 @@ class GestionOrdenPedidoController extends Controller
          'CAT.NOM_CATEGORIA as UNIDAD')
          ->get();*/
 
-        $producto = DB::select(
-            "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
-            [$empresa]
-        );
+        $producto = [];
         $registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
             ->where('COD_ESTADO', 1)
             ->orderBy('MONTO', 'asc')
             ->get();
 
 
-        $listapedido = DB::connection('sqlsrv')->select("
-            SELECT OP.*,
-            STUFF((
-                SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
-                FROM dbo.ARCHIVOS ARCH
-                WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
-                AND ARCH.ACTIVO = 1
-                FOR XML PATH(''), TYPE
-            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
-            FROM WEB.ORDEN_PEDIDO OP
-            WHERE OP.ACTIVO = 1
-            ORDER BY OP.FEC_PEDIDO DESC
-        ");
+          $listapedido = DB::connection('sqlsrv')->select("
+              SELECT TOP 200 OP.*,
+              STUFF((
+                  SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                  FROM dbo.ARCHIVOS ARCH
+                  WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                  AND ARCH.ACTIVO = 1
+                  FOR XML PATH(''), TYPE
+              ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
+              FROM WEB.ORDEN_PEDIDO OP
+              WHERE OP.ACTIVO = 1
+              AND OP.COD_TRABAJADOR_SOLICITA = ?
+              ORDER BY OP.FEC_PEDIDO DESC
+          ", [$usuario_solicita]);
 
         // Convertir el resultado a array asociativo para mantener compatibilidad con la vista
         $listapedido = json_decode(json_encode($listapedido), true);
@@ -739,33 +738,38 @@ class GestionOrdenPedidoController extends Controller
     public function actionAjaxBuscarProducto(Request $request)
     {
         $term = $request->input('term');
-        $tipo = $request->input('tipo'); // Material o Servicio
+        $tipo = $request->input('tipo'); // 'M' o 'S' (Material o Servicio)
         $empresa = Session::get('empresas')->COD_EMPR;
 
-        $productos = DB::table('ALM.PRODUCTO as PRD')
-            ->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
-            ->where('PRD.COD_EMPR', $empresa)
-            ->where('PRD.COD_ESTADO', 1)
-            ->when($term, function ($query) use ($term) {
-                $query->where(function ($sub) use ($term) {
-                    $sub->where('PRD.NOM_PRODUCTO', 'LIKE', '%' . $term . '%')
-                        ->orWhere('PRD.COD_PRODUCTO', 'LIKE', '%' . $term . '%');
-                });
-            })
-            ->when($tipo, function ($query) use ($tipo) {
-                $query->where('PRD.IND_MATERIAL_SERVICIO', $tipo);
-            })
-            ->select(
-                'PRD.COD_PRODUCTO as id',
-                DB::raw("PRD.COD_PRODUCTO + ' - ' + PRD.NOM_PRODUCTO as text"),
-                'PRD.NOM_PRODUCTO',
-                'CAT.NOM_CATEGORIA as UNIDAD',
-                'CAT.COD_CATEGORIA as COD_UNIDAD',
-                DB::raw("CAST(PRD.CAN_PRECIO AS FLOAT) as PRECIO"),
-                'PRD.IND_MATERIAL_SERVICIO'
-            )
-            ->limit(100)
-            ->get();
+        $productos_raw = DB::select(
+            "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
+            [$empresa]
+        );
+
+        $productos = collect($productos_raw)->filter(function ($item) use ($tipo, $term) {
+            // Filtrar por tipo
+            if ($tipo && $item->IND_MATERIAL_SERVICIO !== $tipo) {
+                return false;
+            }
+            // Filtrar por término
+            if ($term) {
+                $term_lower = strtolower(trim($term));
+                $nom_lower = strtolower($item->NOM_PRODUCTO);
+                $cod_lower = strtolower($item->COD_PRODUCTO);
+                return (strpos($nom_lower, $term_lower) !== false) || (strpos($cod_lower, $term_lower) !== false);
+            }
+            return true;
+        })->map(function ($item) {
+            return [
+                'id' => $item->COD_PRODUCTO,
+                'text' => $item->COD_PRODUCTO . ' - ' . $item->NOM_PRODUCTO,
+                'NOM_PRODUCTO' => $item->NOM_PRODUCTO,
+                'UNIDAD' => $item->UNIDAD,
+                'COD_UNIDAD' => $item->COD_UNIDAD,
+                'PRECIO' => $item->PRECIO,
+                'IND_MATERIAL_SERVICIO' => $item->IND_MATERIAL_SERVICIO
+            ];
+        })->values();
 
         return response()->json($productos);
     }
@@ -773,5 +777,45 @@ class GestionOrdenPedidoController extends Controller
     public function actionBuscarProductoCompra(Request $request)
     {
         return $this->actionAjaxBuscarProducto($request);
+    }
+
+    public function actionAjaxVerificarAlmacenProducto(Request $request)
+    {
+        $cod_producto = $request->input('cod_producto');
+        $cod_centro = $request->input('cod_centro');
+        $cod_empr = $request->input('cod_empr');
+
+        // Obtener columnas de ALM.ALMACEN y ALM.CENTRO para determinar el campo de empresa dinámicamente
+        $schema = DB::connection('sqlsrv')->getSchemaBuilder();
+        $cols_almacen = $schema->getColumnListing('ALM.ALMACEN');
+        $cols_centro = $schema->getColumnListing('ALM.CENTRO');
+
+        $query = DB::connection('sqlsrv')->table('ALM.REFERENCIA_ALMACEN as RA')
+            ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
+            ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
+            ->join('ALM.CENTRO as CE', 'CE.COD_CENTRO', '=', 'AL.COD_CENTRO')
+            ->where('RA.TXT_TABLA_ASOC', 'ALM.PRODUCTO')
+            ->where('RA.COD_TABLA_ASOC', $cod_producto)
+            ->where('CE.COD_CENTRO', $cod_centro)
+            ->where('RA.COD_ESTADO', 1);
+
+        if (in_array('COD_EMPR', $cols_almacen)) {
+            $query->where('AL.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_almacen)) {
+            $query->where('AL.COD_EMPRESA', $cod_empr);
+        }
+
+        if (in_array('COD_EMPR', $cols_centro)) {
+            $query->where('CE.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_centro)) {
+            $query->where('CE.COD_EMPRESA', $cod_empr);
+        }
+
+        $existe = $query->exists();
+
+        return response()->json([
+            'success' => true,
+            'tiene_almacen' => $existe
+        ]);
     }
 }

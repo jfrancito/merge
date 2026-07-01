@@ -2289,7 +2289,7 @@ class GestionEntregaDocumentoController extends Controller
                                     'MONTO_RETENCION'=>(float)$documento["RETENCION"]
                                 ]
                             );
-                //OC
+
                 CMPOrden::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
                             ->update(
                                 [
@@ -2319,20 +2319,9 @@ class GestionEntregaDocumentoController extends Controller
                                         'CAN_DCTO'=>3
                                     ]
                                 );
-                    CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                                ->update(
-                                    [
-                                        'CAN_RETENCION_MONTO'=>(float)$documento["RETENCION"],
-                                        'CAN_RETENCION_PORCENTAJE'=>3
-                                    ]
-                                );
                 }
 
             }
-
-
-
-
 
             FeDocumentoEntregable::where('FOLIO','=',$folio)
                         ->update(
