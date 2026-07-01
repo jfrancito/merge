@@ -6409,7 +6409,10 @@ class GestionLiquidacionGastosController extends Controller
         $arendir_id = $request['arendir_id'];
         $moneda_sel_c_id = $request['moneda_sel_c_id'];
         $arendir_sel_id = '';
+
+
         if ($arendir_id == 'VALE') {
+
             $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo($moneda_sel_c_id);
         } else {
             if ($arendir_id == 'IMPULSO') {
@@ -6418,6 +6421,7 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_arendir_sel = $this->gn_combo_arendir_restante_reembolso();
             }
         }
+
 
         return View::make('liquidaciongasto/ajax/comboarendir',
             [
