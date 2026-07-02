@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::share('version', '19.26');
 
+
         View::share('titulo', '');
 
         if (config('app.env') === 'production' && !request()->is('10.1.50.2*')) {

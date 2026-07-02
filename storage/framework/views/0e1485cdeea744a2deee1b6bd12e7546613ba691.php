@@ -1,0 +1,64 @@
+	<div class="modal-header" style="background: #1d3a6d;">
+		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
+	  <div class="row">
+			<div class="col-xs-12">
+				LISTA DE PLANILLA DE MOVILIDAD
+			</div>
+		</div>
+	</div>
+	<div class="modal-body loteestiba" style="padding-top: 0px;">
+		<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
+				  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	            <div class="row">
+	            	<br>
+								<table class="table table-striped table-hover tablalote" width="100%">
+                    <thead>
+                      <tr>
+                      	<th>CODIGO</th>
+                      	<th>SERIE</th>
+                      	<th>NUMERO</th>
+                      	<th>TRABAJADOR</th>
+                      	<th>FECHA_EMI</th>
+                      	<th>TOTAL</th>
+                      	<th>PDF</th>
+                      	<th>SEL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+				              <?php $__currentLoopData = $lpmovilidades; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?> 
+                      <tr >
+                        <td><?php echo e($item->CODIGO); ?></td>
+                        <td><?php echo e($item->SERIE); ?></td>
+												<td><?php echo e($item->NUMERO); ?></td>
+												<td><?php echo e($item->TXT_TRABAJADOR); ?></td>
+												<td><?php echo e($item->FECHA_EMI); ?></td>
+												<td><?php echo e($item->TOTAL); ?></td>
+												<td>
+							            <a href="<?php echo e(url('/pdf-planilla-movilidad/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)))); ?>" 
+							              style="color:#cb2027;font-size: 35px;"
+							             target="_blank"><i class="mdi mdi-collection-pdf"></i>
+							            </a>
+
+												</td>
+                        <td>
+                            <div class="icon iconoentregable">
+                              <span class="mdi mdi-select-all mdisel" data_documento_planilla='<?php echo e($item->ID_DOCUMENTO); ?>' data_iddocumento='<?php echo e($iddocumento); ?>'></span>
+                            </div>
+                        </td>
+                      </tr>
+				              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tbody>
+                  </table>
+
+	            </div>
+				    </div>
+		</div>
+	</div>
+
+
+
+
+
+
+
+

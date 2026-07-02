@@ -1,0 +1,62 @@
+<table id="cxcba" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" style='width: 100%;'>
+    <?php 
+        $total_mn = 0.0000;
+        $total_me = 0.0000;
+     ?>
+    <thead style="background: #1d3a6d; color: white; text-align: center">
+    <tr>
+        <th>CLIENTE</th>
+        <th>CONTRATO</th>
+        <th>CENTRO</th>
+        <th>TIPO CAMBIO</th>
+        <th>FECHA DOCUMENTO</th>
+        <th>TIPO DOCUMENTO</th>
+        <th>NUMERO DOCUMENTO</th>
+        <th>DIAS TRANSCURRIDOS</th>
+        <th>MONEDA</th>
+        <th>JEFE VENTA</th>
+        <th>TIPO CONTRATO</th>
+        <th>IMPORTE ORIGINAL</th>
+        <th>SALDO S/.</th>
+        <th>SALDO $</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php $__currentLoopData = $cuentas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index=>$item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php 
+            $esCreditoEspecial = in_array($item['TIPO_CONTRATO'] ?? '', ['CREDITO AGRARIO', 'CREDITO FERTILIZANTES']);
+            $esCentroBellavista = ($item['Centro'] ?? '') === 'BELLAVISTA';
+         ?>
+
+        <?php if($item['IND_REL'] === 'T' && $item['IND_CP'] === 'C' && $esCreditoEspecial && $esCentroBellavista): ?>
+            <tr>
+                <td><?php echo e($item['NOM_CLIENTE']); ?></td>
+                <td><?php echo e(substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))); ?></td>
+                <td><?php echo e($item['Centro']); ?></td>
+                <td><?php echo e(number_format($item['Tcambio'], 2, '.', ',')); ?></td>
+                <td><?php echo e($item['FecDocumento_Emis']); ?></td>
+                <td><?php echo e($item['TipoDocumento']); ?></td>
+                <td><?php echo e($item['NroDocumento']); ?></td>
+                <td><?php echo e($item['diasTranscurridos']); ?></td>
+                <td><?php echo e($item['SIM_MONEDA']); ?></td>
+                <td><?php echo e($item['JEFE_VENTA']); ?></td>
+                <td><?php echo e($item['TIPO_CONTRATO']); ?></td>
+                <td><?php echo e(number_format($item['TOT_DOC'], 2, '.', '')); ?></td>
+                <td><?php echo e(number_format($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO'], 2, '.', ',')); ?></td>
+                <td><?php echo e(number_format($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO'], 2, '.', ',')); ?></td>
+            </tr>
+            <?php 
+                $total_mn = $total_mn + ($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO']);
+                $total_me = $total_me + ($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO']);
+             ?>
+        <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </tbody>
+    <tfoot>
+    <tr style="background: #4285f4; color: white; text-align: center">
+        <th class="center footerho" colspan="12">TOTAL</th>
+        <th class="center footerho"><?php echo e(number_format($total_mn, 2, '.', ',')); ?></th>
+        <th class="center footerho"><?php echo e(number_format($total_me, 2, '.', ',')); ?></th>
+    </tr>
+    </tfoot>
+</table>

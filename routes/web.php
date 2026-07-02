@@ -485,7 +485,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-lotes-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleLotesComision');
 	Route::any('/select-xml-comision/{idopcion}', 'GestionOCTesoreriaController@actionDetalleSelectComision');
 	Route::any('/detalle-comprobante-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministrator');
+	Route::any('/detalle-comprobante-comision-administrator-masivo/{idopcion}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministratorMasivo');
 	Route::any('/subir-xml-cargar-datos-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministrator');
+	Route::any('/subir-xml-cargar-datos-comision-administrator-masivo/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministratorMasivo');
+	Route::any('/subir-pdf-masivo-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionSubirPDFMasivoComisionAdministrator');
+	Route::post('/guardar-comision-masivo-documentos/{idopcion}', 'GestionOCTesoreriaController@actionGuardarComisionMasivo');
 	Route::any('/validar-xml-oc-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionValidarXMLComisionAdministrator');
 
 
