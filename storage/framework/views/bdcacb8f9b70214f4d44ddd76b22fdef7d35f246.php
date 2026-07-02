@@ -34,6 +34,10 @@
             <span class="tooltiptext">Registrar</span>
             <span class="icon mdi mdi-collection-image"></span>
         </a>
+        <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones registromasivocomision">
+            <span class="tooltiptext">Registro masivo</span>
+            <span class="icon mdi mdi-plus-circle-o"></span>
+        </a>
     </div>
 </div>
 

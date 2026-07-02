@@ -104,6 +104,38 @@ $(document).ready(function(){
     });
 
 
+    $(".agestioncomprobante").on('click','.registromasivocomision', function(event) {
+        event.preventDefault();
+        $('input[type=search]').val('').change();
+        $("#nso").DataTable().search("").draw();
+
+        data = dataenviar();
+        if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        var datastring = JSON.stringify(data);
+
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        // Crear un formulario temporal para abrir en la misma pestaña
+        var tempForm = $('<form>', {
+            'action': carpeta + '/detalle-comprobante-comision-administrator-masivo/' + idopcion,
+            'method': 'POST'
+        }).append($('<input>', {
+            'type': 'hidden',
+            'name': '_token',
+            'value': _token
+        })).append($('<input>', {
+            'type': 'hidden',
+            'name': 'jsondocumenos',
+            'value': datastring
+        }));
+
+        $('body').append(tempForm);
+        tempForm.submit();
+        tempForm.remove();
+    });
+
+
 
 
     $(".agestioncomprobante").on('click','.detalleestibs', function() {

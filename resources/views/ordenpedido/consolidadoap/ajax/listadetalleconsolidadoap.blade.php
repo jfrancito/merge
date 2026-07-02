@@ -197,6 +197,9 @@
                                     data-almacen-actual="{{ trim($item->COD_ALMACEN ?? '') }}"
                                     @if(($item->COD_ESTADO ?? '') == 'ETM0000000000005') disabled @endif>
                                     <option value="">Seleccione...</option>
+                                    @if(trim($item->COD_ALMACEN ?? '') != '')
+                                        <option value="{{ trim($item->COD_ALMACEN) }}" selected>{{ trim($item->NOM_ALMACEN ?? '') }}</option>
+                                    @endif
                                 </select>
                             </td>
                             <td class="text-center">{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
@@ -270,12 +273,24 @@
             }
         });
 
-        $('.select2-almacen-ap').select2({
-            minimumResultsForSearch: Infinity,
-            width: '240px'
+        function initSelect2AlmacenAp() {
+            $('.select2-almacen-ap').each(function() {
+                if (!$(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '240px'
+                    });
+                }
+            });
+        }
+
+        initSelect2AlmacenAp();
+
+        $('#tabla-detalle-consolidado-ap').on('draw.dt', function() {
+            initSelect2AlmacenAp();
         });
 
-        function cargarAlmacenesFilaAp($tr) {
+        function cargarAlmacenesFilaAp($tr, callback) {
             let cod_producto = $tr.data('id');
             let $selectCompra = $tr.find('.combo-compra-ap');
             let $selectAlmacen = $tr.find('.combo-almacen-ap');
@@ -285,6 +300,8 @@
 
             if (cod_centro === '') {
                 $selectAlmacen.html('<option value="">Seleccione...</option>').trigger('change');
+                $selectAlmacen.data('loaded', true);
+                if (typeof callback === 'function') callback();
                 return;
             }
 
@@ -320,24 +337,43 @@
                         html += '<option value="' + cod_alm + '" ' + selected + '>' + alm.NOM_ALMACEN + '</option>';
                     });
                     $selectAlmacen.html(html).trigger('change');
+                    $selectAlmacen.data('loaded', true);
+                    if (typeof callback === 'function') callback();
                 },
                 error: function(e) {
                     console.error('Error al obtener almacenes:', e);
+                    if (typeof callback === 'function') callback();
                 }
             });
         }
 
-        // Cargar almacenes inicialmente para cada fila
+        // NO cargar almacenes inicialmente para cada fila para evitar demoras de múltiples peticiones AJAX
+        /*
         let table = $('#tabla-detalle-consolidado-ap').DataTable();
         table.rows().nodes().to$().each(function() {
             cargarAlmacenesFilaAp($(this));
         });
+        */
 
         // Escuchar cambios en el combo de compra
         $(document).on('change', '.combo-compra-ap', function() {
             let $tr = $(this).closest('tr');
-            $tr.find('.combo-almacen-ap').data('almacen-actual', '');
+            let $selectAlmacen = $tr.find('.combo-almacen-ap');
+            $selectAlmacen.data('almacen-actual', '');
+            $selectAlmacen.data('loaded', false);
             cargarAlmacenesFilaAp($tr);
+        });
+
+        // Cargar almacenes bajo demanda al abrir el select2 si no se han cargado previamente
+        $(document).on('select2:opening', '.select2-almacen-ap', function(e) {
+            let $select = $(this);
+            let $tr = $select.closest('tr');
+            if (!$select.data('loaded')) {
+                e.preventDefault();
+                cargarAlmacenesFilaAp($tr, function() {
+                    $select.select2('open');
+                });
+            }
         });
 
         $('.inputmask-mil').inputmask('decimal', {
