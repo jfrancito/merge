@@ -25,165 +25,132 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('section'); ?>
-<div class="be-content contenido ordenpedido">
+<div class="be-content ordenpedidoprincipal">
     <div class="main-content container-fluid">
         <input type="hidden" id="token" name="_token" value="<?php echo e(csrf_token()); ?>">
 
         <div class="row">
             <div class="col-sm-12">
-                <div class="panel panel-default panel-border-color panel-border-color-success">
-                    <div class="panel-heading">
-                        <?php echo e($titulo); ?>
 
-                      <div class="tools tooltiptop">
-                      <div class="dropdown">
+                <div class="tab-container">
+                    <ul class="nav nav-tabs" style="display: none;">
+                        <li class="active"><a href="#ordenpedido" data-toggle="tab"><b>RESUMEN</b></a></li>
+                        <li id="tab-detalle-pedido" style="display:none;"><a href="#detallepedido" data-toggle="tab"><b>DETALLE</b></a></li>
+                    </ul>
 
-                          <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscarpedidoresumen">
-                            <span class="tooltiptext">Buscar Pedido</span>
-                            <span class="icon mdi mdi-search"></span>
-                          </a>
+                    <div class="tab-content">
+                        <!-- LISTADO PRINCIPAL -->
+                        <div id="ordenpedido" class="tab-pane fade in active cont">
+                            <div class="panel panel-default panel-border-color panel-border-color-success">
+                                <div class="panel-heading">
+                                    <?php echo e($titulo); ?>
 
-                          <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
-
-                          <ul class="dropdown-menu" aria-labelledby="menudespacho"
-                              style="margin: 7px -169px 0;">
-                              <li>
-                                <a href="<?php echo e(url('/resumen-masivo-excel-op')); ?>" 
-                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
-                                   target="_blank"
-                                   id="descargarresumenmasivoexcelop" 
-                                   data-href="<?php echo e(url('/resumen-masivo-excel-op')); ?>"
-                                   title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Orden</span>
-                                   Descargar excel pedido
-                                </a>
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
-
-                </div>
-                    <div class="panel-body">
-                        
-                        <div class="row filtrotabla">
-                            <div class="col-xs-12 col-md-3 cajareporte">
-                                <label class="control-label">Empresa:</label>
-                                <?php echo Form::select('empresa_id', $combo_empresa, $empresa_id, ['class'=>'select2 form-control input-sm','id'=>'empresa_id']); ?>
-
-                            </div>
-
-                           <div class="col-xs-12 col-md-1 cajareporte">
-                                <label class="control-label">Centro:</label>
-                                <?php echo Form::select('centro_pedido', $combo_centro, $centro_pedido, ['class'=>'select2 form-control input-sm','id'=>'centro_pedido']); ?>
-
-                            </div>
-
-                            <div class="col-xs-12 col-md-2 cajareporte">
-                                <label class="control-label">Área:</label>
-                                <?php echo Form::select('area', $combo_area, $area, ['class'=>'select2 form-control input-sm','id'=>'area']); ?>
-
-                            </div>
-
-                            <div class="col-xs-12 col-md-3 cajareporte">
-                                <div class="form-group ">
-                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    <div data-min-view="2" 
-                                           data-date-format="dd-mm-yyyy"  
-                                           class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                           <input size="16" type="text" 
-                                                  value="<?php echo e($fecha_inicio); ?>" 
-                                                  placeholder="Fecha Inicio"
-                                                  id='fecha_inicio' 
-                                                  name='fecha_inicio' 
-                                                  required = ""
-                                                  class="form-control input-sm"/>
-                                            <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
-                                      </div>
-                                  </div>
-                                </div>
-                            </div> 
-
-                              <div class="col-xs-12 col-md-3 cajareporte">
-                              <div class="form-group ">
-                                <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
-                                <div class="col-sm-12 abajocaja" >
-                                  <div data-min-view="2" 
-                                         data-date-format="dd-mm-yyyy"  
-                                         class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                         <input size="16" type="text" 
-                                                value="<?php echo e($fecha_fin); ?>" 
-                                                placeholder="Fecha Fin"
-                                                id='fecha_fin' 
-                                                name='fecha_fin' 
-                                                required = ""
-                                                class="form-control input-sm"/>
-                                          <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                                    <div class="tools tooltiptop">
+                                        <div class="dropdown">
+                                            <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscarpedidoresumen">
+                                                <span class="tooltiptext">Buscar Pedido</span>
+                                                <span class="icon mdi mdi-search"></span>
+                                            </a>
+                                            <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
+                                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
+                                            <ul class="dropdown-menu" aria-labelledby="menudespacho" style="margin: 7px -169px 0;">
+                                                <li>
+                                                    <a href="<?php echo e(url('/resumen-masivo-excel-op')); ?>" 
+                                                       class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                                       target="_blank"
+                                                       id="descargarresumenmasivoexcelop" 
+                                                       data-href="<?php echo e(url('/resumen-masivo-excel-op')); ?>"
+                                                       title="Descargar excel" style="width:100%">
+                                                       <span class="tooltiptext">Descargar excel Orden</span>
+                                                       Descargar excel pedido
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                              </div>
+                                <div class="panel-body">
+                                    
+                                    <div class="row filtrotabla">
+                                        <div class="col-xs-12 col-md-3 cajareporte">
+                                            <label class="control-label">Empresa:</label>
+                                            <?php echo Form::select('empresa_id', $combo_empresa, $empresa_id, ['class'=>'select2 form-control input-sm','id'=>'empresa_id']); ?>
+
+                                        </div>
+                                        <div class="col-xs-12 col-md-1 cajareporte">
+                                            <label class="control-label">Centro:</label>
+                                            <?php echo Form::select('centro_pedido', $combo_centro, $centro_pedido, ['class'=>'select2 form-control input-sm','id'=>'centro_pedido']); ?>
+
+                                        </div>
+                                        <div class="col-xs-12 col-md-2 cajareporte">
+                                            <label class="control-label">Área:</label>
+                                            <?php echo Form::select('area', $combo_area, $area, ['class'=>'select2 form-control input-sm','id'=>'area']); ?>
+
+                                        </div>
+                                        <div class="col-xs-12 col-md-3 cajareporte">
+                                            <div class="form-group ">
+                                                <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
+                                                <div class="col-sm-12 abajocaja" >
+                                                    <div data-min-view="2" 
+                                                         data-date-format="dd-mm-yyyy"  
+                                                         class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
+                                                         <input size="16" type="text" 
+                                                                value="<?php echo e($fecha_inicio); ?>" 
+                                                                placeholder="Fecha Inicio"
+                                                                id='fecha_inicio' 
+                                                                name='fecha_inicio' 
+                                                                required = ""
+                                                                class="form-control input-sm"/>
+                                                         <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-xs-12 col-md-3 cajareporte">
+                                            <div class="form-group ">
+                                                <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
+                                                <div class="col-sm-12 abajocaja" >
+                                                    <div data-min-view="2" 
+                                                         data-date-format="dd-mm-yyyy"  
+                                                         class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
+                                                         <input size="16" type="text" 
+                                                                value="<?php echo e($fecha_fin); ?>" 
+                                                                placeholder="Fecha Fin"
+                                                                id='fecha_fin' 
+                                                                name='fecha_fin' 
+                                                                required = ""
+                                                                class="form-control input-sm"/>
+                                                         <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="idopcion" id="idopcion" value="<?php echo e($idopcion); ?>">
+                                    </div>
+
+                                    
+                                    <div class="table-responsive listajax" style="margin-top: 20px;">
+                                        <?php if(isset($ajax) && $ajax): ?>
+                                            <?php echo $__env->make('ordenpedido.reporte.alistaresumenordenpedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
-
-                            <input type="hidden" name="idopcion" id="idopcion" value="<?php echo e($idopcion); ?>">
                         </div>
 
-                        
-                        <div class="table-responsive listajax" style="margin-top: 20px;">
-                            <?php if(isset($ajax) && $ajax): ?>
-                                <?php echo $__env->make('ordenpedido.reporte.alistaresumenordenpedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
-                            <?php endif; ?>
+                        <!-- DETALLE DINÁMICO -->
+                        <div id="detallepedido" class="tab-pane fade cont">
+                            <div id="detalle-pedido-container">
+                                <!-- Contenido dinámico -->
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </div><!-- FIN tab-content -->
+                </div><!-- FIN tab-container -->
+
             </div>
         </div>
     </div>
 </div>
-
-    <!-- MODAL DETALLE -->
-    <div id="modal-detalle-pedido-resumen" class="modal-container colored-header colored-header-primary modal-effect-8">
-        <div class="modal-content ">
-            <div class='modal-detalle-pedido-container'>
-            </div>
-        </div>
-    </div>
-    <div class="modal-overlay"></div>
-
-    <style>
-        /* ── Contenedor principal: centrado fijo en pantalla ── */
-        #modal-detalle-pedido-resumen {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            margin: 0 !important;
-            z-index: 9999;
-        }
-
-        /* ── Caja blanca interior ── */
-        #modal-detalle-pedido-resumen .modal-content {
-            border-radius: 14px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-        }
-
-        /* ── Asegurar que el contenido interno use el espacio disponible ── */
-        .modal-detalle-pedido-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-    </style>
 
 <?php $__env->stopSection(); ?>
 

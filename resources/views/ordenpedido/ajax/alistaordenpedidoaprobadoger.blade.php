@@ -1,25 +1,23 @@
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm pedido-card mb-4">
 
-  <div class="panel panel-default panel-contrast">
-        <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
-            LISTA ORDEN DE PEDIDO
-        </div>
+    <div class="pedido-header">
+        <i class="fa fa-clipboard-list me-2"></i> LISTA ORDEN DE PEDIDO
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="table-pedidos-ger-aprobados" class="table table-hover table-striped mb-0 listatabla">
-                <thead class="thead-dark">
+            <table id="table-pedidos-ger-aprobados" class="table table-hover mb-0">
+                <thead>
                     <tr>
                         <th>ID PEDIDO</th>
                         <th>FECHA</th>
                         <th>MES</th>
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
-                        <th>SOLICITA</th>
+                        <th>USUARIO SOLICITA</th>
                         <th>AREA</th>
-                        <th>AUTORIZA</th>
-                        <th>APRUEBA GER</th>
-                        <th>APRUEBA ADM</th>
+                        <th>AUTORIZA JEFE AREA</th>
+                        <th>APRUEBA GERENCIA AREA</th>
+                        <th>APRUEBA GER ADM - JEF. COMPRAS</th>
                         <th>GLOSA</th>
                         <th>ESTADO</th>
                         <th>VER DETALLE</th>
@@ -27,17 +25,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($listapedido as $index => $item)
-                       @if (
-                            (
-                                $item['COD_ESTADO'] === 'ETM0000000000015' ||
-                                $item['COD_ESTADO'] === 'ETM0000000000005'
-                            )
-                            &&
-                            !is_null($item['COD_TRABAJADOR_APRUEBA_GER'])
-                            &&
-                            $item['COD_TRABAJADOR_APRUEBA_GER'] === $usuario_logueado_id
+                @foreach($listapedido as $index => $item)
+                    @if (
+                        (
+                            $item['COD_ESTADO'] === 'ETM0000000000015'
+                            || $item['COD_ESTADO'] === 'ETM0000000000005'
                         )
+                        && $item['COD_TRABAJADOR_APRUEBA_GER'] === $usuario_logueado_id
+                    )
                         <tr class="align-middle">
                             <td>{{ $item['ID_PEDIDO'] }}</td>
                             <td>{{ $item['FEC_PEDIDO'] }}</td>
@@ -49,19 +44,22 @@
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
+
                             <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
                             <td>@include('comprobante.ajax.estadospedido')</td>
-                           <td class="text-center">
-                            <div class="grupo-acciones">
-                                 <button
-                                    class="btn btn-sm ver-detalle-pedido-ger btn-detalle-moderno"
-                                    data-id="{{ $item['ID_PEDIDO'] }}"
-                                    title="Ver detalle del pedido">
-                                    <i class="fa fa-eye"></i>
-                                    Detalle
-                                </button>
-                            </div>
-                           </td>
+                                    <td class="text-center">
+                                        <div class="grupo-acciones">
+
+                                            <!-- VER DETALLE (SISTEMA DE PESTAÑAS) -->
+                                            <button
+                                                    class="btn btn-sm ver-detalle-pedido-ger btn-detalle-moderno"
+                                                    data-id="{{ $item['ID_PEDIDO'] }}"
+                                                    title="Ver detalle del pedido">
+                                                <i class="fa fa-eye"></i>
+                                                Detalle
+                                            </button>
+                                        </div>
+                                    </td>
                             <td class="align-center-tb">
                                 @if($item['MULTI_ARCHIVOS'] != '')
                                     @php
@@ -106,15 +104,13 @@
                             </td>
 
                         </tr>
-                        @endif
-                    @endforeach
+                    @endif
+                @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
-
 
 <style>
     .pedido-card {
@@ -133,12 +129,16 @@
 
     .table thead th {
         background: #f3f5f9;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 11.5px;
+        font-weight: 700;
         color: #333;
         text-transform: uppercase;
         border-bottom: 2px solid #dee2e6;
-        white-space: nowrap;
+        white-space: normal !important;
+        vertical-align: middle;
+        text-align: center;
+        line-height: 1.2;
+        max-width: 110px !important;
     }
 
     /* GENERAL */

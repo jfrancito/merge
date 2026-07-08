@@ -155,6 +155,13 @@
 
         inicializarTablasAutorizacion();
 
+        // Ajustar columnas de DataTables al cambiar de pestaña para evitar desalineación
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if ($.fn.DataTable) {
+                $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+            }
+        });
+
       });
     </script> 
 <script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>

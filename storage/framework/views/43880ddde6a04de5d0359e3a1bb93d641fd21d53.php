@@ -112,6 +112,7 @@
                 var config = {
                     "pageLength": 10,
                     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    "order": [[0, "desc"]],
                     "language": {
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -152,6 +153,13 @@
         }
 
         inicializarTablasAutorizacion();
+
+        // Ajustar columnas de DataTables al cambiar de pestaña para evitar desalineación
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if ($.fn.DataTable) {
+                $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+            }
+        });
 
       });
     </script> 

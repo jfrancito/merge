@@ -35,8 +35,7 @@
             </div>
 
             <div class="panel-body" style="padding: 30px;">
-                
-                <!-- TABLA DE PRODUCTOS (SIN TOCAR ESTRUCTURA) -->
+                <!-- TABLA DE PRODUCTOS (SIN TOCAR ESTRUCTURA - ANCHO COMPLETO) -->
                 <div class="table-responsive" style="border-radius: 8px; border: 1px solid #eaecf4;">
                     <table class="table align-middle mb-0" id="tabla-detalle-tab">
                         <thead style="background: #f8f9fc;">
@@ -114,6 +113,83 @@
                         <p class="mb-0" style="font-size: 14px; color: #000 !important;"><?php echo e($pedido->TXT_GLOSA_RECHAZO); ?></p>
                     </div>
                 <?php endif; ?>
+
+                <!-- PANEL DE SEGUIMIENTO (LÍNEA DE TIEMPO) -->
+                <!-- PANEL DE SEGUIMIENTO (CENTRADITO Y COMPACTO) -->
+                <div class="panel panel-default" style="max-width: 650px; margin: 30px 0 0 0; border-radius: 12px; border: 1px solid #eaecf4; background: #fff; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05); overflow: hidden;">
+                    <div class="panel-heading" style="background: #f8f9fc; padding: 12px 20px; border-bottom: 1px solid #eaecf4;">
+                        <h4 class="fw-bold" style="color: #1d3a6d; font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa fa-history" style="color: #4e73df;"></i> Línea de Tiempo y Seguimiento del Pedido
+                        </h4>
+                    </div>
+                    <div class="panel-body" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                        <?php if(count($historial) > 0): ?>
+                            <div class="timeline-container-op" style="position: relative; padding-left: 30px; padding-right: 5px;">
+                                <div class="timeline-line-op" style="position: absolute; top: 0; bottom: 0; left: 15px; width: 2px; background-color: #eaecf4; border-radius: 1px;"></div>
+                                <?php $__currentLoopData = $historial; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php 
+                                        $iconClass = 'fa fa-check';
+                                        $iconBg = '#1cc88a'; // verde por defecto
+                                        
+                                        $tipoUpper = strtoupper($log->TIPO);
+                                        if (strpos($tipoUpper, 'RECHAZADO') !== false || strpos($tipoUpper, 'ANULA') !== false) {
+                                            $iconClass = 'fa fa-times';
+                                            $iconBg = '#e74a3b'; // rojo
+                                        } elseif (strpos($tipoUpper, 'GENERADO') !== false) {
+                                            $iconClass = 'fa fa-plus';
+                                            $iconBg = '#4e73df'; // azul
+                                        } elseif (strpos($tipoUpper, 'EMITIDO') !== false) {
+                                            $iconClass = 'fa fa-paper-plane-o';
+                                            $iconBg = '#36b9cc'; // celeste
+                                        } elseif (strpos($tipoUpper, 'AUTORIZADO') !== false || strpos($tipoUpper, 'AUTORIZACIÓN') !== false) {
+                                            $iconClass = 'fa fa-thumbs-o-up';
+                                            $iconBg = '#f6c23e'; // amarillo
+                                        }
+                                     ?>
+                                    <div class="timeline-item-op" style="position: relative; margin-bottom: 20px; display: flex; flex-direction: column;">
+                                        <!-- Icon Badge -->
+                                        <div class="timeline-badge-op" style="position: absolute; left: -30px; width: 28px; height: 28px; border-radius: 50%; background-color: <?php echo e($iconBg); ?>; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;">
+                                            <i class="<?php echo e($iconClass); ?>" style="color: white; font-size: 12px;"></i>
+                                        </div>
+                                        <!-- Panel Content -->
+                                        <div class="timeline-panel-op" style="background: #f8f9fc; border: 1px solid #eaecf4; border-radius: 8px; padding: 12px 15px; transition: all 0.2s ease-in-out;">
+                                            <div class="timeline-header-op" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px dashed #eaecf4; padding-bottom: 8px; margin-bottom: 8px; gap: 8px;">
+                                                <span class="timeline-title-op" style="font-size: 14px; font-weight: 700; color: #1d3a6d;"><?php echo e($log->TIPO); ?></span>
+                                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                    <span class="timeline-time-op" style="font-size: 14px; font-weight: 800; color: #4e73df; background: #eef2ff; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #d0dcfc;">
+                                                        <i class="fa fa-clock-o"></i> <?php echo e(date('H:i:s', strtotime($log->FECHA))); ?>
+
+                                                    </span>
+                                                    <span class="text-dark" style="font-size: 13px; font-weight: 700; background: #f1f3f9; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; color: #333 !important;">
+                                                        <i class="fa fa-calendar-o text-muted"></i> <?php echo e(date('d-m-Y', strtotime($log->FECHA))); ?>
+
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-body-op">
+                                                <div class="timeline-user-op" style="font-size: 13px; color: #4e73df; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                    <i class="fa fa-user" style="color: #858796;"></i>
+                                                    <span><?php echo e($log->USUARIO_NOMBRE); ?></span>
+                                                </div>
+                                                <?php if(!empty($log->MENSAJE)): ?>
+                                                    <div class="timeline-message-op alert alert-warning" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; border-left: 3px solid #f6c23e; background: #fffdf5; border-radius: 4px; font-size: 12px; color: #856404; font-weight: 600;">
+                                                        <?php echo e($log->MENSAJE); ?>
+
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-4 text-muted" style="padding: 20px 0;">
+                                <i class="fa fa-info-circle fa-2x mb-2 text-info" style="color: #36b9cc; margin-bottom: 10px;"></i>
+                                <p class="mb-0" style="font-size: 13px; margin: 0;">No se registran transiciones de historial para este pedido.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
                 <!-- BARRA DE ACCIONES FINAL -->
                 <div class="d-flex justify-content-end align-items-center gap-3 mt-5 pt-4" style="border-top: 2px solid transparent; width: 100%; text-align: right; margin-top: 20px !important;">
@@ -207,5 +283,11 @@
     /* TABLA */
     #tabla-detalle-tab tbody tr:hover {
         background-color: #fcfcfc;
+    }
+
+    .timeline-panel-op:hover {
+        background: #ffffff !important;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.08) !important;
+        border-color: #d1d3e2 !important;
     }
 </style>

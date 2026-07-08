@@ -99,8 +99,8 @@
                         </div>
 
                         <!-- BOTONES DE ACCIÓN DEBAJO DEL TOTAL -->
-                        @if($cotizacion->COD_ESTADO != 'ETM0000000000005')
-                            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                            @if($cotizacion->COD_ESTADO != 'ETM0000000000005')
                                 <button class="btn btn-warning editar-cotizacion" data-id="{{ $id_cotizacion }}"
                                     style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                                     <i class="fa fa-edit"></i> EDITAR
@@ -109,12 +109,13 @@
                                     style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                                     <i class="fa fa-check"></i> APROBAR
                                 </button>
-                                <button class="btn btn-danger eliminar-cotizacion" data-id="{{ $id_cotizacion }}"
-                                    style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #e3342f; border: none;">
-                                    <i class="fa fa-trash"></i> ELIMINAR
-                                </button>
-                            </div>
-                        @endif
+                            @endif
+                            <!-- El botón ELIMINAR se queda siempre visible, incluso si está Aprobada -->
+                            <button class="btn btn-danger eliminar-cotizacion" data-id="{{ $id_cotizacion }}" data-estado="{{ $cotizacion->COD_ESTADO }}"
+                                style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #e3342f; border: none;">
+                                <i class="fa fa-trash"></i> ELIMINAR
+                            </button>
+                        </div>
                     </div>
                 </div>
 

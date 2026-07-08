@@ -1,34 +1,32 @@
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm pedido-card mb-4">
 
-    <div class="panel panel-default panel-contrast">
-        <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
-            LISTA ORDEN DE PEDIDO
-        </div>
+    <div class="pedido-header">
+        <i class="fa fa-clipboard-list me-2"></i> LISTA ORDEN DE PEDIDO
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="table-pedidos-ger-rechazados" class="table table-hover table-striped mb-0 listatabla">
-                <thead class="thead-dark">
-                <tr>
-                    <th>ID PEDIDO</th>
-                    <th>FECHA</th>
-                    <th>MES</th>
-                    <th>AÑO</th>
-                    <th>TIPO PEDIDO</th>
-                    <th>SOLICITA</th>
-                    <th>AREA</th>
-                    <th>AUTORIZA</th>
-                    <th>APRUEBA GER</th>
-                    <th>APRUEBA ADM</th>
-                    <th>GLOSA</th>
-                    <th>ESTADO</th>
-                    <th>VER DETALLE</th>
-                    <th>ARCHIVO</th>
-                </tr>
+            <table id="table-pedidos-ger-rechazados" class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID PEDIDO</th>
+                        <th>FECHA</th>
+                        <th>MES</th>
+                        <th>AÑO</th>
+                        <th>TIPO PEDIDO</th>
+                        <th>USUARIO SOLICITA</th>
+                        <th>AREA</th>
+                        <th>AUTORIZA JEFE AREA</th>
+                        <th>APRUEBA GERENCIA AREA</th>
+                        <th>APRUEBA GER ADM - JEF. COMPRAS</th>
+                        <th>GLOSA</th>
+                        <th>ESTADO</th>
+                        <th>VER DETALLE</th>
+                        <th>ARCHIVO</th>
+                    </tr>
                 </thead>
                 <tbody>
                 <?php $__currentLoopData = $listapedido; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php if($item['COD_ESTADO'] === 'ETM0000000000006'&& trim($item['COD_USUARIO_MODIF_AUD']) === trim($cod_usuario_modifica)): ?>
+                    <?php if($item['COD_ESTADO'] === 'ETM0000000000006' && trim($item['COD_TRABAJADOR_APRUEBA_GER']) === trim($usuario_logueado_id)): ?>
                         <tr class="align-middle">
                             <td><?php echo e($item['ID_PEDIDO']); ?></td>
                             <td><?php echo e($item['FEC_PEDIDO']); ?></td>
@@ -40,7 +38,7 @@
                             <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_AUTORIZA']); ?></td>
                             <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_GER']); ?></td>
                             <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_ADM']); ?></td>
-                            <td><?php echo e($item['TXT_GLOSA']); ?></td>
+                            <td class="col-glosa"><?php echo e($item['TXT_GLOSA']); ?></td>
                             <td><?php echo $__env->make('comprobante.ajax.estadospedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?></td>
                             <td class="text-center">
                                 <div class="grupo-acciones">
@@ -48,7 +46,8 @@
                                     <!-- VER DETALLE (SIEMPRE VISIBLE) -->
                                     <button
                                             class="btn btn-sm ver-detalle-pedido-ger btn-detalle-moderno"
-                                            data-id="<?php echo e($item['ID_PEDIDO']); ?>">
+                                            data-id="<?php echo e($item['ID_PEDIDO']); ?>"
+                                            title="Ver detalle del pedido">
                                         <i class="fa fa-eye"></i> Detalle
                                     </button>
                                 </div>
@@ -123,12 +122,15 @@
 
     .table thead th {
         background: #f3f5f9;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 12px;
+        font-weight: 700;
         color: #333;
         text-transform: uppercase;
         border-bottom: 2px solid #dee2e6;
-        white-space: nowrap;
+        white-space: normal !important;
+        vertical-align: middle;
+        text-align: center;
+        line-height: 1.2;
     }
 
     /* GENERAL */

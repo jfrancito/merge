@@ -37,9 +37,10 @@
             <th>AREA</th>
             <th>FAMILIA</th>
             <th>GLOSA</th>
-            <th>SOLICITA</th>
-            <th>AUTORIZA</th>
-            <th>APRUEBA ADM</th>
+            <th>USUARIO SOLICITA</th>
+            <th>AUTORIZA JEFE AREA</th>
+            <th>APRUEBA GERENCIA AREA</th>
+            <th>APRUEBA GER ADM - JEF. COMPRAS</th>
             <th style="text-align: center;">DETALLE</th>
         </tr>
     </thead>
@@ -87,6 +88,7 @@
             <td>{{ $item->TXT_GLOSA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_SOLICITA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
+            <td>{{ $item->TXT_TRABAJADOR_APRUEBA_GER }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
             <td style="text-align: center;">
                 <button class="btn btn-sm ver-detalle-pedido-res btn-detalle-moderno" 

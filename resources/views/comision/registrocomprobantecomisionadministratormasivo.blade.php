@@ -65,6 +65,7 @@
                                                         <input type="hidden" name="device_info" id='device_info'>
                                                         <input type="hidden" name="idopcion" id="idopcion" value="{{$idopcion}}">
                                                         <input type="hidden" name="jsondocumenos" id='jsondocumenos' value="{{$jsondocumenos}}">
+                                                        <input type="hidden" id="total_xml_masivo" value="{{ $fedocumentos->sum('TOTAL_VENTA_ORIG') }}">
                                                         
                                                         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
                                                             <div class="form-group">

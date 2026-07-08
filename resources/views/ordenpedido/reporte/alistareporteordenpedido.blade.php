@@ -17,10 +17,10 @@
             <th>CENTRO</th>
             <th>AREA</th>
             <th>TIPO PEDIDO</th>
-            <th>SOLICITA</th>
-            <th>AUTORIZA</th>
-            <th>APRUEBA GER</th>
-            <th>APRUEBA ADM</th>
+            <th>USUARIO SOLICITA</th>
+            <th>AUTORIZA JEFE AREA</th>
+            <th>APRUEBA GERENCIA AREA</th>
+            <th>APRUEBA GER ADM - JEF. COMPRAS</th>
             <th>GLOSA</th>
             <th>ESTADO</th>
             <th>USUARIO RECHAZA</th>

@@ -1,122 +1,123 @@
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm pedido-card mb-4">
 
-  <div class="panel panel-default panel-contrast">
-        <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
-            LISTA ORDEN DE PEDIDO
-        </div>
+    <div class="pedido-header">
+        <i class="fa fa-clipboard-list me-2"></i> LISTA ORDEN DE PEDIDO
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="table-pedidos-autorizados" class="table table-hover table-striped mb-0 listatabla">
-                <thead class="thead-dark">
+            <table id="table-pedidos-autorizados" class="table table-hover mb-0">
+                <thead>
                     <tr>
                         <th>ID PEDIDO</th>
                         <th>FECHA</th>
                         <th>MES</th>
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
-                        <th>SOLICITA</th>
+                        <th>USUARIO SOLICITA</th>
                         <th>AREA</th>
-                        <th>AUTORIZA</th>
-                        <th>APRUEBA GER</th>
-                        <th>APRUEBA ADM</th>
+                        <th>AUTORIZA JEFE AREA</th>
+                        <th>APRUEBA GERENCIA AREA</th>
+                        <th>APRUEBA GER ADM - JEF. COMPRAS</th>
                         <th>GLOSA</th>
                         <th>ESTADO</th>
                         <th>VER DETALLE</th>
                         <th>ARCHIVO</th>
                     </tr>
                 </thead>
-               <tbody>
-                    <?php $__currentLoopData = $listapedido; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tbody>
+                <?php $__currentLoopData = $listapedido; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                        <?php if(
-                            (
-                                $item['COD_ESTADO'] === 'ETM0000000000013'
-                                || $item['COD_ESTADO'] === 'ETM0000000000015'
-                                || $item['COD_ESTADO'] === 'ETM0000000000005'
-                            )
-                            && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id
-                        ): ?>
+                    <?php if(
+                        (
+                            $item['COD_ESTADO'] === 'ETM0000000000013'
+                            || $item['COD_ESTADO'] === 'ETM0000000000015'
+                            || $item['COD_ESTADO'] === 'ETM0000000000005'
+                        )
+                        && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id
+                    ): ?>
 
-                            <tr class="align-middle">
-                                <td><?php echo e($item['ID_PEDIDO']); ?></td>
-                                <td><?php echo e($item['FEC_PEDIDO']); ?></td>
-                                <td><?php echo e($item['TXT_NOMBRE']); ?></td>
-                                <td><?php echo e($item['COD_ANIO']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_TIPO_PEDIDO']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_SOLICITA']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_AREA']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_AUTORIZA']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_GER']); ?></td>
-                                <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_ADM']); ?></td>
-                                <td class="col-glosa"><?php echo e($item['TXT_GLOSA']); ?></td>
-                                <td><?php echo $__env->make('comprobante.ajax.estadospedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?></td>
-                                <td class="text-center">
-                                    <div class="grupo-acciones">
-                                        <button
-                                            class="btn btn-sm ver-detalle-pedido-aut btn-detalle-moderno"
-                                            data-id="<?php echo e($item['ID_PEDIDO']); ?>"
-                                            title="Ver detalle del pedido">
-                                            <i class="fa fa-eye"></i>
-                                            Detalle
-                                        </button>
-                                    </div>
-                                </td>
-                                <td class="align-center-tb">
-                                    <?php if($item['MULTI_ARCHIVOS'] != ''): ?>
-                                        <?php 
-                                            $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
-                                            $archivos = [];
-                                            foreach($archivos_raw as $ar) {
-                                                $partes = explode(' [FLD] ', $ar);
-                                                if(count($partes) == 2) {
-                                                    $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
-                                                }
-                                            }
-                                         ?>
+                        <tr class="align-middle">
+                            <td><?php echo e($item['ID_PEDIDO']); ?></td>
+                            <td><?php echo e($item['FEC_PEDIDO']); ?></td>
+                            <td><?php echo e($item['TXT_NOMBRE']); ?></td>
+                            <td><?php echo e($item['COD_ANIO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TIPO_PEDIDO']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_SOLICITA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_AREA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_AUTORIZA']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_GER']); ?></td>
+                            <td class="col-nombre"><?php echo e($item['TXT_TRABAJADOR_APRUEBA_ADM']); ?></td>
 
-                                        <?php if(count($archivos) > 1): ?>
-                                            <!-- MÚLTIPLES ARCHIVOS: DROPDOWN -->
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
-                                                    <i class="fa fa-download"></i> Archivos <span class="caret"></span>
+                            <td class="col-glosa"><?php echo e($item['TXT_GLOSA']); ?></td>
+                            <td><?php echo $__env->make('comprobante.ajax.estadospedido', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?></td>
+                                    <td class="text-center">
+                                        <div class="grupo-acciones">
+
+
+
+                                            <!-- VER DETALLE -->
+                                                <button
+                                                    class="btn btn-sm ver-detalle-pedido-aut btn-detalle-moderno"
+                                                    data-id="<?php echo e($item['ID_PEDIDO']); ?>"
+                                                    title="Ver detalle del pedido">
+                                                    <i class="fa fa-eye"></i>
+                                                    Detalle
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                    <?php $__currentLoopData = $archivos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $arch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                        <li>
-                                                            <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($arch['url']))); ?>" target="_blank">
-                                                                <?php echo e(($index + 1) . '. ' . $arch['nombre']); ?>
 
-                                                            </a>
-                                                        </li>
-                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                </ul>
-                                            </div>
-                                        <?php elseif(count($archivos) == 1): ?>
-                                            <!-- UN SOLO ARCHIVO -->
-                                            <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($archivos[0]['url']))); ?>"
-                                               class="btn btn-xs btn-success"
-                                               target="_blank"
-                                               title="Descargar: <?php echo e($archivos[0]['nombre']); ?>">
-                                                <i class="fa fa-download"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <span class="text-muted">—</span>
+                                        </div>
+                                    </td>
+                            <td class="align-center-tb">
+                                <?php if($item['MULTI_ARCHIVOS'] != ''): ?>
+                                    <?php 
+                                        $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
+                                        $archivos = [];
+                                        foreach($archivos_raw as $ar) {
+                                            $partes = explode(' [FLD] ', $ar);
+                                            if(count($partes) == 2) {
+                                                $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
+                                            }
+                                        }
+                                     ?>
+
+                                    <?php if(count($archivos) > 1): ?>
+                                        <!-- MÚLTIPLES ARCHIVOS: DROPDOWN -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
+                                                <i class="fa fa-download"></i> Archivos <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                <?php $__currentLoopData = $archivos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $arch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <li>
+                                                        <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($arch['url']))); ?>" target="_blank">
+                                                            <?php echo e(($index + 1) . '. ' . $arch['nombre']); ?>
+
+                                                        </a>
+                                                    </li>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            </ul>
+                                        </div>
+                                    <?php elseif(count($archivos) == 1): ?>
+                                        <!-- UN SOLO ARCHIVO -->
+                                        <a href="<?php echo e(url('descargar-archivo-informe/'.base64_encode($archivos[0]['url']))); ?>"
+                                           class="btn btn-xs btn-success"
+                                           target="_blank"
+                                           title="Descargar: <?php echo e($archivos[0]['nombre']); ?>">
+                                            <i class="fa fa-download"></i>
+                                        </a>
                                     <?php endif; ?>
-                                </td>
+                                <?php else: ?>
+                                    <span class="text-muted">—</span>
+                                <?php endif; ?>
+                            </td>
 
-                            </tr>
-
-                        <?php endif; ?>
-
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
 
 <style>
     .pedido-card {
@@ -135,12 +136,16 @@
 
     .table thead th {
         background: #f3f5f9;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 11.5px;
+        font-weight: 700;
         color: #333;
         text-transform: uppercase;
         border-bottom: 2px solid #dee2e6;
-        white-space: nowrap;
+        white-space: normal !important;
+        vertical-align: middle;
+        text-align: center;
+        line-height: 1.2;
+        max-width: 110px !important;
     }
 
     /* GENERAL */

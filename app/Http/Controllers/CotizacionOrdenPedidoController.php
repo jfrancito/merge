@@ -1008,29 +1008,29 @@ class CotizacionOrdenPedidoController extends Controller
                 }
             }
 
-            // 1. Desactivar Cabecera y Cambiar Estado a ANULADO con Auditoría
+            // 1. Mantener Cabecera Activa y Cambiar Estado a ANULADO con Auditoría
             DB::table('WEB.ORDEN_COTIZACION')
                 ->where('ID_COTIZACION', $id_cotizacion)
                 ->update([
-                    'ACTIVO' => 0,
+                    'ACTIVO' => 1,
                     'COD_ESTADO' => 'ETM0000000000014',
                     'TXT_ESTADO' => 'ANULADO',
                     'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
                     'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                 ]);
 
-            // 2. Desactivar Detalle (aunque ya se filtran por cabecera, mejor ser explícitos)
+            // 2. Desactivar Detalle
             DB::table('WEB.ORDEN_COTIZACION_DETALLE')
                 ->where('ID_COTIZACION', $id_cotizacion)
                 ->update(['ACTIVO' => 0]);
 
-            // Réplica de eliminación/anulación a zonas
+            // Réplica de anulación a zonas
             if ($conexionbd !== 'sqlsrv') {
                 try {
                     DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION')
                         ->where('ID_COTIZACION', $id_cotizacion)
                         ->update([
-                            'ACTIVO' => 0,
+                            'ACTIVO' => 1,
                             'COD_ESTADO' => 'ETM0000000000014',
                             'TXT_ESTADO' => 'ANULADO',
                             'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,

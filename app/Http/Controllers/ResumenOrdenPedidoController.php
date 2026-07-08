@@ -175,6 +175,11 @@ class ResumenOrdenPedidoController extends Controller
         $cantidad = $pedillodetalle->pluck('CANTIDAD');
         $txt_observacion = $pedillodetalle->pluck('TXT_OBSERVACION');
 
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
         return view('ordenpedido.modal.modaldetallepedidores', [
             'ajax' => true,
             'pedido' => $pedido,
@@ -183,7 +188,8 @@ class ResumenOrdenPedidoController extends Controller
             'nom_categoria' => $nom_categoria,
             'cantidad' => $cantidad,
             'txt_observacion' => $txt_observacion,
-            'pedillodetalle' => $pedillodetalle
+            'pedillodetalle' => $pedillodetalle,
+            'historial' => $historial
         ]);
     }
 

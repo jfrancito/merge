@@ -11,7 +11,7 @@
         <th>TIPO PEDIDO</th>
         <th>CENTRO</th>
         <th>ESTADO</th>
-        <th>SOLICITA</th>
+        <th>USUARIO SOLICITA</th>
         <th>APRUEBA JEFE COMPRAS</th>
         <th>GLOSA</th>
         <th>CONSOLIDADO SEDE</th>

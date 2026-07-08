@@ -13,6 +13,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Facades\Log;
+use App\Modelos\FeDocumentoHistorial;
 
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
@@ -118,6 +119,17 @@ class GestionOrdenPedidoAutorizaController extends Controller
             ""
         );
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'AUTORIZADO POR JEFATURA ÁREA';
+        $documento->MENSAJE = '';
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -171,6 +183,17 @@ class GestionOrdenPedidoAutorizaController extends Controller
             ->where('ID_PEDIDO', $orden_pedido_id)
             ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'PEDIDO RECHAZADO';
+        $documento->MENSAJE = $request->input('motivo', '');
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -200,10 +223,16 @@ class GestionOrdenPedidoAutorizaController extends Controller
         $cantidad = $pedillodetalle->pluck('CANTIDAD');
         $txt_observacion = $pedillodetalle->pluck('TXT_OBSERVACION');
 
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
         return view('ordenpedido.ajax.detalletabpedidoautoriza', [
             'ajax' => true,
             'pedido' => $pedido,
-            'pedillodetalle' => $pedillodetalle
+            'pedillodetalle' => $pedillodetalle,
+            'historial' => $historial
         ]);
     }
 

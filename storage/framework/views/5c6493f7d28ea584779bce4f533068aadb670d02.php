@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE PRODUCTOS -->
+                <!-- TABLA DE PRODUCTOS (ANCHO COMPLETO) -->
                 <div class="table-responsive" style="border-radius: 8px; border: 1px solid #eaecf4;">
                     <table class="table table-hover mb-0" id="tabla-detalle-tab-aut">
                         <thead>
@@ -100,49 +100,44 @@
                                     $subtotal = $cantidad_mostrar * $precio;
                                     $suma_total_general += $subtotal;
                                  ?>
-                                <tr>
-                                    <td class="text-center fw-bold text-muted"><?php echo e($index + 1); ?></td>
-                                    <td>
-                                        <div class="fw-bold text-dark" style="font-size: 14px; margin-bottom: 4px;"><?php echo e($detalle->NOM_PRODUCTO); ?></div>
-                                        <span style="background: #edf2ff; color: #4e73df; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #d0dcfc; display: inline-flex; align-items: center;">
-                                            <i class="fa fa-tag me-1" style="font-size: 10px;"></i> <?php echo e($detalle->COD_PRODUCTO); ?>
-
-                                        </span>
+                                <tr style="border-bottom: 1px solid #eaecf4;">
+                                    <td class="text-center fw-bold" style="color: #1d3a6d; vertical-align: middle;"><?php echo e($index + 1); ?></td>
+                                    <td style="vertical-align: middle;">
+                                        <div style="font-weight: 600; color: #2e2f37;"><?php echo e($detalle->NOM_PRODUCTO); ?></div>
+                                        <small class="text-muted">Cód: <?php echo e($detalle->COD_PRODUCTO); ?></small>
                                     </td>
-                                    <td class="text-center">
-                                        <span
-                                            class="badge-corpo <?php echo e($detalle->IND_MATERIAL_SERVICIO == 'M' ? 'bg-light text-primary' : 'bg-light text-warning'); ?>">
-                                            <?php echo e($detalle->IND_MATERIAL_SERVICIO == 'M' ? 'MATERIAL' : 'SERVICIO'); ?>
-
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge"
-                                            style="background: #f0f3ff; color: #4e73df; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;"><?php echo e((int) $detalle->CANTIDAD); ?></span>
-                                    </td>
-                                    <td class="text-center" style="font-weight: 600; color: #333;">
-                                        <?php echo e($detalle->NOM_CATEGORIA ?: '—'); ?>
-
-                                    </td>
-                                    <td class="text-center">
-                                        <?php if($pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session && $pedido->COD_ESTADO == 'ETM0000000000010'): ?>
-                                            <input type="number" class="form-control text-center input-cantidad-editar input-sm"
-                                                value="<?php echo e((int) $cantidad_mostrar); ?>" min="1" data-id="<?php echo e($detalle->ID_PEDIDO); ?>"
-                                                data-prod="<?php echo e($detalle->COD_PRODUCTO); ?>"
-                                                style="width: 80px; margin: 0 auto; font-weight: bold; border-color: #d1d3e2;">
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <?php if($detalle->IND_MATERIAL_SERVICIO == 'M'): ?>
+                                            <span class="badge-corpo bg-light text-primary">Material</span>
                                         <?php else: ?>
-                                            <span class="fw-bold text-dark"
-                                                style="font-size: 15px;"><?php echo e((int) $cantidad_mostrar); ?></span>
+                                            <span class="badge-corpo bg-light text-warning">Servicio</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center">
-                                        <div class="text-muted" style="min-width: 120px; font-size: 13px;">
+                                    <td class="text-center fw-bold" style="vertical-align: middle;"><?php echo e((int) $detalle->CANTIDAD); ?></td>
+                                    <td class="text-center text-uppercase" style="vertical-align: middle;"><?php echo e($detalle->NOM_UNIDAD_MEDIDA ?? 'UND'); ?></td>
+                                    
+                                    <!-- Cantidad Autorizada (Editable o Texto) -->
+                                    <td class="text-center" style="vertical-align: middle; width: 140px;">
+                                        <?php if($pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session && $pedido->COD_ESTADO == 'ETM0000000000010'): ?>
+                                            <input type="number" 
+                                                   class="form-control input-cantidad-editar input-cantidad-aut-val" 
+                                                   value="<?php echo e((int)$cantidad_mostrar); ?>" 
+                                                   min="0"
+                                                   data-id="<?php echo e($detalle->COD_PRODUCTO); ?>"
+                                                   style="width: 90px; display: inline-block;">
+                                        <?php else: ?>
+                                            <span class="fw-bold text-success" style="font-size: 14px;"><?php echo e((int)$cantidad_mostrar); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <td style="vertical-align: middle;">
+                                        <div class="text-wrap" style="max-width: 180px; font-size: 12px; color: #858796;">
                                             <?php echo e($detalle->TXT_OBSERVACION ?: '—'); ?>
 
                                         </div>
                                     </td>
-                                    <td class="text-center fw-bold">S/ <?php echo e(number_format($precio, 2)); ?></td>
-                                    <td class="text-center fw-bold text-dark">S/ <?php echo e(number_format($subtotal, 2)); ?></td>
+                                    <td class="text-center fw-bold" style="vertical-align: middle;">S/ <?php echo e(number_format($precio, 2)); ?></td>
+                                    <td class="text-center fw-bold text-dark cell-subtotal" style="vertical-align: middle;">S/ <?php echo e(number_format($subtotal, 2)); ?></td>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
@@ -150,15 +145,14 @@
                             <tr style="background: #f8f9fc;">
                                 <td colspan="8" class="text-right fw-bold text-uppercase"
                                     style="padding: 15px; color: #1d3a6d;">Total General</td>
-                                <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px;">S/
+                                <td class="text-center fw-bold text-primary total-general-aut" style="padding: 15px; font-size: 18px;">S/
                                     <?php echo e(number_format($suma_total_general, 2)); ?></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
 
-
-
+                <!-- GLOSA DE RECHAZO (ESTILO DISCRETO PERO CLARO) -->
                 <?php if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO)): ?>
                     <div class="alert alert-danger mt-4"
                         style="background: #fff; border: 1px solid #f5c6cb; border-left: 5px solid #d9534f; border-radius: 6px;">
@@ -168,6 +162,83 @@
                         </p>
                     </div>
                 <?php endif; ?>
+
+                <!-- PANEL DE SEGUIMIENTO (LÍNEA DE TIEMPO) -->
+                <!-- PANEL DE SEGUIMIENTO (CENTRADITO Y COMPACTO) -->
+                <div class="panel panel-default" style="max-width: 650px; margin: 30px 0 0 0; border-radius: 12px; border: 1px solid #eaecf4; background: #fff; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05); overflow: hidden;">
+                    <div class="panel-heading" style="background: #f8f9fc; padding: 12px 20px; border-bottom: 1px solid #eaecf4;">
+                        <h4 class="fw-bold" style="color: #1d3a6d; font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa fa-history" style="color: #4e73df;"></i> Línea de Tiempo y Seguimiento del Pedido
+                        </h4>
+                    </div>
+                    <div class="panel-body" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                        <?php if(count($historial) > 0): ?>
+                            <div class="timeline-container-op" style="position: relative; padding-left: 30px; padding-right: 5px;">
+                                <div class="timeline-line-op" style="position: absolute; top: 0; bottom: 0; left: 15px; width: 2px; background-color: #eaecf4; border-radius: 1px;"></div>
+                                <?php $__currentLoopData = $historial; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php 
+                                        $iconClass = 'fa fa-check';
+                                        $iconBg = '#1cc88a'; // verde por defecto
+                                        
+                                        $tipoUpper = strtoupper($log->TIPO);
+                                        if (strpos($tipoUpper, 'RECHAZADO') !== false || strpos($tipoUpper, 'ANULA') !== false) {
+                                            $iconClass = 'fa fa-times';
+                                            $iconBg = '#e74a3b'; // rojo
+                                        } elseif (strpos($tipoUpper, 'GENERADO') !== false) {
+                                            $iconClass = 'fa fa-plus';
+                                            $iconBg = '#4e73df'; // azul
+                                        } elseif (strpos($tipoUpper, 'EMITIDO') !== false) {
+                                            $iconClass = 'fa fa-paper-plane-o';
+                                            $iconBg = '#36b9cc'; // celeste
+                                        } elseif (strpos($tipoUpper, 'AUTORIZADO') !== false || strpos($tipoUpper, 'AUTORIZACIÓN') !== false) {
+                                            $iconClass = 'fa fa-thumbs-o-up';
+                                            $iconBg = '#f6c23e'; // amarillo
+                                        }
+                                     ?>
+                                    <div class="timeline-item-op" style="position: relative; margin-bottom: 20px; display: flex; flex-direction: column;">
+                                        <!-- Icon Badge -->
+                                        <div class="timeline-badge-op" style="position: absolute; left: -30px; width: 28px; height: 28px; border-radius: 50%; background-color: <?php echo e($iconBg); ?>; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;">
+                                            <i class="<?php echo e($iconClass); ?>" style="color: white; font-size: 12px;"></i>
+                                        </div>
+                                        <!-- Panel Content -->
+                                        <div class="timeline-panel-op" style="background: #f8f9fc; border: 1px solid #eaecf4; border-radius: 8px; padding: 12px 15px; transition: all 0.2s ease-in-out;">
+                                            <div class="timeline-header-op" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px dashed #eaecf4; padding-bottom: 8px; margin-bottom: 8px; gap: 8px;">
+                                                <span class="timeline-title-op" style="font-size: 14px; font-weight: 700; color: #1d3a6d;"><?php echo e($log->TIPO); ?></span>
+                                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                    <span class="timeline-time-op" style="font-size: 14px; font-weight: 800; color: #4e73df; background: #eef2ff; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #d0dcfc;">
+                                                        <i class="fa fa-clock-o"></i> <?php echo e(date('H:i:s', strtotime($log->FECHA))); ?>
+
+                                                    </span>
+                                                    <span class="text-dark" style="font-size: 13px; font-weight: 700; background: #f1f3f9; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; color: #333 !important;">
+                                                        <i class="fa fa-calendar-o text-muted"></i> <?php echo e(date('d-m-Y', strtotime($log->FECHA))); ?>
+
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-body-op">
+                                                <div class="timeline-user-op" style="font-size: 13px; color: #4e73df; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                    <i class="fa fa-user" style="color: #858796;"></i>
+                                                    <span><?php echo e($log->USUARIO_NOMBRE); ?></span>
+                                                </div>
+                                                <?php if(!empty($log->MENSAJE)): ?>
+                                                    <div class="timeline-message-op alert alert-warning" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; border-left: 3px solid #f6c23e; background: #fffdf5; border-radius: 4px; font-size: 12px; color: #856404; font-weight: 600;">
+                                                        <?php echo e($log->MENSAJE); ?>
+
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-4 text-muted" style="padding: 20px 0;">
+                                <i class="fa fa-info-circle fa-2x mb-2 text-info" style="color: #36b9cc; margin-bottom: 10px;"></i>
+                                <p class="mb-0" style="font-size: 13px; margin: 0;">No se registran transiciones de historial para este pedido.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
                 <!-- BARRA DE ACCIONES FINAL -->
                 <div class="d-flex justify-content-end align-items-center gap-3 mt-5 pt-4"
@@ -303,5 +374,11 @@
 
     .gap-3 {
         gap: 1rem;
+    }
+
+    .timeline-panel-op:hover {
+        background: #ffffff !important;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.08) !important;
+        border-color: #d1d3e2 !important;
     }
 </style>
