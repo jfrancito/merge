@@ -130,6 +130,82 @@
         </table>
     </div>
 
+    <!-- PANEL DE SEGUIMIENTO (LÍNEA DE TIEMPO) -->
+    <div class="tracking-container mx-3 my-3">
+        <div class="card border-0 shadow-sm" style="border-radius: 10px; background: #fff; border: 1px solid #e3e6f0;">
+            <div class="card-header py-3" style="background: #f8f9fc; border-bottom: 1px solid #e3e6f0;">
+                <h6 class="m-0 font-weight-bold text-primary" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-history" style="font-size: 16px; color: #4e73df;"></i>
+                    LÍNEA DE TIEMPO Y SEGUIMIENTO DEL PEDIDO
+                </h6>
+            </div>
+            <div class="card-body p-3" style="max-height: 350px; overflow-y: auto;">
+                @if(isset($historial) && count($historial) > 0)
+                    <div class="timeline-container-op" style="position: relative; padding-left: 30px; padding-right: 5px;">
+                        <div class="timeline-line-op" style="position: absolute; top: 0; bottom: 0; left: 15px; width: 2px; background-color: #eaecf4; border-radius: 1px;"></div>
+                        @foreach($historial as $index => $log)
+                            @php
+                                $iconClass = 'fa fa-check';
+                                $iconBg = '#1cc88a'; // verde por defecto
+                                
+                                $tipoUpper = strtoupper($log->TIPO);
+                                if (strpos($tipoUpper, 'RECHAZADO') !== false || strpos($tipoUpper, 'ANULA') !== false) {
+                                    $iconClass = 'fa fa-times';
+                                    $iconBg = '#e74a3b'; // rojo
+                                } elseif (strpos($tipoUpper, 'GENERADO') !== false) {
+                                    $iconClass = 'fa fa-plus';
+                                    $iconBg = '#4e73df'; // azul
+                                } elseif (strpos($tipoUpper, 'EMITIDO') !== false) {
+                                    $iconClass = 'fa fa-paper-plane-o';
+                                    $iconBg = '#36b9cc'; // celeste
+                                } elseif (strpos($tipoUpper, 'AUTORIZADO') !== false || strpos($tipoUpper, 'AUTORIZACIÓN') !== false) {
+                                    $iconClass = 'fa fa-thumbs-o-up';
+                                    $iconBg = '#f6c23e'; // amarillo
+                                }
+                            @endphp
+                            <div class="timeline-item-op" style="position: relative; margin-bottom: 20px; display: flex; flex-direction: column;">
+                                <!-- Icon Badge -->
+                                <div class="timeline-badge-op" style="position: absolute; left: -30px; width: 28px; height: 28px; border-radius: 50%; background-color: {{ $iconBg }}; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;">
+                                    <i class="{{ $iconClass }}" style="color: white; font-size: 12px;"></i>
+                                </div>
+                                <!-- Panel Content -->
+                                <div class="timeline-panel-op" style="background: #f8f9fc; border: 1px solid #eaecf4; border-radius: 8px; padding: 12px 15px; transition: all 0.2s ease-in-out;">
+                                    <div class="timeline-header-op" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px dashed #eaecf4; padding-bottom: 8px; margin-bottom: 8px; gap: 8px;">
+                                        <span class="timeline-title-op" style="font-size: 14px; font-weight: 700; color: #1d3a6d;">{{ $log->TIPO }}</span>
+                                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                            <span class="timeline-time-op" style="font-size: 13px; font-weight: 800; color: #4e73df; background: #eef2ff; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #d0dcfc;">
+                                                <i class="fa fa-clock-o"></i> {{ date('H:i:s', strtotime($log->FECHA)) }}
+                                            </span>
+                                            <span class="text-dark" style="font-size: 12px; font-weight: 700; background: #f1f3f9; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; color: #333 !important;">
+                                                <i class="fa fa-calendar-o text-muted"></i> {{ date('d-m-Y', strtotime($log->FECHA)) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-body-op">
+                                        <div class="timeline-user-op" style="font-size: 13px; color: #4e73df; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-user" style="color: #858796;"></i>
+                                            <span>{{ $log->USUARIO_NOMBRE }}</span>
+                                        </div>
+                                        @if(!empty($log->MENSAJE))
+                                            <div class="timeline-message-op alert alert-warning" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; border-left: 3px solid #f6c23e; background: #fffdf5; border-radius: 4px; font-size: 12px; color: #856404; font-weight: 600;">
+                                                {{ $log->MENSAJE }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa fa-info-circle mb-2" style="font-size: 24px; color: #36b9cc; display: block; margin-bottom: 10px;"></i>
+                        No se registran transiciones de historial para este pedido.
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))
         <div class="rechazo-container mx-3 my-3">
             <div class="alert alert-danger mb-0" style="border-radius: 10px; border: none; background: #fff5f5; border-left: 4px solid #f44336; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">

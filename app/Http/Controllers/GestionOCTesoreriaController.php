@@ -1684,6 +1684,19 @@ class GestionOCTesoreriaController extends Controller
                     return response()->json(['success' => false, 'message' => 'No se ha cargado/validado ningún XML.']);
                 }
 
+                // VALIDACIÓN DE TOTALES
+                $total_asociado = 0.0;
+                foreach ($jsondocumenos as $item) {
+                    $total_asociado += (float)$item['atender'];
+                }
+                $total_xml = (float)$fedocs_temp->sum('TOTAL_VENTA_ORIG');
+                if (abs($total_asociado - $total_xml) > 0.02) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El monto total de los documentos asociados (S/ ' . number_format($total_asociado, 2) . ') no coincide con el monto total de los XMLs cargados (S/ ' . number_format($total_xml, 2) . ').'
+                    ]);
+                }
+
                 $ultimo_lote = $this->funciones->generar_lote('FE_REF_ASOC', 8);
                 $lote_num = (int)$ultimo_lote;
 
@@ -1940,7 +1953,21 @@ class GestionOCTesoreriaController extends Controller
                     $empresa = Session::get('empresas');
                 }
 
-
+                // VALIDACIÓN DE TOTALES
+                $total_asociado = 0.0;
+                foreach ($jsondocumenos as $item) {
+                    $total_asociado += (float)$item['atender'];
+                }
+                $total_pdf = 0.0;
+                foreach ($pdfs_info as $pdf) {
+                    $total_pdf += (float)$pdf['total'];
+                }
+                if (abs($total_asociado - $total_pdf) > 0.02) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El monto total de los documentos asociados (S/ ' . number_format($total_asociado, 2) . ') no coincide con el monto total de los PDFs cargados (S/ ' . number_format($total_pdf, 2) . ').'
+                    ]);
+                }
                 // Obtener el lote inicial desde la base de datos
                 $ultimo_lote = $this->funciones->generar_lote('FE_REF_ASOC', 8);
                 $lote_num = (int)$ultimo_lote;

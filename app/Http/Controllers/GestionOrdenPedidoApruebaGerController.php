@@ -13,6 +13,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Facades\Log;
+use App\Modelos\FeDocumentoHistorial;
 
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
@@ -108,6 +109,17 @@ class GestionOrdenPedidoApruebaGerController extends Controller
             ""
         );
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'AUTORIZACIÓN DE GERENCIA ÁREA';
+        $documento->MENSAJE = '';
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -161,6 +173,17 @@ class GestionOrdenPedidoApruebaGerController extends Controller
             ->where('ID_PEDIDO', $orden_pedido_id)
             ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'PEDIDO RECHAZADO';
+        $documento->MENSAJE = $request->input('motivo', '');
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -190,6 +213,11 @@ class GestionOrdenPedidoApruebaGerController extends Controller
 
         $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
 
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
         return view('ordenpedido.ajax.detalletabpedidoger', [
             'ajax' => true,
             'pedido' => $pedido,
@@ -200,7 +228,8 @@ class GestionOrdenPedidoApruebaGerController extends Controller
             'txt_observacion' => $txt_observacion,
             'can_precio' => $can_precio,
             'pedillodetalle' => $pedillodetalle,
-            'cod_usuario_session' => $cod_usuario_session
+            'cod_usuario_session' => $cod_usuario_session,
+            'historial' => $historial
         ]);
     }
 

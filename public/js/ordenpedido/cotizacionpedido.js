@@ -1588,13 +1588,19 @@ $(document).ready(function () {
        ================================= */
     $(document).on('click', '.eliminar-cotizacion', function (e) {
         var id_cotizacion = $(this).data('id');
+        var estado = $(this).data('estado');
         var _token = $('#token').val();
+
+        var mensaje = "¿Desea eliminar la cotización (" + id_cotizacion + ")? Esta acción liberará los productos para cotizar de nuevo.";
+        if (estado === 'ETM0000000000005') {
+            mensaje = "⚠️ <b>¡ATENCIÓN!</b> Esta cotización se encuentra <b>APROBADA</b>.<br><br>¿Está completamente seguro de que desea eliminar la cotización (" + id_cotizacion + ")? Esta acción es irreversible y liberará los productos.";
+        }
 
         modalBonito({
             tipo: 'warning',
             icono: '⚠️',
             titulo: '¿Eliminar Cotización?',
-            mensaje: "¿Desea eliminar la cotización (" + id_cotizacion + ")? Esta acción liberará los productos para cotizar de nuevo.",
+            mensaje: mensaje,
             confirmar: true,
             ancho: '450px',
             onConfirm: function () {

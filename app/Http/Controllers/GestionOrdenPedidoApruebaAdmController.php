@@ -13,6 +13,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Facades\Log;
+use App\Modelos\FeDocumentoHistorial;
 
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
@@ -109,6 +110,25 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             ""
         );
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        
+        $rol = Session::get('usuario')->rol;
+        $usuario_nom = strtoupper(Session::get('usuario')->nombre);
+        $tipo_historial = 'APROBADO POR GERENCIA ADMINISTRACIÓN';
+        if (($rol && strpos(strtoupper($rol->nombre), 'JEFE COMPRAS') !== false) || 
+            (strpos($usuario_nom, 'BERNAL') !== false && strpos($usuario_nom, 'JELENY') !== false)) {
+            $tipo_historial = 'APROBADO POR JEFE DE COMPRAS';
+        }
+        $documento->TIPO = $tipo_historial;
+        $documento->MENSAJE = '';
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -162,6 +182,17 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             ->where('ID_PEDIDO', $orden_pedido_id)
             ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
 
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'PEDIDO RECHAZADO';
+        $documento->MENSAJE = $request->input('motivo', '');
+        $documento->save();
+
         return response()->json([
             'success' => true
         ]);
@@ -192,6 +223,11 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
 
         $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
 
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
         return view('ordenpedido.ajax.detalletabpedidoadm', [
             'ajax' => true,
             'pedido' => $pedido,
@@ -202,7 +238,8 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             'txt_observacion' => $txt_observacion,
             'pedillodetalle' => $pedillodetalle,
             'can_precio' => $can_precio,
-            'cod_usuario_session' => $cod_usuario_session
+            'cod_usuario_session' => $cod_usuario_session,
+            'historial' => $historial
         ]);
     }
 

@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE PRODUCTOS -->
+                <!-- TABLA DE PRODUCTOS (ANCHO COMPLETO) -->
                 <div class="table-responsive" style="border-radius: 8px; border: 1px solid #eaecf4;">
                     <table class="table table-hover mb-0" id="tabla-detalle-tab-adm">
                         <thead>
@@ -74,11 +74,11 @@
                                 <th class="text-center" style="width: 50px; color: #000; font-weight: 700;">#</th>
                                 <th style="color: #000; font-weight: 700;">Producto</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Tipo</th>
-                                <th class="text-center" style="color: #000; font-weight: 700;">Cant. Origen</th>
+                                <th class="text-center" style="color: #000; font-weight: 700;">Cant. Original</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
                                 @if($mostrarJefe) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th> @endif
-                                @if($mostrarGer) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Gerencia</th> @endif
-                                <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprueba Admin</th>
+                                @if($mostrarGer) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Gerencia</th> @endif
+                                <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Admin</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Observación</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Precio Unit.</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Total Item</th>
@@ -93,75 +93,64 @@
                                     $cant_ger      = $detalle->CAN_MODIF_GER;
                                     $cant_adm      = $detalle->CAN_MODIF_ADM;
 
-                                    $valor_editar = $cant_adm 
-                                                    ?? $cant_ger 
-                                                    ?? $cant_jefe 
-                                                    ?? $cant_original;
-                                    
+                                    $valor_editar = $cant_adm ?? $cant_ger ?? $cant_jefe ?? $cant_original;
                                     $precio = $detalle->CAN_PRECIO ?? 0;
-                                    $subtotal = $cant_original * $precio; // El subtotal se calcula sobre la original o sobre la final? Usualmente sobre original
+                                    $subtotal = $valor_editar * $precio;
                                     $suma_total_general += $subtotal;
                                 @endphp
-                                <tr>
-                                    <td class="text-center fw-bold text-muted">{{ $index + 1 }}</td>
-                                    <td>
+                                <tr style="border-bottom: 1px solid #eaecf4;">
+                                    <td class="text-center fw-bold text-muted" style="vertical-align: middle;">{{ $index + 1 }}</td>
+                                    <td style="vertical-align: middle;">
                                         <div class="fw-bold text-dark" style="font-size: 14px; margin-bottom: 4px;">{{ $detalle->NOM_PRODUCTO }}</div>
                                         <span style="background: #edf2ff; color: #4e73df; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #d0dcfc; display: inline-flex; align-items: center;">
                                             <i class="fa fa-tag me-1" style="font-size: 10px;"></i> {{ $detalle->COD_PRODUCTO }}
                                         </span>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center" style="vertical-align: middle;">
                                         <span class="badge-corpo {{ $detalle->IND_MATERIAL_SERVICIO == 'M' ? 'bg-light text-primary' : 'bg-light text-warning' }}">
                                             {{ $detalle->IND_MATERIAL_SERVICIO == 'M' ? 'MATERIAL' : 'SERVICIO' }}
                                         </span>
                                     </td>
-
-                                    {{-- CANTIDAD ORIGEN --}}
-                                    <td class="text-center">
-                                        <span class="badge" style="background: #f0f3ff; color: #4e73df; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int)$cant_original }}</span>
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <span class="badge" style="background: #f0f3ff; color: #4e73df; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int) $cant_original }}</span>
                                     </td>
-
-                                    <td class="text-center" style="font-weight: 600; color: #333;">
-                                        {{ $detalle->NOM_CATEGORIA ?: '—' }}
+                                    <td class="text-center" style="font-weight: 600; color: #333; vertical-align: middle;">
+                                        {{ $detalle->NOM_UNIDAD_MEDIDA ?? 'UND' }}
                                     </td>
-
-                                    {{-- CANTIDAD JEFE --}}
+                                    
                                     @if($mostrarJefe)
-                                        <td class="text-center">
-                                            <span class="badge" style="background: #e7ffe7; color: #1cc88a; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int)$cant_jefe }}</span>
+                                        <td class="text-center" style="vertical-align: middle;">
+                                            <span class="fw-bold text-success" style="font-size: 15px;">{{ (int)$cant_jefe }}</span>
                                         </td>
                                     @endif
 
-                                    {{-- CANTIDAD GERENCIA --}}
                                     @if($mostrarGer)
-                                        <td class="text-center">
-                                            <span class="badge" style="background: #fff4e5; color: #f6c23e; font-weight: 800; border-radius: 6px; font-size: 14px; padding: 6px 12px;">{{ (int)$cant_ger }}</span>
+                                        <td class="text-center" style="vertical-align: middle;">
+                                            <span class="fw-bold text-info" style="font-size: 15px;">{{ (int)$cant_ger }}</span>
                                         </td>
                                     @endif
 
-                                    {{-- CANTIDAD ADM (INPUT) --}}
-                                    <td class="text-center">
+                                    <td class="text-center" style="vertical-align: middle; width: 140px;">
                                         @if ($pedido->COD_TRABAJADOR_APRUEBA_ADM == $cod_usuario_session && $pedido->COD_ESTADO == 'ETM0000000000015')
                                             <input type="number" 
-                                                   class="form-control text-center input-cantidad-editar input-sm" 
-                                                   value="{{ (int)$valor_editar }}"
-                                                   min="1"
-                                                   data-id="{{ $detalle->ID_PEDIDO }}"
-                                                   data-prod="{{ $detalle->COD_PRODUCTO }}"
-                                                   style="width: 80px; margin: 0 auto; font-weight: bold; border-color: #d1d3e2;">
+                                                   class="form-control text-center input-cantidad-editar input-cantidad-adm-val"
+                                                   value="{{ (int)$valor_editar }}" 
+                                                   min="0" 
+                                                   data-id="{{ $detalle->COD_PRODUCTO }}"
+                                                   style="width: 90px; display: inline-block;">
                                         @else
                                             <span class="fw-bold text-dark" style="font-size: 15px;">{{ (int)$valor_editar }}</span>
                                         @endif
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="text-center" style="vertical-align: middle;">
                                         <div class="text-muted" style="min-width: 120px; font-size: 13px;">
                                             {{ $detalle->TXT_OBSERVACION ?: '—' }}
                                         </div>
                                     </td>
 
-                                    <td class="text-center fw-bold cell-precio" data-precio="{{ $precio }}">S/ {{ number_format($precio, 2) }}</td>
-                                    <td class="text-center fw-bold text-dark cell-subtotal">S/ {{ number_format($subtotal, 2) }}</td>
+                                    <td class="text-center fw-bold cell-precio" data-precio="{{ $precio }}" style="vertical-align: middle;">S/ {{ number_format($precio, 2) }}</td>
+                                    <td class="text-center fw-bold text-dark cell-subtotal" style="vertical-align: middle;">S/ {{ number_format($subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -174,12 +163,87 @@
                     </table>
                 </div>
 
+                <!-- GLOSA DE RECHAZO -->
                 @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))
                     <div class="alert alert-danger mt-4" style="background: #fff; border: 1px solid #f5c6cb; border-left: 5px solid #d9534f; border-radius: 6px;">
                         <h6 class="fw-bold text-danger mb-1" style="font-size: 14px;">Motivo del Rechazo:</h6>
                         <p class="mb-0" style="font-size: 14px; color: #000 !important;">{{ $pedido->TXT_GLOSA_RECHAZO }}</p>
                     </div>
                 @endif
+
+                <!-- PANEL DE SEGUIMIENTO (LÍNEA DE TIEMPO) -->
+                <!-- PANEL DE SEGUIMIENTO (CENTRADITO Y COMPACTO) -->
+                <div class="panel panel-default" style="max-width: 650px; margin: 30px 0 0 0; border-radius: 12px; border: 1px solid #eaecf4; background: #fff; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05); overflow: hidden;">
+                    <div class="panel-heading" style="background: #f8f9fc; padding: 12px 20px; border-bottom: 1px solid #eaecf4;">
+                        <h4 class="fw-bold" style="color: #1d3a6d; font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa fa-history" style="color: #4e73df;"></i> Línea de Tiempo y Seguimiento del Pedido
+                        </h4>
+                    </div>
+                    <div class="panel-body" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                        @if(count($historial) > 0)
+                            <div class="timeline-container-op" style="position: relative; padding-left: 30px; padding-right: 5px;">
+                                <div class="timeline-line-op" style="position: absolute; top: 0; bottom: 0; left: 15px; width: 2px; background-color: #eaecf4; border-radius: 1px;"></div>
+                                @foreach($historial as $index => $log)
+                                    @php
+                                        $iconClass = 'fa fa-check';
+                                        $iconBg = '#1cc88a'; 
+                                        
+                                        $tipoUpper = strtoupper($log->TIPO);
+                                        if (strpos($tipoUpper, 'RECHAZADO') !== false || strpos($tipoUpper, 'ANULA') !== false) {
+                                            $iconClass = 'fa fa-times';
+                                            $iconBg = '#e74a3b';
+                                        } elseif (strpos($tipoUpper, 'GENERADO') !== false) {
+                                            $iconClass = 'fa fa-plus';
+                                            $iconBg = '#4e73df';
+                                        } elseif (strpos($tipoUpper, 'EMITIDO') !== false) {
+                                            $iconClass = 'fa fa-paper-plane-o';
+                                            $iconBg = '#36b9cc';
+                                        } elseif (strpos($tipoUpper, 'AUTORIZADO') !== false || strpos($tipoUpper, 'AUTORIZACIÓN') !== false) {
+                                            $iconClass = 'fa fa-thumbs-o-up';
+                                            $iconBg = '#f6c23e';
+                                        }
+                                    @endphp
+                                    <div class="timeline-item-op" style="position: relative; margin-bottom: 20px; display: flex; flex-direction: column;">
+                                        <!-- Icon Badge -->
+                                        <div class="timeline-badge-op" style="position: absolute; left: -30px; width: 28px; height: 28px; border-radius: 50%; background-color: {{ $iconBg }}; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;">
+                                            <i class="{{ $iconClass }}" style="color: white; font-size: 12px;"></i>
+                                        </div>
+                                        <!-- Panel Content -->
+                                        <div class="timeline-panel-op" style="background: #f8f9fc; border: 1px solid #eaecf4; border-radius: 8px; padding: 12px 15px; transition: all 0.2s ease-in-out;">
+                                            <div class="timeline-header-op" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px dashed #eaecf4; padding-bottom: 8px; margin-bottom: 8px; gap: 8px;">
+                                                <span class="timeline-title-op" style="font-size: 14px; font-weight: 700; color: #1d3a6d;">{{ $log->TIPO }}</span>
+                                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                    <span class="timeline-time-op" style="font-size: 14px; font-weight: 800; color: #4e73df; background: #eef2ff; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #d0dcfc;">
+                                                        <i class="fa fa-clock-o"></i> {{ date('H:i:s', strtotime($log->FECHA)) }}
+                                                    </span>
+                                                    <span class="text-dark" style="font-size: 13px; font-weight: 700; background: #f1f3f9; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; color: #333 !important;">
+                                                        <i class="fa fa-calendar-o text-muted"></i> {{ date('d-m-Y', strtotime($log->FECHA)) }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-body-op">
+                                                <div class="timeline-user-op" style="font-size: 13px; color: #4e73df; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                    <i class="fa fa-user" style="color: #858796;"></i>
+                                                    <span>{{ $log->USUARIO_NOMBRE }}</span>
+                                                </div>
+                                                @if(!empty($log->MENSAJE))
+                                                    <div class="timeline-message-op alert alert-warning" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; border-left: 3px solid #f6c23e; background: #fffdf5; border-radius: 4px; font-size: 12px; color: #856404; font-weight: 600;">
+                                                        {{ $log->MENSAJE }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-4 text-muted" style="padding: 20px 0;">
+                                <i class="fa fa-info-circle fa-2x mb-2 text-info" style="color: #36b9cc; margin-bottom: 10px;"></i>
+                                <p class="mb-0" style="font-size: 13px; margin: 0;">No se registran transiciones de historial para este pedido.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
 
                 <!-- BARRA DE ACCIONES FINAL -->
                 <div class="d-flex justify-content-end align-items-center gap-3 mt-5 pt-4" style="border-top: 2px solid transparent; width: 100%; text-align: right; margin-top: 50px !important;">
@@ -287,6 +351,12 @@
     }
     
     .gap-3 { gap: 1rem; }
+
+    .timeline-panel-op:hover {
+        background: #ffffff !important;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.08) !important;
+        border-color: #d1d3e2 !important;
+    }
 </style>
 
 <script>

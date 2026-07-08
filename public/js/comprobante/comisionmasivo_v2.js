@@ -12,6 +12,9 @@ $(document).ready(function() {
         $('.select2').select2();
     }
 
+    // Inicializar el estado del botón Guardar Todo al cargar la página
+    actualizarEstadoBotonGuardar();
+
     // Archivos seleccionados en caché para previsualización
     var selectedPdfFiles = [];
     var parsedPdfsData = [];
@@ -161,8 +164,8 @@ $(document).ready(function() {
                     }
                 }
 
-                // Habilitar el botón Guardar Todo
-                $('#btn-guardar-comision-masivo').removeAttr('disabled');
+                // Actualizar estado del botón Guardar Todo
+                actualizarEstadoBotonGuardar();
 
                 cerrarcargando();
 
@@ -344,6 +347,41 @@ $(document).ready(function() {
             });
             valMsg.html('<i class="mdi mdi-close-circle" style="font-size: 14px;"></i> LOS TOTALES NO COINCIDEN');
         }
+
+        actualizarEstadoBotonGuardar();
+    }
+
+    // Habilita o deshabilita el botón de guardar según correspondencia de montos
+    function actualizarEstadoBotonGuardar() {
+        var docId = $('#documento_id').val();
+        var totalAsociados = parseFloat($('#total_asociado_oc').val()) || 0;
+
+        if (docId === 'DCC0000000000048') {
+            // Modo PDF
+            if (selectedPdfFiles.length === 0 || parsedPdfsData.length === 0) {
+                $('#btn-guardar-comision-masivo').attr('disabled', 'disabled');
+                return;
+            }
+            var totalPdfs = parsedPdfsData.reduce(function(acc, pdf) {
+                return acc + pdf.total;
+            }, 0);
+
+            if (Math.abs(totalAsociados - totalPdfs) <= 0.02) {
+                $('#btn-guardar-comision-masivo').removeAttr('disabled');
+            } else {
+                $('#btn-guardar-comision-masivo').attr('disabled', 'disabled');
+            }
+        } else {
+            // Modo XML
+            var totalXml = parseFloat($('#total_xml_masivo').val()) || 0;
+            var xmlLoaded = $('#total_xml_masivo').length > 0 && totalXml > 0;
+            
+            if (xmlLoaded && Math.abs(totalAsociados - totalXml) <= 0.02) {
+                $('#btn-guardar-comision-masivo').removeAttr('disabled');
+            } else {
+                $('#btn-guardar-comision-masivo').attr('disabled', 'disabled');
+            }
+        }
     }
 
     // Escuchar el botón Guardar Todo
@@ -358,18 +396,42 @@ $(document).ready(function() {
         }
 
         var docId = $('#documento_id').val();
+        var totalAsociados = parseFloat($('#total_asociado_oc').val()) || 0;
         var msgConfirm = '';
+
         if (docId === 'DCC0000000000048') {
-            // Validar que se hayan cargado PDFs (solo en modo otros documentos)
+            // Modo PDF
+            // Validar que se hayan cargado PDFs
             if (selectedPdfFiles.length === 0 || parsedPdfsData.length === 0) {
                 alerterrorajax("Debe cargar al menos un archivo PDF.");
                 return false;
             }
-            // Configurar mensaje y mostrar confirmación
+            
+            // Sumar los totales de los PDFs cargados
+            var totalPdfs = parsedPdfsData.reduce(function(acc, pdf) {
+                return acc + pdf.total;
+            }, 0);
+
+            // Validar que coincidan
+            if (Math.abs(totalAsociados - totalPdfs) > 0.02) {
+                $('#modal-advertencia-mensaje').html("<b>Error! Los montos no coinciden.</b><br><br>Monto total de los documentos asociados: <b>S/ " + totalAsociados.toFixed(2) + "</b><br>Monto total de los PDFs cargados: <b>S/ " + totalPdfs.toFixed(2) + "</b>");
+                $('#modal-advertencia-premium').modal('show');
+                return false;
+            }
+
             var totalComprobantes = selectedPdfFiles.length;
             msgConfirm = 'Se procesarán y guardarán <span class="negrita">' + totalComprobantes + '</span> facturas y se asociarán con las operaciones caja de comisiones.';
         } else {
             // Modo XML
+            var totalXml = parseFloat($('#total_xml_masivo').val()) || 0;
+
+            // Validar que coincidan
+            if (Math.abs(totalAsociados - totalXml) > 0.02) {
+                $('#modal-advertencia-mensaje').html("<b>Error! Los montos no coinciden.</b><br><br>Monto total de los documentos asociados: <b>S/ " + totalAsociados.toFixed(2) + "</b><br>Monto total de los XMLs cargados: <b>S/ " + totalXml.toFixed(2) + "</b>");
+                $('#modal-advertencia-premium').modal('show');
+                return false;
+            }
+
             msgConfirm = 'Se procesará y guardará el comprobante XML y se asociará con las operaciones caja de comisiones.';
         }
 

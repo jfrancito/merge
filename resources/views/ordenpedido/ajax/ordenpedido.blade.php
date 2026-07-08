@@ -124,6 +124,13 @@
                 "order": [[0, "desc"]]
             });
 
+            // Ajustar columnas de DataTables al cambiar de pestaña para evitar desalineación
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                if ($.fn.DataTable) {
+                    $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+                }
+            });
+
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>

@@ -18,11 +18,11 @@
                     <th>MES</th>
                     <th>AÑO</th>
                     <th>TIPO PEDIDO</th>
-                    <th>SOLICITA</th>
+                    <th>USUARIO SOLICITA</th>
                     <th>AREA</th>
-                    <th>AUTORIZA</th>
-                    <th>APRUEBA GER</th>
-                    <th>APRUEBA ADM</th>
+                    <th>AUTORIZA JEFE AREA</th>
+                    <th>APRUEBA GERENCIA AREA</th>
+                    <th>APRUEBA GER ADM - JEF. COMPRAS</th>
                     <th>GLOSA</th>
                     <th>ESTADO</th>
                     <th class="text-center">ACCIONES</th>
@@ -136,12 +136,16 @@
 
     .table thead th {
         background: #f3f5f9;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 11.5px;
+        font-weight: 700;
         color: #333;
         text-transform: uppercase;
         border-bottom: 2px solid #dee2e6;
-        white-space: nowrap;
+        white-space: normal !important;
+        vertical-align: middle;
+        text-align: center;
+        line-height: 1.2;
+        max-width: 110px !important;
     }
 
     /* GENERAL */

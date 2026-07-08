@@ -76,14 +76,23 @@
                                     </td>
                                     <td class="text-center">
                                         <div style="display: flex; gap: 5px; justify-content: center;">
-                                            <button class="btn btn-sm ver-detalle-cotizacion"
-                                                data-id="{{ $item->ID_COTIZACION }}"
-                                                style="border-radius: 8px; padding: 6px 15px; transition: all 0.3s; background: #f0f3ff; border: 1px solid #d0dcfc; color: #4e73df; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: 700; font-size: 11px; letter-spacing: 0.5px;"
-                                                title="Ver Detalle de Cotización">
-                                                <i class="fa fa-eye" style="font-size: 14px; margin-right: 7px;"></i>
-                                                DETALLE
-                                            </button>
-
+                                            @if($item->TXT_ESTADO != 'ANULADO')
+                                                <button class="btn btn-sm ver-detalle-cotizacion"
+                                                    data-id="{{ $item->ID_COTIZACION }}"
+                                                    style="border-radius: 8px; padding: 6px 15px; transition: all 0.3s; background: #f0f3ff; border: 1px solid #d0dcfc; color: #4e73df; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: 700; font-size: 11px; letter-spacing: 0.5px;"
+                                                    title="Ver Detalle de Cotización">
+                                                    <i class="fa fa-eye" style="font-size: 14px; margin-right: 7px;"></i>
+                                                    DETALLE
+                                                </button>
+                                            @else
+                                                <button class="btn btn-sm"
+                                                    style="border-radius: 8px; padding: 6px 15px; background: #f8f9fa; border: 1px solid #e3e6f0; color: #b7b9cc; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; cursor: not-allowed;"
+                                                    disabled
+                                                    title="Cotización Anulada - Detalle No Disponible">
+                                                    <i class="fa fa-eye-slash" style="font-size: 14px; margin-right: 7px;"></i>
+                                                    DETALLE
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

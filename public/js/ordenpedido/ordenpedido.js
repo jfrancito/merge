@@ -2020,15 +2020,20 @@ $(document).ready(function () {
         
         $.ajax({
             type: 'POST',
-            url: carpeta + '/ver-detalle-pedido-resumen',
+            url: carpeta + '/ver_detalle_orden_pedido',
             data: {
                 _token: _token,
                 orden_pedido_id: id_pedido
             },
             success: function (data) {
                 cerrarcargando();
-                $('.modal-detalle-pedido-container').html(data);
-                $('#modal-detalle-pedido-resumen').niftyModal('show');
+                $("#detalle-pedido-container").html(data);
+                
+                // Ocultar botones de acción de edición si estamos en el resumen
+                $("#detalle-pedido-container").find(".editar-pedido, .emitir-pedido").hide();
+                
+                $("#tab-detalle-pedido").show();
+                $('.nav-tabs a[href="#detallepedido"]').tab('show');
             },
             error: function (data) {
                 cerrarcargando();

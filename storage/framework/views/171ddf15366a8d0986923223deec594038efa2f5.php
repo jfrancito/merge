@@ -240,15 +240,30 @@
             }
         });
 
-        $('.select2-compra').select2({
-            minimumResultsForSearch: Infinity,
-            width: '145px'
-        });
+        function initSelect2Consolidado() {
+            $('.select2-compra').each(function() {
+                if (!$(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '145px'
+                    });
+                }
+            });
 
-        // Inicializar select2-almacen
-        $('.select2-almacen').select2({
-            minimumResultsForSearch: Infinity,
-            width: '240px'
+            $('.select2-almacen').each(function() {
+                if (!$(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2({
+                        minimumResultsForSearch: Infinity,
+                        width: '240px'
+                    });
+                }
+            });
+        }
+
+        initSelect2Consolidado();
+
+        $('#tabla-detalle-consolidado').on('draw.dt', function() {
+            initSelect2Consolidado();
         });
 
         // Función para cargar los almacenes de una fila

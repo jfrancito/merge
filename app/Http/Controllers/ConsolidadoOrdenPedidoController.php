@@ -158,12 +158,9 @@ class ConsolidadoOrdenPedidoController extends Controller
         $anio_pedido = '';
         $familia_id = '';
 
-        $listaordenpedido = $this->lg_lista_cabecera_pedido_consolidado(
-            $empresa_id,
-            $centro_id,
-            $mes_pedido,
-            $anio_pedido
-        );
+        // Se inicializa vacío para evitar demoras al cargar la pestaña.
+        // La búsqueda real se ejecuta mediante el botón Buscar con los filtros seleccionados.
+        $listaordenpedido = [];
 
         $listaordenconsolidado = $this->lg_lista_cabecera_consolidado();
 

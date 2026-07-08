@@ -23,6 +23,7 @@ use View;
 use Validator;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Modelos\FeDocumentoHistorial;
 
 class GestionOrdenPedidoController extends Controller
 {
@@ -530,6 +531,19 @@ class GestionOrdenPedidoController extends Controller
 
         $this->replicateOrdenPedidoToZona($orden_pedido_id);
 
+        if ($accion === 'I') {
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            $documento->FECHA = $pedido_db->FEC_USUARIO_CREA_AUD;
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'PEDIDO GENERADO POR USUARIO';
+            $documento->MENSAJE = '';
+            $documento->save();
+        }
+
         return response()->json(['success' => true]);
     }
 
@@ -547,10 +561,16 @@ class GestionOrdenPedidoController extends Controller
             ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
             ->get();
 
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
         return view('ordenpedido.ajax.detalletabpedido', [
             'ajax' => true,
             'pedido' => $pedido,
-            'pedillodetalle' => $pedillodetalle
+            'pedillodetalle' => $pedillodetalle,
+            'historial' => $historial
         ]);
     }
 
@@ -598,6 +618,17 @@ class GestionOrdenPedidoController extends Controller
         );
 
         $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'PEDIDO EMITIDO POR USUARIO';
+        $documento->MENSAJE = '';
+        $documento->save();
 
         return response()->json([
             'success' => true
@@ -721,6 +752,17 @@ class GestionOrdenPedidoController extends Controller
             ]);
 
         $this->replicateOrdenPedidoToZona($orden_pedido_id);
+
+        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+        $documento = new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO = $orden_pedido_id;
+        $documento->DOCUMENTO_ITEM = 1;
+        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
+        $documento->USUARIO_ID = Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+        $documento->TIPO = 'ANULACIÓN DEL PEDIDO';
+        $documento->MENSAJE = '';
+        $documento->save();
 
         return response()->json([
             'success' => true
