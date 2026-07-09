@@ -6335,13 +6335,15 @@ trait ComprobanteTraits
                         'ISCHFC0000000037',
                         'IICHFC0000000037',
                         'IICHFC0000000050',
-                        'ISCHFC0000000046'
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052'
                     ])
 
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', ['OPC0000000000002', 'OPC0000000000001'])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
-                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', ['OOC0000000000008', 'OOC0000000000009'])
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', ['OOC0000000000008', 'OOC0000000000009',''])
                     ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020'])
                     ->where('TES.COD_CAJA_BANCO', $banco_id)
                     ->whereRaw("
@@ -6411,7 +6413,7 @@ trait ComprobanteTraits
                                 )
                                 ->where('TES.IND_EXTORNO', 0)
                                 ->where('TES.COD_ESTADO', 1)
-                                ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020','IICHIM0000000020','IICHIM0000000224','ISCHIM0000000020','ISCHIM0000000201'])
+                                ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020',])
                                 ->where('TES.COD_CAJA_BANCO', $banco_id)
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
