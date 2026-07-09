@@ -1,22 +1,34 @@
+<style>
+    #reporteordenpedidoestado th {
+        white-space: normal !important;
+        line-height: 1.2 !important;
+        font-size: 11px !important;
+        max-width: 120px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+</style>
 <table id="reporteordenpedidoestado"
        class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap "
        cellspacing="0" width="100%">
     <thead class="background-th-azul">
     <tr>
-        <th>ID PEDIDO</th>
-        <th>AREA</th>
-        <th>FECHA PEDIDO</th>
-        <th>AÑO</th>
-        <th>PERIODO</th>
-        <th>TIPO PEDIDO</th>
-        <th>CENTRO</th>
-        <th>ESTADO</th>
-        <th>USUARIO SOLICITA</th>
-        <th>APRUEBA JEFE COMPRAS</th>
-        <th>GLOSA</th>
-        <th>CONSOLIDADO SEDE</th>
-        <th>CONSOLIDADO GENERAL</th>
-        <th>ARCHIVO</th>
+        <th class="text-center">ID<br>PEDIDO</th>
+        <th class="text-center">AREA</th>
+        <th class="text-center">FECHA<br>PEDIDO</th>
+        <th class="text-center">AÑO</th>
+        <th class="text-center">PERIODO</th>
+        <th class="text-center">TIPO<br>PEDIDO</th>
+        <th class="text-center">CENTRO</th>
+        <th class="text-center">ESTADO</th>
+        <th class="text-center">USUARIO<br>SOLICITA</th>
+        <th class="text-center">JEFE<br>AUTORIZA</th>
+        <th class="text-center">APRUEBA GERENCIA<br>DE AREA</th>
+        <th class="text-center">APRUEBA GERENCIA ADM<br>O JEFE DE COMPRAS</th>
+        <th class="text-center">GLOSA</th>
+        <th class="text-center">CONSOLIDADO<br>SEDE</th>
+        <th class="text-center">CONSOLIDADO<br>GENERAL</th>
+        <th class="text-center">ARCHIVO</th>
     </tr>
     </thead>
     <tbody>
@@ -40,6 +52,8 @@
                 @endif
             </td>
             <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>
+            <td>{{$item->TXT_TRABAJADOR_AUTORIZA ?: '—'}}</td>
+            <td>{{$item->TXT_TRABAJADOR_APRUEBA_GER ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>
             <td>{{$item->TXT_GLOSA}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>

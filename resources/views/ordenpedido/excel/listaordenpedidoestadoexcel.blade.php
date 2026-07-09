@@ -35,6 +35,10 @@
         <th class='tabladp'>TIPO PEDIDO</th>
         <th class='tabladp'>CENTRO</th>
         <th class='tabladp'>ESTADO</th>
+        <th class='tabladp'>USUARIO SOLICITA</th>
+        <th class='tabladp'>JEFE AUTORIZA</th>
+        <th class='tabladp'>APRUEBA GERENCIA DE AREA</th>
+        <th class='tabladp'>APRUEBA GERENCIA ADM O JEFE DE COMPRAS</th>
         <th class='tabladp'>CONSOLIDADO SEDE</th>
         <th class='tabladp'>CONSOLIDADO GENERAL</th>
     </tr>
@@ -56,6 +60,10 @@
                     {{$item->TXT_ESTADO}}
                 @endif
             </td>
+            <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>
+            <td>{{$item->TXT_TRABAJADOR_AUTORIZA ?: '—'}}</td>
+            <td>{{$item->TXT_TRABAJADOR_APRUEBA_GER ?: '—'}}</td>
+            <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO_GENERAL}}</td>
         </tr>

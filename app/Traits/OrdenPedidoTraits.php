@@ -1650,6 +1650,8 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.COD_ESTADO,
                 OP.TXT_ESTADO,
                 OP.TXT_TRABAJADOR_SOLICITA,
+                OP.TXT_TRABAJADOR_AUTORIZA,
+                OP.TXT_TRABAJADOR_APRUEBA_GER,
                 OP.TXT_GLOSA,
                 OP.TXT_TRABAJADOR_APRUEBA_ADM,
                 OP.COD_TRABAJADOR_APRUEBA_ADM,
