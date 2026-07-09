@@ -990,23 +990,50 @@ class CotizacionOrdenPedidoController extends Controller
     {
         $id_cotizacion = $request->input('id_cotizacion');
 
+        // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+        $cot = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        if (!$cot) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró la cotización especificada.'
+            ]);
+        }
+
+        $cod_centro = trim($cot->COD_CENTRO);
+        $conexionbd = 'sqlsrv';
+        if ($cod_centro == 'CEN0000000000004') {
+            $conexionbd = 'sqlsrv_r';
+        } else {
+            if ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+        }
+
+        // Validar si la cotización está referenciada a una Orden de Compra activa en Osiris en su conexión respectiva
+        $referencia_oc = DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC as R')
+            ->join('CMP.ORDEN as O', 'O.COD_ORDEN', '=', 'R.COD_TABLA_ASOC')
+            ->where('R.COD_TABLA', $id_cotizacion)
+            ->where('R.TXT_TABLA', 'WEB.ORDEN_COTIZACION')
+            ->where('R.TXT_TABLA_ASOC', 'CMP.ORDEN')
+            ->where('R.COD_ESTADO', 1)
+            ->select('O.COD_ORDEN', 'O.COD_CATEGORIA_ESTADO_ORDEN')
+            ->first();
+
+        if ($referencia_oc) {
+            $estado_oc = trim($referencia_oc->COD_CATEGORIA_ESTADO_ORDEN);
+            if ($estado_oc !== 'EOR0000000000017' && $estado_oc !== 'EOR0000000000005') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar la cotización porque está vinculada a una Orden de Compra activa en Osiris (' . trim($referencia_oc->COD_ORDEN) . '). Primero tiene que anular o rechazar la Orden de compra en Osiris.'
+                ]);
+            }
+        }
+
         try {
             DB::beginTransaction();
-
-            // Obtener el centro para réplica en zonas antes de modificar la cabecera
-            $cot = DB::table('WEB.ORDEN_COTIZACION')
-                ->where('ID_COTIZACION', $id_cotizacion)
-                ->first();
-            $cod_centro = $cot ? $cot->COD_CENTRO : '';
-
-            $conexionbd = 'sqlsrv';
-            if ($cod_centro == 'CEN0000000000004') {
-                $conexionbd = 'sqlsrv_r';
-            } else {
-                if ($cod_centro == 'CEN0000000000006') {
-                    $conexionbd = 'sqlsrv_b';
-                }
-            }
 
             // 1. Mantener Cabecera Activa y Cambiar Estado a ANULADO con Auditoría
             DB::table('WEB.ORDEN_COTIZACION')

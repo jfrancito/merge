@@ -93,14 +93,14 @@ class ValeRendirController extends Controller
 
 
         //CUENTA BANCARIA
-
+    
          $cod_empr_cli = DB::table('users as usu')
             ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
             ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
             ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
             ->where('usu.id', $cod_usuario_registro)
+            ->where('emp.COD_ESTADO', 1)
             ->value('emp.COD_EMPR');
-
 
         $empresatrabjador = STDEmpresa::where('COD_EMPR','=',$cod_empr_cli)->first();
         $nrodocumentotrab = $empresatrabjador->NRO_DOCUMENTO;
@@ -349,6 +349,7 @@ class ValeRendirController extends Controller
             ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
             ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
             ->where('usu.id', $cod_usuario_registro)
+            ->where('emp.COD_ESTADO', 1)
             ->value('emp.COD_EMPR');
 
        $trabajador     =   DB::table('STD.TRABAJADOR')
