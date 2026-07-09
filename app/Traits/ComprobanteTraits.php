@@ -6289,6 +6289,7 @@ trait ComprobanteTraits
                              ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
                     })
                     ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                    ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
                     ->select(
                         'TES.COD_OPERACION_CAJA',
                         'TES.COD_EMPR',
@@ -6302,13 +6303,13 @@ trait ComprobanteTraits
                         'TES.NRO_VOUCHER',
                         'CMD.NOM_CATEGORIA as MONEDA',
                         'CME.NOM_CATEGORIA as ESTADO',
-                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN)  as MONTO_SOLES'),
-                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME)  as MONTO_DOLARES'),
+                        DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                        DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
 
                         DB::raw("
                             CASE 
-                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
-                                ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN)
+                                ELSE ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME)
                             END AS MONTO
                         "),
                         DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
@@ -6353,7 +6354,8 @@ trait ComprobanteTraits
                         END - ISNULL(TES.ATENDIDO, 0) <> 0
                     ")
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
-                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                    ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
 
 
 
@@ -6378,6 +6380,7 @@ trait ComprobanteTraits
                                          ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
                                 })
                                 ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                                ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
                                 ->select(
                                     'TES.COD_OPERACION_CAJA',
                                     'TES.COD_EMPR',
@@ -6391,12 +6394,12 @@ trait ComprobanteTraits
                                     'TES.NRO_VOUCHER',
                                     'CMD.NOM_CATEGORIA as MONEDA',
                                     'CME.NOM_CATEGORIA as ESTADO',
-                                    DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
-                                    DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                                    DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                                    DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
                                     DB::raw("
                                         CASE 
-                                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
-                                            ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN)
+                                            ELSE ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME)
                                         END AS MONTO
                                     "),
                                     DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
@@ -6417,7 +6420,8 @@ trait ComprobanteTraits
                                 ->where('TES.COD_CAJA_BANCO', $banco_id)
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
-                                ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+                                ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                                ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
 
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                         ->leftJoin('FE_REF_ASOC', function ($leftJoin) {
@@ -6553,6 +6557,7 @@ trait ComprobanteTraits
                              ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
                     })
                     ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                    ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
                     ->select(
                         'TES.COD_OPERACION_CAJA',
                         'TES.COD_EMPR',
@@ -6566,13 +6571,13 @@ trait ComprobanteTraits
                         'TES.NRO_VOUCHER',
                         'CMD.NOM_CATEGORIA as MONEDA',
                         'CME.NOM_CATEGORIA as ESTADO',
-                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN)  as MONTO_SOLES'),
-                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME)  as MONTO_DOLARES'),
+                        DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                        DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
 
                         DB::raw("
                             CASE 
-                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
-                                ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN)
+                                ELSE ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME)
                             END AS MONTO
                         "),
                         DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
@@ -6612,7 +6617,8 @@ trait ComprobanteTraits
                         END - ISNULL(TES.ATENDIDO, 0) <> 0
                     ")
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
-                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                    ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
 
 
 
@@ -6637,6 +6643,7 @@ trait ComprobanteTraits
                                          ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
                                 })
                                 ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                                ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
                                 ->select(
                                     'TES.COD_OPERACION_CAJA',
                                     'TES.COD_EMPR',
@@ -6650,12 +6657,12 @@ trait ComprobanteTraits
                                     'TES.NRO_VOUCHER',
                                     'CMD.NOM_CATEGORIA as MONEDA',
                                     'CME.NOM_CATEGORIA as ESTADO',
-                                    DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
-                                    DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                                    DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                                    DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
                                     DB::raw("
                                         CASE 
-                                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
-                                            ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN)
+                                            ELSE ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME)
                                         END AS MONTO
                                     "),
                                     DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
@@ -6676,7 +6683,8 @@ trait ComprobanteTraits
                                 //->where('TES.COD_CAJA_BANCO', $banco_id)
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
-                                ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+                                ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                                ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
 
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                                 ->leftJoin('FE_REF_ASOC', function ($leftJoin){
@@ -6805,7 +6813,11 @@ trait ComprobanteTraits
                         'ISCHFC0000000036',
                         'ISCHFC0000000033',
                         'ISCHFC0000000037',
-                        'IICHFC0000000037'
+                        'IICHFC0000000037',
+                        'IICHFC0000000050',
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -6870,14 +6882,18 @@ trait ComprobanteTraits
             ->whereIn('TES.COD_FLUJO_CAJA', [
                 'IICHFC0000000004',
                 'ISCHFC0000000004',
-
                 'IICHFC0000000009',
                 'IICHFC0000000012',
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
                 'ISCHFC0000000036',
                 'ISCHFC0000000033',
-                'IICHFC0000000037'
+                'IICHFC0000000037',
+                'IICHFC0000000037',
+                'IICHFC0000000050',
+                'ISCHFC0000000046',
+                'IICHFC0000000056',
+                'ISCHFC0000000052'
             ])
             ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                 'OPC0000000000002',
@@ -6943,14 +6959,18 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
                         'ISCHFC0000000004',
-
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
                         'ISCHFC0000000033',
-                        'IICHFC0000000037'
+                        'IICHFC0000000037',
+                        'IICHFC0000000037',
+                        'IICHFC0000000050',
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -7015,7 +7035,12 @@ trait ComprobanteTraits
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
                         'ISCHFC0000000033',
-                        'IICHFC0000000037'
+                        'IICHFC0000000037',
+                        'IICHFC0000000037',
+                        'IICHFC0000000050',
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -7080,7 +7105,12 @@ trait ComprobanteTraits
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
                         'ISCHFC0000000033',
-                        'IICHFC0000000037'
+                        'IICHFC0000000037',
+                        'IICHFC0000000037',
+                        'IICHFC0000000050',
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
