@@ -108,8 +108,8 @@
                     <input type="checkbox"
                            class="{{$item->COD_OPERACION_CAJA}} input_asignar"
                            data_total="@if($item->MONEDA=='SOLES') {{$item->MONTO_SOLES}} @else {{$item->MONTO_DOLARES}} @endif"
-                           id="{{$item->COD_OPERACION_CAJA}}">
-                    <label for="{{$item->COD_OPERACION_CAJA}}"
+                           id="{{$item->COD_OPERACION_CAJA}}_{{$index}}">
+                    <label for="{{$item->COD_OPERACION_CAJA}}_{{$index}}"
                            data-atr="ver"
                            class="checkbox checkbox_asignar"
                            data_total="@if($item->MONEDA=='SOLES') {{$item->MONTO_SOLES}} @else {{$item->MONTO_DOLARES}} @endif"
