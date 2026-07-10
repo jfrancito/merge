@@ -6338,7 +6338,9 @@ trait ComprobanteTraits
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
                         'IICHFC0000000056',
-                        'ISCHFC0000000052'
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
 
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', ['OPC0000000000002', 'OPC0000000000001'])
@@ -6355,7 +6357,16 @@ trait ComprobanteTraits
                     ")
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                    ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                    ->where(function($query) {
+                        $query->where(function($q) {
+                            $q->whereIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                              ->whereIn('ASM.TXT_CUENTA_CONTABLE', ['679201', '673110']);
+                        })
+                        ->orWhere(function($q) {
+                            $q->whereNotIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                              ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                        });
+                    });
 
 
 
@@ -6421,7 +6432,16 @@ trait ComprobanteTraits
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                 ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                                ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                                ->where(function($query) {
+                                    $query->where(function($q) {
+                                        $q->whereIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                                          ->whereIn('ASM.TXT_CUENTA_CONTABLE', ['679201', '673110']);
+                                    })
+                                    ->orWhere(function($q) {
+                                        $q->whereNotIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                                          ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                                    });
+                                });
 
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                         ->leftJoin('FE_REF_ASOC', function ($leftJoin) {
@@ -6602,7 +6622,13 @@ trait ComprobanteTraits
                         'ISCHFC0000000036',
                         'ISCHFC0000000033',
                         'ISCHFC0000000037',
-                        'IICHFC0000000037'
+                        'IICHFC0000000037',
+                        'IICHFC0000000050',
+                        'ISCHFC0000000046',
+                        'IICHFC0000000056',
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -6618,7 +6644,16 @@ trait ComprobanteTraits
                     ")
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                    ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                    ->where(function($query) {
+                        $query->where(function($q) {
+                            $q->whereIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                              ->whereIn('ASM.TXT_CUENTA_CONTABLE', ['679201', '673110']);
+                        })
+                        ->orWhere(function($q) {
+                            $q->whereNotIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                              ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                        });
+                    });
 
 
 
@@ -6684,7 +6719,16 @@ trait ComprobanteTraits
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                 ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                                ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                                ->where(function($query) {
+                                    $query->where(function($q) {
+                                        $q->whereIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                                          ->whereIn('ASM.TXT_CUENTA_CONTABLE', ['679201', '673110']);
+                                    })
+                                    ->orWhere(function($q) {
+                                        $q->whereNotIn('TES.COD_FLUJO_CAJA', ['ISCHFC0000000051', 'IICHFC0000000055'])
+                                          ->where('ASM.TXT_CUENTA_CONTABLE', 'not like', '104%');
+                                    });
+                                });
 
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                                 ->leftJoin('FE_REF_ASOC', function ($leftJoin){
@@ -6817,7 +6861,9 @@ trait ComprobanteTraits
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
                         'IICHFC0000000056',
-                        'ISCHFC0000000052'
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -6893,7 +6939,9 @@ trait ComprobanteTraits
                 'IICHFC0000000050',
                 'ISCHFC0000000046',
                 'IICHFC0000000056',
-                'ISCHFC0000000052'
+                'ISCHFC0000000052',
+                'ISCHFC0000000051',
+                'IICHFC0000000055'
             ])
             ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                 'OPC0000000000002',
@@ -6970,7 +7018,9 @@ trait ComprobanteTraits
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
                         'IICHFC0000000056',
-                        'ISCHFC0000000052'
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -7040,7 +7090,9 @@ trait ComprobanteTraits
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
                         'IICHFC0000000056',
-                        'ISCHFC0000000052'
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
                         'OPC0000000000002',
@@ -7110,7 +7162,9 @@ trait ComprobanteTraits
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
                         'IICHFC0000000056',
-                        'ISCHFC0000000052'
+                        'ISCHFC0000000052',
+                        'ISCHFC0000000051',
+                        'IICHFC0000000055'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)

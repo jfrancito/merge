@@ -109,8 +109,8 @@
                     <input type="checkbox"
                            class="<?php echo e($item->COD_OPERACION_CAJA); ?> input_asignar"
                            data_total="<?php if($item->MONEDA=='SOLES'): ?> <?php echo e($item->MONTO_SOLES); ?> <?php else: ?> <?php echo e($item->MONTO_DOLARES); ?> <?php endif; ?>"
-                           id="<?php echo e($item->COD_OPERACION_CAJA); ?>">
-                    <label for="<?php echo e($item->COD_OPERACION_CAJA); ?>"
+                           id="<?php echo e($item->COD_OPERACION_CAJA); ?>_<?php echo e($index); ?>">
+                    <label for="<?php echo e($item->COD_OPERACION_CAJA); ?>_<?php echo e($index); ?>"
                            data-atr="ver"
                            class="checkbox checkbox_asignar"
                            data_total="<?php if($item->MONEDA=='SOLES'): ?> <?php echo e($item->MONTO_SOLES); ?> <?php else: ?> <?php echo e($item->MONTO_DOLARES); ?> <?php endif; ?>"
