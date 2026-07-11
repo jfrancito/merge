@@ -6425,6 +6425,14 @@ trait ComprobanteTraits
                                 )
                                 ->where('TES.IND_EXTORNO', 0)
                                 ->where('TES.COD_ESTADO', 1)
+
+                                ->whereRaw("
+                                    CASE 
+                                        WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                                        ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                    END - ISNULL(TES.ATENDIDO, 0) <> 0
+                                ")
+
                                 ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020',])
                                 ->where('TES.COD_CAJA_BANCO', $banco_id)
                                 ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
@@ -6535,6 +6543,14 @@ trait ComprobanteTraits
                         )
                         ->where('TES.IND_EXTORNO', 0)
                         ->where('TES.COD_ESTADO', 1)
+                        ->whereRaw("
+                            CASE 
+                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN 
+                                ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) - ISNULL(descuentos.MONTODESCUENTO, 0) + ISNULL(aumentos.MONTOAUMENTO, 0)
+                            ELSE 
+                                ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) - ISNULL(descuentos.MONTODESCUENTO, 0) + ISNULL(aumentos.MONTOAUMENTO, 0)
+                            END - ISNULL(TES.ATENDIDO, 0) <> 0
+                        ")
                         ->where('TES.COD_CAJA_BANCO', $banco_id)
                         ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                         ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
