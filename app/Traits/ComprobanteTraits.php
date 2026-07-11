@@ -6337,8 +6337,6 @@ trait ComprobanteTraits
                         'IICHFC0000000037',
                         'IICHFC0000000050',
                         'ISCHFC0000000046',
-                        'IICHFC0000000056',
-                        'ISCHFC0000000052',
                         'ISCHFC0000000051',
                         'IICHFC0000000055'
                     ])
@@ -6540,7 +6538,10 @@ trait ComprobanteTraits
                         ->where('TES.COD_CAJA_BANCO', $banco_id)
                         ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                         ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                        ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
+                        ->where(function ($query) {
+                            $query->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
+                                  ->orWhere('TES.TXT_ITEM_MOVIMIENTO', 'like', '%AMORTIZACIÓN DE CAPITAL%');
+                        })
                         ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
 
 
