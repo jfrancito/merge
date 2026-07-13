@@ -84,7 +84,7 @@ class CotizacionOrdenPedidoController extends Controller
 
         // Anular automáticamente cotizaciones aprobadas con más de 7 días de antigüedad
         // siempre y cuando NO esté referenciada a una ORDEN DE COMPRA
-        DB::table('WEB.ORDEN_COTIZACION')
+        $cotizaciones_a_anular = DB::table('WEB.ORDEN_COTIZACION')
             ->where('COD_ESTADO', 'ETM0000000000005') // APROBADO
             ->where('ACTIVO', 1)
             ->whereRaw('DATEDIFF(day, FEC_COTIZACION, GETDATE()) >= 7')
@@ -96,13 +96,112 @@ class CotizacionOrdenPedidoController extends Controller
                 AND RA.TXT_TABLA_ASOC = 'CMP.ORDEN'
                 AND O.COD_CATEGORIA_ESTADO_ORDEN NOT IN ('EOR0000000000005', 'EOR0000000000017')
             )")
-            ->update([
-                'COD_ESTADO' => 'ETM0000000000014',
-                'TXT_ESTADO' => 'ANULADO',
-                'TXT_GLOSA_ANULACION' => 'pasaron los 7 días de vigencia',
-                'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
-                'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
-            ]);
+            ->pluck('ID_COTIZACION')
+            ->toArray();
+
+        if (!empty($cotizaciones_a_anular)) {
+            foreach ($cotizaciones_a_anular as $id_cot) {
+                // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+                $cot_temp = DB::table('WEB.ORDEN_COTIZACION')
+                    ->where('ID_COTIZACION', $id_cot)
+                    ->first();
+
+                if ($cot_temp) {
+                    $cod_centro_temp = trim($cot_temp->COD_CENTRO);
+                    $conexionbd_temp = 'sqlsrv';
+                    if ($cod_centro_temp == 'CEN0000000000004') {
+                        $conexionbd_temp = 'sqlsrv_r';
+                    } else {
+                        if ($cod_centro_temp == 'CEN0000000000006') {
+                            $conexionbd_temp = 'sqlsrv_b';
+                        }
+                    }
+
+                    // 1. Actualizar Cabecera a ANULADO
+                    DB::table('WEB.ORDEN_COTIZACION')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->update([
+                            'COD_ESTADO' => 'ETM0000000000014',
+                            'TXT_ESTADO' => 'ANULADO',
+                            'TXT_GLOSA_ANULACION' => 'pasaron los 7 días de vigencia',
+                            'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                            'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                        ]);
+
+                    // 2. Desactivar Detalles
+                    DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->update(['ACTIVO' => 0]);
+
+                    // Réplica de cabecera y detalle a zonas
+                    if ($conexionbd_temp !== 'sqlsrv') {
+                        try {
+                            DB::connection($conexionbd_temp)->table('WEB.ORDEN_COTIZACION')
+                                ->where('ID_COTIZACION', $id_cot)
+                                ->update([
+                                    'COD_ESTADO' => 'ETM0000000000014',
+                                    'TXT_ESTADO' => 'ANULADO',
+                                    'TXT_GLOSA_ANULACION' => 'pasaron los 7 días de vigencia',
+                                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                                ]);
+
+                            DB::connection($conexionbd_temp)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                                ->where('ID_COTIZACION', $id_cot)
+                                ->update(['ACTIVO' => 0]);
+                        } catch (\Exception $ez) {
+                            \Log::error('Error al replicar anulación automática de cotización a zona (' . $conexionbd_temp . '): ' . $ez->getMessage());
+                        }
+                    }
+
+                    // 3. Desactivar Archivos
+                    DB::table('dbo.ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $id_cot)
+                        ->update(['ACTIVO' => 0]);
+
+                    // Obtener referencias asociadas para limpiar consolidado
+                    $referencias_temp = DB::table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA_ASOC', $id_cot)
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                        ->get();
+
+                    // 4. Eliminar referencias
+                    DB::table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA_ASOC', $id_cot)
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                        ->delete();
+
+                    // Réplica de eliminación REFERENCIA_ASOC en zonas
+                    if ($conexionbd_temp !== 'sqlsrv') {
+                        try {
+                            DB::connection($conexionbd_temp)->table('CMP.REFERENCIA_ASOC')
+                                ->where('COD_TABLA_ASOC', $id_cot)
+                                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                                ->delete();
+                        } catch (\Exception $ez) {
+                            \Log::error('Error al replicar eliminación de CMP.REFERENCIA_ASOC a zona (' . $conexionbd_temp . '): ' . $ez->getMessage());
+                        }
+                    }
+
+                    // 5. Restaurar TXT_COTIZACION en Consolidados
+                    $detalles_temp = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->get();
+
+                    foreach ($detalles_temp as $det_temp) {
+                        foreach ($referencias_temp as $ref_temp) {
+                            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $ref_temp->COD_TABLA)
+                                ->where('COD_PRODUCTO', $det_temp->COD_PRODUCTO)
+                                ->update(['TXT_COTIZACION' => null]);
+                        }
+                    }
+
+                    // Réplica general de la cotización
+                    $this->replicateCotizacionToZona($id_cot);
+                }
+            }
+        }
 
         $listacotizaciones = DB::table('WEB.ORDEN_COTIZACION as C')
             ->leftJoin('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
