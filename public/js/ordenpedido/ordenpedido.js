@@ -317,6 +317,14 @@ $(document).ready(function () {
             mensaje: '¿Deseas guardar la <b>Orden de Pedido</b>?',
             confirmar: true,
             onConfirm: function () {
+                var self = this;
+                if (self.buttons && self.buttons.confirmar) {
+                    self.buttons.confirmar.disable();
+                    self.buttons.cancelar.disable();
+                }
+
+                // Desactivar el botón en la página principal para evitar clics dobles
+                $('#asignarordenpedido').prop('disabled', true).addClass('disabled');
 
                 // Abrimos cargando solo cuando el usuario confirma
                 abrircargando();
@@ -368,6 +376,10 @@ $(document).ready(function () {
                             mensaje: xhr.responseJSON?.message ||
                                 'Ocurrió un error al guardar la Orden de Pedido.'
                         });
+                        
+                        // Re-habilitar el botón en la página en caso de error
+                        $('#asignarordenpedido').prop('disabled', false).removeClass('disabled');
+                        
                         cerrarcargando(); // Cerramos solo si hay error
                     },
                 });

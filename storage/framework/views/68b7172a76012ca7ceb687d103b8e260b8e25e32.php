@@ -126,7 +126,7 @@
 
     .table thead th {
         background: #f3f5f9;
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 700;
         color: #333;
         text-transform: uppercase;
@@ -135,6 +135,7 @@
         vertical-align: middle;
         text-align: center;
         line-height: 1.2;
+        max-width: 110px !important;
     }
 
     /* GENERAL */

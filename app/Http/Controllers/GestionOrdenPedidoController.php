@@ -320,231 +320,243 @@ class GestionOrdenPedidoController extends Controller
 
     public function insertOrdenPedidoAction(Request $request)
     {
-        // Capturar valores del formulario
-        $fec_pedido = $request->input('fec_pedido');
-        $cod_periodo = $request->input('cod_periodo');
-        $cod_anio = $request->input('cod_anio');
-        $cod_empr = $request->input('cod_empr');
-        $cod_centro = $request->input('cod_centro');
-        $cod_tipo_pedido = $request->input('cod_tipo_pedido');
-        $cod_trabajador_solicita = $request->input('cod_trabajador_solicita');
-        $cod_trabajador_autoriza = $request->input('cod_trabajador_autoriza');
-        $cod_trabajador_aprueba_ger = $request->input('cod_trabajador_aprueba_ger');
-        $cod_trabajador_aprueba_adm = $request->input('cod_trabajador_aprueba_adm');
-        $txt_glosa = $request->input('txt_glosa');
-        $cod_estado = $request->input('cod_estado');
-        $cod_area = $request->input('cod_area');
-        $orden_pedido_id = $request->input('orden_pedido_id');
-        $opcion = $request->input('opcion');
-        //$array_detalle = $request->input('array_detalle');
+        ob_start();
+        try {
+            // Capturar valores del formulario
+            $fec_pedido = $request->input('fec_pedido');
+            $cod_periodo = $request->input('cod_periodo');
+            $cod_anio = $request->input('cod_anio');
+            $cod_empr = $request->input('cod_empr');
+            $cod_centro = $request->input('cod_centro');
+            $cod_tipo_pedido = $request->input('cod_tipo_pedido');
+            $cod_trabajador_solicita = $request->input('cod_trabajador_solicita');
+            $cod_trabajador_autoriza = $request->input('cod_trabajador_autoriza');
+            $cod_trabajador_aprueba_ger = $request->input('cod_trabajador_aprueba_ger');
+            $cod_trabajador_aprueba_adm = $request->input('cod_trabajador_aprueba_adm');
+            $txt_glosa = $request->input('txt_glosa');
+            $cod_estado = $request->input('cod_estado');
+            $cod_area = $request->input('cod_area');
+            $orden_pedido_id = $request->input('orden_pedido_id');
+            $opcion = $request->input('opcion');
+            //$array_detalle = $request->input('array_detalle');
 
-        $array_detalle = json_decode($request->input('array_detalle'), true) ?? [];
+            $array_detalle = json_decode($request->input('array_detalle'), true) ?? [];
 
-        $archivos_info = []; // Almacenar info de cada archivo para insertar después
+            $archivos_info = []; // Almacenar info de cada archivo para insertar después
 
-        if ($request->hasFile('select_file')) {
+            if ($request->hasFile('select_file')) {
 
-            $archivos = $request->file('select_file');
+                $archivos = $request->file('select_file');
 
-            // Soportar tanto un archivo como múltiples
-            if (!is_array($archivos)) {
-                $archivos = [$archivos];
-            }
-
-            foreach ($archivos as $archivo) {
-                $nombre_original = $archivo->getClientOriginalName();
-                $extension_item = $archivo->getClientOriginalExtension();
-                $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
-                $size_item = $archivo->getSize();
-                $mime_item = $archivo->getMimeType();
-                $nombre_guardado = time() . '_' . $nombre_original;
-
-                $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
-                $ruta_item = $destino_remoto . '\\' . $nombre_guardado;
-
-                if (!copy($archivo->getRealPath(), $ruta_item)) {
-                    throw new \Symfony\Component\HttpFoundation\File\Exception\FileException(
-                        "No se pudo escribir en el directorio de red: " . $destino_remoto
-                    );
+                // Soportar tanto un archivo como múltiples
+                if (!is_array($archivos)) {
+                    $archivos = [$archivos];
                 }
 
-                $archivos_info[] = [
-                    'nombre_original'     => $nombre_original,
-                    'nombre_sin_extension'=> $nombre_sin_extension,
-                    'extension'           => $extension_item,
-                    'size'                => $size_item,
-                    'mime'                => $mime_item,
-                    'ruta'                => $ruta_item,
-                ];
+                foreach ($archivos as $archivo) {
+                    $nombre_original = $archivo->getClientOriginalName();
+                    $extension_item = $archivo->getClientOriginalExtension();
+                    $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+                    $size_item = $archivo->getSize();
+                    $mime_item = $archivo->getMimeType();
+                    $nombre_guardado = time() . '_' . $nombre_original;
+
+                    $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+                    $ruta_item = $destino_remoto . '\\' . $nombre_guardado;
+
+                    if (!copy($archivo->getRealPath(), $ruta_item)) {
+                        throw new \Symfony\Component\HttpFoundation\File\Exception\FileException(
+                            "No se pudo escribir en el directorio de red: " . $destino_remoto
+                        );
+                    }
+
+                    $archivos_info[] = [
+                        'nombre_original'     => $nombre_original,
+                        'nombre_sin_extension'=> $nombre_sin_extension,
+                        'extension'           => $extension_item,
+                        'size'                => $size_item,
+                        'mime'                => $mime_item,
+                        'ruta'                => $ruta_item,
+                    ];
+                }
             }
-        }
 
-        // =======================
-        // Procesar nombres y textos relacionados
-        // =======================
-        $registro_periodo = DB::table('Web.periodos')
-            ->where('COD_PERIODO', $cod_periodo)
-            ->first();
-        $txt_nombre = $registro_periodo->TXT_NOMBRE ?? '';
+            // =======================
+            // Procesar nombres y textos relacionados
+            // =======================
+            $registro_periodo = DB::table('Web.periodos')
+                ->where('COD_PERIODO', $cod_periodo)
+                ->first();
+            $txt_nombre = $registro_periodo->TXT_NOMBRE ?? '';
 
-        $registro_tipo_pedido = DB::table('WEB.TIPO_PEDIDO_ORDEN')
-            ->where('COD_TIPO_PEDIDO', $cod_tipo_pedido)
-            ->first();
-        $txt_tipo_pedido = $registro_tipo_pedido->TXT_TIPO_PEDIDO ?? '';
+            $registro_tipo_pedido = DB::table('WEB.TIPO_PEDIDO_ORDEN')
+                ->where('COD_TIPO_PEDIDO', $cod_tipo_pedido)
+                ->first();
+            $txt_tipo_pedido = $registro_tipo_pedido->TXT_TIPO_PEDIDO ?? '';
 
-        $registro_solicita = DB::table('dbo.users')
-            ->where('usuarioosiris_id', $cod_trabajador_solicita)
-            ->first();
-        $txt_trabajador_solicita = $registro_solicita->nombre ?? '';
+            $registro_solicita = DB::table('dbo.users')
+                ->where('usuarioosiris_id', $cod_trabajador_solicita)
+                ->first();
+            $txt_trabajador_solicita = $registro_solicita->nombre ?? '';
 
-        $registro_autoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
-            ->where('COD_TRAB', $cod_trabajador_autoriza)
-            ->first();
-        $txt_trabajador_autoriza = $registro_autoriza ? trim(
-            ($registro_autoriza->nombres ?? '') . ' ' .
-            ($registro_autoriza->apellidopaterno ?? '') . ' ' .
-            ($registro_autoriza->apellidomaterno ?? '')
-        ) : '';
+            $registro_autoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_autoriza)
+                ->first();
+            $txt_trabajador_autoriza = $registro_autoriza ? trim(
+                ($registro_autoriza->nombres ?? '') . ' ' .
+                ($registro_autoriza->apellidopaterno ?? '') . ' ' .
+                ($registro_autoriza->apellidomaterno ?? '')
+            ) : '';
 
-        $registro_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
-            ->where('COD_TRAB', $cod_trabajador_aprueba_ger)
-            ->first();
-        $txt_trabajador_aprueba_ger = $registro_aprueba_ger ? trim(
-            ($registro_aprueba_ger->nombres ?? '') . ' ' .
-            ($registro_aprueba_ger->apellidopaterno ?? '') . ' ' .
-            ($registro_aprueba_ger->apellidomaterno ?? '')
-        ) : '';
+            $registro_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_aprueba_ger)
+                ->first();
+            $txt_trabajador_aprueba_ger = $registro_aprueba_ger ? trim(
+                ($registro_aprueba_ger->nombres ?? '') . ' ' .
+                ($registro_aprueba_ger->apellidopaterno ?? '') . ' ' .
+                ($registro_aprueba_ger->apellidomaterno ?? '')
+            ) : '';
 
-        $registro_aprueba_adm = DB::table('WEB.ListaplatrabajadoresGenereal')
-            ->where('COD_TRAB', $cod_trabajador_aprueba_adm)
-            ->first();
-        $txt_trabajador_aprueba_adm = $registro_aprueba_adm ? trim(
-            ($registro_aprueba_adm->nombres ?? '') . ' ' .
-            ($registro_aprueba_adm->apellidopaterno ?? '') . ' ' .
-            ($registro_aprueba_adm->apellidomaterno ?? '')
-        ) : '';
+            $registro_aprueba_adm = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_aprueba_adm)
+                ->first();
+            $txt_trabajador_aprueba_adm = $registro_aprueba_adm ? trim(
+                ($registro_aprueba_adm->nombres ?? '') . ' ' .
+                ($registro_aprueba_adm->apellidopaterno ?? '') . ' ' .
+                ($registro_aprueba_adm->apellidomaterno ?? '')
+            ) : '';
 
-        $registro_estado = DB::table('CMP.CATEGORIA')
-            ->where('COD_CATEGORIA', $cod_estado)
-            ->first();
-        $txt_estado = $registro_estado->NOM_CATEGORIA ?? '';
+            $registro_estado = DB::table('CMP.CATEGORIA')
+                ->where('COD_CATEGORIA', $cod_estado)
+                ->first();
+            $txt_estado = $registro_estado->NOM_CATEGORIA ?? '';
 
-        $registro_area = DB::table('WEB.ListaplatrabajadoresGenereal')
-            ->where('area_id', $cod_area)
-            ->first();
-        $txt_area = $registro_area->cadarea ?? '';
+            $registro_area = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('area_id', $cod_area)
+                ->first();
+            $txt_area = $registro_area->cadarea ?? '';
 
-        // =======================
-        // Determinar acción: Insertar o Actualizar
-        // =======================
-        $accion = ($opcion === 'U') ? 'U' : 'I';
+            // =======================
+            // Determinar acción: Insertar o Actualizar
+            // =======================
+            $accion = ($opcion === 'U') ? 'U' : 'I';
 
-        // Insertar cabecera
-        $orden_pedido_id =
-            $this->insertOrdenPedido(
-                $accion,
-                $orden_pedido_id,
-                $fec_pedido,
-                $cod_periodo,
-                $txt_nombre,
-                $cod_anio,
-                $cod_empr,
-                $cod_centro,
-                $cod_tipo_pedido,
-                $txt_tipo_pedido,
-                $cod_trabajador_solicita,
-                $txt_trabajador_solicita,
-                $cod_trabajador_autoriza,
-                $txt_trabajador_autoriza,
-                $cod_trabajador_aprueba_ger,
-                $txt_trabajador_aprueba_ger,
-                $cod_trabajador_aprueba_adm,
-                $txt_trabajador_aprueba_adm,
-                $txt_glosa,
-                $cod_estado,
-                $txt_estado,
-                $cod_area,
-                $txt_area,
-                true,
-                ""
-            );
-
-        // determine if update, deactivate existing details
-        if ($accion === 'U') {
-            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-                ->where('ID_PEDIDO', $orden_pedido_id)
-                ->update(['ACTIVO' => 0]);
-        }
-
-        if (count($array_detalle) > 0) {
-            foreach ($array_detalle as $item) {
-                $this->insertOrdenPedidoDetalle(
-                    'I',
+            // Insertar cabecera
+            $orden_pedido_id =
+                $this->insertOrdenPedido(
+                    $accion,
                     $orden_pedido_id,
+                    $fec_pedido,
+                    $cod_periodo,
+                    $txt_nombre,
+                    $cod_anio,
                     $cod_empr,
                     $cod_centro,
-                    $item['cod_producto'],
-                    $item['nom_producto'],
-                    $item['cod_categoria'] ?? '',
-                    $item['nom_categoria'] ?? '',
-                    $item['cantidad'],
-                    $item['precio'],
-                    $item['txt_observacion'] ?? '',
+                    $cod_tipo_pedido,
+                    $txt_tipo_pedido,
+                    $cod_trabajador_solicita,
+                    $txt_trabajador_solicita,
+                    $cod_trabajador_autoriza,
+                    $txt_trabajador_autoriza,
+                    $cod_trabajador_aprueba_ger,
+                    $txt_trabajador_aprueba_ger,
+                    $cod_trabajador_aprueba_adm,
+                    $txt_trabajador_aprueba_adm,
+                    $txt_glosa,
+                    $cod_estado,
+                    $txt_estado,
+                    $cod_area,
+                    $txt_area,
                     true,
                     ""
                 );
 
-                // ACTUALIZAR IND_MATERIAL_SERVICIO BASADO EN SELECCION DEL FRONTEND
-                if (isset($item['ind_material_servicio'])) {
-                    DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-                        ->where('ID_PEDIDO', $orden_pedido_id)
-                        ->where('COD_PRODUCTO', $item['cod_producto'])
-                        ->where('ACTIVO', 1)
-                        ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
-                }
-            }
-        }
-
-        if (count($archivos_info) > 0) {
+            // determine if update, deactivate existing details
             if ($accion === 'U') {
-                DB::table('dbo.ARCHIVOS')
-                    ->where('ID_DOCUMENTO', $orden_pedido_id)
+                DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                    ->where('ID_PEDIDO', $orden_pedido_id)
                     ->update(['ACTIVO' => 0]);
             }
 
-            foreach ($archivos_info as $idx => $info) {
-                DB::table('dbo.ARCHIVOS')->insert([
-                    'ID_DOCUMENTO'       => $orden_pedido_id ?? '',
-                    'DOCUMENTO_ITEM'     => $idx + 1,
-                    'TIPO_ARCHIVO'       => $info['mime'],
-                    'NOMBRE_ARCHIVO'     => $info['nombre_sin_extension'],
-                    'DESCRIPCION_ARCHIVO'=> $info['nombre_original'],
-                    'URL_ARCHIVO'        => $info['ruta'],
-                    'EXTENSION'          => $info['extension'],
-                    'SIZE'               => $info['size'],
-                    'ACTIVO'             => 1,
-                    'FECHA_CREA'         => DB::raw('GETDATE()'),
-                    'USUARIO_CREA'       => Session::get('usuario')->usuario ?? 'SISTEMA',
-                ]);
+            if (count($array_detalle) > 0) {
+                foreach ($array_detalle as $item) {
+                    $this->insertOrdenPedidoDetalle(
+                        'I',
+                        $orden_pedido_id,
+                        $cod_empr,
+                        $cod_centro,
+                        $item['cod_producto'],
+                        $item['nom_producto'],
+                        $item['cod_categoria'] ?? '',
+                        $item['nom_categoria'] ?? '',
+                        $item['cantidad'],
+                        $item['precio'],
+                        $item['txt_observacion'] ?? '',
+                        true,
+                        ""
+                    );
+
+                    // ACTUALIZAR IND_MATERIAL_SERVICIO BASADO EN SELECCION DEL FRONTEND
+                    if (isset($item['ind_material_servicio'])) {
+                        DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                            ->where('ID_PEDIDO', $orden_pedido_id)
+                            ->where('COD_PRODUCTO', $item['cod_producto'])
+                            ->where('ACTIVO', 1)
+                            ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                    }
+                }
             }
+
+            if (count($archivos_info) > 0) {
+                if ($accion === 'U') {
+                    DB::table('dbo.ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $orden_pedido_id)
+                        ->update(['ACTIVO' => 0]);
+                }
+
+                foreach ($archivos_info as $idx => $info) {
+                    DB::table('dbo.ARCHIVOS')->insert([
+                        'ID_DOCUMENTO'       => $orden_pedido_id ?? '',
+                        'DOCUMENTO_ITEM'     => $idx + 1,
+                        'TIPO_ARCHIVO'       => $info['mime'],
+                        'NOMBRE_ARCHIVO'     => $info['nombre_sin_extension'],
+                        'DESCRIPCION_ARCHIVO'=> $info['nombre_original'],
+                        'URL_ARCHIVO'        => $info['ruta'],
+                        'EXTENSION'          => $info['extension'],
+                        'SIZE'               => $info['size'],
+                        'ACTIVO'             => 1,
+                        'FECHA_CREA'         => DB::raw('GETDATE()'),
+                        'USUARIO_CREA'       => Session::get('usuario')->usuario ?? 'SISTEMA',
+                    ]);
+                }
+            }
+
+            $this->replicateOrdenPedidoToZona($orden_pedido_id);
+
+            if ($accion === 'I') {
+                $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $orden_pedido_id;
+                $documento->DOCUMENTO_ITEM = 1;
+                
+                $fecha_crea = !empty($pedido_db->FEC_USUARIO_CREA_AUD) ? $pedido_db->FEC_USUARIO_CREA_AUD : date('Y-m-d H:i:s');
+                $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_crea));
+                
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'PEDIDO GENERADO POR USUARIO';
+                $documento->MENSAJE = '';
+                $documento->save();
+            }
+
+            ob_clean();
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al registrar orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-
-        $this->replicateOrdenPedidoToZona($orden_pedido_id);
-
-        if ($accion === 'I') {
-            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
-            $documento = new FeDocumentoHistorial;
-            $documento->ID_DOCUMENTO = $orden_pedido_id;
-            $documento->DOCUMENTO_ITEM = 1;
-            $documento->FECHA = $pedido_db->FEC_USUARIO_CREA_AUD;
-            $documento->USUARIO_ID = Session::get('usuario')->id;
-            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-            $documento->TIPO = 'PEDIDO GENERADO POR USUARIO';
-            $documento->MENSAJE = '';
-            $documento->save();
-        }
-
-        return response()->json(['success' => true]);
     }
 
 
@@ -577,62 +589,73 @@ class GestionOrdenPedidoController extends Controller
 
     public function insertEmitirOrdenPedido(Request $request)
     {
-        $id_buscar = $request->input('orden_pedido_id');
-        $orden_pedido_id = $request->input('orden_pedido_id');
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
 
-        $pedido = DB::table('WEB.ORDEN_PEDIDO')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->first();
-        $estado = DB::table('CMP.CATEGORIA')
-            ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('COD_CATEGORIA', 'ETM0000000000010')
-            ->first();
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('COD_CATEGORIA', 'ETM0000000000010')
+                ->first();
 
 
-        $this->insertOrdenPedido(
-            'U',
-            $id_buscar,
-            $pedido->FEC_PEDIDO,
-            $pedido->COD_PERIODO,
-            $pedido->TXT_NOMBRE,
-            $pedido->COD_ANIO,
-            $pedido->COD_EMPR,
-            $pedido->COD_CENTRO,
-            $pedido->COD_TIPO_PEDIDO,
-            $pedido->TXT_TIPO_PEDIDO,
-            $pedido->COD_TRABAJADOR_SOLICITA,
-            $pedido->TXT_TRABAJADOR_SOLICITA,
-            $pedido->COD_TRABAJADOR_AUTORIZA,
-            $pedido->TXT_TRABAJADOR_AUTORIZA,
-            $pedido->COD_TRABAJADOR_APRUEBA_GER,
-            $pedido->TXT_TRABAJADOR_APRUEBA_GER,
-            $pedido->COD_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_GLOSA,
-            $estado->COD_CATEGORIA,
-            $estado->NOM_CATEGORIA,
-            $pedido->COD_AREA,
-            $pedido->TXT_AREA,
-            true,
-            ""
-        );
+            $this->insertOrdenPedido(
+                'U',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                ""
+            );
 
-        $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+            $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
 
-        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
-        $documento = new FeDocumentoHistorial;
-        $documento->ID_DOCUMENTO = $orden_pedido_id;
-        $documento->DOCUMENTO_ITEM = 1;
-        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
-        $documento->USUARIO_ID = Session::get('usuario')->id;
-        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-        $documento->TIPO = 'PEDIDO EMITIDO POR USUARIO';
-        $documento->MENSAJE = '';
-        $documento->save();
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'PEDIDO EMITIDO POR USUARIO';
+            $documento->MENSAJE = '';
+            $documento->save();
 
-        return response()->json([
-            'success' => true
-        ]);
+            ob_clean();
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al emitir orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
     }
 
     public function actionAjaxPedidoEditar(Request $request)
@@ -704,69 +727,79 @@ class GestionOrdenPedidoController extends Controller
 
     public function insertAnularOrdenPedido(Request $request)
     {
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
 
-        $id_buscar = $request->input('orden_pedido_id');
-        $orden_pedido_id = $request->input('orden_pedido_id');
-
-        $pedido = DB::table('WEB.ORDEN_PEDIDO')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->first();
-        $estado = DB::table('CMP.CATEGORIA')
-            ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('NOM_CATEGORIA', 'ANULADO')
-            ->first();
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('NOM_CATEGORIA', 'ANULADO')
+                ->first();
 
 
-        $this->insertOrdenPedido(
-            'D',
-            $id_buscar,
-            $pedido->FEC_PEDIDO,
-            $pedido->COD_PERIODO,
-            $pedido->TXT_NOMBRE,
-            $pedido->COD_ANIO,
-            $pedido->COD_EMPR,
-            $pedido->COD_CENTRO,
-            $pedido->COD_TIPO_PEDIDO,
-            $pedido->TXT_TIPO_PEDIDO,
-            $pedido->COD_TRABAJADOR_SOLICITA,
-            $pedido->TXT_TRABAJADOR_SOLICITA,
-            $pedido->COD_TRABAJADOR_AUTORIZA,
-            $pedido->TXT_TRABAJADOR_AUTORIZA,
-            $pedido->COD_TRABAJADOR_APRUEBA_GER,
-            $pedido->TXT_TRABAJADOR_APRUEBA_GER,
-            $pedido->COD_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_GLOSA,
-            $estado->COD_CATEGORIA,
-            $estado->NOM_CATEGORIA,
-            $pedido->COD_AREA,
-            $pedido->TXT_AREA,
-            true,
-            ""
-        );
+            $this->insertOrdenPedido(
+                'D',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                ""
+            );
 
-        DB::table('WEB.ORDEN_PEDIDO_DETALLE')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->update([
-                'ACTIVO' => 0
+            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->update([
+                    'ACTIVO' => 0
+                ]);
+
+            $this->replicateOrdenPedidoToZona($orden_pedido_id);
+
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'ANULACIÓN DEL PEDIDO';
+            $documento->MENSAJE = '';
+            $documento->save();
+
+            ob_clean();
+            return response()->json([
+                'success' => true
             ]);
-
-        $this->replicateOrdenPedidoToZona($orden_pedido_id);
-
-        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
-        $documento = new FeDocumentoHistorial;
-        $documento->ID_DOCUMENTO = $orden_pedido_id;
-        $documento->DOCUMENTO_ITEM = 1;
-        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
-        $documento->USUARIO_ID = Session::get('usuario')->id;
-        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-        $documento->TIPO = 'ANULACIÓN DEL PEDIDO';
-        $documento->MENSAJE = '';
-        $documento->save();
-
-        return response()->json([
-            'success' => true
-        ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al anular orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
     }
 
     public function actionAjaxObtenerCorrelativoPedido(Request $request)
