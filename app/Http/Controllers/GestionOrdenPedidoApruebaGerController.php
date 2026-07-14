@@ -67,126 +67,146 @@ class GestionOrdenPedidoApruebaGerController extends Controller
 
     public function insertApruebaOrdenPedidoGer(Request $request)
     {
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
 
-        $id_buscar = $request->input('orden_pedido_id');
-        $orden_pedido_id = $request->input('orden_pedido_id');
-
-        $pedido = DB::table('WEB.ORDEN_PEDIDO')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->first();
-        $estado = DB::table('CMP.CATEGORIA')
-            ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('COD_CATEGORIA', 'ETM0000000000015')
-            ->first();
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('COD_CATEGORIA', 'ETM0000000000015')
+                ->first();
 
 
 
-        $this->insertOrdenPedido(
-            'U',
-            $id_buscar,
-            $pedido->FEC_PEDIDO,
-            $pedido->COD_PERIODO,
-            $pedido->TXT_NOMBRE,
-            $pedido->COD_ANIO,
-            $pedido->COD_EMPR,
-            $pedido->COD_CENTRO,
-            $pedido->COD_TIPO_PEDIDO,
-            $pedido->TXT_TIPO_PEDIDO,
-            $pedido->COD_TRABAJADOR_SOLICITA,
-            $pedido->TXT_TRABAJADOR_SOLICITA,
-            $pedido->COD_TRABAJADOR_AUTORIZA,
-            $pedido->TXT_TRABAJADOR_AUTORIZA,
-            $pedido->COD_TRABAJADOR_APRUEBA_GER,
-            $pedido->TXT_TRABAJADOR_APRUEBA_GER,
-            $pedido->COD_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_GLOSA,
-            $estado->COD_CATEGORIA,
-            $estado->NOM_CATEGORIA,
-            $pedido->COD_AREA,
-            $pedido->TXT_AREA,
-            true,
-            ""
-        );
+            $this->insertOrdenPedido(
+                'U',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                ""
+            );
 
-        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
-        $documento = new FeDocumentoHistorial;
-        $documento->ID_DOCUMENTO = $orden_pedido_id;
-        $documento->DOCUMENTO_ITEM = 1;
-        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
-        $documento->USUARIO_ID = Session::get('usuario')->id;
-        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-        $documento->TIPO = 'AUTORIZACIÓN DE GERENCIA ÁREA';
-        $documento->MENSAJE = '';
-        $documento->save();
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'AUTORIZACIÓN DE GERENCIA ÁREA';
+            $documento->MENSAJE = '';
+            $documento->save();
 
-        return response()->json([
-            'success' => true
-        ]);
+            ob_clean();
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al aprobar orden de pedido gerencia: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
     }
 
     public function insertRechazarOrdenPedidoGer(Request $request)
     {
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
 
-        $id_buscar = $request->input('orden_pedido_id');
-        $orden_pedido_id = $request->input('orden_pedido_id');
-
-        $pedido = DB::table('WEB.ORDEN_PEDIDO')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->first();
-        $estado = DB::table('CMP.CATEGORIA')
-            ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('NOM_CATEGORIA', 'RECHAZADO')
-            ->first();
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('NOM_CATEGORIA', 'RECHAZADO')
+                ->first();
 
 
-        $this->insertOrdenPedido(
-            'R',
-            $id_buscar,
-            $pedido->FEC_PEDIDO,
-            $pedido->COD_PERIODO,
-            $pedido->TXT_NOMBRE,
-            $pedido->COD_ANIO,
-            $pedido->COD_EMPR,
-            $pedido->COD_CENTRO,
-            $pedido->COD_TIPO_PEDIDO,
-            $pedido->TXT_TIPO_PEDIDO,
-            $pedido->COD_TRABAJADOR_SOLICITA,
-            $pedido->TXT_TRABAJADOR_SOLICITA,
-            $pedido->COD_TRABAJADOR_AUTORIZA,
-            $pedido->TXT_TRABAJADOR_AUTORIZA,
-            $pedido->COD_TRABAJADOR_APRUEBA_GER,
-            $pedido->TXT_TRABAJADOR_APRUEBA_GER,
-            $pedido->COD_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
-            $pedido->TXT_GLOSA,
-            $estado->COD_CATEGORIA,
-            $estado->NOM_CATEGORIA,
-            $pedido->COD_AREA,
-            $pedido->TXT_AREA,
-            true,
-            ""
-        );
+            $this->insertOrdenPedido(
+                'R',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                ""
+            );
 
-        // Guardar motivo de rechazo
-        DB::table('WEB.ORDEN_PEDIDO')
-            ->where('ID_PEDIDO', $orden_pedido_id)
-            ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
+            // Guardar motivo de rechazo
+            DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->update(['TXT_GLOSA_RECHAZO' => $request->input('motivo', '')]);
 
-        $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
-        $documento = new FeDocumentoHistorial;
-        $documento->ID_DOCUMENTO = $orden_pedido_id;
-        $documento->DOCUMENTO_ITEM = 1;
-        $documento->FECHA = $pedido_db->FEC_USUARIO_MODIF_AUD;
-        $documento->USUARIO_ID = Session::get('usuario')->id;
-        $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-        $documento->TIPO = 'PEDIDO RECHAZADO';
-        $documento->MENSAJE = $request->input('motivo', '');
-        $documento->save();
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'PEDIDO RECHAZADO';
+            $documento->MENSAJE = $request->input('motivo', '');
+            $documento->save();
 
-        return response()->json([
-            'success' => true
-        ]);
+            ob_clean();
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al rechazar orden de pedido gerencia: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
     }
 
 
