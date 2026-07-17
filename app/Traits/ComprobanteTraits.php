@@ -934,60 +934,64 @@ trait ComprobanteTraits
         if($rol->ind_uc == 1){
 
 
-                                    $listadatos = DB::table('FE_DOCUMENTO')
+            $listadatos                 = DB::table('FE_DOCUMENTO')
                                         ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                        ->join('CMP.REFERENCIA_ASOC as REF', 'REF.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
-                                        ->join('CMP.DOCUMENTO_CTBLE as DOC', function ($join) {
-                                            $join->on('DOC.COD_DOCUMENTO_CTBLE', '=', 'REF.COD_TABLA_ASOC')
-                                                 ->whereRaw('FE_DOCUMENTO.ID_DOCUMENTO = DOC.TXT_TIPO_REFERENCIA');
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                        ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                            $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                                 ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                         })
-                                        ->where('REF.COD_ESTADO', '1')
-                                        ->where('DOC.COD_EMPR', $empresa_id)
-                                        ->where('DOC.COD_CATEGORIA_MONEDA', $moneda_id)
-                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO', $banco_id)
-                                        ->whereBetween(DB::raw('CAST(FE_DOCUMENTO.FECHA_PA AS DATE)'), [$fecha_inicio, $fecha_fin])
+                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+
+
+                                        //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
-                                        ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(DOC.CAN_TOTAL AS FLOAT)')
-                                        ->where(function ($query) {
-                                            $query->where('FE_DOCUMENTO.FOLIO', '')
-                                                  ->orWhereNull('FE_DOCUMENTO.FOLIO');
-                                        })
-                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00011874')
+                                        ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
+                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                         ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
-                                        ->select('FE_DOCUMENTO.*', 'DOC.*')
-                                        ->distinct()
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
+
 
 
 
         }else{
 
+            $listadatos                 = DB::table('FE_DOCUMENTO')
+                                        ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                        ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                            $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                                 ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                        })
+                                         ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                        ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
+                                        ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
+                                        ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
+                                        ->get();
 
-                                $listadatos = DB::table('FE_DOCUMENTO')
-                                    ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                    ->join('CMP.REFERENCIA_ASOC as REF', 'REF.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
-                                    ->join('CMP.DOCUMENTO_CTBLE as DOC', function ($join) {
-                                        $join->on('DOC.COD_DOCUMENTO_CTBLE', '=', 'REF.COD_TABLA_ASOC')
-                                             ->whereRaw('FE_DOCUMENTO.ID_DOCUMENTO = DOC.TXT_TIPO_REFERENCIA');
-                                    })
-                                    ->where('REF.COD_ESTADO', '1')
-                                    ->where('DOC.COD_EMPR', $empresa_id)
-                                    ->where('DOC.COD_CATEGORIA_MONEDA', $moneda_id)
-                                    ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO', $banco_id)
-                                    ->whereBetween(DB::raw('CAST(FE_DOCUMENTO.FECHA_PA AS DATE)'), [$fecha_inicio, $fecha_fin])
-                                    ->whereIn('DOC.COD_USUARIO_CREA_AUD', $array_usuarios)
-                                    ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
-                                    ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(DOC.CAN_TOTAL AS FLOAT)')
-                                    ->where(function ($query) {
-                                        $query->where('FE_DOCUMENTO.FOLIO', '')
-                                              ->orWhereNull('FE_DOCUMENTO.FOLIO');
-                                    })
-                                    //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00011874')
-                                    ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
-                                    ->select('FE_DOCUMENTO.*', 'DOC.*')
-                                    ->distinct()
-                                    ->get();
+
+
 
 
             //dd($listadatos);
