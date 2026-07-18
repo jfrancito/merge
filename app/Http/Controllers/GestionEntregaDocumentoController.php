@@ -169,9 +169,10 @@ class GestionEntregaDocumentoController extends Controller
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
                                         'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',                                      
-                                        'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO'
+                                        'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
+                                        'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO'
                                     );
-
 
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
         $array_canjes       =   $this->con_array_canjes();
@@ -185,9 +186,14 @@ class GestionEntregaDocumentoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
             }else{
-                if (in_array($operacion_id, $array_canjes)) {
-                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+
+                if($operacion_id=='ORDEN_COMPRA_ANTICIPO' || $operacion_id=='CONTRATO_ANTICIPO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                }else{
+                    if (in_array($operacion_id, $array_canjes)) {
+                        $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                    }
                 }
             }
         }
