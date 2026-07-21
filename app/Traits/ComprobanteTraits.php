@@ -415,6 +415,41 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_documentos_estiba_folio_anticipo($folio) {
+
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA_ANTICIPO')
+                                ->select(
+                                        DB::raw("DISTINCT 
+                                                    FE_DOCUMENTO.*,
+                                                    FE_DOCUMENTO.TXT_EMPR as TXT_EMPR_EMISOR,
+                                                    SERIE NRO_SERIE,
+                                                    '' TXT_TIPO_REFERENCIA,
+                                                    '' AS TXT_GLOSA_INTER,
+                                                    RUC_PROVEEDOR   NRO_DOCUMENTO, 
+                                                    FEC_VENTA FEC_EMISION, 
+                                                    FEC_VENCI_PAGO FEC_VENCIMIENTO, 
+                                                    NUMERO NRO_DOC, 
+                                                    ID_TIPO_DOC TXT_CATEGORIA_TIPO_DOC, 
+                                                    '' AS TIPO_CUENTA,
+                                                    MONEDA AS TIPO_MONEDA, 
+                                                    MONEDA AS TIPO_MONEDA_ABONO,
+                                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, 
+                                                    FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO"))
+                                ->get();
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
 
     private function con_lista_documentos_contrato_folio($folio) {
 
@@ -1037,7 +1072,7 @@ trait ComprobanteTraits
                                     ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
                                     ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
-                                    ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
+                                    //->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
                                     //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                     ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                     ->where(function ($query) {
@@ -1059,7 +1094,7 @@ trait ComprobanteTraits
                                     ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                     ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
-                                    ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
+                                    //->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
                                     //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                     ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                     ->where(function ($query) {
@@ -1301,6 +1336,120 @@ trait ComprobanteTraits
 
     }
 
+
+    private function con_lista_doc_proveedor_banco_folio_oc_anti_union($folio,$banco_txt) {
+
+        $listadatos01             =     CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
+                                        ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
+                                            $join->on('CMP.ORDEN.COD_EMPR_CLIENTE', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
+                                                 ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+                                                 ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
+                                        })
+                                        ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                        ->leftjoin('CMP.CATEGORIA as CAT_MONEDA', 'CAT_MONEDA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.COD_CATEGORIA_MONEDA')
+                                        ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.ORDEN.COD_EMPR_CLIENTE')
+                                        ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                        ->where('FOLIO','=',$folio)
+                                        ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                        ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
+                                                        CMP.ORDEN.COD_EMPR_CLIENTE,
+                                                        CMP.ORDEN.TXT_EMPR_CLIENTE,
+                                                        STD.EMPRESA.NRO_DOCUMENTO,
+                                                        CAT_MONEDA.TXT_REFERENCIA AS TIPO_MONEDA, 
+                                                        CMP.CATEGORIA.CODIGO_SUNAT,
+                                                        CAT_CUENTA.TXT_ABREVIATURA,
+                                                        SUM(TOTAL_VENTA_ORIG) TOTAL,
+                                                        SUM(CASE 
+                                                                WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.ORDEN.COD_EMPR 
+                                                                THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                                ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            END) AS TOTAL_PAGAR,
+                                                        SUM(ROUND(MONTO_DETRACCION_RED, 0)) DETRACCION'))
+                                        ->groupBy('CMP.ORDEN.COD_EMPR_CLIENTE')
+                                        ->groupBy('CMP.ORDEN.TXT_EMPR_CLIENTE')
+                                        ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')
+                                        ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
+                                        ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
+                                        ->groupBy('CAT_MONEDA.TXT_REFERENCIA')
+                                        ->groupBy('CAT_CUENTA.TXT_ABREVIATURA');
+
+
+
+                                $listadatos02 = DB::table('FE_DOCUMENTO')
+                                    ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                    ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                    // Se agregó prefijo para evitar ambigüedad
+                                    ->where('FE_DOCUMENTO.TXT_CATEGORIA_BANCO', '=', $banco_txt) 
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                                    ->select(DB::raw("
+                                        FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
+                                        FE_DOCUMENTO.RUC_PROVEEDOR AS COD_EMPR_CLIENTE,
+                                        FE_DOCUMENTO.RZ_PROVEEDOR AS TXT_EMPR_CLIENTE,
+                                        FE_DOCUMENTO.RUC_PROVEEDOR AS NRO_DOCUMENTO,
+                                        FE_DOCUMENTO.ID_DOCUMENTO,
+                                        FE_DOCUMENTO.MONEDA AS TIPO_MONEDA,
+                                        '' AS CODIGO_SUNAT,
+                                        FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA AS TXT_ABREVIATURA,
+                                        MAX(FE_DOCUMENTO.TOTAL_VENTA_ORIG) AS TOTAL,
+                                        
+                                        MAX(
+                                            ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG, 0) 
+                                            - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED, 0), 0) 
+                                            - ISNULL(FE_DOCUMENTO.MONTO_RETENCION, 0) 
+                                            - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA, 0) 
+                                            - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC, 0) 
+                                            - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS, 0) 
+                                            + ISNULL(FE_DOCUMENTO.COMPENSACION, 0) 
+                                            + ISNULL(FE_DOCUMENTO.PERCEPCION, 0)
+                                        ) AS TOTAL_PAGAR,
+                                        
+                                        MAX(ROUND(FE_DOCUMENTO.MONTO_DETRACCION_RED, 0)) AS DETRACCION
+                                    "))
+                                    ->groupBy([
+                                        'FE_DOCUMENTO.RUC_PROVEEDOR',
+                                        'FE_DOCUMENTO.RZ_PROVEEDOR',
+                                        'FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA',
+                                        'FE_DOCUMENTO.MONEDA',
+                                        'FE_DOCUMENTO.ID_DOCUMENTO'
+                                    ])
+                                    ->get();
+
+
+
+                $listadatos02 = $listadatos02->groupBy(function ($item) {
+                    return $item->TXT_NRO_CUENTA_BANCARIA . '-' . $item->COD_EMPR_CLIENTE;
+                })->map(function ($group) {
+                    return (object) [
+                        'TXT_NRO_CUENTA_BANCARIA' => $group->first()->TXT_NRO_CUENTA_BANCARIA,
+                        'COD_EMPR_CLIENTE' => $group->first()->COD_EMPR_CLIENTE,
+                        'TXT_EMPR_CLIENTE' => $group->first()->TXT_EMPR_CLIENTE,
+                        'NRO_DOCUMENTO' => $group->first()->NRO_DOCUMENTO,
+                        'TIPO_MONEDA' => $group->first()->TIPO_MONEDA,
+                        'CODIGO_SUNAT' => $group->first()->CODIGO_SUNAT,
+                        'TXT_ABREVIATURA' => $group->first()->TXT_ABREVIATURA,
+                        'TOTAL' => $group->sum('TOTAL'),
+                        'TOTAL_PAGAR' => $group->sum('TOTAL_PAGAR'),
+                        'DETRACCION' => $group->sum('DETRACCION'),
+                    ];
+                })->values();
+
+
+        //dd($listadatos02);
+
+        $listadatos01 = collect($listadatos01->get()); // Aseguramos que sea una colección
+        $listadatos02 = collect($listadatos02); // Ya es una colección después de ->groupBy()->map()
+
+        $listadatos = $listadatos01->merge($listadatos02);
+
+        //dd($listadatos);
+
+        //$listadatos             =   $listadatos01->union($listadatos02)->get();
+
+        return  $listadatos;
+
+
+    }
 
 
     private function con_lista_doc_proveedor_banco_folio_oc_union($folio,$banco_txt) {
@@ -8986,6 +9135,21 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_entregable_anticipo_modal_moneda($folio,$moneda_id) {
+
+        $moneda_real            =   DB::table('CMP.CATEGORIA')->where('COD_CATEGORIA','=',$moneda_id)->first();
+
+        $listadatos             =   FeDocumento::join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                    ->where('FOLIO','=',$folio)
+                                    ->where('MONEDA','=',$moneda_real->CODIGO_SUNAT)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('FE_DOCUMENTO.*,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER,FE_REF_ASOC.ID_DOCUMENTO AS COD_ORDEN'))
+                                    ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function con_lista_cabecera_comprobante_entregable_modal_moneda($folio,$moneda_id) {
 
@@ -9603,6 +9767,22 @@ trait ComprobanteTraits
 
 
     }
+
+    private function con_lista_cabecera_comprobante_entregable_anticipo_estiba_modal_moneda_union($folio,$moneda_id) {
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                ->whereIn('FE_DOCUMENTO.OPERACION',$this->con_array_canjes())
+                                ->selectRaw('DISTINCT FE_DOCUMENTO.*')
+                                ->get();
+
+        return  $listadatos;
+
+
+    }
+
 
 
     private function con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union_consolidado($folio,$moneda_id) {

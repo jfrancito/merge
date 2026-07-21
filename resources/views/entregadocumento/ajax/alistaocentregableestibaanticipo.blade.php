@@ -20,21 +20,14 @@
           <span><b>LOTE : </b> {{$item->ID_DOCUMENTO}}  </span>
           <span><b>DOCUMENTO : </b> {{$item->SERIE}} - {{$item->NUMERO}}  </span>
           <span><b>PROVEEDOR  :</b> {{$item->RZ_PROVEEDOR}}</span>
-          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->SERIE}} - {{$item->NUMERO}}</span>
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
-          <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
+          <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCI_PAGO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
           <span><b>MONEDA  :</b>{{$item->MONEDA}}</span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
-          <span><b>BANCO  :</b>{{$item->TXT_EMPR_BANCO}}</span>
-          <span><b>SUBIO VOUCHER  :</b>
-            @IF($item->COD_ESTADO == 'ETM0000000000008')
-              SI
-            @ELSE
-              NO
-            @ENDIF
-          </span>
+          <span><b>BANCO  :</b>{{$item->TXT_CATEGORIA_BANCO}}</span>
           <span><b>CUENTA DETRACCION: </b> {{$item->CTA_DETRACCION}}  </span>
           <span><b>VALOR DETRACCION  :</b>{{$item->VALOR_DETRACCION}}</span>
           <span><b>PAGO DETRACCION: </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
@@ -50,7 +43,7 @@
         </td>
         <td class="center neto_pagar"><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
         <td>
-            @IF($item->NRO_SERIE != '' && 0<=0)
+            @IF($item->SERIE != '' && 0<=0)
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
                 class="{{$item->ID_DOCUMENTO}} input_asignar selectfolio"
