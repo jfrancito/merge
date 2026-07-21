@@ -63,11 +63,20 @@
                     </a>  
                   </li>
                 <?php else: ?>
-                  <li>
-                    <a href="<?php echo e(url('/descargar-folio-excel/'.$item->FOLIO)); ?>">
-                      Descargar Resumen
-                    </a>  
-                  </li>
+                  <?php if($item->OPERACION=='CONTRATO_ANTICIPO' || $item->OPERACION =='ORDEN_COMPRA_ANTICIPO'): ?>
+                    <li>
+                      <a href="<?php echo e(url('/descargar-folio-anticipo-excel/'.$item->FOLIO)); ?>">
+                        Descargar Resumen
+                      </a>  
+                    </li>
+                  <?php else: ?>
+                    <li>
+                      <a href="<?php echo e(url('/descargar-folio-excel/'.$item->FOLIO)); ?>">
+                        Descargar Resumen
+                      </a>  
+                    </li>
+                  <?php endif; ?>
+
                 <?php endif; ?>
               <?php endif; ?>
               <?php if($item->OPERACION=='CONTRATO'): ?>
@@ -82,7 +91,15 @@
                     <?php if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'): ?>
                       <?php echo $__env->make('entregadocumento.excel.opcionlca', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
                     <?php else: ?>
-                      <?php echo $__env->make('entregadocumento.excel.opcionoc', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                      <?php if($item->OPERACION=='ORDEN_COMPRA_ANTICIPO'): ?>
+                        <?php echo $__env->make('entregadocumento.excel.opcionoca', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                      <?php else: ?>
+                        <?php if($item->OPERACION=='CONTRATO_ANTICIPO'): ?>
+                          <?php echo $__env->make('entregadocumento.excel.opcionoca', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                        <?php else: ?>
+                          <?php echo $__env->make('entregadocumento.excel.opcionoc', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                        <?php endif; ?>
+                      <?php endif; ?>
                     <?php endif; ?>
                   <?php endif; ?>
                 <?php endif; ?>

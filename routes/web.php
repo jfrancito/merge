@@ -645,6 +645,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-lca-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoLCAFolio');
 	Route::any('/descargar-folio-dic-consolidado-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICConsolidadoFolio');
 
+	Route::any('/descargar-folio-anticipo-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolioAnticipo');
+
+
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
 	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}/{fecha_inicio}/{fecha_fin}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
@@ -680,7 +683,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/descargar-pago-proveedor-macro-bbva-balanza-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBalanzaBbva');
 
-
+	Route::any('/descargar-pago-proveedor-macro-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacroOCA');
+	Route::any('/descargar-pago-proveedor-macro-bbva-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBbvaOCA');
+	Route::any('/descargar-pago-proveedor-macro-sbk-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroSBKOCA');
+	Route::any('/descargar-pago-proveedor-macro-interbank-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbankOCA');
 
 
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');

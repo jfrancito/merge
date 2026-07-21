@@ -63,11 +63,20 @@
                     </a>  
                   </li>
                 @else
-                  <li>
-                    <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
-                      Descargar Resumen
-                    </a>  
-                  </li>
+                  @if($item->OPERACION=='CONTRATO_ANTICIPO' || $item->OPERACION =='ORDEN_COMPRA_ANTICIPO')
+                    <li>
+                      <a href="{{ url('/descargar-folio-anticipo-excel/'.$item->FOLIO) }}">
+                        Descargar Resumen
+                      </a>  
+                    </li>
+                  @else
+                    <li>
+                      <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
+                        Descargar Resumen
+                      </a>  
+                    </li>
+                  @endif
+
                 @endif
               @endif
               @if($item->OPERACION=='CONTRATO')
@@ -82,7 +91,15 @@
                     @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
                       @include('entregadocumento.excel.opcionlca')
                     @else
-                      @include('entregadocumento.excel.opcionoc')
+                      @if($item->OPERACION=='ORDEN_COMPRA_ANTICIPO')
+                        @include('entregadocumento.excel.opcionoca')
+                      @else
+                        @if($item->OPERACION=='CONTRATO_ANTICIPO')
+                          @include('entregadocumento.excel.opcionoca')
+                        @else
+                          @include('entregadocumento.excel.opcionoc')
+                        @endif
+                      @endif
                     @endif
                   @endif
                 @endif
