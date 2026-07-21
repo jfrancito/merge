@@ -823,16 +823,10 @@ class CotizacionOrdenPedidoController extends Controller
                 }
             }
 
-            // 5. Inserción de detalles
-            // Si es edición, primero desactivamos los detalles anteriores y liberamos el estado 'Cotizado'
+            // 5. Inserción / Actualización de detalles
+            $productos_existentes = [];
             if ($accion == 'U') {
-                // 1. Eliminar referencias anteriores en CMP.REFERENCIA_ASOC
-                DB::table('CMP.REFERENCIA_ASOC')
-                    ->where('COD_TABLA_ASOC', $id_cotizacion)
-                    ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
-                    ->delete();
-
-                // 2. Obtener detalles previos para resetear su estado en consolidados
+                // 1. Obtener detalles previos para resetear su estado en consolidados (DEBE HACERSE ANTES DE ELIMINAR REFERENCIAS)
                 $detalles_previos = DB::table('WEB.ORDEN_COTIZACION_DETALLE as CD')
                     ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
                     ->where('CD.ID_COTIZACION', $id_cotizacion)
@@ -841,6 +835,12 @@ class CotizacionOrdenPedidoController extends Controller
                     ->select('CD.COD_PRODUCTO', 'RA.COD_TABLA as ID_PEDIDO_CONSOLIDADO_GENERAL')
                     ->get();
 
+                // 2. Eliminar referencias anteriores en CMP.REFERENCIA_ASOC
+                DB::table('CMP.REFERENCIA_ASOC')
+                    ->where('COD_TABLA_ASOC', $id_cotizacion)
+                    ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                    ->delete();
+
                 foreach ($detalles_previos as $dp) {
                     DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
                         ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $dp->ID_PEDIDO_CONSOLIDADO_GENERAL)
@@ -848,17 +848,27 @@ class CotizacionOrdenPedidoController extends Controller
                         ->update(['TXT_COTIZACION' => null]);
                 }
 
+                // 3. Obtener códigos de producto actualmente registrados para esta cotización
+                $productos_existentes = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->pluck('COD_PRODUCTO')
+                    ->map(function ($item) { return trim($item); })
+                    ->toArray();
+
+                // 4. Limpiar posibles registros inactivos huérfanos creados en ediciones anteriores
                 DB::table('WEB.ORDEN_COTIZACION_DETALLE')
                     ->where('ID_COTIZACION', $id_cotizacion)
-                    ->update(['ACTIVO' => 0]);
+                    ->where('ACTIVO', 0)
+                    ->delete();
 
                 if ($conexionbd !== 'sqlsrv') {
                     try {
                         DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
                             ->where('ID_COTIZACION', $id_cotizacion)
-                            ->update(['ACTIVO' => 0]);
+                            ->where('ACTIVO', 0)
+                            ->delete();
                     } catch (\Exception $ez) {
-                        Log::error('Error al desactivar detalles anteriores en zona (' . $conexionbd . '): ' . $ez->getMessage());
+                        Log::error('Error al eliminar detalles inactivos anteriores en zona (' . $conexionbd . '): ' . $ez->getMessage());
                     }
                 }
             }
@@ -918,9 +928,12 @@ class CotizacionOrdenPedidoController extends Controller
                         $breakdown = [['id' => $det['id_consolidado'], 'cant' => $total_por_distribuir]];
                     }
 
-                    // 1. Inserción de detalle de cotización (UNA ÚNICA FILA POR PRODUCTO)
+                    $cod_prod_trim = trim($det['cod_producto']);
+                    $tipo_op_det = ($accion == 'U' && in_array($cod_prod_trim, $productos_existentes)) ? 'U' : 'I';
+
+                    // 1. Inserción/Actualización de detalle de cotización (UNA ÚNICA FILA POR PRODUCTO)
                     $this->insertOrdenCotizacionDetalle(
-                        'I',
+                        $tipo_op_det,
                         $id_cotizacion,
                         '', // @ID_PEDIDO_CONSOLIDADO_GENERAL vacío (se usan las referencias)
                         '',
@@ -1008,6 +1021,30 @@ class CotizacionOrdenPedidoController extends Controller
                                     ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_linea)
                                     ->where('COD_PRODUCTO', $det['cod_producto'])
                                     ->update(['TXT_COTIZACION' => null]);
+                            }
+                        }
+                    }
+                }
+
+                // 4. Desactivar productos quitados durante la edición
+                if ($accion == 'U') {
+                    $productos_nuevos = array_map(function ($d) { return trim($d['cod_producto']); }, $detalles);
+                    $productos_eliminados = array_diff($productos_existentes, $productos_nuevos);
+
+                    foreach ($productos_eliminados as $cod_prod_elim) {
+                        DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                            ->where('ID_COTIZACION', $id_cotizacion)
+                            ->where('COD_PRODUCTO', $cod_prod_elim)
+                            ->update(['ACTIVO' => 0]);
+
+                        if ($conexionbd !== 'sqlsrv') {
+                            try {
+                                DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                                    ->where('ID_COTIZACION', $id_cotizacion)
+                                    ->where('COD_PRODUCTO', $cod_prod_elim)
+                                    ->update(['ACTIVO' => 0]);
+                            } catch (\Exception $ez) {
+                                Log::error('Error al desactivar detalle eliminado en zona (' . $conexionbd . '): ' . $ez->getMessage());
                             }
                         }
                     }

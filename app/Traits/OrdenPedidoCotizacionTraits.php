@@ -300,16 +300,18 @@ trait OrdenPedidoCotizacionTraits
                     ->where('ID_COTIZACION', $id_cotizacion)
                     ->get();
 
-                // Desactivar temporalmente los de la zona para evitar duplicados residuales si cambiaron
+                // Eliminar en la zona los detalles de producto que ya no existen en la base central para esta cotización
+                $productos_central = $detalles->pluck('COD_PRODUCTO')->map(function($p) { return trim($p); })->toArray();
                 DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
                     ->where('ID_COTIZACION', $id_cotizacion)
-                    ->update(['ACTIVO' => 0]);
+                    ->whereNotIn('COD_PRODUCTO', $productos_central)
+                    ->delete();
 
                 foreach ($detalles as $det) {
                     $det_array = $safe_format_dates((array)$det);
                     DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
                         ->updateOrInsert(
-                            ['ID_COTIZACION' => $id_cotizacion, 'COD_PRODUCTO' => $det->COD_PRODUCTO, 'ID_PEDIDO_CONSOLIDADO_GENERAL' => $det->ID_PEDIDO_CONSOLIDADO_GENERAL],
+                            ['ID_COTIZACION' => $id_cotizacion, 'COD_PRODUCTO' => $det->COD_PRODUCTO],
                             $det_array
                         );
                 }
