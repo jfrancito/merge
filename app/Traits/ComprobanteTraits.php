@@ -1047,6 +1047,8 @@ trait ComprobanteTraits
                                     ->whereNotNull('COD_CATEGORIA_AREA')
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
+
+
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
@@ -1069,7 +1071,8 @@ trait ComprobanteTraits
                                     ->where('COD_EMPR','=',$empresa_id)
                                     ->where('MONEDA','=',$moneda_real->CODIGO_SUNAT)
                                     ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
-                                    ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                    //->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                    //->whereIn('FE_DOCUMENTO.usuario_pa',$array_usuarios)
                                     ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                     //->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
@@ -1082,7 +1085,7 @@ trait ComprobanteTraits
                                     ->selectRaw('DISTINCT FE_DOCUMENTO.*') // DISTINCT aplicado solo a estas columnas
                                     ->get();
 
-
+            //dd($listadatos);
 
 
         }else{
@@ -1104,7 +1107,7 @@ trait ComprobanteTraits
                                     ->selectRaw('DISTINCT FE_DOCUMENTO.*') // DISTINCT aplicado solo a estas columnas
                                     ->get();
 
-            //dd($listadatos);
+
 
 
         }
