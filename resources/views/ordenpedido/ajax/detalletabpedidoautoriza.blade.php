@@ -124,6 +124,7 @@
                                                    value="{{ (int)$cantidad_mostrar }}" 
                                                    min="0"
                                                    data-id="{{ $detalle->COD_PRODUCTO }}"
+                                                   data-prod="{{ $detalle->COD_PRODUCTO }}"
                                                    style="width: 90px; display: inline-block;">
                                         @else
                                             <span class="fw-bold text-success" style="font-size: 14px;">{{ (int)$cantidad_mostrar }}</span>

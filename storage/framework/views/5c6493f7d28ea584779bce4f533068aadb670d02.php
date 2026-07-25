@@ -124,6 +124,7 @@
                                                    value="<?php echo e((int)$cantidad_mostrar); ?>" 
                                                    min="0"
                                                    data-id="<?php echo e($detalle->COD_PRODUCTO); ?>"
+                                                   data-prod="<?php echo e($detalle->COD_PRODUCTO); ?>"
                                                    style="width: 90px; display: inline-block;">
                                         <?php else: ?>
                                             <span class="fw-bold text-success" style="font-size: 14px;"><?php echo e((int)$cantidad_mostrar); ?></span>
