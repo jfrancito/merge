@@ -127,6 +127,7 @@
                                                    value="{{ (int)$valor_editar }}" 
                                                    min="0" 
                                                    data-id="{{ $detalle->COD_PRODUCTO }}"
+                                                   data-prod="{{ $detalle->COD_PRODUCTO }}"
                                                    style="width: 90px; display: inline-block;">
                                         @else
                                             <span class="fw-bold text-dark" style="font-size: 15px;">{{ (int)$valor_editar }}</span>
