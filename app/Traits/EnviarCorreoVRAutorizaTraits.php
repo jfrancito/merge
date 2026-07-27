@@ -130,7 +130,7 @@ trait EnviarCorreoVRAutorizaTraits
             } elseif ($emailfromcentro === 'CEN0000000000002') {
                 $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
             } else {
-                $destinatarios = ["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe", "analucia.lopez@induamerica.com.pe"];
+                $destinatarios = ["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe", "analucia.lopez@induamerica.com.pe","kasandra.arteaga@induamerica.com.pe"];
             }
 
             Mail::send('emails.emailvalerendirautoriza',
