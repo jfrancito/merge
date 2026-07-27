@@ -79,9 +79,7 @@ Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoA
 
 Route::any('/enviocorreoconsolidadoplanilla', 'UserController@actionEnviarCorreoConsolidado'); //correo para jefe acopio liuidacion compra
 Route::any('/enviocorreoconsolidadoplanilladet', 'UserController@actionEnviarCorreoConsolidadoDet'); //correo para jefe acopio liuidacion compra
-
 Route::any('/updateseriecorrelativocpe', 'UserController@actionUpdateSerieCorrelativoCpe'); //correo para jefe acopio liuidacion compra
-
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -122,6 +120,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');
 
+	Route::any('/ajax-modal-configuracion-categoria-conta-orden', 'UserController@actionAjaxModalConfiguracionCategoriaContaOrden');
+	Route::any('/configurar-categoria-conta-orden/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarCategoriaContaOrden');
+	Route::any('/ajax-modal-configuracion-ubicacion-conta-orden', 'UserController@actionAjaxModalConfiguracionUbicacionContaOrden');
+	Route::any('/configurar-ubicacion-conta-orden/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarUbicacionContaOrden');
+
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
@@ -129,7 +132,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
 	Route::any('/ajax-modal-cambiar-reparable', 'UserController@actionAjaxModalCambiarReparable');
 	Route::any('/guardar-cambio-reparable/{orden_id}/{idopcion}', 'UserController@actionGuardarCambiarReparable');
-
 
     Route::any('/gestion-de-reporte-saldo-div/{idopcion}', 'ReporteDIVSaldosController@actionListarDivSaldos');
     Route::any('/ajax-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldos');
@@ -448,6 +450,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-agregar-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoMerge');
 	Route::any('/comprobante-masivo-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoExcel');
 	Route::any('/comprobante-masivo-tesoreria-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoTesoreriaExcel');
+	Route::any('/comprobante-masivo-marketing-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoMarketingExcel');
 
 
 	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}/{anio_id}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');

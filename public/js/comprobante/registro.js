@@ -151,6 +151,141 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('click','.btn-registrar-categoria-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-categoria-conta-orden",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-registrar-ubicacion-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-ubicacion-conta-orden",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-volver-grupo-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('submit', '.form-ajax-categoria', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var data = form.serialize();
+
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                cerrarcargando();
+                if (response.success) {
+                    var _token = $('#token').val();
+                    var idopcion = $('#idopcion').val();
+                    var prefijo_id = $('#prefijo_id').val();
+                    var orden_id = $('#orden_id').val();
+                    
+                    var data_grupo = {
+                        _token: _token,
+                        prefijo_id: prefijo_id,
+                        orden_id: orden_id,
+                        idopcion: idopcion
+                    };
+                    
+                    ajax_modal(data_grupo, "/ajax-modal-configuracion-grupo-oc",
+                              "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
+                } else {
+                    alerterrorajax(response.mensaje);
+                }
+            },
+            error: function(response) {
+                cerrarcargando();
+                error500(response);
+            }
+        });
+    });
+
+    $(".registrocomprobante").on('submit', '.form-ajax-ubicacion', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var data = form.serialize();
+
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                cerrarcargando();
+                if (response.success) {
+                    var _token = $('#token').val();
+                    var idopcion = $('#idopcion').val();
+                    var prefijo_id = $('#prefijo_id').val();
+                    var orden_id = $('#orden_id').val();
+                    
+                    var data_grupo = {
+                        _token: _token,
+                        prefijo_id: prefijo_id,
+                        orden_id: orden_id,
+                        idopcion: idopcion
+                    };
+                    
+                    ajax_modal(data_grupo, "/ajax-modal-configuracion-grupo-oc",
+                              "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
+                } else {
+                    alerterrorajax(response.mensaje);
+                }
+            },
+            error: function(response) {
+                cerrarcargando();
+                error500(response);
+            }
+        });
+    });
+
 
     $(".registrocomprobante").on('click','.agregar_cuenta_bancaria', function() {
 

@@ -1,6 +1,7 @@
-<form method="POST" action="{{ url('/configurar-grupo-marketing/'.$orden_id.'/'.$idopcion) }}">
-  {{ csrf_field() }}
-  <input type="hidden" name="device_info" id='device_info'>
+<form method="POST" action="<?php echo e(url('/configurar-ubicacion-conta-orden/'.$prefijo_id.'/'.$orden_id.'/'.$idopcion)); ?>" class="form-ajax-ubicacion">
+  <?php echo e(csrf_field()); ?>
+
+  <input type="hidden" name="device_info" id="device_info">
 
   <!-- Estilos Premium Embebidos -->
   <style type="text/css">
@@ -23,6 +24,12 @@
           font-size: 18px;
           font-weight: 600;
           letter-spacing: -0.025em;
+          display: flex;
+          align-items: center;
+      }
+      .premium-modal-wrapper .modal-title i {
+          margin-right: 8px;
+          font-size: 20px;
       }
       .premium-modal-wrapper .modal-close {
           color: #94a3b8;
@@ -67,6 +74,7 @@
           box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
           height: 38px !important;
           transition: all 0.2s ease !important;
+          width: 100%;
       }
       .premium-modal-wrapper .input-premium:focus {
           border-color: #6366f1 !important;
@@ -136,7 +144,7 @@
     <div class="modal-header">
       <button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
       <h3 class="modal-title">
-         <b>Datos de la Actividad</b>
+         <i class="mdi mdi-plus-circle-o"></i><b>Registrar Sede</b>
       </h3>
     </div>
     
@@ -146,40 +154,24 @@
           
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="form-group">
-              <label class="col-sm-12 control-label negrita">Actividad</label>
-              <div class="col-sm-12 abajocaja">
+              <label class="control-label negrita">Sede (*):</label>
+              <div>
                 <input type="text"
-                       id="grupo" name="grupo" value="" placeholder="Nombre de la actividad..."
+                       id="ubicacion" name="ubicacion" value="" placeholder="Ingrese nombre de la sede..."
                        required=""
-                       autocomplete="off" class="form-control input-premium" data-aw="4"/>
+                       autocomplete="off" class="form-control input-premium" data-aw="1"/>
               </div>
             </div>
           </div>
 
-          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px;">
             <div class="form-group">
-              <label class="col-sm-12 control-label negrita">Clasificación</label>
-              <div class="col-sm-12 abajocaja">
-                {!! Form::select('ID_CATCONTAORDEN', $combocategoria, $defecto_categoria,
-                                  [
-                                    'class'   => 'select3 form-control control input-xs combo',
-                                    'id'      => 'ID_CATCONTAORDEN',
-                                    'data-aw' => '1',
-                                  ]) !!}
-              </div>
-            </div>
-          </div>
-
-          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
-            <div class="form-group">
-              <label class="col-sm-12 control-label negrita">Sede</label>
-              <div class="col-sm-12 abajocaja">
-                {!! Form::select('ID_UBICACION', $comboubicacion, $defecto_ubicacion,
-                                  [
-                                    'class'   => 'select3 form-control control input-xs combo',
-                                    'id'      => 'ID_UBICACION',
-                                    'data-aw' => '2',
-                                  ]) !!}
+              <label class="control-label negrita">Estado (*):</label>
+              <div>
+                <select name="estado" id="estado" class="form-control select3" style="width: 100%;" required>
+                  <option value="1" selected>Activo</option>
+                  <option value="0">Inactivo</option>
+                </select>
               </div>
             </div>
           </div>
@@ -189,44 +181,21 @@
     </div>
 
     <div class="modal-footer">
+      <button type="button" class="btn-premium-secondary btn-volver-grupo-modal"><i class="mdi mdi-arrow-left"></i> Volver</button>
       <div>
-        <button type="button" class="btn-premium-secondary btn-registrar-categoria-modal"><i class="mdi mdi-plus-circle-o"></i> Clasificación</button>
-        <button type="button" class="btn-premium-secondary btn-registrar-ubicacion-modal"><i class="mdi mdi-plus-circle-o"></i> Sede</button>
+        <button type="button" data-dismiss="modal" class="btn-premium-secondary" style="margin-right: 8px;">Cancelar</button>
+        <button type="submit" class="btn-premium-success">Guardar</button>
       </div>
-      <button type="submit" data-dismiss="modal" class="btn-premium-success btn-guardar-configuracion-cb">Guardar</button>
     </div>
   </div>
 </form>
 
-@if(isset($ajax))
+<?php if(isset($ajax)): ?>
   <script type="text/javascript">
     $(document).ready(function(){
       $('.select3').select2({
           dropdownParent: $('#modal-configuracion-usuario-detalle')
       });
-      $('.importe').inputmask({ 
-          'alias': 'numeric', 
-          'groupSeparator': ',', 
-          'autoGroup': true, 
-          'digits': 0, 
-          'digitsOptional': false, 
-          'prefix': '', 
-          'placeholder': '0'
-      });
-
-      $('.cuentanumero').on('keypress', function (e) {
-          var charCode = e.which ? e.which : e.keyCode;
-          if (charCode < 48 || charCode > 57) {
-              e.preventDefault();
-          }
-      });
-
-      $('.cuentanumero').on('paste', function (e) {
-          var pasteData = e.originalEvent.clipboardData.getData('text');
-          if (!/^\d+$/.test(pasteData)) {
-              e.preventDefault();
-          }
-      });
     });
   </script>
-@endif
+<?php endif; ?>

@@ -1,5 +1,6 @@
-<form method="POST" action="{{ url('/configurar-grupo-marketing/'.$orden_id.'/'.$idopcion) }}">
-  {{ csrf_field() }}
+<form method="POST" action="<?php echo e(url('/configurar-grupo-marketing/'.$orden_id.'/'.$idopcion)); ?>">
+  <?php echo e(csrf_field()); ?>
+
   <input type="hidden" name="device_info" id='device_info'>
 
   <!-- Estilos Premium Embebidos -->
@@ -160,12 +161,13 @@
             <div class="form-group">
               <label class="col-sm-12 control-label negrita">Clasificación</label>
               <div class="col-sm-12 abajocaja">
-                {!! Form::select('ID_CATCONTAORDEN', $combocategoria, $defecto_categoria,
+                <?php echo Form::select('ID_CATCONTAORDEN', $combocategoria, $defecto_categoria,
                                   [
                                     'class'   => 'select3 form-control control input-xs combo',
                                     'id'      => 'ID_CATCONTAORDEN',
                                     'data-aw' => '1',
-                                  ]) !!}
+                                  ]); ?>
+
               </div>
             </div>
           </div>
@@ -174,12 +176,13 @@
             <div class="form-group">
               <label class="col-sm-12 control-label negrita">Sede</label>
               <div class="col-sm-12 abajocaja">
-                {!! Form::select('ID_UBICACION', $comboubicacion, $defecto_ubicacion,
+                <?php echo Form::select('ID_UBICACION', $comboubicacion, $defecto_ubicacion,
                                   [
                                     'class'   => 'select3 form-control control input-xs combo',
                                     'id'      => 'ID_UBICACION',
                                     'data-aw' => '2',
-                                  ]) !!}
+                                  ]); ?>
+
               </div>
             </div>
           </div>
@@ -198,7 +201,7 @@
   </div>
 </form>
 
-@if(isset($ajax))
+<?php if(isset($ajax)): ?>
   <script type="text/javascript">
     $(document).ready(function(){
       $('.select3').select2({
@@ -229,4 +232,4 @@
       });
     });
   </script>
-@endif
+<?php endif; ?>
