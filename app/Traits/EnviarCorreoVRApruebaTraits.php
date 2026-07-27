@@ -140,6 +140,7 @@ trait EnviarCorreoVRApruebaTraits
                         "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
+                        "kasandra.arteaga@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -164,6 +165,7 @@ trait EnviarCorreoVRApruebaTraits
                         "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
+                        "kasandra.arteaga@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -183,6 +185,7 @@ trait EnviarCorreoVRApruebaTraits
                         "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
+                        "kasandra.arteaga@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -197,6 +200,7 @@ trait EnviarCorreoVRApruebaTraits
                     'marley.sucse@induamerica.com.pe',
                     'diana.malca@induamerica.com.pe',
                     "analucia.lopez@induamerica.com.pe",
+                    "kasandra.arteaga@induamerica.com.pe",
                     'karim.ramirez@induamerica.com.pe',
                     "catherine.quiroz@induamerica.com.pe",
                     "fiorela.carrasco@induamerica.com.pe",
