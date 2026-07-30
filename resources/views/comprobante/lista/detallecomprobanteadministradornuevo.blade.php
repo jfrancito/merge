@@ -143,15 +143,15 @@
                 <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="panel panel-default panel-contrast">
-                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">GRUPO MARKETING
-                        <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Grupo</span></div>
+                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ACTIVIDAD MARKETING
+                        <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Actividad</span></div>
                       </div>
                       <div class="panel-body panel-body-contrast">
                               <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
                                         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
                                             <div class="form-group">
-                                              <label class="col-sm-12 control-label labelleft" ><b>Grupo :</b></label>
+                                              <label class="col-sm-12 control-label labelleft" ><b>Actividad :</b></label>
                                               <div class="col-sm-12 abajocaja" >
                                                   {!! Form::select( 'grupo_id', $combogrupo, array(''),
                                                                     [
