@@ -15,6 +15,7 @@ yarn-error.log
 /resources/assets/js/app.js
 /app/Console/Kernel.php
 /storage/app
+/storage/framework/views/
 app/Http/Controllers/DocumentoApiController.php
 /public/firmas
 /config/database.php
