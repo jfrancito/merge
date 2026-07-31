@@ -921,7 +921,6 @@ $(document).ready(function(){
         var tarchivos = JSON.parse(tarchivosDataEl.textContent);
         tarchivos.forEach(function(item) {
             var options = {
-                theme: 'fa5',
                 language: 'es',
                 allowedFileExtensions: [item.formato]
             };
