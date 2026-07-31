@@ -79,7 +79,9 @@ Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoA
 
 Route::any('/enviocorreoconsolidadoplanilla', 'UserController@actionEnviarCorreoConsolidado'); //correo para jefe acopio liuidacion compra
 Route::any('/enviocorreoconsolidadoplanilladet', 'UserController@actionEnviarCorreoConsolidadoDet'); //correo para jefe acopio liuidacion compra
+
 Route::any('/updateseriecorrelativocpe', 'UserController@actionUpdateSerieCorrelativoCpe'); //correo para jefe acopio liuidacion compra
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -120,11 +122,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');
 
-	Route::any('/ajax-modal-configuracion-categoria-conta-orden', 'UserController@actionAjaxModalConfiguracionCategoriaContaOrden');
-	Route::any('/configurar-categoria-conta-orden/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarCategoriaContaOrden');
-	Route::any('/ajax-modal-configuracion-ubicacion-conta-orden', 'UserController@actionAjaxModalConfiguracionUbicacionContaOrden');
-	Route::any('/configurar-ubicacion-conta-orden/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarUbicacionContaOrden');
-
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
@@ -132,6 +129,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
 	Route::any('/ajax-modal-cambiar-reparable', 'UserController@actionAjaxModalCambiarReparable');
 	Route::any('/guardar-cambio-reparable/{orden_id}/{idopcion}', 'UserController@actionGuardarCambiarReparable');
+
 
     Route::any('/gestion-de-reporte-saldo-div/{idopcion}', 'ReporteDIVSaldosController@actionListarDivSaldos');
     Route::any('/ajax-reporte-div-saldos', 'ReporteDIVSaldosController@actionAjaxListarDivSaldos');
@@ -450,7 +448,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-agregar-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoMerge');
 	Route::any('/comprobante-masivo-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoExcel');
 	Route::any('/comprobante-masivo-tesoreria-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoTesoreriaExcel');
-	Route::any('/comprobante-masivo-marketing-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoMarketingExcel');
 
 
 	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}/{anio_id}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');
@@ -488,7 +485,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-lotes-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleLotesComision');
 	Route::any('/select-xml-comision/{idopcion}', 'GestionOCTesoreriaController@actionDetalleSelectComision');
 	Route::any('/detalle-comprobante-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministrator');
+	Route::any('/detalle-comprobante-comision-administrator-masivo/{idopcion}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministratorMasivo');
 	Route::any('/subir-xml-cargar-datos-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministrator');
+	Route::any('/subir-xml-cargar-datos-comision-administrator-masivo/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministratorMasivo');
+	Route::any('/subir-pdf-masivo-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionSubirPDFMasivoComisionAdministrator');
+	Route::post('/guardar-comision-masivo-documentos/{idopcion}', 'GestionOCTesoreriaController@actionGuardarComisionMasivo');
 	Route::any('/validar-xml-oc-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionValidarXMLComisionAdministrator');
 
 
@@ -644,6 +645,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-lca-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoLCAFolio');
 	Route::any('/descargar-folio-dic-consolidado-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICConsolidadoFolio');
 
+	Route::any('/descargar-folio-anticipo-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolioAnticipo');
+
+
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
 	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}/{fecha_inicio}/{fecha_fin}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
@@ -679,7 +683,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/descargar-pago-proveedor-macro-bbva-balanza-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBalanzaBbva');
 
-
+	Route::any('/descargar-pago-proveedor-macro-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacroOCA');
+	Route::any('/descargar-pago-proveedor-macro-bbva-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBbvaOCA');
+	Route::any('/descargar-pago-proveedor-macro-sbk-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroSBKOCA');
+	Route::any('/descargar-pago-proveedor-macro-interbank-excel-oca/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbankOCA');
 
 
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');
@@ -1174,6 +1181,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/cotizacion-orden-pedido/{idopcion}', 'CotizacionOrdenPedidoController@actionCotizacionOrdenPedido');
 	Route::post('/ajax-buscar-proveedor-ruc', 'CotizacionOrdenPedidoController@actionAjaxBuscarProveedorRuc');
 	Route::post('/ajax-listar-consolidado-general-aprobado', 'CotizacionOrdenPedidoController@actionAjaxListarConsolidadoGeneralAprobado');
+	Route::post('/ajax-productos-consolidado-sin-cotizar', 'CotizacionOrdenPedidoController@actionAjaxProductosConsolidadoSinCotizar');
+	Route::post('/ajax-deshabilitar-productos-consolidado', 'CotizacionOrdenPedidoController@actionAjaxDeshabilitarProductosConsolidado');
 	Route::post('/ajax-listar-pedidos-aprobados-servicio', 'CotizacionOrdenPedidoController@actionAjaxListarPedidosAprobadosServicio');
 	Route::post('/ajax-listar-detalle-consolidado-general-seleccionado', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleConsolidadoGeneralSeleccionado');
 	Route::post('/ajax-listar-detalle-pedidos-aprobados-seleccionados', 'CotizacionOrdenPedidoController@actionAjaxListarDetallePedidosAprobadosSeleccionados');
