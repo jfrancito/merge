@@ -2,7 +2,7 @@
 
     <!-- Panel Heading -->
     <div class="panel panel-default panel-border-color panel-border-color-success">
-        <div class="panel-heading">Solicitud de Vale a rendir</div>
+        <div class="panel-heading">Solicitud de Vale</div>
     </div>
 
     <!-- Panel Body -->
