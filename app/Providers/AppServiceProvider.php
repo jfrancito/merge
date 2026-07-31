@@ -19,13 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $capeta = '/merge';
-        if (strpos(request()->getHost(), '.test') !== false) {
-            $capeta = '';
-        }
-        View::share('capeta', $capeta);
+        Schema::defaultStringLength(191);
+        View::share('capeta', '/merge');
 
-        View::share('version', '19.19');
+        View::share('version', '19.98');
+
 
         View::share('titulo', '');
 
@@ -37,8 +35,7 @@ class AppServiceProvider extends ServiceProvider
         // Forzar que asset() genere URLs relativas en entorno local
         if (request()->getHost() === '10.1.50.2' || 
             request()->getHost() === 'localhost' ||
-            strpos(request()->getHost(), '10.1.50.2') !== false ||
-            strpos(request()->getHost(), '.test') !== false) {
+            strpos(request()->getHost(), '10.1.50.2') !== false) {
             
             // En local: reemplazar la raíz de las URLs por vacío para que sean relativas
             \URL::forceRootUrl('');
