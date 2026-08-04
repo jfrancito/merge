@@ -1096,6 +1096,198 @@ $(document).ready(function(){
         }
     });
 
+    function actualizarDetalleGrupoMarketing() {
+        var grupo_id = $('#grupo_id').val();
+        if (grupo_id && grupo_id !== '') {
+            $.ajax({
+                type: 'GET',
+                url: '/ajax-obtener-detalle-grupo-marketing',
+                data: { grupo_id: grupo_id },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#info_sede_txt').text(response.sede ? response.sede : '-');
+                        $('#info_clasificacion_txt').text(response.clasificacion ? response.clasificacion : '-');
+                    } else {
+                        $('#info_sede_txt').text('-');
+                        $('#info_clasificacion_txt').text('-');
+                    }
+                },
+                error: function() {
+                    $('#info_sede_txt').text('-');
+                    $('#info_clasificacion_txt').text('-');
+                }
+            });
+        } else {
+            $('#info_sede_txt').text('-');
+            $('#info_clasificacion_txt').text('-');
+        }
+    }
+
+    $('body').on('change', '#grupo_id', function() {
+        actualizarDetalleGrupoMarketing();
+    });
+
+    if ($('#grupo_id').length > 0) {
+        setTimeout(function() {
+            actualizarDetalleGrupoMarketing();
+        }, 500);
+    }
+
+    $(".registrocomprobante").on('click','.agregar_grupo_marketing_oc', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-registrar-categoria-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-categoria-conta-orden",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-registrar-ubicacion-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-ubicacion-conta-orden",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-volver-grupo-modal', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('submit', '.form-ajax-categoria', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var data = form.serialize();
+
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                cerrarcargando();
+                if (response.success) {
+                    var _token = $('#token').val();
+                    var idopcion = $('#idopcion').val();
+                    var prefijo_id = $('#prefijo_id').val();
+                    var orden_id = $('#orden_id').val();
+                    
+                    var data_grupo = {
+                        _token: _token,
+                        prefijo_id: prefijo_id,
+                        orden_id: orden_id,
+                        idopcion: idopcion
+                    };
+                    
+                    ajax_modal(data_grupo, "/ajax-modal-configuracion-grupo-oc",
+                              "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
+                } else {
+                    alerterrorajax(response.mensaje);
+                }
+            },
+            error: function(response) {
+                cerrarcargando();
+                error500(response);
+            }
+        });
+    });
+
+    $(".registrocomprobante").on('submit', '.form-ajax-ubicacion', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var data = form.serialize();
+
+        abrircargando();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                cerrarcargando();
+                if (response.success) {
+                    var _token = $('#token').val();
+                    var idopcion = $('#idopcion').val();
+                    var prefijo_id = $('#prefijo_id').val();
+                    var orden_id = $('#orden_id').val();
+                    
+                    var data_grupo = {
+                        _token: _token,
+                        prefijo_id: prefijo_id,
+                        orden_id: orden_id,
+                        idopcion: idopcion
+                    };
+                    
+                    ajax_modal(data_grupo, "/ajax-modal-configuracion-grupo-oc",
+                              "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
+                } else {
+                    alerterrorajax(response.mensaje);
+                }
+            },
+            error: function(response) {
+                cerrarcargando();
+                error500(response);
+            }
+        });
+    });
+
 });
 
 

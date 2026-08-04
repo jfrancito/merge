@@ -7,6 +7,22 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style>
+        /* Estilos premium para desenfocar el fondo cuando un modal está abierto */
+        .be-content:has(.modal-show) .main-content {
+            filter: blur(8px) brightness(0.85) contrast(0.95);
+            transition: filter 0.4s ease-in-out;
+            pointer-events: none; /* Evitar interacciones con el fondo */
+        }
+        .main-content {
+            transition: filter 0.4s ease-in-out;
+        }
+        /* Altura fija scrollable para el listado de opciones de Select2 en modales */
+        .select2-container--default .select2-results > .select2-results__options {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+        }
+    </style>
 @stop
 
 @section('section')
@@ -79,6 +95,12 @@
           overlaySelector: '.modal-overlay',
           closeSelector: '.modal-close',
           classAddAfterOpen: 'modal-show',
+          beforeClose: function(modal, event) {
+              // Si el cierre es gatillado por hacer clic en el overlay de fondo, evitar el cierre
+              if (event && ($(event.target).hasClass('modal-overlay') || $(event.target).hasClass('md-overlay'))) {
+                  return false;
+              }
+          }
         });
 
         $(document).ready(function(){
