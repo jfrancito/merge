@@ -328,14 +328,6 @@ class UserController extends Controller
 
 		$usuario = User::where('id', '=', Session::get('usuario')->id)->first();
 
-		$selected_categoria_id = $request->input('selected_categoria_id', '');
-		$selected_ubicacion_id = $request->input('selected_ubicacion_id', '');
-
-		$categorias = DB::table('CatContaOrden')->where('estado', '=', 1)->pluck('nombre', 'id')->toArray();
-		$combocategoria = array('' => 'Seleccione Clasificación') + $categorias;
-
-		$ubicaciones = DB::table('ubicacionContaOrden')->where('estado', '=', 1)->pluck('ubicacion', 'id')->toArray();
-		$comboubicacion = array('' => 'Seleccione Sede') + $ubicaciones;
 
 		return View::make(
 			'usuario/modal/ajax/mdatosgrupocoman',
@@ -347,10 +339,6 @@ class UserController extends Controller
 				'orden_id' => $orden_id,
 				'idopcion' => $idopcion,
 				'ajax' => true,
-				'combocategoria' => $combocategoria,
-				'comboubicacion' => $comboubicacion,
-				'defecto_categoria' => $selected_categoria_id,
-				'defecto_ubicacion' => $selected_ubicacion_id,
 			]
 		);
 	}
@@ -1006,12 +994,7 @@ class UserController extends Controller
 	public function actionConfigurarDatosGrupoMarketing($orden_id, $idopcion, Request $request)
 	{
 
-		$grupo = trim($request['grupo']);
-		$existe = FeGrupoDocumento::where('NOMBRE', '=', $grupo)->first();
-		if (count($existe) > 0) {
-			return Redirect::back()->withInput()->with('errorbd', 'El Grupo Marketing "' . $grupo . '" ya existe.');
-		}
-
+		$grupo = $request['grupo'];
 		$idcab = $this->funciones->getCreateIdMaestradocpla('FE_GRUPO_DOCUMENTO', 'GRMK');
 
 
@@ -1023,157 +1006,9 @@ class UserController extends Controller
 		$cuentabancaria->ACTIVO = 1;
 		$cuentabancaria->COD_ESTADO = 'ETM0000000000001';
 		$cuentabancaria->TXT_ESTADO = 'GENERADO';
-		
-		// Guardar relaciones de categoría
-		$catId = $request['ID_CATCONTAORDEN'] ? $request['ID_CATCONTAORDEN'] : $request['cat_conta_orden_id'];
-		$catTxt = '';
-		if (empty($catId)) {
-			$defaultCat = DB::table('CatContaOrden')->where('estado', '=', 1)->first();
-			if ($defaultCat) {
-				$catId = $defaultCat->id;
-				$catTxt = $defaultCat->nombre;
-			}
-		} else {
-			$cat = DB::table('CatContaOrden')->where('id', '=', $catId)->first();
-			if ($cat) {
-				$catTxt = $cat->nombre;
-			}
-		}
-
-		// Guardar relaciones de ubicación
-		$ubiId = $request['ID_UBICACION'] ? $request['ID_UBICACION'] : $request['ubicacion_conta_orden_id'];
-		$ubiTxt = '';
-		if (empty($ubiId)) {
-			$defaultUbi = DB::table('ubicacionContaOrden')->where('estado', '=', 1)->first();
-			if ($defaultUbi) {
-				$ubiId = $defaultUbi->id;
-				$ubiTxt = $defaultUbi->ubicacion;
-			}
-		} else {
-			$ubi = DB::table('ubicacionContaOrden')->where('id', '=', $ubiId)->first();
-			if ($ubi) {
-				$ubiTxt = $ubi->ubicacion;
-			}
-		}
-
-		// Asignar los 4 nuevos campos a la BD
-		$cuentabancaria->ID_CATCONTAORDEN = $catId ? $catId : null;
-		$cuentabancaria->TXT_CATCONTAORDEN = $catTxt ? $catTxt : null;
-		$cuentabancaria->ID_UBICACION = $ubiId ? $ubiId : null;
-		$cuentabancaria->TXT_UBICACION = $ubiTxt ? $ubiTxt : null;
-
 		$cuentabancaria->save();
 
-
 		return Redirect::back()->withInput()->with('bienhecho', 'Grupo Marketing ' . $grupo . ' registrada con éxito');
-	}
-
-	public function actionAjaxObtenerDetalleGrupoMarketing(Request $request)
-	{
-		$grupo_id = $request->input('grupo_id');
-		$grupo = DB::table('FE_GRUPO_DOCUMENTO')->where('ID_DOCUMENTO', '=', $grupo_id)->first();
-		
-		if ($grupo) {
-			return response()->json([
-				'success' => true,
-				'clasificacion' => $grupo->TXT_CATCONTAORDEN ? $grupo->TXT_CATCONTAORDEN : '',
-				'sede' => $grupo->TXT_UBICACION ? $grupo->TXT_UBICACION : ''
-			]);
-		}
-		
-		return response()->json([
-			'success' => false,
-			'clasificacion' => '',
-			'sede' => ''
-		]);
-	}
-
-	public function actionAjaxModalConfiguracionCategoriaContaOrden(Request $request)
-	{
-		$prefijo_id = $request['prefijo_id'];
-		$orden_id = $request['orden_id'];
-		$idopcion = $request['idopcion'];
-
-		return View::make(
-			'usuario/modal/ajax/mdatosoccatconta',
-			[
-				'prefijo_id' => $prefijo_id,
-				'orden_id' => $orden_id,
-				'idopcion' => $idopcion,
-				'ajax' => true,
-			]
-		);
-	}
-
-	public function actionConfigurarCategoriaContaOrden($prefijo_id, $orden_id, $idopcion, Request $request)
-	{
-		$nombre = trim($request['nombre']);
-		$estado = $request['estado'];
-
-		$existe = DB::table('CatContaOrden')->where('nombre', '=', $nombre)->first();
-		if ($existe) {
-			if ($request->ajax()) {
-				return response()->json(['success' => false, 'mensaje' => 'La categoría "' . $nombre . '" ya se encuentra registrada.']);
-			}
-			return Redirect::back()->withInput()->with('errorbd', 'La categoría "' . $nombre . '" ya se encuentra registrada.');
-		}
-
-		$id = DB::table('CatContaOrden')->insertGetId([
-			'nombre' => $nombre,
-			'estado' => $estado,
-			'cod_usuario_crea_aud' => Session::get('usuario')->id,
-			'fec_usuario_crea_aud' => $this->fechaactual,
-		]);
-
-		if ($request->ajax()) {
-			return response()->json(['success' => true, 'mensaje' => 'Categoría "' . $nombre . '" registrada con éxito.', 'id' => $id]);
-		}
-
-		return Redirect::back()->with('bienhecho', 'Categoría "' . $nombre . '" registrada con éxito.');
-	}
-
-	public function actionAjaxModalConfiguracionUbicacionContaOrden(Request $request)
-	{
-		$prefijo_id = $request['prefijo_id'];
-		$orden_id = $request['orden_id'];
-		$idopcion = $request['idopcion'];
-
-		return View::make(
-			'usuario/modal/ajax/mdatosocubicacion',
-			[
-				'prefijo_id' => $prefijo_id,
-				'orden_id' => $orden_id,
-				'idopcion' => $idopcion,
-				'ajax' => true,
-			]
-		);
-	}
-
-	public function actionConfigurarUbicacionContaOrden($prefijo_id, $orden_id, $idopcion, Request $request)
-	{
-		$ubicacion = trim($request['ubicacion']);
-		$estado = $request['estado'];
-
-		$existe = DB::table('ubicacionContaOrden')->where('ubicacion', '=', $ubicacion)->first();
-		if ($existe) {
-			if ($request->ajax()) {
-				return response()->json(['success' => false, 'mensaje' => 'La ubicación "' . $ubicacion . '" ya se encuentra registrada.']);
-			}
-			return Redirect::back()->withInput()->with('errorbd', 'La ubicación "' . $ubicacion . '" ya se encuentra registrada.');
-		}
-
-		$id = DB::table('ubicacionContaOrden')->insertGetId([
-			'ubicacion' => $ubicacion,
-			'estado' => $estado,
-			'cod_usuario_crea_aud' => Session::get('usuario')->id,
-			'fec_usuario_crea_aud' => $this->fechaactual,
-		]);
-
-		if ($request->ajax()) {
-			return response()->json(['success' => true, 'mensaje' => 'Ubicación "' . $ubicacion . '" registrada con éxito.', 'id' => $id]);
-		}
-
-		return Redirect::back()->with('bienhecho', 'Ubicación "' . $ubicacion . '" registrada con éxito.');
 	}
 
 	public function actionConfigurarDatosCuentaBancariaOC($prefijo_id, $orden_id, $idopcion, Request $request)

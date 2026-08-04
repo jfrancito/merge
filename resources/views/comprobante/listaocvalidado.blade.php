@@ -49,17 +49,6 @@
                                    Descargar excel Contabilidada
                                 </a>
                               </li>
-                              <li>
-                                <a href="{{url('/comprobante-masivo-marketing-excel')}}" 
-                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
-                                   target="_blank"
-                                   id="descargarcomprobantemasivomarketingexcel" 
-                                   data-href="{{url('/comprobante-masivo-marketing-excel')}}"
-                                   title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Marketing</span>
-                                   Descargar excel Marketing
-                                </a>
-                              </li>
                           </ul>
                       </div>
                   </div>
