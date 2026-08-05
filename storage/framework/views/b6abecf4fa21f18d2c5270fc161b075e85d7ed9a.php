@@ -96,31 +96,13 @@
                     </div>
                 </div>
 
-
-                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
-                    <div class="form-group">
-                        <label class="col-sm-12 control-label labelleft">Glosa :</label>
-                        <div class="col-sm-12 input-group xs-mb-15">
-                            <textarea id="txt_glosa" name="" placeholder="Glosa" required=""
-                                      autocomplete="off" class="form-control custom-glosa-height"
-                                      data-aw="4"></textarea>
-                            <span class="input-group-btn">
-                            <button id="asignarvalerendir" type="button" class="btn btn-primary ">
-                                  <font style="vertical-align: inherit;"><font
-                                              style="vertical-align: inherit;">Guardar</font></font>
-                                </button>
-                           </span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+        </div>
 
-            <div class="listadetalleajax"></div>
+             <div class="listadetalleajax"></div>
+             <?php echo $__env->make('valerendir.ajax.modalvalerendircuentabancaria', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
 
-            <div class="ajaxvacio text-center fw-bold">
-                COMPLETE LOS CAMPOS CORRECTAMENTE ...
-            </div>
+            <div class="ajaxvacio text-center fw-bold"></div>
 
             <input type="text" id="vale_rendir_id" hidden>
             <?php echo $__env->make('valerendir.modal.detallerendir', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
@@ -216,6 +198,15 @@
                 <div class='listacontratomasiva listajax reporteajax'>
                 </div>
             </div>
+            <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
+                <div class="col-xs-6"></div>
+                <div class="col-xs-6 text-right">
+                    <button id="asignarvalerendir" type="button" class="btn btn-primary">
+                        EMITIR VALE
+                    </button>
+                </div>
+            </div>
+
             <div class='listajax'>
                    <?php echo $__env->make('valerendirreembolso.ajax.listamodalvalerendirreembolso', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
 

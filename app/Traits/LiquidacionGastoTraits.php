@@ -341,7 +341,7 @@ trait LiquidacionGastoTraits
                                     'COD_PRODUCTO' => $primer_item['COD_PRODUCTO'],
                                     'TXT_PRODUCTO' => $producto,
                                     'TOTAL' => $primer_item['TOTAL'], // Se mantiene el primero
-                                    'concepto_id' => $items->last()['concepto_id'], // Se toma el último
+                                    'concepto_id' => $items->pluck('concepto_id')->implode(','), // Se concatenan con comas
                                     'concepto' => $items->pluck('concepto')->implode(', '), // Se concatenan
                                     'monto' => $items->sum('monto') // Se suman
                                 ];
@@ -378,8 +378,16 @@ trait LiquidacionGastoTraits
                             ->toArray();
 
 
-                        // Primero, obtener los concepto_id que ya existen en $array
-                        $conceptosExistentes = array_column($array, 'concepto_id');
+                        // Primero, obtener todos los concepto_id individuales que ya existen en $array
+                        $conceptosExistentes = [];
+                        foreach ($array as $row) {
+                            if (!empty($row['concepto_id'])) {
+                                $ids = explode(',', $row['concepto_id']);
+                                foreach ($ids as $id) {
+                                    $conceptosExistentes[] = trim($id);
+                                }
+                            }
+                        }
 
                         // Recorrer $final y agregar los que no existen
                         foreach ($final as $itemFinal) {
