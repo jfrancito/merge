@@ -11,6 +11,9 @@ $(document).ready(function(){
             let can_total_importe = $('#can_total_importe').val();
             let can_total_saldo = $('#can_total_saldo').val();
             let cod_moneda = $('#cod_moneda').val();
+            let tipo_pago = $('#tipo_pago').val();
+            let txt_categoria_banco = $('#txt_categoria_banco').val();
+            let numero_cuenta = $('#numero_cuenta').val();
             let vale_rendir_id = $('#vale_rendir_id').val();
 
             let opcion = !vale_rendir_id ? 'I' : 'U';
@@ -44,6 +47,21 @@ $(document).ready(function(){
             if (!txt_glosa) {
                 alerterrorajax("El campo 'Glosa' es obligatorio.");
                 return;
+            }
+
+            if (!tipo_pago) {
+                alerterrorajax("El campo 'Tipo Pago' es obligatorio.");
+                return;
+            }
+
+            if (tipo_pago == "0") {
+                txt_categoria_banco = '';
+                numero_cuenta = '';
+            } else if (tipo_pago == "1") {
+                if (!txt_categoria_banco || !numero_cuenta) {
+                    alerterrorajax("Debe ingresar la entidad financiera y número de cuenta para transferencias.");
+                    return;
+                }
             }
 
             if (parseFloat(can_total_importe) <= 0 || isNaN(parseFloat(can_total_importe))) {
@@ -91,6 +109,9 @@ $(document).ready(function(){
                     can_total_importe: can_total_importe,
                     can_total_saldo: can_total_saldo,
                     cod_moneda: cod_moneda,
+                    tipo_pago: tipo_pago,
+                    txt_categoria_banco: txt_categoria_banco,
+                    numero_cuenta: numero_cuenta,
                     vale_rendir_id: vale_rendir_id,
                     opcion: opcion,
                     array_detalle: detalles
@@ -257,8 +278,18 @@ $(document).ready(function(){
                     $('#can_total_saldo').val(data_left["0"]["CAN_TOTAL_SALDO"]);
                     $('#txt_glosa').val(data_left["0"]["TXT_GLOSA"]);
                     $('#cod_moneda').val(data_left["0"]["COD_MONEDA"]).trigger('change'); 
-                    $('#vale_rendir_id').val(valerendir_id);
-                    $('#btntexto').text('Modificar');
+                    $('#tipo_pago').val(data_left["0"]["TIPO_PAGO"]).trigger('change');
+                     
+                     // Rellenar banco y cuenta despues de disparar el trigger de tipo_pago
+                     setTimeout(function() {
+                         if (data_left["0"]["TIPO_PAGO"] == "1") {
+                             $('#txt_categoria_banco').val(data_left["0"]["TXT_CATEGORIA_BANCO"]);
+                             $('#numero_cuenta').val(data_left["0"]["NRO_CUENTA"]);
+                         }
+                     }, 100);
+
+                     $('#vale_rendir_id').val(valerendir_id);
+                     $('#btntexto').text('Modificar');
 
                     $.ajax({
                         type: "POST",

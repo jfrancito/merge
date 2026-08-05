@@ -473,36 +473,94 @@ class GestionOrdenPedidoController extends Controller
 
             // determine if update, deactivate existing details
             if ($accion === 'U') {
+                $productosEnviados = collect($array_detalle)->pluck('cod_producto')->toArray();
+
+                // 1. Desactivar unicamente los productos que fueron eliminados en la edicion
                 DB::table('WEB.ORDEN_PEDIDO_DETALLE')
                     ->where('ID_PEDIDO', $orden_pedido_id)
-                    ->update(['ACTIVO' => 0]);
-            }
+                    ->whereNotIn('COD_PRODUCTO', $productosEnviados)
+                    ->update([
+                        'ACTIVO' => 0,
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                        'FEC_USUARIO_MODIF_AUD' => Carbon::now()
+                    ]);
 
-            if (count($array_detalle) > 0) {
-                foreach ($array_detalle as $item) {
-                    $this->insertOrdenPedidoDetalle(
-                        'I',
-                        $orden_pedido_id,
-                        $cod_empr,
-                        $cod_centro,
-                        $item['cod_producto'],
-                        $item['nom_producto'],
-                        $item['cod_categoria'] ?? '',
-                        $item['nom_categoria'] ?? '',
-                        $item['cantidad'],
-                        $item['precio'],
-                        $item['txt_observacion'] ?? '',
-                        true,
-                        ""
-                    );
-
-                    // ACTUALIZAR IND_MATERIAL_SERVICIO BASADO EN SELECCION DEL FRONTEND
-                    if (isset($item['ind_material_servicio'])) {
-                        DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                // 2. Sincronizar los productos enviados (actualizar los existentes y registrar los nuevos)
+                if (count($array_detalle) > 0) {
+                    foreach ($array_detalle as $item) {
+                        $productoExistente = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
                             ->where('ID_PEDIDO', $orden_pedido_id)
                             ->where('COD_PRODUCTO', $item['cod_producto'])
-                            ->where('ACTIVO', 1)
-                            ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                            ->first();
+
+                        if ($productoExistente) {
+                            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                ->where('ID_PEDIDO', $orden_pedido_id)
+                                ->where('COD_PRODUCTO', $item['cod_producto'])
+                                ->update([
+                                    'NOM_PRODUCTO' => $item['nom_producto'],
+                                    'COD_CATEGORIA' => $item['cod_categoria'] ?? '',
+                                    'NOM_CATEGORIA' => $item['nom_categoria'] ?? '',
+                                    'CANTIDAD' => $item['cantidad'],
+                                    'CAN_PRECIO' => $item['precio'],
+                                    'TXT_OBSERVACION' => $item['txt_observacion'] ?? '',
+                                    'IND_MATERIAL_SERVICIO' => $item['ind_material_servicio'] ?? ($item['nom_categoria'] === 'SERVICIO' ? 'S' : 'M'),
+                                    'ACTIVO' => 1,
+                                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                                    'FEC_USUARIO_MODIF_AUD' => Carbon::now()
+                                ]);
+                        } else {
+                            $this->insertOrdenPedidoDetalle(
+                                'I',
+                                $orden_pedido_id,
+                                $cod_empr,
+                                $cod_centro,
+                                $item['cod_producto'],
+                                $item['nom_producto'],
+                                $item['cod_categoria'] ?? '',
+                                $item['nom_categoria'] ?? '',
+                                $item['cantidad'],
+                                $item['precio'],
+                                $item['txt_observacion'] ?? '',
+                                true,
+                                ""
+                            );
+
+                            if (isset($item['ind_material_servicio'])) {
+                                DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                    ->where('ID_PEDIDO', $orden_pedido_id)
+                                    ->where('COD_PRODUCTO', $item['cod_producto'])
+                                    ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Insercion limpia inicial (Accion 'I')
+                if (count($array_detalle) > 0) {
+                    foreach ($array_detalle as $item) {
+                        $this->insertOrdenPedidoDetalle(
+                            'I',
+                            $orden_pedido_id,
+                            $cod_empr,
+                            $cod_centro,
+                            $item['cod_producto'],
+                            $item['nom_producto'],
+                            $item['cod_categoria'] ?? '',
+                            $item['nom_categoria'] ?? '',
+                            $item['cantidad'],
+                            $item['precio'],
+                            $item['txt_observacion'] ?? '',
+                            true,
+                            ""
+                        );
+
+                        if (isset($item['ind_material_servicio'])) {
+                            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                ->where('ID_PEDIDO', $orden_pedido_id)
+                                ->where('COD_PRODUCTO', $item['cod_producto'])
+                                ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                        }
                     }
                 }
             }

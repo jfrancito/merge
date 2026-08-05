@@ -15,7 +15,7 @@ use App\Modelos\STDTrabajador;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Session;
-use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
+use App\WEBRegla, App\Modelos\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
 use Validator;
 
@@ -93,6 +93,50 @@ class ValeRendirControllerReembolso extends Controller
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
+
+        //CUENTA BANCARIA
+        $cod_empr_cli = DB::table('users as usu')
+            ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
+            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
+            ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
+            ->where('usu.id', $cod_usuario_registro)
+            ->where('emp.COD_ESTADO', 1)
+            ->value('emp.COD_EMPR');
+
+        $empresatrabjador = STDEmpresa::where('COD_EMPR','=',$cod_empr_cli)->first();
+        $nrodocumentotrab = $empresatrabjador ? $empresatrabjador->NRO_DOCUMENTO : '';
+
+        $values                 =   [$nrodocumentotrab,$cod_empr];
+        $datoscuentasueldo      =   !empty($nrodocumentotrab) ? DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values) : [];   
+
+        $txt_categoria_banco = null;
+        $numero_cuenta = null;
+
+        if (!empty($datoscuentasueldo)) {
+            // Caso trabajador interno
+            $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
+            $numero_cuenta = $datoscuentasueldo[0]->numcuenta ?? null;
+        } else {
+            // Caso tercero
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->select('txt_banco', 'txt_cuenta_corriente')
+                ->first();
+
+            if ($tercero) {
+                $txt_categoria_banco = $tercero->txt_banco;
+                $numero_cuenta = $tercero->txt_cuenta_corriente;
+            } else {
+                $txt_categoria_banco = null;
+                $numero_cuenta = null;
+            }
+        }
+
+        $tipopago = [
+                0 => 'EFECTIVO',
+                1 => 'TRANSFERENCIA'
+            ];
+
 
         $areacomercial = DB::table('WEB.platrabajadores')
         ->where('situacion_id', 'PRMAECEN000000000002') // activo
@@ -174,6 +218,7 @@ class ValeRendirControllerReembolso extends Controller
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
         $combo3 = array('' => 'Seleccione Destino') + $destino;
         $combo4 = array('' => 'Seleccione Moneda') + $moneda;
+        $combo5 = array('' => 'Seleccione Tipo Pago') + $tipopago;
 
         $listarusuarios = $this->listaValeRendirReembolso(
     	        "GEN",
@@ -196,6 +241,9 @@ class ValeRendirControllerReembolso extends Controller
             'listausuarios2' => $combo2,
             'listausuarios3' => $combo3,
             'listausuarios4' => $combo4,
+            'listausuarios5' => $combo5,
+            'txt_categoria_banco'   => $txt_categoria_banco,
+            'numero_cuenta'         => $numero_cuenta,
             'usuario_aprueba_predeterminado' => $usuario_aprueba_predeterminado,
             'usuario_autoriza_predeterminado' => $usuario_autoriza_predeterminado,
             'listarusuarios' => $listarusuarios,      
@@ -216,6 +264,9 @@ class ValeRendirControllerReembolso extends Controller
         $can_total_importe  = $request->input('can_total_importe');
         $can_total_saldo    = $request->input('can_total_saldo');
         $cod_moneda         = $request->input('cod_moneda');
+        $tipo_pago          = $request->input('tipo_pago');
+        $txt_categoria_banco = $request->input('txt_categoria_banco');
+        $numero_cuenta      = $request->input('numero_cuenta');
         $vale_rendir_id     = $request->input('vale_rendir_id');
         $opcion             = $request->input('opcion');
         $array_detalle      = $request->input('array_detalle');
@@ -293,12 +344,13 @@ class ValeRendirControllerReembolso extends Controller
                 "", "",
                 $tipo_motivo,
                 $cod_moneda,
-                "",
+                $tipo_pago,
                 $txt_glosa,
                 "", "", "",
                 $can_total_importe,
                 $can_total_saldo,
-                "", "",
+                $txt_categoria_banco,
+                $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
                 true,
@@ -383,12 +435,13 @@ class ValeRendirControllerReembolso extends Controller
                 "", "",
                 $tipo_motivo,
                 $cod_moneda,
-                "",
+                $tipo_pago,
                 $txt_glosa,
                 "", "", "",
                 $can_total_importe,
                 $can_total_saldo,
-                "", "",
+                $txt_categoria_banco,
+                $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
                 true,
@@ -542,7 +595,7 @@ class ValeRendirControllerReembolso extends Controller
 	public function traerdataValeRendirActionReembolso(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $usuarios = WEBValeRendirReembolso::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE', 'COD_MONEDA'])->toJson();
+        $usuarios = WEBValeRendirReembolso::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TIPO_PAGO', 'TXT_CATEGORIA_BANCO', 'NRO_CUENTA', 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE', 'COD_MONEDA'])->toJson();
         return $usuarios;
 
     }
