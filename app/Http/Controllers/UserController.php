@@ -327,7 +327,8 @@ class UserController extends Controller
 		$idoc = $orden_id;
 
 		$usuario = User::where('id', '=', Session::get('usuario')->id)->first();
-
+		$clasificaciones = \App\Modelos\CatContaOrden::where('estado', '=', 1)->pluck('nombre', 'id')->toArray();
+		$sedes = \App\Modelos\UbicacionContaOrden::where('estado', '=', 1)->pluck('ubicacion', 'id')->toArray();
 
 		return View::make(
 			'usuario/modal/ajax/mdatosgrupocoman',
@@ -338,6 +339,8 @@ class UserController extends Controller
 				'prefijo_id' => $prefijo_id,
 				'orden_id' => $orden_id,
 				'idopcion' => $idopcion,
+				'clasificaciones' => $clasificaciones,
+				'sedes' => $sedes,
 				'ajax' => true,
 			]
 		);
@@ -995,12 +998,22 @@ class UserController extends Controller
 	{
 
 		$grupo = $request['grupo'];
-		$idcab = $this->funciones->getCreateIdMaestradocpla('FE_GRUPO_DOCUMENTO', 'GRMK');
+		$catcontaorden_id = $request['catcontaorden_id'];
+		$ubicacioncontaorden_id = $request['ubicacioncontaorden_id'];
 
+		$clasificacion = \App\Modelos\CatContaOrden::find($catcontaorden_id);
+		$sede = \App\Modelos\UbicacionContaOrden::find($ubicacioncontaorden_id);
+
+		$idcab = $this->funciones->getCreateIdMaestradocpla('FE_GRUPO_DOCUMENTO', 'GRMK');
 
 		$cuentabancaria = new FeGrupoDocumento();
 		$cuentabancaria->ID_DOCUMENTO = $idcab;
 		$cuentabancaria->NOMBRE = $grupo;
+		$cuentabancaria->ID_CATCONTAORDEN = $catcontaorden_id;
+		$cuentabancaria->TXT_CATCONTAORDEN = $clasificacion ? $clasificacion->nombre : null;
+		$cuentabancaria->ID_UBICACION = $ubicacioncontaorden_id;
+		$cuentabancaria->TXT_UBICACION = $sede ? $sede->ubicacion : null;
+
 		$cuentabancaria->USUARIO_CREA = Session::get('usuario')->id;
 		$cuentabancaria->FECHA_CREA = $this->fechaactual;
 		$cuentabancaria->ACTIVO = 1;
@@ -1008,7 +1021,7 @@ class UserController extends Controller
 		$cuentabancaria->TXT_ESTADO = 'GENERADO';
 		$cuentabancaria->save();
 
-		return Redirect::back()->withInput()->with('bienhecho', 'Grupo Marketing ' . $grupo . ' registrada con éxito');
+		return Redirect::back()->withInput()->with('bienhecho', 'Actividad de Marketing ' . $grupo . ' registrada con éxito');
 	}
 
 	public function actionConfigurarDatosCuentaBancariaOC($prefijo_id, $orden_id, $idopcion, Request $request)
@@ -3594,6 +3607,58 @@ class UserController extends Controller
 			Session::flash('bienhecho', 'Se realizo la modificacion de la contraseña con exito');
 			echo "Exito";
 		}
+	}
+
+	public function actionAjaxGuardarClasificacion(Request $request)
+	{
+		$nombre = $request['nombre'];
+		$estado = $request['estado'] === 'Activo' || $request['estado'] === '1' ? 1 : 0;
+
+		$clasificacion = new \App\Modelos\CatContaOrden();
+		$clasificacion->nombre = $nombre;
+		$clasificacion->estado = $estado;
+		$clasificacion->cod_usuario_crea_aud = Session::get('usuario')->id;
+		$clasificacion->fec_usuario_crea_aud = $this->fechaactual;
+		$clasificacion->save();
+
+		$list = \App\Modelos\CatContaOrden::where('estado', '=', 1)->get(['id', 'nombre']);
+		return response()->json(['success' => true, 'list' => $list]);
+	}
+
+	public function actionAjaxGuardarSede(Request $request)
+	{
+		$ubicacion = $request['ubicacion'];
+		$estado = $request['estado'] === 'Activo' || $request['estado'] === '1' ? 1 : 0;
+
+		$sede = new \App\Modelos\UbicacionContaOrden();
+		$sede->ubicacion = $ubicacion;
+		$sede->estado = $estado;
+		$sede->cod_usuario_crea_aud = Session::get('usuario')->id;
+		$sede->fec_usuario_crea_aud = $this->fechaactual;
+		$sede->save();
+
+		$list = \App\Modelos\UbicacionContaOrden::where('estado', '=', 1)->get(['id', 'ubicacion']);
+		return response()->json(['success' => true, 'list' => $list]);
+	}
+
+	public function actionAjaxObtenerDetalleGrupoMarketing(Request $request)
+	{
+		$grupo_id = $request->input('grupo_id');
+		$grupo = DB::table('FE_GRUPO_DOCUMENTO')->where('ID_DOCUMENTO', '=', $grupo_id)->first();
+		
+		if ($grupo) {
+			return response()->json([
+				'success' => true,
+				'clasificacion' => $grupo->TXT_CATCONTAORDEN ? $grupo->TXT_CATCONTAORDEN : '',
+				'sede' => $grupo->TXT_UBICACION ? $grupo->TXT_UBICACION : ''
+			]);
+		}
+		
+		return response()->json([
+			'success' => false,
+			'clasificacion' => '',
+			'sede' => ''
+		]);
 	}
 
 }

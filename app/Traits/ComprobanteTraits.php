@@ -4632,7 +4632,6 @@ trait ComprobanteTraits
 
         $listadatos             =       FeDocumento::whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        ->where('OPERACION','=','ORDEN_COMPRA')
                                         ->ProveedorFE($proveedor_id)
                                         ->EstadoFE($estado_id)
                                         ->where('OPERACION','=',$operacion_id)
@@ -5091,7 +5090,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id = 'ORDEN_COMPRA') {
 
         $rol                    =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
         $trabajador             =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -5117,8 +5116,15 @@ trait ComprobanteTraits
         if($rol->ind_uc == 1){
 
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            $query = FeDocumento::query();
+            if($operacion_id == 'ORDEN_COMPRA_ANTICIPO') {
+                $query = $query->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                               ->join('CMP.ORDEN', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN');
+            } else {
+                $query = $query->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN');
+            }
+
+            $listadatos     =   $query->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
@@ -5130,7 +5136,7 @@ trait ComprobanteTraits
 
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
@@ -5209,8 +5215,15 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                ->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            $query = FeDocumento::query();
+            if($operacion_id == 'ORDEN_COMPRA_ANTICIPO') {
+                $query = $query->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                               ->join('CMP.ORDEN', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN');
+            } else {
+                $query = $query->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN');
+            }
+
+            $listadatos     =   $query->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
@@ -5220,7 +5233,7 @@ trait ComprobanteTraits
                                 ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -5296,7 +5309,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_contrato_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_contrato_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id = 'CONTRATO') {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -5319,8 +5332,15 @@ trait ComprobanteTraits
         if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
 
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            $query = FeDocumento::query();
+            if($operacion_id == 'CONTRATO_ANTICIPO') {
+                $query = $query->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                               ->join('CMP.DOCUMENTO_CTBLE', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+            } else {
+                $query = $query->join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+            }
+
+            $listadatos     =   $query->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
@@ -5334,7 +5354,7 @@ trait ComprobanteTraits
 
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','CONTRATO')
+                                ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 //->where('WEBPAGOSOC.TXT_GLOSA', 'not like', '%ANTICIPO A PROVEEDOR%')
                                 ->ProveedorFE($proveedor_id)
@@ -5410,8 +5430,15 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+            $query = FeDocumento::query();
+            if($operacion_id == 'CONTRATO_ANTICIPO') {
+                $query = $query->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                               ->join('CMP.DOCUMENTO_CTBLE', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+            } else {
+                $query = $query->join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+            }
+
+            $listadatos     =   $query->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
@@ -5426,7 +5453,7 @@ trait ComprobanteTraits
 
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','CONTRATO')
+                                ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')

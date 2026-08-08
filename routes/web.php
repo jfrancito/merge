@@ -121,6 +121,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');
+	Route::post('/ajax-guardar-clasificacion', 'UserController@actionAjaxGuardarClasificacion');
+	Route::post('/ajax-guardar-sede', 'UserController@actionAjaxGuardarSede');
+	Route::any('/ajax-obtener-detalle-grupo-marketing', 'UserController@actionAjaxObtenerDetalleGrupoMarketing');
 
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
@@ -448,6 +451,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-agregar-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoMerge');
 	Route::any('/comprobante-masivo-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoExcel');
 	Route::any('/comprobante-masivo-tesoreria-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoTesoreriaExcel');
+	Route::any('/comprobante-masivo-marketing-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoMarketingExcel');
 
 
 	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}/{anio_id}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');
