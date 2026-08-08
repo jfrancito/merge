@@ -32,6 +32,26 @@ $(document).ready(function(){
         ajax_modal({_token: _token}, "/ajax-modal-cambiar-clave", "modal-cambiar-clave", "modal-cambiar-clave-container");
     });
 
+    if ($.fn.niftyModal) {
+        $.fn.niftyModal('setDefaults', {
+            overlaySelector: '.modal-overlay',
+            closeSelector: '.modal-close',
+            classAddAfterOpen: 'modal-show'
+        });
+    }
+
+    $('body').on('show', '.modal-container', function() {
+        $('.be-wrapper').addClass('modal-open-blur');
+        $('body').addClass('modal-open-blur');
+        // Unbind the overlay click event to prevent close on clicking outside, while keeping the overlay as a click-blocking shield
+        $('.modal-overlay').off('click');
+    });
+
+    $('body').on('hide', '.modal-container', function() {
+        $('.be-wrapper').removeClass('modal-open-blur');
+        $('body').removeClass('modal-open-blur');
+    });
+
 });
 
 
