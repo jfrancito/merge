@@ -52,10 +52,9 @@
               </div>
             </div>
           </div>
-
-    @include('comprobante.modal.mmodificararchivo')
     </div>
   </div>
+  @include('comprobante.modal.mmodificararchivo')
 </div>
 
 @stop
