@@ -3791,24 +3791,4 @@ class UserController extends Controller
 		return response()->json(['success' => true, 'list' => $list]);
 	}
 
-	public function actionAjaxObtenerDetalleGrupoMarketing(Request $request)
-	{
-		$grupo_id = $request->input('grupo_id');
-		$grupo = DB::table('FE_GRUPO_DOCUMENTO')->where('ID_DOCUMENTO', '=', $grupo_id)->first();
-		
-		if ($grupo) {
-			return response()->json([
-				'success' => true,
-				'clasificacion' => $grupo->TXT_CATCONTAORDEN ? $grupo->TXT_CATCONTAORDEN : '',
-				'sede' => $grupo->TXT_UBICACION ? $grupo->TXT_UBICACION : ''
-			]);
-		}
-		
-		return response()->json([
-			'success' => false,
-			'clasificacion' => '',
-			'sede' => ''
-		]);
-	}
-
 }
