@@ -74,11 +74,11 @@ class ReporteComprobanteController extends Controller
         $funcion                =   $this;
 
 
-        if($operacion_id=='ORDEN_COMPRA'){
+        if($operacion_id=='ORDEN_COMPRA' || $operacion_id=='ORDEN_COMPRA_ANTICIPO'){
 
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
-            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
-                $excel->sheet('ORDEN COMPRA', function($sheet) use ($listadatos,$titulo,$funcion) {
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                $excel->sheet($operacion_id == 'ORDEN_COMPRA_ANTICIPO' ? 'ORDEN COMPRA ANTICIPO' : 'ORDEN COMPRA', function($sheet) use ($listadatos,$titulo,$funcion) {
 
                     $sheet->loadView('reporte/excel/listacomprobantemasivo')->with('listadatos',$listadatos)
                                                                        ->with('titulo',$titulo)
@@ -88,11 +88,11 @@ class ReporteComprobanteController extends Controller
 
         }else{
 
-            if($operacion_id=='CONTRATO'){
+            if($operacion_id=='CONTRATO' || $operacion_id=='CONTRATO_ANTICIPO'){
 
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
-                Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
-                    $excel->sheet('CONTRATO', function($sheet) use ($listadatos,$titulo,$funcion) {
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+                Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                    $excel->sheet($operacion_id == 'CONTRATO_ANTICIPO' ? 'CONTRATO ANTICIPO' : 'CONTRATO', function($sheet) use ($listadatos,$titulo,$funcion) {
                         $sheet->loadView('reporte/excel/listacomprobantemasivocontrato')->with('listadatos',$listadatos)
                                                                            ->with('titulo',$titulo)
                                                                            ->with('funcion',$funcion);                                               

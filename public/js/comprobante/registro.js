@@ -1096,6 +1096,25 @@ $(document).ready(function(){
         }
     });
 
+  $(".registrocomprobante").on('click','.agregar_grupo_marketing_oc', function() {
+
+          var _token                  =   $('#token').val();
+          var idopcion                =   $('#idopcion').val();
+          var prefijo_id              =   $('#prefijo_id').val();
+          var orden_id                =   $('#orden_id').val();
+
+          data                        =   {
+                                              _token                  : _token,
+                                              prefijo_id              : prefijo_id,
+                                              orden_id                : orden_id,
+                                              idopcion                : idopcion,
+                                          };
+
+          ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                    "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+     });
+  
     function actualizarDetalleGrupoMarketing() {
         var grupo_id = $('#grupo_id').val();
         if (grupo_id && grupo_id !== '') {
@@ -1268,7 +1287,6 @@ $(document).ready(function(){
             }
         });
     });
-
 });
 
 

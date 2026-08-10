@@ -15,7 +15,7 @@
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="panel panel-default panel-contrast">
-        <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ACTIVIDAD MARKETING
+        <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ACTIVIDAD DE MARKETING
           <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Actividad</span></div>
         </div>
         <div class="panel-body panel-body-contrast">

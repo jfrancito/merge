@@ -5472,7 +5472,7 @@ class GestionUsuarioContactoController extends Controller
 
 
             $arraygrupo             =   DB::table('FE_GRUPO_DOCUMENTO')->pluck('NOMBRE','ID_DOCUMENTO')->toArray();
-            $combogrupo             =   array('' => "Seleccione Grupo") + $arraygrupo;
+            $combogrupo             =   array('' => "Seleccionar actividad") + $arraygrupo;
 
             $funciones = $this;
 

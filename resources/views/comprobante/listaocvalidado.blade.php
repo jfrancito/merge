@@ -29,7 +29,8 @@
                               style="margin: 7px -169px 0;">
                               <li>
                                   <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
-                                     class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                     onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
+                                     class='btn btn-secondary botoncabecera tooltipcss opciones'
                                      target="_blank"
                                      id="descargarcomprobantemasivotesoreriraexcel" 
                                      data-href="{{url('/comprobante-masivo-tesoreria-excel')}}"
@@ -40,13 +41,26 @@
                               </li>
                               <li>
                                 <a href="{{url('/comprobante-masivo-excel')}}" 
-                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                   onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
+                                   class='btn btn-secondary botoncabecera tooltipcss opciones'
                                    target="_blank"
                                    id="descargarcomprobantemasivoexcel" 
                                    data-href="{{url('/comprobante-masivo-excel')}}"
                                    title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Contabilidada</span>
-                                   Descargar excel Contabilidada
+                                   <span class="tooltiptext">Descargar excel Contabilidad</span>
+                                   Descargar excel Contabilidad
+                                </a>
+                              </li>
+                              <li>
+                                <a href="{{url('/comprobante-masivo-marketing-excel')}}" 
+                                   onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
+                                   class='btn btn-secondary botoncabecera tooltipcss opciones'
+                                   target="_blank"
+                                   id="descargarcomprobantemasivomarketingexcel" 
+                                   data-href="{{url('/comprobante-masivo-marketing-excel')}}"
+                                   title="Descargar excel" style="width:100%">
+                                   <span class="tooltiptext">Descargar excel Marketing</span>
+                                   Descargar excel Marketing
                                 </a>
                               </li>
                               <li>
