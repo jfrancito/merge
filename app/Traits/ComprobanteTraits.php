@@ -4655,16 +4655,25 @@ trait ComprobanteTraits
                                         ->pluck('COD_USUARIO')
                                         ->toArray();
 
+        $tabla = "CMP.DOCUMENTO_CTBLE";
+        $columna_join = "COD_DOCUMENTO_CTBLE";
+        $glosa_col = "TXT_GLOSA";
+        if($operacion_id == 'ORDEN_COMPRA_ANTICIPO'){
+            $tabla = "CMP.ORDEN";
+            $columna_join = "COD_ORDEN";
+            $glosa_col = "TXT_GLOSA";
+        }
+
         if($rol->ind_uc == 1){
 
 
                     $sql = "
                         SELECT 
                             FE_DOCUMENTO.*, 
-                            CMP.DOCUMENTO_CTBLE.*,
+                            {$tabla}.*,
                             FE_DETALLE_DOCUMENTO.*,
                             FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
-                            CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                            {$tabla}.{$glosa_col} AS TXT_GLOSA_ORDEN,
                             FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                             FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
                             CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
@@ -4727,7 +4736,7 @@ trait ComprobanteTraits
                             WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO 
                             ORDER BY FE_REF_ASOC.ID_DOCUMENTO
                         ) AS D
-                        INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+                        INNER JOIN {$tabla} ON D.ID_DOCUMENTO = {$tabla}.{$columna_join}
                         INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
 
                         LEFT JOIN (SELECT 
@@ -4747,7 +4756,7 @@ trait ComprobanteTraits
                         ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
                         LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
 
-                        LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
+                        LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = {$tabla}.COD_USUARIO_CREA_AUD
                         LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
                         WHERE CAST(fecha_pa AS DATE) >= ? 
                           AND CAST(fecha_pa AS DATE) <= ?
@@ -4770,10 +4779,10 @@ trait ComprobanteTraits
                 $sql = "
                     SELECT 
                         FE_DOCUMENTO.*, 
-                        CMP.DOCUMENTO_CTBLE.*,
+                        {$tabla}.*,
                         FE_DETALLE_DOCUMENTO.*,
                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
-                        CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                        {$tabla}.{$glosa_col} AS TXT_GLOSA_ORDEN,
                         FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                         FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
                         CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
@@ -4834,7 +4843,7 @@ trait ComprobanteTraits
                         WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO 
                         ORDER BY FE_REF_ASOC.ID_DOCUMENTO
                     ) AS D
-                    INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+                    INNER JOIN {$tabla} ON D.ID_DOCUMENTO = {$tabla}.{$columna_join}
                     INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
                     LEFT JOIN (SELECT 
                                 dc.*,
@@ -4853,7 +4862,7 @@ trait ComprobanteTraits
                     ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
                     LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
 
-                    LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
+                    LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = {$tabla}.COD_USUARIO_CREA_AUD
                     LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
 
 

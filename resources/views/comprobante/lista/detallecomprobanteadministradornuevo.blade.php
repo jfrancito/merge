@@ -143,25 +143,45 @@
                 <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="panel panel-default panel-contrast">
-                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">GRUPO MARKETING
-                        <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Grupo</span></div>
+                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ACTIVIDAD MARKETING
+                        <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Actividad</span></div>
                       </div>
                       <div class="panel-body panel-body-contrast">
                               <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
-                                            <div class="form-group">
-                                              <label class="col-sm-12 control-label labelleft" ><b>Grupo :</b></label>
-                                              <div class="col-sm-12 abajocaja" >
-                                                  {!! Form::select( 'grupo_id', $combogrupo, array(''),
-                                                                    [
-                                                                      'class'       => 'select2 form-control control input-xs' ,
-                                                                      'id'          => 'grupo_id',
-                                                                      'data-aw'     => '1',
-                                                                    ]) !!}
-                                              </div>
-                                            </div>
-                                        </div>
+                                         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                             <div class="form-group">
+                                               <label class="col-sm-12 control-label labelleft" ><b>Actividad :</b></label>
+                                               <div class="col-sm-12 abajocaja" >
+                                                   {!! Form::select( 'grupo_id', $combogrupo, (isset($fedocumento) && is_object($fedocumento)) ? $fedocumento->COD_GRUPO_MK : '',
+                                                                     [
+                                                                       'class'       => 'select2 form-control control input-xs' ,
+                                                                       'id'          => 'grupo_id',
+                                                                       'data-aw'     => '1',
+                                                                     ]) !!}
+                                               </div>
+                                             </div>
+                                         </div>
+                                         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 info-marketing-container" style="margin-top: 15px;">
+                                             <div style="display: flex; gap: 20px; background: #fafafa; border: 1px solid #e3e3e3; padding: 10px 15px; border-radius: 6px; box-shadow: inset 0 1px 1px rgba(0,0,0,.05); min-height: 52px; align-items: center;">
+                                                 <div style="flex: 1; border-right: 1px solid #e3e3e3; padding-right: 10px;">
+                                                     <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: #777; letter-spacing: 0.8px; margin-bottom: 2px;">
+                                                         <i class="fa fa-map-marker" style="color: #337ab7; margin-right: 3px;"></i> Sede
+                                                     </div>
+                                                     <div id="info_sede_txt" style="font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                         -
+                                                     </div>
+                                                 </div>
+                                                 <div style="flex: 1; padding-left: 5px;">
+                                                     <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: #777; letter-spacing: 0.8px; margin-bottom: 2px;">
+                                                         <i class="fa fa-tag" style="color: #f0ad4e; margin-right: 3px;"></i> Clasificación
+                                                     </div>
+                                                     <div id="info_clasificacion_txt" style="font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                         -
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
                                     </div>
                               </div>
                       </div>
