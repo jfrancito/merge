@@ -60,13 +60,11 @@
             </div>
           </div>
       </div>
-    @include('comprobante.modal.mmodificararchivo')
-    @include('comprobante.modal.mregistrorequerimiento')
-
-    @include('usuario.modal.musuario')
-
     </div>
   </div>
+  @include('comprobante.modal.mmodificararchivo')
+  @include('comprobante.modal.mregistrorequerimiento')
+  @include('usuario.modal.musuario')
 </div>
 
 @stop

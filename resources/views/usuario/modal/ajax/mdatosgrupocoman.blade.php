@@ -288,6 +288,18 @@
 @if(isset($ajax))
   <script type="text/javascript">
     $(document).ready(function(){
+      $('.select3').select2({
+          dropdownParent: $('#modal-configuracion-usuario-detalle')
+      });
+      $('.importe').inputmask({ 
+          'alias': 'numeric', 
+          'groupSeparator': ',', 
+          'autoGroup': true, 
+          'digits': 0, 
+          'digitsOptional': false, 
+          'prefix': '', 
+          'placeholder': '0'
+      });
 
       $('.select3').select2({
           dropdownParent: $('#modal-configuracion-usuario-detalle')
@@ -428,6 +440,12 @@
           });
       });
 
+      $('.cuentanumero').on('paste', function (e) {
+          var pasteData = e.originalEvent.clipboardData.getData('text');
+          if (!/^\d+$/.test(pasteData)) {
+              e.preventDefault();
+          }
+      });
     });
   </script>
 @endif
