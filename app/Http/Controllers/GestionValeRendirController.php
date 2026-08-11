@@ -15,7 +15,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
 use View;
@@ -272,10 +272,12 @@ class GestionValeRendirController extends Controller
             return response()->json(['error' => 'Faltan datos requeridos.']);
         }
 
+        DB::beginTransaction();
         try {
             $vale = WEBValeRendir::find($vale_id);
 
             if (!$vale) {
+                DB::rollBack();
                 return response()->json(['error' => 'Vale no encontrado.']);
             }
 
@@ -285,15 +287,48 @@ class GestionValeRendirController extends Controller
                     'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
                 ]);
 
+            // Guardar Historial
+            $existeHistorial = DB::table('FE_DOCUMENTO_HISTORIAL')
+                ->where('ID_DOCUMENTO', '=', $vale_id)
+                ->where('DOCUMENTO_ITEM', '=', 1)
+                ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
+                ->exists();
+
+            if ($existeHistorial) {
+                DB::table('FE_DOCUMENTO_HISTORIAL')
+                    ->where('ID_DOCUMENTO', '=', $vale_id)
+                    ->where('DOCUMENTO_ITEM', '=', 1)
+                    ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
+                    ->update([
+                        'FECHA' => Carbon::now(),
+                        'USUARIO_ID' => Session::get('usuario')->id,
+                        'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
+                        'MENSAJE' => 'AUMENTO DE ' . $aumento_dias . ' DÍAS PARA EMISION DE LIQUIDACION'
+                    ]);
+            } else {
+                DB::table('FE_DOCUMENTO_HISTORIAL')
+                    ->insert([
+                        'ID_DOCUMENTO' => $vale_id,
+                        'DOCUMENTO_ITEM' => 1,
+                        'FECHA' => Carbon::now(),
+                        'USUARIO_ID' => Session::get('usuario')->id,
+                        'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
+                        'TIPO' => 'MODIFICADO POR ADMINISTRACION',
+                        'MENSAJE' => 'AUMENTO DE ' . $aumento_dias . ' DÍAS PARA EMISION DE LIQUIDACION'
+                    ]);
+            }
+
+            DB::commit();
+
             $this->enviarCorreoValeRendirDetalleDias($vale_id);
 
             return response()->json(['success' => 'Vale actualizado correctamente.']);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['error' => 'Error al actualizar: ' . $e->getMessage()]);
         }
     }
-
     public function actionActualizarImporteVale(Request $request)
     {
         $detalles = $request->input('detalles');
@@ -302,6 +337,7 @@ class GestionValeRendirController extends Controller
             return response()->json(['error' => 'No se recibieron importes.']);
         }
 
+        DB::beginTransaction();
         try {
             $agrupados = [];
             $cambios = [];
@@ -376,12 +412,57 @@ class GestionValeRendirController extends Controller
                     ]);
             }
 
-            // Enviar correo
+            // Enviar correo e historial
             $valeId = $detalles[0]['id'] ?? null;
 
             if ($valeId) {
+                // Registrar Historial por cada diferencia de importe detectada
+                foreach ($cambios as $key => $cambio) {
+                    foreach ($cambio['diferencias'] as $dif) {
+                        $concepto = trim($dif['nombre']);
+                        $nuevoImporte = trim(str_replace(['S/.', 'S/', '$', ' '], '', $dif['despues']));
+                        $mensajeHistorial = mb_strtoupper($concepto . ' AUMENTÓ A ' . $nuevoImporte . ' SOLES', 'UTF-8');
+
+                        // Buscar si ya existe historial para este concepto de este vale
+                        $existeHistorialConcepto = DB::table('FE_DOCUMENTO_HISTORIAL')
+                            ->where('ID_DOCUMENTO', '=', $valeId)
+                            ->where('DOCUMENTO_ITEM', '=', 1)
+                            ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
+                            ->where('MENSAJE', 'like', mb_strtoupper($concepto, 'UTF-8') . ' AUMENTÓ A %')
+                            ->exists();
+
+                        if ($existeHistorialConcepto) {
+                            DB::table('FE_DOCUMENTO_HISTORIAL')
+                                ->where('ID_DOCUMENTO', '=', $valeId)
+                                ->where('DOCUMENTO_ITEM', '=', 1)
+                                ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
+                                ->where('MENSAJE', 'like', mb_strtoupper($concepto, 'UTF-8') . ' AUMENTÓ A %')
+                                ->update([
+                                    'FECHA' => Carbon::now(),
+                                    'USUARIO_ID' => Session::get('usuario')->id,
+                                    'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
+                                    'MENSAJE' => $mensajeHistorial
+                                ]);
+                        } else {
+                            DB::table('FE_DOCUMENTO_HISTORIAL')
+                                ->insert([
+                                    'ID_DOCUMENTO' => $valeId,
+                                    'DOCUMENTO_ITEM' => 1,
+                                    'FECHA' => Carbon::now(),
+                                    'USUARIO_ID' => Session::get('usuario')->id,
+                                    'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
+                                    'TIPO' => 'MODIFICADO POR ADMINISTRACION',
+                                    'MENSAJE' => $mensajeHistorial
+                                ]);
+                        }
+                    }
+                }
+
+                DB::commit();
 
                 $this->enviarCorreoValeRendirDetalleImporte($valeId, $cambios);
+            } else {
+                DB::commit();
             }
 
             return response()->json([
@@ -390,6 +471,7 @@ class GestionValeRendirController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['error' => $e->getMessage()]);
         }
     }

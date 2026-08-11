@@ -70,7 +70,8 @@ trait EnviarCorreoVRDetalleImporteTraits
 
 
             $nombreAprobador = DB::table('WEB.VALE_RENDIR as vr')
-            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
+            ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
+            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'u.usuarioosiris_id')
             ->where('vr.ID', $valerendir_id)
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
             ->select('tra.nombres', 'tra.apellidopaterno', 'tra.apellidomaterno')
