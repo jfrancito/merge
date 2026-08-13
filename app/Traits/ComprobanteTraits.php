@@ -10722,6 +10722,10 @@ trait ComprobanteTraits
             array_push($array_usuarios, 'HPEREZAL');
         }
 
+        if(Session::get('usuario')->name=='DPAREDES'){
+            array_push($array_usuarios, 'ARAMOSMA');
+        }
+
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -10827,6 +10831,10 @@ trait ComprobanteTraits
             //marilu
             if(Session::get('usuario')->name=='MPACHECU'){
                 array_push($array_usuarios, 'HPEREZAL');
+            }
+
+            if(Session::get('usuario')->name=='DPAREDES'){
+                array_push($array_usuarios, 'ARAMOSMA');
             }
 
 
@@ -10947,7 +10955,9 @@ trait ComprobanteTraits
             array_push($array_usuarios, 'HPEREZAL');
         }
 
-
+        if(Session::get('usuario')->name=='DPAREDES'){
+            array_push($array_usuarios, 'ARAMOSMA');
+        }
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -11058,6 +11068,10 @@ trait ComprobanteTraits
         //marilu
         if(Session::get('usuario')->name=='MPACHECU'){
             array_push($array_usuarios, 'HPEREZAL');
+        }
+
+        if(Session::get('usuario')->name=='DPAREDES'){
+            array_push($array_usuarios, 'ARAMOSMA');
         }
 
 

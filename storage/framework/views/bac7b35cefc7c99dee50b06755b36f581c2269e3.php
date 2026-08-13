@@ -57,6 +57,21 @@
         .btn-detalle-moderno:active {
             transform: translateY(0) !important;
         }
+
+        /* Difuminado global de fondo al abrir modales (sin afectar el modal en sí) */
+        .modal-open-blur .main-content,
+        .modal-open-blur .be-top-header,
+        .modal-open-blur .be-left-sidebar {
+            -webkit-filter: blur(5px) !important;
+            filter: blur(5px) !important;
+            transition: filter 0.3s ease, -webkit-filter 0.3s ease;
+        }
+
+        /* Congelar el scroll del body al abrir modales */
+        body.modal-open-blur {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
     </style>
 
 
