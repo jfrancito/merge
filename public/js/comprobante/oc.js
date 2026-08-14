@@ -439,7 +439,7 @@ $(document).ready(function(){
 
     });
 
-    $(".cfedocumento").on('click','#descargarcomprobantemasivomarketingexcel', function() {
+     $(".cfedocumento").on('click','#descargarcomprobantemasivomktexcel', function() {
 
         var fecha_inicio         =   $('#fecha_inicio').val();
         var fecha_fin            =   $('#fecha_fin').val();

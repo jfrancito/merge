@@ -151,6 +151,10 @@
         max-height: 400px !important;
         overflow-y: auto !important;
     }
+    
+    #grupo, #nueva_clasificacion_nombre, #nueva_sede_nombre {
+        text-transform: uppercase;
+    }
 
 </style>
 
@@ -177,8 +181,8 @@
                       </div>
 
                       <div class="form-group">
-                          <label class="control-label">Categoría</label>
-                          {!! Form::select('catcontaorden_id', ['' => 'Seleccione Categoría'] + $clasificaciones, null, [
+                          <label class="control-label">Clasificación</label>
+                          {!! Form::select('catcontaorden_id', ['' => 'Seleccione Clasificación'] + $clasificaciones, null, [
                               'class' => 'select3 form-control input-premium',
                               'id' => 'catcontaorden_id',
                               'required' => 'required'
@@ -201,7 +205,7 @@
           <div class="modal-footer">
               <div>
                   <button type="button" class="btn-premium-secondary" id="btn-abrir-clasificacion" style="margin-right: 5px;">
-                      <i class="icon mdi mdi-plus-circle-o"></i> Categoría
+                      <i class="icon mdi mdi-plus-circle-o"></i> Clasificación
                   </button>
                   <button type="button" class="btn-premium-secondary" id="btn-abrir-sede">
                       <i class="icon mdi mdi-plus-circle-o"></i> Sede
@@ -308,6 +312,8 @@
       // Swap to Clasificación
       $('#btn-abrir-clasificacion').on('click', function(e) {
           e.preventDefault();
+          $('#nueva_clasificacion_nombre').val('');
+          $('#nueva_clasificacion_estado').val('1');
           $('#div-principal-actividad').hide();
           $('#div-registrar-clasificacion').show();
           // Adjust modal size to small
@@ -318,6 +324,8 @@
       // Swap to Sede
       $('#btn-abrir-sede').on('click', function(e) {
           e.preventDefault();
+          $('#nueva_sede_nombre').val('');
+          $('#nueva_sede_estado').val('1');
           $('#div-principal-actividad').hide();
           $('#div-registrar-sede').show();
           // Adjust modal size to small
@@ -366,15 +374,13 @@
                   if (response.success) {
                       var select = $('#catcontaorden_id');
                       select.empty();
-                      select.append('<option value="">Seleccione Categoría</option>');
+                      select.append('<option value="">Seleccione Clasificación</option>');
                       var lastId = null;
                       $.each(response.list, function(index, item) {
                           select.append('<option value="' + item.id + '">' + item.nombre + '</option>');
                           lastId = item.id;
                       });
-                      if (lastId) {
-                          select.val(lastId).trigger('change');
-                      }
+                      select.val('').trigger('change');
                       
                       $('#nueva_clasificacion_nombre').val('');
                       $('#div-registrar-clasificacion').hide();
@@ -421,9 +427,7 @@
                           select.append('<option value="' + item.id + '">' + item.ubicacion + '</option>');
                           lastId = item.id;
                       });
-                      if (lastId) {
-                          select.val(lastId).trigger('change');
-                      }
+                      select.val('').trigger('change');
                       
                       $('#nueva_sede_nombre').val('');
                       $('#div-registrar-sede').hide();
@@ -445,6 +449,11 @@
           if (!/^\d+$/.test(pasteData)) {
               e.preventDefault();
           }
+      });
+
+      // Forzar mayúsculas en los inputs de actividad, clasificación y sede
+      $('#grupo, #nueva_clasificacion_nombre, #nueva_sede_nombre').on('input', function() {
+          this.value = this.value.toUpperCase();
       });
     });
   </script>
