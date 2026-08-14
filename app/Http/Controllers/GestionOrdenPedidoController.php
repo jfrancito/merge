@@ -482,7 +482,7 @@ class GestionOrdenPedidoController extends Controller
                     ->update([
                         'ACTIVO' => 0,
                         'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
-                        'FEC_USUARIO_MODIF_AUD' => Carbon::now()
+                        'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
                 // 2. Sincronizar los productos enviados (actualizar los existentes y registrar los nuevos)
@@ -507,7 +507,7 @@ class GestionOrdenPedidoController extends Controller
                                     'IND_MATERIAL_SERVICIO' => $item['ind_material_servicio'] ?? ($item['nom_categoria'] === 'SERVICIO' ? 'S' : 'M'),
                                     'ACTIVO' => 1,
                                     'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
-                                    'FEC_USUARIO_MODIF_AUD' => Carbon::now()
+                                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                                 ]);
                         } else {
                             $this->insertOrdenPedidoDetalle(
