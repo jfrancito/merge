@@ -4762,15 +4762,28 @@ trait ComprobanteTraits
                           AND FE_DOCUMENTO.COD_EMPR = ?
                           AND FE_DOCUMENTO.OPERACION = ?
                           AND FE_DOCUMENTO.COD_ESTADO <> ''
-                        ORDER BY FEC_VENTA ASC
                     ";
 
-                    $listadatos = DB::select($sql, [
+                    $params = [
                         $fecha_inicio,
                         $fecha_fin,
                         Session::get('empresas')->COD_EMPR,
                         $operacion_id
-                    ]);
+                    ];
+
+                    if ($proveedor_id != 'TODO') {
+                        $sql .= " AND FE_DOCUMENTO.RUC_PROVEEDOR = ? ";
+                        $params[] = $proveedor_id;
+                    }
+
+                    if ($estado_id != 'TODO') {
+                        $sql .= " AND FE_DOCUMENTO.COD_ESTADO = ? ";
+                        $params[] = $estado_id;
+                    }
+
+                    $sql .= " ORDER BY FEC_VENTA ASC ";
+
+                    $listadatos = DB::select($sql, $params);
 
         }else{
 
@@ -4871,15 +4884,28 @@ trait ComprobanteTraits
                       AND FE_DOCUMENTO.COD_EMPR = ?
                       AND FE_DOCUMENTO.OPERACION = ?
                       AND FE_DOCUMENTO.COD_ESTADO <> ''
-                    ORDER BY FEC_VENTA ASC
                 ";
 
-                $listadatos = DB::select($sql, [
+                $params = [
                     $fecha_inicio,
                     $fecha_fin,
                     Session::get('empresas')->COD_EMPR,
                     $operacion_id
-                ]);
+                ];
+
+                if ($proveedor_id != 'TODO') {
+                    $sql .= " AND FE_DOCUMENTO.RUC_PROVEEDOR = ? ";
+                    $params[] = $proveedor_id;
+                }
+
+                if ($estado_id != 'TODO') {
+                    $sql .= " AND FE_DOCUMENTO.COD_ESTADO = ? ";
+                    $params[] = $estado_id;
+                }
+
+                $sql .= " ORDER BY FEC_VENTA ASC ";
+
+                $listadatos = DB::select($sql, $params);
                 //dd($listadatos);
 
         }
@@ -4943,15 +4969,28 @@ trait ComprobanteTraits
                           AND FE_DOCUMENTO.COD_EMPR = ?
                           AND FE_DOCUMENTO.OPERACION = ?
                           AND FE_DOCUMENTO.COD_ESTADO <> ''
-                        ORDER BY FEC_VENTA ASC
                     ";
 
-                    $listadatos = DB::select($sql, [
+                    $params = [
                         $fecha_inicio,
                         $fecha_fin,
                         Session::get('empresas')->COD_EMPR,
                         $operacion_id
-                    ]);
+                    ];
+
+                    if ($proveedor_id != 'TODO') {
+                        $sql .= " AND FE_DOCUMENTO.RUC_PROVEEDOR = ? ";
+                        $params[] = $proveedor_id;
+                    }
+
+                    if ($estado_id != 'TODO') {
+                        $sql .= " AND FE_DOCUMENTO.COD_ESTADO = ? ";
+                        $params[] = $estado_id;
+                    }
+
+                    $sql .= " ORDER BY FEC_VENTA ASC ";
+
+                    $listadatos = DB::select($sql, $params);
 
         }else{
 
@@ -4992,17 +5031,30 @@ trait ComprobanteTraits
                       AND FE_DOCUMENTO.COD_EMPR = ?
                       AND FE_DOCUMENTO.OPERACION = ?
                       AND FE_DOCUMENTO.COD_ESTADO <> ''
-                    ORDER BY FEC_VENTA ASC
                 ";
 
                 //dd($fecha_inicio);
 
-                $listadatos = DB::select($sql, [
+                $params = [
                     $fecha_inicio,
                     $fecha_fin,
                     Session::get('empresas')->COD_EMPR,
                     $operacion_id
-                ]);
+                ];
+
+                if ($proveedor_id != 'TODO') {
+                    $sql .= " AND FE_DOCUMENTO.RUC_PROVEEDOR = ? ";
+                    $params[] = $proveedor_id;
+                }
+
+                if ($estado_id != 'TODO') {
+                    $sql .= " AND FE_DOCUMENTO.COD_ESTADO = ? ";
+                    $params[] = $estado_id;
+                }
+
+                $sql .= " ORDER BY FEC_VENTA ASC ";
+
+                $listadatos = DB::select($sql, $params);
                 //dd($listadatos);
 
         }

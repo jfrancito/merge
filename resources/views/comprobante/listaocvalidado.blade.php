@@ -52,16 +52,16 @@
                                 </a>
                               </li>
                               <li>
-                                <a href="{{url('/comprobante-masivo-marketing-excel')}}" 
-                                   onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
-                                   class='btn btn-secondary botoncabecera tooltipcss opciones'
-                                   target="_blank"
-                                   id="descargarcomprobantemasivomarketingexcel" 
-                                   data-href="{{url('/comprobante-masivo-marketing-excel')}}"
-                                   title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Marketing</span>
-                                   Descargar excel Marketing
-                                </a>
+                               <a href="{{url('/comprobante-masivo-mkt-excel')}}" 
+                                    onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
+                                    class='btn btn-secondary botoncabecera tooltipcss opciones'
+                                    target="_blank"
+                                    id="descargarcomprobantemasivomktexcel" 
+                                    data-href="{{url('/comprobante-masivo-mkt-excel')}}"
+                                    title="Descargar excel" style="width:100%">
+                                    <span class="tooltiptext">Descargar excel Marketing</span>
+                                    Descargar excel Marketing
+                                 </a>
                               </li>
                           </ul>
                       </div>

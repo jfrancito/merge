@@ -162,7 +162,7 @@
                                             </div>
                                           </div>
                                       </div>
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 info-marketing-container" style="margin-top: 15px;">
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 info-mkt-box" style="margin-top: 15px;">
                                           <div style="display: flex; gap: 20px; background: #fafafa; border: 1px solid #e3e3e3; padding: 10px 15px; border-radius: 6px; box-shadow: inset 0 1px 1px rgba(0,0,0,.05); min-height: 52px; align-items: center;">
                                               <div style="flex: 1; border-right: 1px solid #e3e3e3; padding-right: 10px;">
                                                   <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: #777; letter-spacing: 0.8px; margin-bottom: 2px;">
