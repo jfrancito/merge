@@ -23,6 +23,11 @@ trait EnviarCorreoVRDetalleDiasTraits
          try {
 
             $VALE_RENDIR = WEBValeRendir::where("ID", '=', $valerendir_id)->first();
+            if (!$VALE_RENDIR) {
+                \Log::error("No se encontró el vale con ID: " . $valerendir_id);
+                return false;
+            }
+
             $detalles = WEBValeRendirDetalle::where("ID", $valerendir_id)->get();
 
 
@@ -33,6 +38,8 @@ trait EnviarCorreoVRDetalleDiasTraits
                 ->where('ID', $valerendir_id)
                 ->value('COD_CENTRO');
 
+            // Obtener el usuario modificador/aprobador de la tabla users
+            $user_modif = DB::table('users')->where('id', '=', $VALE_RENDIR->COD_USUARIO_MODIF_AUD)->first();
 
              /* =========================================================
                CORREOS Y NOMBRES - EMPRESA PRINCIPAL
@@ -51,12 +58,6 @@ trait EnviarCorreoVRDetalleDiasTraits
             ->where('vr.ID', $valerendir_id)
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
             ->value('tra.emailcorp');
-
-            /*$emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
-            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
-            ->where('vr.ID', $valerendir_id)
-            ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
-            ->value('tra.emailcorp');*/
 
             $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
             ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
@@ -85,8 +86,13 @@ trait EnviarCorreoVRDetalleDiasTraits
             ->select('tra.nombres', 'tra.apellidopaterno', 'tra.apellidomaterno', 'tra.emailcorp')
             ->first();
 
-            $nombreCompleto = ucwords(strtolower("{$nombreTrabajador->nombres} {$nombreTrabajador->apellidopaterno} {$nombreTrabajador->apellidomaterno}"));
-            $nombreCompletoAp = ucwords(strtolower("{$nombreAprobador->nombres} {$nombreAprobador->apellidopaterno} {$nombreAprobador->apellidomaterno}"));
+            $nombreCompleto = $nombreTrabajador 
+                ? ucwords(strtolower("{$nombreTrabajador->nombres} {$nombreTrabajador->apellidopaterno} {$nombreTrabajador->apellidomaterno}"))
+                : 'Trabajador';
+
+            $nombreCompletoAp = $nombreAprobador
+                ? ucwords(strtolower("{$nombreAprobador->nombres} {$nombreAprobador->apellidopaterno} {$nombreAprobador->apellidomaterno}"))
+                : ($user_modif->nombre ?? 'Administrador');
 
              /* =========================================================
                CORREOS Y NOMBRES - TERCEROS
@@ -121,25 +127,20 @@ trait EnviarCorreoVRDetalleDiasTraits
                 ->whereRaw("LTRIM(RTRIM(tra.TXT_CORREO_ELECTRONICO)) <> ''")
                 ->value('tra.TXT_CORREO_ELECTRONICO');
 
-            if (!$VALE_RENDIR) {
-                \Log::error("No se encontró el vale con ID: " . $valerendir_id);
-                return false;
-            }
-
              /* =========================================================
                ELECCIÓN SEGÚN TIPO DE PERSONAL
             ========================================================= */
             if ($cod_personal_rendir === 'TPR0000000000002') {
-                $emailfrom = $emailTrabajadorAprueba;
+                $emailfrom = $emailTrabajadorAprueba ?: ($user_modif->email ?? 'noreply@induamerica.com.pe');
                 $nombreFrom = $nombreCompletoAp;
                 $emailTo = $emailTrabajadorTercero;
                 $emailfromcentro = $centroVale;
 
             } else {
-                $emailfrom = $emailTrabajadorAprueba;
+                $emailfrom = $emailTrabajadorAprueba ?: ($user_modif->email ?? 'noreply@induamerica.com.pe');
                 $nombreFrom = $nombreCompletoAp;
-                $emailTo = $emailTrabajador->emailcorp;
-                $emailfromcentro = $emailTrabajador->centro_osiris_id;
+                $emailTo = $emailTrabajador ? $emailTrabajador->emailcorp : null;
+                $emailfromcentro = $emailTrabajador ? $emailTrabajador->centro_osiris_id : null;
             }
 
 
@@ -242,6 +243,19 @@ trait EnviarCorreoVRDetalleDiasTraits
                     ];
             }
 
+
+            // Limpiar y filtrar destinatarios y copias vacías
+            $destinatarios = array_filter(array_map('trim', $destinatarios));
+            $copias = array_filter(array_map('trim', $copias));
+
+            if (empty($destinatarios)) {
+                if (!empty($copias)) {
+                    $destinatarios[] = array_shift($copias);
+                } else {
+                    \Log::warning("No se puede enviar correo para el Vale $valerendir_id. Faltan destinatarios.");
+                    return false;
+                }
+            }
 
             Mail::send('emails.emailvalerendirdetalledias',
             [
