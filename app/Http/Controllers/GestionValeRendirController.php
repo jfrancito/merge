@@ -300,7 +300,7 @@ class GestionValeRendirController extends Controller
                     ->where('DOCUMENTO_ITEM', '=', 1)
                     ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
                     ->update([
-                        'FECHA' => Carbon::now(),
+                        'FECHA' => DB::raw('GETDATE()'),
                         'USUARIO_ID' => Session::get('usuario')->id,
                         'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
                         'MENSAJE' => 'AUMENTO DE ' . $aumento_dias . ' DÍAS PARA EMISION DE LIQUIDACION'
@@ -310,7 +310,7 @@ class GestionValeRendirController extends Controller
                     ->insert([
                         'ID_DOCUMENTO' => $vale_id,
                         'DOCUMENTO_ITEM' => 1,
-                        'FECHA' => Carbon::now(),
+                        'FECHA' => DB::raw('GETDATE()'),
                         'USUARIO_ID' => Session::get('usuario')->id,
                         'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
                         'TIPO' => 'MODIFICADO POR ADMINISTRACION',
@@ -438,7 +438,7 @@ class GestionValeRendirController extends Controller
                                 ->where('TIPO', '=', 'MODIFICADO POR ADMINISTRACION')
                                 ->where('MENSAJE', 'like', mb_strtoupper($concepto, 'UTF-8') . ' AUMENTÓ A %')
                                 ->update([
-                                    'FECHA' => Carbon::now(),
+                                    'FECHA' => DB::raw('GETDATE()'),
                                     'USUARIO_ID' => Session::get('usuario')->id,
                                     'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
                                     'MENSAJE' => $mensajeHistorial
@@ -448,7 +448,7 @@ class GestionValeRendirController extends Controller
                                 ->insert([
                                     'ID_DOCUMENTO' => $valeId,
                                     'DOCUMENTO_ITEM' => 1,
-                                    'FECHA' => Carbon::now(),
+                                    'FECHA' => DB::raw('GETDATE()'),
                                     'USUARIO_ID' => Session::get('usuario')->id,
                                     'USUARIO_NOMBRE' => Session::get('usuario')->nombre,
                                     'TIPO' => 'MODIFICADO POR ADMINISTRACION',
