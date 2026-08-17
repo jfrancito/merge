@@ -435,6 +435,7 @@ $(document).ready(function(){
         var empresa_id           =   $('#empresa_id').val();
         var centro_id            =   $('#centro_id').val();
         var operacion_id         =   $('#operacion_id').val();
+        var moneda_id            =   $('#moneda_id').val();
 
 
 
@@ -448,6 +449,7 @@ $(document).ready(function(){
                                 empresa_id              : empresa_id,
                                 centro_id               : centro_id,
                                 operacion_id            : operacion_id,
+                                moneda_id               : moneda_id,
                                 glosa                   : glosa,
 
                                 idopcion                : idopcion

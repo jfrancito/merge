@@ -131,29 +131,50 @@ class ResumenOrdenPedidoController extends Controller
 
     public function actionTerminarResumenOp(Request $request) 
     {
-        $id_pedido = $request->input('id_pedido');
+        $id_pedidos = $request->input('id_pedido'); // Puede ser un array o string separado por comas
+        if (!is_array($id_pedidos)) {
+            $id_pedidos = explode(',', $id_pedidos);
+        }
         
-        try {
-            DB::table('WEB.ORDEN_PEDIDO')
-                ->where('ID_PEDIDO', $id_pedido)
-                ->update([
-                    'COD_ESTADO_TEMP' => 'ETM0000000000008',
-                    'TXT_ESTADO_TEMP' => 'TERMINADO'
-                ]);
+        $success_count = 0;
+        $failed_pedidos = [];
 
-            // Enviar correo de notificación
-            $this->enviarCorreoOrdenPedidoTerminado($id_pedido);
+        foreach ($id_pedidos as $id_pedido) {
+            $id_pedido = trim($id_pedido);
+            if (empty($id_pedido)) continue;
 
-            return response()->json([
-                'success' => true,
-                'mensaje' => 'El pedido fue marcado como TERMINADO correctamente.'
-            ]);
-        } catch (\Exception $e) {
+            try {
+                DB::table('WEB.ORDEN_PEDIDO')
+                    ->where('ID_PEDIDO', $id_pedido)
+                    ->update([
+                        'COD_ESTADO_TEMP' => 'ETM0000000000008',
+                        'TXT_ESTADO_TEMP' => 'TERMINADO'
+                    ]);
+
+                // Enviar correo de notificación
+                $this->enviarCorreoOrdenPedidoTerminado($id_pedido);
+                $success_count++;
+            } catch (\Exception $e) {
+                $failed_pedidos[] = $id_pedido . ': ' . $e->getMessage();
+            }
+        }
+
+        if (count($failed_pedidos) > 0 && $success_count == 0) {
             return response()->json([
                 'success' => false,
-                'mensaje' => 'Ocurrió un error: ' . $e->getMessage()
+                'mensaje' => 'No se pudo terminar ningún pedido. Errores: ' . implode(' | ', $failed_pedidos)
             ], 500);
         }
+
+        $msg = 'Se terminaron ' . $success_count . ' pedido(s) correctamente.';
+        if (count($failed_pedidos) > 0) {
+            $msg .= ' Errores en: ' . implode(' | ', $failed_pedidos);
+        }
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => $msg
+        ]);
     }
 
     public function actionDetallePedidoResumen(Request $request)

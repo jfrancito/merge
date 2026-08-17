@@ -11,9 +11,35 @@
     .fila-aprobada:hover td {
         background-color: #e2e6ea !important;
     }
-    input.radio-seleccion {
+    input.checkbox-seleccion {
         cursor: pointer;
         transform: scale(1.5);
+        border-radius: 50%;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #5a5a5a;
+        background-color: #fff;
+        outline: none;
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+    }
+    input.checkbox-seleccion:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    input.checkbox-seleccion:checked::after {
+        content: '';
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background-color: #fff;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
     }
 </style>
 
@@ -30,7 +56,7 @@
 <table id="tablaReporteOrdenResumen" class="table table-striped table-borderless" style="font-style: italic; min-width: 1200px;">
     <thead style="background-color: #1d3a6d; color: white;">
         <tr>
-            <th style="width: 50px; text-align: center;">SEL</th>
+            <th style="width: 50px; text-align: center;"><input type="checkbox" id="checkAllPedidos" style="transform: scale(1.5); cursor: pointer;"></th>
             <th>ID PEDIDO</th>
             <th>ESTADO</th>
             <th>FEC PEDIDO</th>
@@ -67,7 +93,7 @@
         <tr class="<?php echo e($es_aprobado_real ? 'fila-aprobada' : ''); ?>" data-id="<?php echo e($item->ID_PEDIDO); ?>" data-estado="<?php echo e(empty($item->TXT_ESTADO_TEMP) ? $item->TXT_ESTADO : $item->TXT_ESTADO_TEMP); ?>">
             <td style="text-align: center; vertical-align: middle;">
                 <?php if($es_aprobado_real): ?>
-                    <input type="radio" name="radio_pedido" class="radio-seleccion" value="<?php echo e($item->ID_PEDIDO); ?>">
+                    <input type="checkbox" name="checkbox_pedido" class="checkbox-seleccion" value="<?php echo e($item->ID_PEDIDO); ?>">
                 <?php endif; ?>
             </td>
             <td><?php echo e($item->ID_PEDIDO); ?></td>
@@ -107,6 +133,8 @@
 
 <script>
 $(document).ready(function () {
+    var selectedOrders = new Set();
+
     var tablaResumen = $('#tablaReporteOrdenResumen').DataTable({
         pageLength: 10,
         order: [[1, 'desc']], // Ordenar por ID PEDIDO, ignorando la columna del radio
@@ -116,22 +144,130 @@ $(document).ready(function () {
         }
     });
 
-    // Evento de seleccion de fila
+    // Evento de seleccion de fila (soporta seleccion unica al hacer click en la fila y multiple al hacer click en el check)
     $('#tablaReporteOrdenResumen tbody').on('click', 'tr.fila-aprobada', function (e) {
+        // Evitar seleccion si hacen clic en el boton de Detalle
+        if ($(e.target).closest('button').length > 0 || $(e.target).is('button') || $(e.target).is('i')) {
+            return;
+        }
+
         var tr = $(this);
         var idPedido = tr.data('id');
-        var radio = tr.find('.radio-seleccion');
+        var cb = tr.find('.checkbox-seleccion');
 
-        // Desmarcar todas y marcar solo esta
+        // Si el click fue en el checkbox o en su celda (primer td)
+        if ($(e.target).is('.checkbox-seleccion') || $(e.target).closest('td').index() === 0) {
+            // Si hicieron click en la celda y no directamente en el checkbox, invertimos el checkbox
+            if (!$(e.target).is('.checkbox-seleccion')) {
+                cb.prop('checked', !cb.prop('checked'));
+            }
+            
+            var isChecked = cb.prop('checked');
+            if (isChecked) {
+                tr.addClass('fila-seleccionada');
+                selectedOrders.add(idPedido);
+            } else {
+                tr.removeClass('fila-seleccionada');
+                selectedOrders.delete(idPedido);
+            }
+            actualizarSeleccion();
+            return;
+        }
+
+        // En cualquier otra celda, se comporta como seleccion unica
+        selectedOrders.clear();
+        selectedOrders.add(idPedido);
+
+        // Desmarcar todos y limpiar filas seleccionadas en el DOM actual
         $('#tablaReporteOrdenResumen tbody tr').removeClass('fila-seleccionada');
-        $('.radio-seleccion').prop('checked', false);
+        $('.checkbox-seleccion').prop('checked', false);
 
+        // Seleccionar esta fila en el DOM
         tr.addClass('fila-seleccionada');
-        radio.prop('checked', true);
+        cb.prop('checked', true);
         
-        $('#pedidoSeleccionadoParaTerminar').val(idPedido);
-        $('#textoPedidoSeleccionado').text('Pedido Seleccionado: ' + idPedido);
-        $('#contenedorBotonTerminar').fadeIn();
+        actualizarSeleccion();
     });
+
+    // Evento para "Seleccionar todos"
+    $(document).on('change', '#checkAllPedidos', function (e) {
+        var checked = $(this).prop('checked');
+        var rows = tablaResumen.rows({ search: 'applied' }).nodes();
+        
+        $(rows).each(function () {
+            var tr = $(this);
+            if (tr.hasClass('fila-aprobada')) {
+                var idPedido = tr.data('id');
+                var cb = tr.find('.checkbox-seleccion');
+                cb.prop('checked', checked);
+                if (checked) {
+                    tr.addClass('fila-seleccionada');
+                    selectedOrders.add(idPedido);
+                } else {
+                    tr.removeClass('fila-seleccionada');
+                    selectedOrders.delete(idPedido);
+                }
+            }
+        });
+        actualizarSeleccion();
+    });
+
+    // Mantener la seleccion visual en cada redibujado de la tabla (por ejemplo al cambiar de pagina)
+    tablaResumen.on('draw', function () {
+        $('#tablaReporteOrdenResumen tbody tr.fila-aprobada').each(function () {
+            var tr = $(this);
+            var idPedido = tr.data('id');
+            var cb = tr.find('.checkbox-seleccion');
+            
+            if (selectedOrders.has(idPedido)) {
+                tr.addClass('fila-seleccionada');
+                cb.prop('checked', true);
+            } else {
+                tr.removeClass('fila-seleccionada');
+                cb.prop('checked', false);
+            }
+        });
+        actualizarEstadoSelectAll();
+    });
+
+    function actualizarSeleccion() {
+        var selectedIds = Array.from(selectedOrders);
+
+        if (selectedIds.length > 0) {
+            $('#pedidoSeleccionadoParaTerminar').val(selectedIds.join(','));
+            if (selectedIds.length === 1) {
+                $('#textoPedidoSeleccionado').text('Pedido Seleccionado: ' + selectedIds[0]);
+            } else {
+                $('#textoPedidoSeleccionado').text('Pedidos Seleccionados (' + selectedIds.length + '): ' + selectedIds.join(', '));
+            }
+            $('#contenedorBotonTerminar').fadeIn();
+        } else {
+            $('#pedidoSeleccionadoParaTerminar').val('');
+            $('#textoPedidoSeleccionado').text('');
+            $('#contenedorBotonTerminar').fadeOut();
+            $('#checkAllPedidos').prop('checked', false);
+        }
+
+        actualizarEstadoSelectAll();
+    }
+
+    function actualizarEstadoSelectAll() {
+        var rows = tablaResumen.rows({ search: 'applied' }).nodes();
+        var allChecked = true;
+        var hasAprobadas = false;
+
+        $(rows).each(function () {
+            var tr = $(this);
+            if (tr.hasClass('fila-aprobada')) {
+                hasAprobadas = true;
+                var idPedido = tr.data('id');
+                if (!selectedOrders.has(idPedido)) {
+                    allChecked = false;
+                }
+            }
+        });
+
+        $('#checkAllPedidos').prop('checked', hasAprobadas && allChecked);
+    }
 });
 </script>

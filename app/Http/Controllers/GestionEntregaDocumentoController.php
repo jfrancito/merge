@@ -169,7 +169,8 @@ class GestionEntregaDocumentoController extends Controller
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',                                      
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
                                         'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
-                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO'
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
+                                        'NOTA_DEBITO' => 'NOTA DE DEBITO'
                                     );
 
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
@@ -184,13 +185,16 @@ class GestionEntregaDocumentoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
             }else{
-                if($operacion_id=='ORDEN_COMPRA_ANTICIPO' || $operacion_id=='CONTRATO_ANTICIPO'){
-
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                if($operacion_id=='NOTA_DEBITO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
                 }else{
-                    if (in_array($operacion_id, $array_canjes)) {
-                        $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                    if($operacion_id=='ORDEN_COMPRA_ANTICIPO' || $operacion_id=='CONTRATO_ANTICIPO'){
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                    }else{
+                        if (in_array($operacion_id, $array_canjes)) {
+                            $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                        }
                     }
                 }
             }
@@ -261,18 +265,18 @@ class GestionEntregaDocumentoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
             }else{
-                if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_lca($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                if($operacion_id=='NOTA_DEBITO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
                 }else{
-
-                    if($operacion_id=='ORDEN_COMPRA_ANTICIPO' || $operacion_id=='CONTRATO_ANTICIPO'){
-
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                    if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_lca($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
                     }else{
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                        if($operacion_id=='ORDEN_COMPRA_ANTICIPO' || $operacion_id=='CONTRATO_ANTICIPO'){
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                        }else{
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
+                        }
                     }
-
-                    //$listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
                 }
             }
         }
@@ -341,6 +345,7 @@ class GestionEntregaDocumentoController extends Controller
         $empresa_id         =   $request['empresa_id'];
         $centro_id          =   $request['centro_id'];
         $operacion_id       =   $request['operacion_id'];
+        $moneda_id          =   $request->get('moneda_id', 'MON0000000000001');
         $idopcion           =   $request['idopcion'];
         $glosa              =   $request['glosa'];
 
@@ -398,12 +403,16 @@ class GestionEntregaDocumentoController extends Controller
 
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO,$moneda_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO,$moneda_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+                if($operacion_id=='NOTA_DEBITO'){
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO,$moneda_id);
+                }else{
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO,$operacion_id,$moneda_id);
+                }
             }
         }
 

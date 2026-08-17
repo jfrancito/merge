@@ -99,7 +99,7 @@ trait ComprobanteTraits
         return $nombre;
     }
     public function con_array_canjes() {
-        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
+        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA','NOTA_DEBITO'];
         return $array;
     }
 
@@ -126,6 +126,7 @@ trait ComprobanteTraits
                     'DOCUMENTO_INTERNO_SECADO'=>'TDO0000000000096',
                     'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071',
                     'DOCUMENTO_INTERNO_COMPRA'=>'TDO0000000000086',
+                    'NOTA_DEBITO'=>'TDO0000000000008',
                 ];
         $id = $array[$valor];
 
@@ -805,6 +806,55 @@ trait ComprobanteTraits
         return  $listadatos;
 
 
+    }
+
+    private function con_lista_cabecera_comprobante_entregable_nota_debito($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id) {
+
+        $array_usuarios         =   SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        $query = DB::table('FE_DOCUMENTO')
+            ->join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+            ->leftJoin('CMP.REFERENCIA_ASOC', function ($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', '=', 1)
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->leftJoin('CMP.DOCUMENTO_CTBLE as doc_ref', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'doc_ref.COD_DOCUMENTO_CTBLE')
+            ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.OPERACION','=','NOTA_DEBITO')
+            ->where(function ($query) {
+                $query->where('FE_DOCUMENTO.FOLIO', '=', '');
+                $query->orWhereNull('FE_DOCUMENTO.FOLIO');
+            })
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
+            ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+            ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
+            ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id);
+
+        if ($rol->ind_uc != 1) {
+            $query->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios);
+        }
+
+        $listadatos = $query->select(
+                'FE_DOCUMENTO.*',
+                'CMP.DOCUMENTO_CTBLE.*',
+                'doc_ref.NRO_SERIE as NRO_SERIE',
+                'doc_ref.NRO_DOC as NRO_DOC',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO_VOUCHER',
+                'FE_DOCUMENTO.TXT_CATEGORIA_BANCO as TXT_BANCO',
+                'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO as FEC_VENCIMIENTO'
+            )
+            ->orderBy('FE_DOCUMENTO.fecha_pa', 'asc')
+            ->get();
+
+        return $listadatos;
     }
 
     private function con_lista_cabecera_comprobante_entregable_estiba($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id) {
