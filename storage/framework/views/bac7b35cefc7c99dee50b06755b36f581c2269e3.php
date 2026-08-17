@@ -97,6 +97,8 @@
          <input type="hidden" id="token" name="_token"  value="<?php echo e(csrf_token()); ?>"> 
     </div>
 
+    <?php echo $__env->yieldContent('modal'); ?>
+
 
     <script src="<?php echo e(asset('public/lib/jquery/jquery-2.1.3.min.js')); ?>" type="text/javascript"></script>
     <script src="<?php echo e(asset('public/lib/perfect-scrollbar/js/perfect-scrollbar.jquery.min.js')); ?>" type="text/javascript"></script>

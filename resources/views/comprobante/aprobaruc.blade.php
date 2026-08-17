@@ -62,11 +62,14 @@
       </div>
     </div>
   </div>
+</div>
+
+@stop
+
+@section('modal')
   @include('comprobante.modal.mmodificararchivo')
   @include('comprobante.modal.mregistrorequerimiento')
   @include('usuario.modal.musuario')
-</div>
-
 @stop
 
 @section('script')
