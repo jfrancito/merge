@@ -97,6 +97,8 @@
          <input type="hidden" id="token" name="_token"  value="{{ csrf_token() }}"> 
     </div>
 
+    @yield('modal')
+
 
     <script src="{{ asset('public/lib/jquery/jquery-2.1.3.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/perfect-scrollbar/js/perfect-scrollbar.jquery.min.js') }}" type="text/javascript"></script>
