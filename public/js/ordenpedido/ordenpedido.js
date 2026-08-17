@@ -454,16 +454,21 @@ $(document).ready(function () {
                 tipo: 'warn',
                 icono: '⚠',
                 titulo: 'Sin Seleccionar',
-                mensaje: 'Debe seleccionar un pedido aprobado para cambiar a Terminado.'
+                mensaje: 'Debe seleccionar al menos un pedido aprobado para cambiar a Terminado.'
             });
             return;
         }
+
+        let totalPedidos = idPedido.split(',').length;
+        let msgConfirmacion = totalPedidos === 1 
+            ? '¿Deseas marcar la <b>Orden de Pedido ' + idPedido + '</b> como TERMINADA?'
+            : '¿Deseas marcar las <b>' + totalPedidos + ' Órdenes de Pedido (' + idPedido + ')</b> como TERMINADAS?';
 
         modalBonito({
             tipo: 'info',
             icono: '📝',
             titulo: 'Confirmar Terminar Pedido',
-            mensaje: '¿Deseas marcar la <b>Orden de Pedido ' + idPedido + '</b> como TERMINADA?',
+            mensaje: msgConfirmacion,
             confirmar: true,
             onConfirm: function () {
                 abrircargando();
@@ -707,6 +712,11 @@ $(document).ready(function () {
     });
 
     $(document).on('change', '#cod_centro', function () {
+        // Si estamos editando un pedido existente, no recalculamos el correlativo
+        if ($('#orden_pedido_id').val()) {
+            return;
+        }
+
         let cod_centro = $(this).val();
         let cod_empr = $('#cod_empr').val();
         let _token = $('#token').val();
@@ -1110,6 +1120,7 @@ $(document).ready(function () {
                     $('#cod_trabajador_aprueba_ger').val(p.COD_TRABAJADOR_APRUEBA_GER).trigger('change');
                     $('#cod_trabajador_aprueba_adm').val(p.COD_TRABAJADOR_APRUEBA_ADM).trigger('change');
                     $('#cod_tipo_pedido').val(p.COD_TIPO_PEDIDO).trigger('change');
+                    $('#cod_centro').val(p.COD_CENTRO).trigger('change');
                     $('#txt_glosa').val(p.TXT_GLOSA);
                     $('#cod_estado').val(p.COD_ESTADO);
 
