@@ -147,9 +147,7 @@
                   <div class='listajax'>
                     @include('valerendir.gestion.alistavalesrendiradmin') 
                   </div>
-
-                  @include('valerendir.modal.detallerendir')
-
+                  
                 </div>
               </div>
             </div>
@@ -157,6 +155,11 @@
     </div>
   </div>
 @stop
+
+@section('modal')
+  @include('valerendir.modal.detallerendir')
+@stop
+
 @section('script')
 
   <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>

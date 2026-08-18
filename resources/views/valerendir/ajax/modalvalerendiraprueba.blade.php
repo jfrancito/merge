@@ -23,10 +23,14 @@
             </div>
         </div>
         <input type="text" id="vale_rendir_id" hidden>
-         @include('valerendir.modal.detallerendir')
     </div>
 
-      <div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog" aria-labelledby="rechazoModalLabel" aria-hidden="true">
+@stop
+
+@section('modal')
+    @include('valerendir.modal.detallerendir')
+
+    <div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog" aria-labelledby="rechazoModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content shadow-lg border-0 rounded-3" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px;">
                     <div class="modal-header py-2" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border-top-left-radius: 15px; border-top-right-radius: 15px;">
@@ -153,11 +157,6 @@
         </div>
       </div>
     </div>
-
-
-
-    
-
 @stop
 
 @section('script')
