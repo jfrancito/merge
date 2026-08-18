@@ -51,6 +51,21 @@
             </div>
         </div>
     </div>
+    <style>
+        .custom-glosa-height {
+            height: 100px;
+        }
+
+        .row-deleted {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+        }
+    </style>
+
+@stop
+
+@section('modal')
+    @include('valerendir.modal.detallerendir')
 
     <div class="modal fade" id="glosaModal" tabindex="-1" role="dialog" aria-labelledby="glosaModalLabel"
          aria-hidden="true">
@@ -98,19 +113,8 @@
                 </div>
             </div>
         </div></div>
-
-    <style>
-        .custom-glosa-height {
-            height: 100px;
-        }
-
-        .row-deleted {
-            background-color: #f8d7da !important;
-            color: #721c24 !important;
-        }
-    </style>
-
 @stop
+
 @section('script')
 
     <script>

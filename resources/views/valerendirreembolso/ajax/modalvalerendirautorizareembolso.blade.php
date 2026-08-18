@@ -22,10 +22,12 @@
             </div>
         </div>
         <input type="text" id="vale_rendir_id" hidden>
-        @include('valerendirreembolso.modal.detallerendirreembolso')
     </div>
 
+@stop
 
+@section('modal')
+    @include('valerendirreembolso.modal.detallerendirreembolso')
 
     <div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog" aria-labelledby="rechazoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -167,9 +169,6 @@
         </div>
       </div>
     </div>
-
-
-
 @stop
 @section('script')
 

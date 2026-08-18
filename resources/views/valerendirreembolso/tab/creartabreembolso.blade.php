@@ -121,7 +121,6 @@
             <div class="ajaxvacio text-center fw-bold"></div>
 
             <input type="text" id="vale_rendir_id" hidden>
-            @include('valerendir.modal.detallerendir')
 
             <div id="vale_rendir_detalle" style="display: none;">
 
