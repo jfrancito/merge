@@ -4,13 +4,15 @@
   @if($operacion_id == 'CONTRATO')
     @include('entregadocumento.excel.ajax.axlistaocentregablecontrato')
   @else
-
-    @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
-      @include('entregadocumento.excel.ajax.axlistaocentregablelca')
+    @if($operacion_id == 'NOTA_DEBITO')
+      @include('entregadocumento.excel.ajax.axlistaocentregablenotadebito')
     @else
-      @include('entregadocumento.excel.ajax.axlistaocentregable')
+      @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
+        @include('entregadocumento.excel.ajax.axlistaocentregablelca')
+      @else
+        @include('entregadocumento.excel.ajax.axlistaocentregable')
+      @endif
     @endif
-
   @endif
 @endif
 
