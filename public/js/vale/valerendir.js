@@ -632,7 +632,7 @@ $(document).ready(function(){
         });*/
 
 
-        $(".valerendirprincipal").on('click', '#aprobarvalerendir', function(e) {
+        $(document).on('click', '#aprobarvalerendir', function(e) {
              e.preventDefault();
 
          let _token                  =   $('#token').val();

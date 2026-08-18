@@ -181,8 +181,15 @@ function alerterrorajax(alert){
 	cadena += "                <span class='icon mdi mdi-check'></span>";
 	cadena += "                <strong>Error!</strong> "+alert;
 	cadena += "          </div>";
-	$(".panel-ajax-alert").append(cadena);
-	setTimeout(function(){ $(".rd"+aleatorio).fadeOut(1000).fadeIn(200).fadeOut(600).fadeIn(500).fadeOut(100);}, 5000);
+	if ($(".panel-ajax-alert").length > 0) {
+		$(".panel-ajax-alert").append(cadena);
+		setTimeout(function(){ $(".rd"+aleatorio).fadeOut(1000).fadeIn(200).fadeOut(600).fadeIn(500).fadeOut(100);}, 5000);
+		if ($(".modal-container.modal-show").length > 0 || $(".modal.in").length > 0 || $(".modal.show").length > 0) {
+			window.alert("Error: " + alert);
+		}
+	} else {
+		window.alert("Error: " + alert);
+	}
 
 }
 
