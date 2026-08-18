@@ -75,7 +75,7 @@
                                   style="border-radius: 0px;"
                                   class="form-horizontal group-border-dashed">
                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                <input type="hidden" name="device_info" id='device_info'>
 
                                 
                                 @include('comprobante.form.formrechazo')

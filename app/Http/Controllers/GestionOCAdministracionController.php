@@ -3916,6 +3916,106 @@ class GestionOCAdministracionController extends Controller
         }
     }
 
+    public function actionAgregarExtornoContratoAdmin($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Extorno Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcionextorno'];
+
+                //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'TXT_REFERENCIA' => $idoc
+                        ]
+                    );
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+
+                //geolocalizacion
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $fedocumento, 'DOCUMENTO EXTORNADO');
+                //geolocalización
+
+
+                //ANULAR TODA LA OPERACION
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X',
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'ind_observacion' => 0
+                        ]
+                    );
+                FeDetalleDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+                FeDocumentoHistorial::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                FeFormaPago::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                Archivo::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+
+                DB::commit();
+                Session::flash('operacion_id', 'CONTRATO');
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'CONTRATO');
+
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
+
+
     public function actionAprobarAdministracionNotaCredito($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
 
