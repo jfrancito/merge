@@ -527,8 +527,8 @@ class GestionEntregaDocumentoController extends Controller
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',                                      
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
                                         'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
-                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO'
-
+                                        'CONTRATO_ANTICIPO' => 'CONTRATO ANTICIPO',
+                                        'NOTA_DEBITO' => 'NOTA DE DEBITO'
                                     );
 
         $funcion        =   $this;
@@ -637,19 +637,20 @@ class GestionEntregaDocumentoController extends Controller
                 $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
                 $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
             }else{
-
-
-                if($folio->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'){
-                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000002');
+                if($folio->OPERACION=='NOTA_DEBITO'){
+                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_nota_debito_modal_moneda($folio->FOLIO,'MON0000000000001');
+                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_nota_debito_modal_moneda($folio->FOLIO,'MON0000000000002');
                 }else{
-                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
-                    $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+                    if($folio->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'){
+                        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000002');
+                    }else{
+                        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+                        $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+                    }
                 }
-
-
             }
         }
 
@@ -885,19 +886,20 @@ class GestionEntregaDocumentoController extends Controller
                 $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
                 $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
             }else{
-
-
-                if($folio->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'){
-                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000002');
+                if($folio->OPERACION=='NOTA_DEBITO'){
+                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_nota_debito_modal_moneda($folio->FOLIO,'MON0000000000001');
+                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_nota_debito_modal_moneda($folio->FOLIO,'MON0000000000002');
                 }else{
-                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
-                    $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
-                    $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+                    if($folio->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'){
+                        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000002');
+                    }else{
+                        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+                        $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+                        $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+                    }
                 }
-
-
             }
         }
 
@@ -2426,7 +2428,11 @@ class GestionEntregaDocumentoController extends Controller
         if($folio->OPERACION=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_modal($folio->FOLIO);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal($folio->FOLIO);
+            if($folio->OPERACION=='NOTA_DEBITO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_nota_debito_modal($folio->FOLIO);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal($folio->FOLIO);
+            }
         }
 
 

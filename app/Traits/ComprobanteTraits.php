@@ -9817,6 +9817,63 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_cabecera_comprobante_entregable_nota_debito_modal($folio) {
+        $listadatos = DB::table('FE_DOCUMENTO')
+            ->join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+            ->leftJoin('CMP.REFERENCIA_ASOC', function ($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', '=', 1)
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->leftJoin('CMP.DOCUMENTO_CTBLE as doc_ref', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'doc_ref.COD_DOCUMENTO_CTBLE')
+            ->where('FE_DOCUMENTO.FOLIO', '=', $folio)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->select(
+                'FE_DOCUMENTO.*',
+                'CMP.DOCUMENTO_CTBLE.*',
+                'doc_ref.NRO_SERIE as NRO_SERIE',
+                'doc_ref.NRO_DOC as NRO_DOC',
+                'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC as COD_TABLA_ASOC',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO_VOUCHER',
+                'FE_DOCUMENTO.TXT_CATEGORIA_BANCO as TXT_BANCO',
+                'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO as FEC_VENCIMIENTO'
+            )
+            ->orderBy('FE_DOCUMENTO.fecha_pa', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_entregable_nota_debito_modal_moneda($folio, $moneda_id) {
+        $listadatos = DB::table('FE_DOCUMENTO')
+            ->join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+            ->leftJoin('CMP.REFERENCIA_ASOC', function ($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', '=', 1)
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->leftJoin('CMP.DOCUMENTO_CTBLE as doc_ref', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'doc_ref.COD_DOCUMENTO_CTBLE')
+            ->where('FE_DOCUMENTO.FOLIO', '=', $folio)
+            ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA', '=', $moneda_id)
+            ->where('FE_DOCUMENTO.OPERACION', '=', 'NOTA_DEBITO')
+            ->select(
+                'FE_DOCUMENTO.*',
+                'CMP.DOCUMENTO_CTBLE.*',
+                'doc_ref.NRO_SERIE as NRO_SERIE',
+                'doc_ref.NRO_DOC as NRO_DOC',
+                'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC as COD_TABLA_ASOC',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO',
+                'FE_DOCUMENTO.COD_ESTADO as COD_ESTADO_VOUCHER',
+                'FE_DOCUMENTO.TXT_CATEGORIA_BANCO as TXT_BANCO',
+                'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO as FEC_VENCIMIENTO'
+            )
+            ->orderBy('FE_DOCUMENTO.fecha_pa', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_entregable_contrato_modal($folio) {
 
 

@@ -1,1 +1,0 @@
-<?php echo $__env->make('usuario.dashboard.nuevotab', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
