@@ -9195,7 +9195,7 @@ trait ComprobanteTraits
                                               ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                     })
                                     ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                    ->whereIn('COD_CENTRO',['CEN0000000000001','CEN0000000000002'])
+                                    ->whereIn('COD_CENTRO',['CEN0000000000001','CEN0000000000002','CEN0000000000006'])
                                     ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                     ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                         FEC_EMISION,
