@@ -1,3 +1,41 @@
+<style>
+    /* Estilos personalizados para select2 dentro de la tabla */
+    .table .select2-container--default .select2-selection--single {
+        border-radius: 6px !important;
+        border: 1px solid #eaecf4 !important;
+        height: 32px !important;
+        background-color: #fdfefe !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        display: block !important;
+    }
+    .table .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057 !important;
+        line-height: 30px !important; /* Centrado vertical exacto para 32px de alto */
+        padding-left: 8px !important;
+        padding-right: 24px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        text-align: left !important;
+        width: 100% !important;
+        display: block !important;
+        margin-top: 0 !important;
+        top: 0 !important;
+    }
+    .table .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px !important;
+        right: 4px !important;
+    }
+    .table .select2-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .select2-container--default .select2-results__option {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+    }
+</style>
 <div class="panel panel-default box-seccion shadow-soft">
     <div class="panel-heading subheader-seccion">
         <i class="mdi mdi-format-list-bulleted"></i> {{ isset($es_servicio) && $es_servicio ? 'Servicios de Pedidos Seleccionados' : 'Productos de Consolidados Seleccionados' }}
@@ -25,6 +63,9 @@
                     <th class="text-center">CANTIDAD</th>
                     <th class="text-center" width="120">PRECIO</th>
                     <th class="text-center" width="120">PRECIO IGV</th>
+                    @if(isset($es_servicio) && $es_servicio)
+                    <th class="text-center" style="min-width: 180px;">CENTRO COSTO</th>
+                    @endif
                     @if(!(isset($es_servicio) && $es_servicio))
                     <th>FAMILIA</th>
                     @endif
@@ -115,7 +156,16 @@
                                    style="height: 32px !important; font-weight: 700; background-color: #fdfefe;">
                         </div>
                     </td>
-
+                    @if(isset($es_servicio) && $es_servicio)
+                    <td class="text-center" style="vertical-align: middle;">
+                        <select class="form-control input-sm centro-costo-producto select2 premium-input" style="width: 100%; font-size: 12px; height: 32px !important;" required>
+                            <option value="">[Seleccione Centro Costo]</option>
+                            @foreach($lista_centro_costo as $cc)
+                                <option value="{{ trim($cc->COD_CENTRO_COSTO) }}" {{ (isset($item->COD_CENTRO_COSTO) && trim($item->COD_CENTRO_COSTO) === trim($cc->COD_CENTRO_COSTO)) ? 'selected' : '' }}>{{ trim($cc->TXT_NOMBRE) }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    @endif
                     @if(!(isset($es_servicio) && $es_servicio))
                     <td>{{ $nom_familia }}</td>
                     @endif

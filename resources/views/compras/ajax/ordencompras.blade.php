@@ -144,6 +144,17 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-xs-12 col-md-3 cajareporte">
+                                            <div class="form-group">
+                                                <label class="col-sm-12 control-label labelleft">Estado:</label>
+                                                <div class="col-sm-12 abajocaja" style="margin-top: -3px;">
+                                                    {!! Form::select('estado_id', $combo_estado, 'TODOS_G_A', [
+                                                        'class' => 'form-control select2 input-sm',
+                                                        'id' => 'estado_id'
+                                                    ]) !!}
+                                                </div>
+                                            </div>
+                                        </div>
                                         <input type="hidden" name="idopcion" id="idopcion" value="{{ $idopcion }}">
                                     </div>
 

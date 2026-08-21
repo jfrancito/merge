@@ -10,7 +10,8 @@
                 $badge_class = 'badge-default';
                 $badge_style = 'font-weight: bold; font-size: 11px; padding: 5px 12px; border-radius: 12px; margin-right: 15px;';
                 if ($estado === 'APROBADO' || $estado === 'APROBADA') {
-                    $badge_class = 'badge-success';
+                    $badge_class = 'badge-warning';
+                    $badge_style .= ' background-color: #f0ad4e; color: #ffffff;';
                 } elseif ($estado === 'RECHAZADO' || $estado === 'RECHAZADA' || $estado === 'ANULADA') {
                     $badge_class = 'badge-danger';
                 } elseif ($estado === 'GENERADA' || $estado === 'GENERADO' || $estado === 'EMITIDA') {
@@ -31,6 +32,13 @@
                         style="border-radius: 4px; font-weight: bold; padding: 6px 16px; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 5px;">
                     <span class="icon mdi mdi-check"></span> Aprobar Orden
                 </button>
+                <button type="button" 
+                        class="btn btn-danger btn-sm btn-rechazar-oc" 
+                        data-codorden="{{ $orden->COD_ORDEN }}"
+                        style="border-radius: 4px; font-weight: bold; padding: 6px 16px; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 5px;">
+                    <span class="icon mdi mdi-close"></span> Rechazar Orden
+                </button>
+            @elseif(trim($orden->COD_CATEGORIA_ESTADO_ORDEN) === 'EOR0000000000016')
                 <button type="button" 
                         class="btn btn-danger btn-sm btn-rechazar-oc" 
                         data-codorden="{{ $orden->COD_ORDEN }}"

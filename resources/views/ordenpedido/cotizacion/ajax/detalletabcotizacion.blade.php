@@ -120,6 +120,11 @@
                 </div>
 
                 <!-- TABLA DE DETALLES -->
+                @php
+                    $tiene_centro_costo = $lista_detalle->contains(function ($value) {
+                        return !empty($value->COD_CENTRO_COSTO);
+                    });
+                @endphp
                 <div class="panel panel-default"
                     style="border-radius: 12px; border: 1px solid #eaecf4; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                     <div class="panel-heading"
@@ -137,6 +142,9 @@
                                     <th class="text-center">Cantidad</th>
                                     <th class="text-center">Precio Unit.</th>
                                     <th class="text-center">Precio Unit. IGV</th>
+                                    @if($tiene_centro_costo)
+                                    <th class="text-center">Centro Costo</th>
+                                    @endif
                                     <th class="text-center" style="padding-right: 25px;">Subtotal</th>
                                 </tr>
                             </thead>
@@ -165,6 +173,14 @@
                                         <td class="text-center" style="color: #28a745; font-weight: 600;">
                                             {{ number_format($det->CAN_PRECIO_IGV, 2) }}
                                         </td>
+                                        @if($tiene_centro_costo)
+                                        <td class="text-center">
+                                            <span class="label label-outline"
+                                                style="border: 1px solid #d1d3e2; color: #5a5c69; font-weight: 600; padding: 3px 10px;">
+                                                {{ trim($det->TXT_NOMBRE) ?: '---' }}
+                                            </span>
+                                        </td>
+                                        @endif
                                         <td class="text-center fw-bold" style="padding-right: 25px; color: #1d3a6d;">
                                             {{ number_format($det->CANTIDAD * $det->CAN_PRECIO, 2) }}
                                         </td>

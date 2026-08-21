@@ -20,7 +20,8 @@
                 $badge_class = 'badge-default';
                 $badge_style = 'font-weight: bold; font-size: 10px; padding: 4px 8px; border-radius: 12px;';
                 if ($estado === 'APROBADO' || $estado === 'APROBADA') {
-                    $badge_class = 'badge-success';
+                    $badge_class = 'badge-warning';
+                    $badge_style = 'font-weight: bold; font-size: 11px; padding: 5px 12px; border-radius: 12px; margin-right: 15px; background-color: #f0ad4e; color: #ffffff;';
                 } elseif ($estado === 'RECHAZADO' || $estado === 'RECHAZADA' || $estado === 'ANULADA') {
                     $badge_class = 'badge-danger';
                 } elseif ($estado === 'GENERADA' || $estado === 'GENERADO' || $estado === 'EMITIDA') {

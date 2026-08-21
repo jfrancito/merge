@@ -385,10 +385,20 @@ class CotizacionOrdenPedidoController extends Controller
 
         $detalles = collect(array_values($grouped));
 
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
         $productos_html = view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
             'lista_detalle' => $detalles,
             'es_edicion' => true,
-            'es_servicio' => $es_servicio
+            'es_servicio' => $es_servicio,
+            'lista_centro_costo' => $lista_centro_costo
         ])->render();
 
         $archivos = DB::table('dbo.ARCHIVOS')
@@ -400,7 +410,8 @@ class CotizacionOrdenPedidoController extends Controller
             'success' => true,
             'cotizacion' => $cot_data, // Enviamos el array limpio
             'productos_html' => $productos_html,
-            'archivos' => $archivos
+            'archivos' => $archivos,
+            'es_servicio' => $es_servicio
         ]);
     }
 
@@ -669,8 +680,18 @@ class CotizacionOrdenPedidoController extends Controller
             $item->ID_PEDIDO_CONSOLIDADO = implode(' - ', array_unique(array_map('trim', $item->ID_CONSOLIDADOS_LISTA)));
         }
 
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
         return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
-            'lista_detalle' => array_values($grouped)
+            'lista_detalle' => array_values($grouped),
+            'lista_centro_costo' => $lista_centro_costo
         ]);
     }
 
@@ -717,17 +738,24 @@ class CotizacionOrdenPedidoController extends Controller
             return $d->SALDO_PENDIENTE > 0;
         });
 
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
         return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
             'lista_detalle' => $detalles->values(),
-            'es_servicio' => true
+            'es_servicio' => true,
+            'lista_centro_costo' => $lista_centro_costo
         ]);
     }
     public function actionGuardarCotizacion(Request $request)
     {
         try {
-            DB::beginTransaction();
-
-            $empresa_sesion = Session::get('empresas');
             $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
             // 1. Obtener el centro actual del usuario
@@ -740,7 +768,31 @@ class CotizacionOrdenPedidoController extends Controller
                 ->select('C.COD_CENTRO')
                 ->first();
 
-            $cod_centro = $centro ? $centro->COD_CENTRO : '';
+            $cod_centro = $centro ? trim($centro->COD_CENTRO) : '';
+
+            // Determinar la conexión de réplica según el centro
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+
+            // Validar conexión a la zona si corresponde
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->getPdo();
+                } catch (\Exception $ex_conn) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). Por favor, intente más tarde.'
+                    ]);
+                }
+            }
+
+            DB::beginTransaction();
+
+            $empresa_sesion = Session::get('empresas');
 
             // 2. Obtener el código de la empresa proveedora (desde el RUC)
             $empresa_proveedor = DB::table('STD.EMPRESA')
@@ -948,7 +1000,9 @@ class CotizacionOrdenPedidoController extends Controller
                         isset($det['cod_familia']) ? $det['cod_familia'] : '',
                         isset($det['nom_familia']) ? $det['nom_familia'] : '',
                         1,
-                        ''
+                        '',
+                        isset($det['cod_centro_costo']) ? $det['cod_centro_costo'] : null,
+                        isset($det['txt_nombre']) ? $det['txt_nombre'] : null
                     );
 
                     // 2. Guardar relación en CMP.REFERENCIA_ASOC para cada consolidado que aporta
@@ -1148,6 +1202,18 @@ class CotizacionOrdenPedidoController extends Controller
             }
         }
 
+        // Validar conexión a la zona si corresponde
+        if ($conexionbd !== 'sqlsrv') {
+            try {
+                DB::connection($conexionbd)->getPdo();
+            } catch (\Exception $ex_conn) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). No se puede anular la cotización en este momento.'
+                ]);
+            }
+        }
+
         // Validar si la cotización está referenciada a una Orden de Compra activa en Osiris en su conexión respectiva
         $referencia_oc = DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC as R')
             ->join('CMP.ORDEN as O', 'O.COD_ORDEN', '=', 'R.COD_TABLA_ASOC')
@@ -1320,6 +1386,32 @@ class CotizacionOrdenPedidoController extends Controller
     {
         $id_cotizacion = $request->input('id_cotizacion');
         \Log::info("Intentando aprobar cotización: " . $id_cotizacion);
+
+        // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+        $cot = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        if ($cot) {
+            $cod_centro = trim($cot->COD_CENTRO);
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->getPdo();
+                } catch (\Exception $ex_conn) {
+                    return response()->json([
+                        'success' => false,
+                        'mensaje' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). No se puede aprobar la cotización en este momento.'
+                    ]);
+                }
+            }
+        }
 
         try {
             DB::table('WEB.ORDEN_COTIZACION')
