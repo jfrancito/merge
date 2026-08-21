@@ -1200,6 +1200,14 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-eliminar-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxEliminarCotizacion');
 	Route::post('/ajax-get-correlativo-sin-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxGetCorrelativoSinCotizacion');
 
+	//APROBAR OC
+
+	Route::get('/gestion-de-aprobar-orden-compras/{idopcion}', 'GestionAprobarOCController@actionAporbarOc');
+	Route::post('/ajax-listar-orden-compras', 'GestionAprobarOCController@actionAjaxListarOrdenCompras');
+	Route::post('/ajax-cargar-detalle-orden-compra', 'GestionAprobarOCController@actionAjaxCargarDetalleOrdenCompra');
+	Route::post('/ajax-aprobar-orden-compra', 'GestionAprobarOCController@actionAjaxAprobarOrdenCompra');
+	Route::post('/ajax-rechazar-orden-compra', 'GestionAprobarOCController@actionAjaxRechazarOrdenCompra');
+
 	Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
 	Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
 	Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');

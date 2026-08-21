@@ -89,8 +89,9 @@
                            <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Vale a Rendir
                         </a>
                         @endif
-                    </div>
+                     </div>
                 </div>
+                 </div>
            </td>
 
              <td>
