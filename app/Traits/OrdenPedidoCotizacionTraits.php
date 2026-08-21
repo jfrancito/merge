@@ -144,9 +144,9 @@ trait OrdenPedidoCotizacionTraits
 	    }
 	}
 
-	public function insertOrdenCotizacionDetalle($ind_tipo_operacion,$id_cotizacion,$id_consolidado, $cod_empr,$cod_centro,$cod_producto,$nom_producto,
+		public function insertOrdenCotizacionDetalle($ind_tipo_operacion,$id_cotizacion,$id_consolidado, $cod_empr,$cod_centro,$cod_producto,$nom_producto,
 		$cod_categoria_medida,$nom_categoria_medida,$cantidad,$precio, $precio_igv,  $cod_categoria_familia,$nom_categoria_familia,$activo,
-	    $cod_usuario_registro)
+	    $cod_usuario_registro, $cod_centro_costo = null, $txt_nombre_centro_costo = null)
 	{
 	    try {
 
@@ -194,6 +194,15 @@ trait OrdenPedidoCotizacionTraits
 	        $stmt->bindParam(16, $cod_usuario_registro, PDO::PARAM_STR);
 
 	        $stmt->execute();
+
+	        // 🔐 Actualizar Centro de Costo (para servicios) en base central
+	        DB::connection('sqlsrv')->table('WEB.ORDEN_COTIZACION_DETALLE')
+	            ->where('ID_COTIZACION', $id_cotizacion)
+	            ->where('COD_PRODUCTO', $cod_producto)
+	            ->update([
+	                'COD_CENTRO_COSTO' => $cod_centro_costo,
+	                'TXT_NOMBRE' => $txt_nombre_centro_costo
+	            ]);
 
 	        // 🔗 Réplica en Zonas
 	        $conexionbd = 'sqlsrv';

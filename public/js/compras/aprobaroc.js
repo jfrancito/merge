@@ -85,6 +85,7 @@ $(document).ready(function () {
         var centro_id = $('#centro_id').val();
         var tipo_compra = $('#tipo_compra').val();
         var moneda_id = $('#moneda_id').val();
+        var estado_id = $('#estado_id').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
@@ -123,6 +124,7 @@ $(document).ready(function () {
                 centro_id: centro_id,
                 tipo_compra: tipo_compra,
                 moneda_id: moneda_id,
+                estado_id: estado_id,
                 idopcion: idopcion
             },
             success: function (resp) {

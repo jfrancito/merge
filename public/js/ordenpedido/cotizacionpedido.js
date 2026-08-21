@@ -472,6 +472,7 @@ $(document).ready(function () {
 
                     table.draw();
                     reordenarItems();
+                    inicializarCentroCostoSelect2();
 
                     modalBonito({
                         tipo: 'success',
@@ -484,6 +485,7 @@ $(document).ready(function () {
                 } else {
                     // Primera carga o estaba vacío
                     $container.html(data);
+                    inicializarCentroCostoSelect2();
                     modalBonito({
                         tipo: 'success',
                         icono: '✅',
@@ -597,6 +599,7 @@ $(document).ready(function () {
 
                     table.draw();
                     reordenarItems();
+                    inicializarCentroCostoSelect2();
 
                     modalBonito({
                         tipo: 'success',
@@ -608,6 +611,7 @@ $(document).ready(function () {
 
                 } else {
                     $container.html(data);
+                    inicializarCentroCostoSelect2();
                     modalBonito({
                         tipo: 'success',
                         icono: '✅',
@@ -971,7 +975,9 @@ $(document).ready(function () {
                 precio_igv: $row.find('.precio-igv-producto').val(),
                 cod_familia: $el.data('cod-familia'),
                 nom_familia: $el.data('nom-familia'),
-                breakdown: $el.data('breakdown')
+                breakdown: $el.data('breakdown'),
+                cod_centro_costo: $row.find('.centro-costo-producto').val() || '',
+                txt_nombre: ($row.find('.centro-costo-producto').val() ? $row.find('.centro-costo-producto option:selected').text().trim() : '')
             });
         });
 
@@ -1010,6 +1016,35 @@ $(document).ready(function () {
                 ancho: '450px'
             });
             return;
+        }
+
+        // --- NUEVA VALIDACIÓN DE CENTRO DE COSTO SI ES SERVICIO ---
+        var tableTipo = $('#table-productos-seleccionados').data('tipo') || 'M';
+        if (tableTipo === 'S') {
+            var ccInvalido = false;
+            var nombreServicioInvalido = '';
+
+            $('.centro-costo-producto').each(function () {
+                var $row = $(this).closest('tr');
+                var cc = $(this).val() || '';
+                
+                if (cc.trim() === '') {
+                    ccInvalido = true;
+                    nombreServicioInvalido = $row.find('td:nth-child(5)').text(); // PRODUCTO/SERVICIO
+                    return false;
+                }
+            });
+
+            if (ccInvalido) {
+                modalBonito({
+                    tipo: 'warn',
+                    icono: '⚠️',
+                    titulo: 'Centro de Costo Requerido',
+                    mensaje: 'El servicio <b>' + nombreServicioInvalido + '</b> no tiene un Centro de Costo asignado. Por favor, seleccione uno.',
+                    ancho: '450px'
+                });
+                return;
+            }
         }
         // ----------------------------------------
 
@@ -1231,6 +1266,12 @@ $(document).ready(function () {
                         var cod_moneda = getVal(cot, 'COD_CATEGORIA_MONEDA');
                         if (cod_moneda) { $('#moneda_id').val(cod_moneda).trigger('change'); }
 
+                        if (res.es_servicio) {
+                            $('#ind_mat_o_ser').val('S').trigger('change');
+                        } else {
+                            $('#ind_mat_o_ser').val('M').trigger('change');
+                        }
+
                         // 3. Cargar Detalle de Productos
                         if (res.productos_html) {
                             $('#lista-productos-cotizacion').html(res.productos_html);
@@ -1238,6 +1279,7 @@ $(document).ready(function () {
                                 $('.check-producto').prop('checked', true);
                                 calcularTotal();
                                 inicializarAlertasPrecio();
+                                inicializarCentroCostoSelect2();
                             }, 500);
                         }
 
@@ -1787,5 +1829,16 @@ $(document).ready(function () {
             }
         });
     });
+
+    function inicializarCentroCostoSelect2() {
+        $('.centro-costo-producto').each(function () {
+            var $select = $(this);
+            if (!$select.hasClass('select2-hidden-accessible')) {
+                $select.select2({
+                    width: '100%'
+                });
+            }
+        });
+    }
 
 });

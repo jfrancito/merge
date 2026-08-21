@@ -48,6 +48,12 @@ class GestionAprobarOCController extends Controller
             'MON0000000000002' => 'DOLARES',
         ];
 
+        $combo_estado = [
+            'TODOS_G_A' => 'GENERADA Y APROBADO',
+            'EOR0000000000001' => 'GENERADA',
+            'EOR0000000000016' => 'APROBADO',
+        ];
+
         $fecha_inicio = Carbon::now()->startOfMonth()->format('d-m-Y');
         $fecha_fin = Carbon::now()->format('d-m-Y');
 
@@ -58,6 +64,7 @@ class GestionAprobarOCController extends Controller
             'combo_centro' => $combo_centro,
             'combo_tipo_compra' => $combo_tipo_compra,
             'combo_moneda' => $combo_moneda,
+            'combo_estado' => $combo_estado,
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
             'titulo' => 'Aprobar Orden de Compra',
@@ -71,6 +78,7 @@ class GestionAprobarOCController extends Controller
             $centro_id = $request->get('centro_id');
             $tipo_compra = $request->get('tipo_compra');
             $moneda_id = $request->get('moneda_id');
+            $estado_id = $request->get('estado_id', 'TODOS_G_A');
             $idopcion = $request->get('idopcion');
 
             $f_inicio = Carbon::createFromFormat('d-m-Y', $request->get('fecha_inicio'))->format('Y-m-d');
@@ -81,7 +89,13 @@ class GestionAprobarOCController extends Controller
             $listaordenes = CMPOrden::leftJoin('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.ORDEN.COD_CENTRO')
                 ->leftJoin('STD.TRABAJADOR', 'STD.TRABAJADOR.COD_TRAB', '=', 'CMP.ORDEN.COD_TRABAJADOR_ENCARGADO')
                 ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', '=', 'TOR0000000000001')
-                ->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', '=', 'EOR0000000000001')
+                ->where(function($q) use ($estado_id) {
+                    if ($estado_id === 'TODOS_G_A') {
+                        $q->whereIn('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', ['EOR0000000000001', 'EOR0000000000016']);
+                    } else {
+                        $q->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', '=', $estado_id);
+                    }
+                })
                 ->whereBetween('CMP.ORDEN.FEC_ORDEN', [$f_inicio, $f_fin])
                 ->where(function($q) use ($empresa_id) {
                     if ($empresa_id) {
