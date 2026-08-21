@@ -238,7 +238,6 @@
                         </div>
                          @include('valerendir.ajax.listamodaldetalleregistroimporte')
                 </div> <!-- vale_rendir_detalle -->
-            </div> <!-- container -->
 
               <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
               <div class="col-xs-6"></div>

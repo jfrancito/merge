@@ -105,7 +105,6 @@
   
                     </div>
                      </div>
-                </div>
              </td>
           
             <td style="text-align: center; vertical-align: middle;">
