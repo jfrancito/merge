@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     // Inicializar totales y visibilidad de campos
     setTimeout(() => {
-            calcularTotalPedido();
+        calcularTotalPedido();
     }, 500);
 
     // Activar pestaña por hash en la URL
@@ -28,7 +28,7 @@ $(document).ready(function () {
        FUNCIÓN MODAL BONITO (ÚNICA)
        =============================== */
 
-    function modalBonito({tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null}) {
+    function modalBonito({ tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null }) {
 
         const colores = {
             error: ['#ff416c', '#ff4b2b'],
@@ -112,7 +112,7 @@ $(document).ready(function () {
         }
     }
 
-    $(document).on('click','.subir-archivo',function(){
+    $(document).on('click', '.subir-archivo', function () {
 
         var idPedido = $(this).data('id');
 
@@ -132,14 +132,14 @@ $(document).ready(function () {
 
         let archivo = this.files[0];
 
-        if(!archivo){
+        if (!archivo) {
             alert('No se seleccionó ningún archivo');
             return;
         }
 
         let idPedido = $('#pedidoSeleccionado').val();
 
-        if(!idPedido){
+        if (!idPedido) {
             alert('No se encontró el pedido');
             return;
         }
@@ -256,12 +256,12 @@ $(document).ready(function () {
                 nom_producto: tds.eq(2).text().trim(),
                 cod_categoria: tds.eq(9).text().trim(),
                 nom_categoria: tds.eq(4).text().trim(),
-                cantidad: (tds.eq(5).find('input').length > 0) 
-                          ? (parseInt(tds.eq(5).find('input').val()) || 0) 
-                          : (parseInt(tds.eq(5).text().trim()) || 0),
-                precio: (tds.eq(6).find('input').length > 0) 
-                        ? (parseFloat(tds.eq(6).find('input').val().replace(/[^\d.-]/g, '')) || 0) 
-                        : (parseFloat(tds.eq(6).text().replace(/[^\d.-]/g, '')) || 0),
+                cantidad: (tds.eq(5).find('input').length > 0)
+                    ? (parseInt(tds.eq(5).find('input').val()) || 0)
+                    : (parseInt(tds.eq(5).text().trim()) || 0),
+                precio: (tds.eq(6).find('input').length > 0)
+                    ? (parseFloat(tds.eq(6).find('input').val().replace(/[^\d.-]/g, '')) || 0)
+                    : (parseFloat(tds.eq(6).text().replace(/[^\d.-]/g, '')) || 0),
                 txt_observacion: tds.eq(8).text().trim(),
                 ind_material_servicio: tds.eq(3).text().trim() === 'SERVICIO' ? 'S' : 'M',
                 opcion_detalle: 'I',
@@ -376,10 +376,10 @@ $(document).ready(function () {
                             mensaje: xhr.responseJSON?.message ||
                                 'Ocurrió un error al guardar la Orden de Pedido.'
                         });
-                        
+
                         // Re-habilitar el botón en la página en caso de error
                         $('#asignarordenpedido').prop('disabled', false).removeClass('disabled');
-                        
+
                         cerrarcargando(); // Cerramos solo si hay error
                     },
                 });
@@ -460,7 +460,7 @@ $(document).ready(function () {
         }
 
         let totalPedidos = idPedido.split(',').length;
-        let msgConfirmacion = totalPedidos === 1 
+        let msgConfirmacion = totalPedidos === 1
             ? '¿Deseas marcar la <b>Orden de Pedido ' + idPedido + '</b> como TERMINADA?'
             : '¿Deseas marcar las <b>' + totalPedidos + ' Órdenes de Pedido (' + idPedido + ')</b> como TERMINADAS?';
 
@@ -472,7 +472,7 @@ $(document).ready(function () {
             confirmar: true,
             onConfirm: function () {
                 abrircargando();
-                
+
                 $.ajax({
                     type: "POST",
                     url: carpeta + "/ajax-terminar-resumen-op",
@@ -489,7 +489,7 @@ $(document).ready(function () {
                                 titulo: 'Operación exitosa',
                                 mensaje: resp.mensaje || 'El pedido fue marcado como TERMINADO.'
                             });
-                            
+
                             // Recargar solo la tabla en lugar de toda la página para mejorar la navegacion AJAX o recargar full
                             // Como la vista usa actionListarAjaxBuscarResumenOP en la vista resumen vamos a disparar buscarpedidoresumen
                             setTimeout(() => {
@@ -554,7 +554,7 @@ $(document).ready(function () {
     /* ===============================
        FILTRO POR TIPO DE PRODUCTO
        =============================== */
-    
+
     // Inicializar Select2 con búsqueda AJAX en #producto_id
     $('#producto_id').select2({
         ajax: {
@@ -585,7 +585,7 @@ $(document).ready(function () {
     $('#producto_id').on('select2:select', function (e) {
         let data = e.params.data;
         let option = $('#producto_id option:selected');
-        
+
         // Asignar data attributes dinámicamente para compatibilidad con la lógica existente
         option.data('nombre', data.NOM_PRODUCTO);
         option.data('unidad', data.UNIDAD);
@@ -641,7 +641,7 @@ $(document).ready(function () {
 
         if (unidad) {
             $('#unidad').val(unidad);
-            
+
             if (indMaterialServicio === 'S') {
                 $('.div-precio-servicio').fadeIn();
                 $('#div-observacion').removeClass('col-md-3').addClass('col-md-2');
@@ -658,9 +658,9 @@ $(document).ready(function () {
             $('.div-precio-servicio').fadeOut();
             $('#div-observacion').removeClass('col-md-2').addClass('col-md-3');
             $('#precio_servicio').val('0.00');
-            
+
             // Si el tipo general sigue siendo Servicio, mantener cantidad 1 y bloqueado
-            if($('#tipo_material_servicio').val() === 'S') {
+            if ($('#tipo_material_servicio').val() === 'S') {
                 $('#cantidad').val(1).prop('disabled', true);
             } else {
                 $('#cantidad').val('').prop('disabled', false);
@@ -672,7 +672,7 @@ $(document).ready(function () {
        CARGAR TIPO SEGÚN MES
        =============================== */
     $(document).on('change', '#cod_periodo', function () {
-        
+
         let codPeriodo = $(this).val();
         let tipoPedidoSelect = $('#cod_tipo_pedido');
 
@@ -689,7 +689,7 @@ $(document).ready(function () {
 
         // Obtener mes del periodo seleccionado (comparación flexible)
         let periodo = registrosPeriodos.find(p => String(p.COD_PERIODO).trim() === String(codPeriodo).trim());
-        
+
         if (periodo) {
 
             let mesPeriodo = parseInt(periodo.mes);
@@ -704,7 +704,7 @@ $(document).ready(function () {
 
             // Asignamos valor (el select permanece deshabilitado según el requerimiento)
             tipoPedidoSelect.val(codTipo).trigger('change');
-            
+
             console.log('Tipo de pedido asignado:', codTipo, 'Mes Periodo:', mesPeriodo, 'Mes Actual:', mesActual);
         } else {
             console.warn('No se encontró el periodo en los registros:', codPeriodo);
@@ -752,10 +752,10 @@ $(document).ready(function () {
         let nom_categoria = option.data('unidad');
         let cantidad = $('#cantidad').val();
         let isServicio = option.data('indmaterialservicio') === 'S';
-        
-        let precio = isServicio 
-                     ? parseFloat($('#precio_servicio').val()) || 0 
-                     : parseFloat(option.data('precio')) || 0;
+
+        let precio = isServicio
+            ? parseFloat($('#precio_servicio').val()) || 0
+            : parseFloat(option.data('precio')) || 0;
 
         let subtotal = parseFloat(cantidad) * precio;
         let txt_observacion = $('#txt_observacion').val();
@@ -835,7 +835,7 @@ $(document).ready(function () {
         let precioHtml = precio.toFixed(2);
 
         let isEditMode = $('#id_pedido').val() !== "";
-        let cantidadHtml = isEditMode 
+        let cantidadHtml = isEditMode
             ? `<input type="number" class="form-control input-sm text-center edit-cantidad-pedido" value="${cantidad}" min="1" style="width: 70px; margin: 0 auto; font-weight: bold;">`
             : cantidad;
 
@@ -891,7 +891,7 @@ $(document).ready(function () {
             // =========================
             // Se muestra cuando supera el umbral de Administración (ej: 800)
 
-            if (totalPedido > umbralGerencia){
+            if (totalPedido > umbralGerencia) {
 
                 if ($('#cod_trabajador_aprueba_ger').closest('.col-md-6').is(':hidden')) {
 
@@ -1059,7 +1059,7 @@ $(document).ready(function () {
                 cerrarcargando();
                 // Insertar contenido en el contenedor del tab
                 $("#detalle-pedido-container").html(resp);
-                
+
                 // Mostrar el tab y activarlo
                 $("#tab-detalle-pedido").show();
                 $('.nav-tabs a[href="#detallepedido"]').tab('show');
@@ -1166,7 +1166,7 @@ $(document).ready(function () {
                     // Cambiar a la pestaña de registro
                     $('a[href="#crearpedido"]').tab('show');
 
-                    if(resp.archivo) {
+                    if (resp.archivo) {
                         $('#formFile').removeAttr('required');
                         $('#enlace_archivo_cargado')
                             .attr('href', carpeta + '/descargar-archivo-informe/' + resp.archivo.URL_ARCHIVO)
@@ -1448,14 +1448,14 @@ $(document).ready(function () {
             icono: '❌',
             titulo: 'Rechazar Orden',
             mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
-                     '<div class="form-group">' +
-                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (GERENCIA):</label>' +
-                        '<textarea id="motivo_rechazo_ger" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
-                     '</div>',
+                '<div class="form-group">' +
+                '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (GERENCIA):</label>' +
+                '<textarea id="motivo_rechazo_ger" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
+                '</div>',
             confirmar: true,
             onConfirm: function () {
                 let motivo = $('#motivo_rechazo_ger').val();
-                if(!motivo || motivo.trim() === ""){
+                if (!motivo || motivo.trim() === "") {
                     alerterrorajax("Debe ingresar un motivo de rechazo.");
                     return false;
                 }
@@ -1622,7 +1622,7 @@ $(document).ready(function () {
                         cerrarcargando();
                         // Re-activar botón en caso de error
                         boton.prop('disabled', false).html('<i class="fa fa-check-circle me-2"></i> EMITIR PEDIDO');
-                        
+
                         modalBonito({
                             tipo: 'error',
                             icono: '❌',
@@ -1756,15 +1756,15 @@ $(document).ready(function () {
             icono: '❌',
             titulo: 'Rechazar Orden',
             mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
-                     '<div class="form-group">' +
-                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo:</label>' +
-                        '<textarea id="motivo_rechazo" class="form-control" rows="3" placeholder="Escriba aquí el motivo por el cual rechaza el pedido..." style="border:1px solid #d9534f;"></textarea>' +
-                     '</div>',
+                '<div class="form-group">' +
+                '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo:</label>' +
+                '<textarea id="motivo_rechazo" class="form-control" rows="3" placeholder="Escriba aquí el motivo por el cual rechaza el pedido..." style="border:1px solid #d9534f;"></textarea>' +
+                '</div>',
             confirmar: true,
             onConfirm: function () {
 
                 let motivo = $('#motivo_rechazo').val();
-                if(!motivo || motivo.trim() === ""){
+                if (!motivo || motivo.trim() === "") {
                     alerterrorajax("Debe ingresar un motivo de rechazo.");
                     return false;
                 }
@@ -1875,16 +1875,22 @@ $(document).ready(function () {
             tipo: 'info',
             icono: '✅',
             titulo: 'Aprobar Orden',
-            mensaje: '¿Está seguro de <b>aprobar</b> esta Orden de Pedido?',
+            mensaje: '¿Está seguro de <b>aprobar</b> esta Orden de Pedido?<br><br>' +
+                '<div class="form-group text-start" style="text-align: left;">' +
+                '<label style="color:#00b09b;font-weight:700;">Glosa de Aprobación (JEFE COMPRAS / GERENCIA ADM) (Opcional):</label>' +
+                '<textarea id="txt_glosa_aprobacion" class="form-control" rows="3" placeholder="Escriba aquí la glosa..." style="border:1px solid #00b09b;"></textarea>' +
+                '</div>',
             confirmar: true,
             onConfirm: function () {
+                let glosa = $('#txt_glosa_aprobacion').val();
                 abrircargando();
                 $.ajax({
                     type: 'POST',
                     url: carpeta + '/ap_adm_orden_pedido',
                     data: {
                         _token: _token,
-                        orden_pedido_id: orden_pedido_id
+                        orden_pedido_id: orden_pedido_id,
+                        glosa: glosa
                     },
                     success: function (resp) {
                         cerrarcargando();
@@ -1924,14 +1930,14 @@ $(document).ready(function () {
             icono: '❌',
             titulo: 'Rechazar Orden',
             mensaje: '¿Está seguro de <b>rechazar</b> esta Orden de Pedido?<br><br>' +
-                     '<div class="form-group">' +
-                        '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (ADM):</label>' +
-                        '<textarea id="motivo_rechazo_adm" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
-                     '</div>',
+                '<div class="form-group">' +
+                '<label style="color:#d9534f;font-weight:700;">Motivo del rechazo (ADM):</label>' +
+                '<textarea id="motivo_rechazo_adm" class="form-control" rows="3" placeholder="Escriba aquí el motivo..." style="border:1px solid #d9534f;"></textarea>' +
+                '</div>',
             confirmar: true,
             onConfirm: function () {
                 let motivo = $('#motivo_rechazo_adm').val();
-                if(!motivo || motivo.trim() === ""){
+                if (!motivo || motivo.trim() === "") {
                     alerterrorajax("Debe ingresar un motivo de rechazo.");
                     return false;
                 }
@@ -2038,9 +2044,9 @@ $(document).ready(function () {
         event.preventDefault();
         var id_pedido = $(this).data('id');
         var _token = $('#token').val();
-        
+
         abrircargando();
-        
+
         $.ajax({
             type: 'POST',
             url: carpeta + '/ver_detalle_orden_pedido',
@@ -2051,10 +2057,10 @@ $(document).ready(function () {
             success: function (data) {
                 cerrarcargando();
                 $("#detalle-pedido-container").html(data);
-                
+
                 // Ocultar botones de acción de edición si estamos en el resumen
                 $("#detalle-pedido-container").find(".editar-pedido, .emitir-pedido").hide();
-                
+
                 $("#tab-detalle-pedido").show();
                 $('.nav-tabs a[href="#detallepedido"]').tab('show');
             },
@@ -2250,7 +2256,7 @@ $(document).ready(function () {
     // Función para recalcular el consolidado automáticamente (Compatible con DataTables)
     const recalcularConsolidado = function () {
         productosConsolidados = {};
-        
+
         if (typeof window.pedidosData === 'undefined' || !window.pedidosData) {
             return;
         }
@@ -2318,7 +2324,7 @@ $(document).ready(function () {
                                 fecha: item.FEC_PEDIDO,
                                 pedido: item.ID_PEDIDO,
                                 area: item.TXT_AREA,
-                                glosa: item.TXT_GLOSA,
+                                glosa: item.TXT_OBSERVACION_DETALLE,
                                 cantidad: item.CANTIDAD
                             });
                         }
@@ -2345,12 +2351,12 @@ $(document).ready(function () {
     $(document).on('change', '#checkAll', function () {
         let isChecked = $(this).is(':checked');
         let table = $('#tablaconsolidadopedido').DataTable();
-        
+
         // Seleccionar/Deseleccionar en todas las páginas procesadas por DataTable
         let rows = table.rows({ 'search': 'applied' }).nodes();
         $('input.pedido_seleccionado', rows).prop('checked', isChecked);
-        
-        recalcularConsolidado(); 
+
+        recalcularConsolidado();
     });
 
     // Evento al cambiar selección individual
@@ -2392,7 +2398,7 @@ $(document).ready(function () {
                         <td class="text-center">${p.fecha}</td>
                         <td class="text-center font-bold">${p.pedido}</td>
                         <td>${p.area}</td>
-                        <td class="text-muted small">${p.glosa}</td>
+                        <td style="color: #334155; font-size: 13px; font-weight: 500;">${p.glosa}</td>
                         <td class="text-center font-bold" style="font-size: 1.1em;">
                             ${parseFloat(p.cantidad).toFixed(2)}
                         </td>
@@ -3489,7 +3495,7 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id = $('#familia_id').val();        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
+        let familia_id = $('#familia_id').val(); window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 
     // EVENTO PARA DESCARGAR EXCEL DEL DETALLE
@@ -3504,16 +3510,16 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id = $('#familia_id').val();        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
+        let familia_id = $('#familia_id').val(); window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 
     // ============================================
     // REPORTE ESTADO: DOBLE CLICK VER DETALLE
     // ============================================
     $(document).on('dblclick', '.reporteordenpedidoestado .fila-pedido', function (e) {
-        
+
         let idPedido = $(this).data('id');
-        let _token   = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
+        let _token = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
 
         if (!idPedido) return;
 
@@ -3530,7 +3536,7 @@ $(document).ready(function () {
             success: function (resp) {
                 cerrarcargando();
                 $('.modal-detalle-pedido-container').html(resp);
-                $('#modal-detalle-pedido').niftyModal('show'); 
+                $('#modal-detalle-pedido').niftyModal('show');
             },
             error: function (xhr) {
                 cerrarcargando();
@@ -3630,67 +3636,88 @@ $(document).ready(function () {
         });
     });
 
+    // FILTRAR LISTA DE CONSOLIDADOS POR ESTADO CON DATA TABLES PAGINACIÓN 20
     // ============================================
-    // FILTRAR LISTA DE CONSOLIDADOS POR ESTADO
-    // ============================================
-    $(document).on('change', '#filtro-estado-consolidado', function() {
-        filtrarConsolidados();
-    });
-
-    function filtrarConsolidados() {
-        let filtroValue = $('#filtro-estado-consolidado').val();
-        let total = 0;
-
-        // Si no hay filas, el contador es 0
-        if($('.fila-consolidado-generado').length === 0){
-            $('#contador-consolidados').text(0);
-            return;
-        }
-
-        $('.fila-consolidado-generado').each(function() {
-            let codEstado = $(this).data('estado');
-            let mostrar = false;
-
-            if (filtroValue === 'TODO') {
-                mostrar = true;
-            } else if (filtroValue === 'GENERADO') {
-                // Estado Generado (Activo)
-                if (codEstado === 'ETM0000000000001') mostrar = true;
-            } else if (filtroValue === 'CERRADO') {
-                // Estados Cerrado (Por Aprobar Jefe Compras) o ya Aprobado
-                if (codEstado === 'ETM0000000000015' || codEstado === 'ETM0000000000005') mostrar = true;
-            }
-
-            if (mostrar) {
-                $(this).show();
-                total++;
-            } else {
-                $(this).hide();
+    if ($('#tabla-consolidados-sede').length > 0 && $.fn.dataTable) {
+        var tableConsolidados = $('#tabla-consolidados-sede').DataTable({
+            "pageLength": 20,
+            "searching": true,
+            "ordering": true,
+            "order": [[0, "desc"]],
+            "dom": "<'row be-datatable-body'<'col-sm-12'tr>>" +
+                   "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>",
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando del _START_ al _END_ de _TOTAL_ consolidados",
+                "sInfoEmpty":      "Mostrando del 0 al 0 de 0 consolidados",
+                "sInfoFiltered":   "(filtrado de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                }
             }
         });
 
-        $('#contador-consolidados').text(total);
-    }
+        // Extensión de búsqueda personalizada de DataTables para filtrar por estado
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                if (settings.nTable.id !== 'tabla-consolidados-sede') {
+                    return true;
+                }
+                var filtroValue = $('#filtro-estado-consolidado').val();
+                if (filtroValue === 'TODO') {
+                    return true;
+                }
+                var rowNode = tableConsolidados.row(dataIndex).node();
+                var codEstado = $(rowNode).data('estado');
 
-    // Ejecutar filtro inicial (para que empiece solo con GENERADOS)
-    if ($('#filtro-estado-consolidado').length > 0) {
-        setTimeout(function() {
-            filtrarConsolidados();
+                if (filtroValue === 'GENERADO') {
+                    return codEstado === 'ETM0000000000001';
+                } else if (filtroValue === 'CERRADO') {
+                    return codEstado === 'ETM0000000000015' || codEstado === 'ETM0000000000005';
+                }
+                return true;
+            }
+        );
+
+        function actualizarFiltroConsolidados() {
+            tableConsolidados.draw();
+            var total = tableConsolidados.rows({ search: 'applied' }).count();
+            $('#contador-consolidados').text(total);
+        }
+
+        $(document).on('change', '#filtro-estado-consolidado', function () {
+            actualizarFiltroConsolidados();
+        });
+
+        // Ejecutar actualización inicial del contador
+        setTimeout(function () {
+            actualizarFiltroConsolidados();
         }, 600);
     }
 
     /* =================================
        PREVISUALIZACIÓN DE ARCHIVOS
        ================================= */
-    $(document).on('change', '#formFile', function() {
+    $(document).on('change', '#formFile', function () {
         var input = this;
         var container = $('#previsualizacion-archivos-orden');
         container.empty().show();
 
         if (input.files && input.files.length > 0) {
-            $.each(input.files, function(i, file) {
+            $.each(input.files, function (i, file) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     var fileUrl = e.target.result;
                     var ext = file.name.split('.').pop().toLowerCase();
                     var isExcel = ['xls', 'xlsx', 'csv'].includes(ext);

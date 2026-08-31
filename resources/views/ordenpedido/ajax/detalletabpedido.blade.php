@@ -48,6 +48,7 @@
                                 
                                 @php
                                     $mostrarJefe = false; $mostrarGer = false; $mostrarAdm = false;
+                                    $total_general = 0;
                                     foreach ($pedillodetalle as $item) {
                                         if (!is_null($item->CAN_MODIF_JEF_AUT)) $mostrarJefe = true;
                                         if (!is_null($item->CAN_MODIF_GER)) $mostrarGer = true;
@@ -60,10 +61,17 @@
                                 @if($mostrarAdm) <th class="text-center py-3">Cant. Admin</th> @endif
                                 
                                 <th class="py-3 pe-4">Observación</th>
+                                <th class="text-center py-3" style="width: 110px;">Precio Unit.</th>
+                                <th class="text-center py-3" style="width: 120px;">Total Item</th>
                             </tr>
                         </thead>
                         <tbody style="font-size: 13.5px; color: #5a5c69;">
                             @forelse($pedillodetalle as $index => $detalle)
+                                @php
+                                    $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : $detalle->CANTIDAD));
+                                    $subtotal = $valor_cantidad * $detalle->CAN_PRECIO;
+                                    $total_general += $subtotal;
+                                @endphp
                                 <tr style="border-bottom: 1px solid #eaecf4;">
                                     <td class="text-center py-3 ps-4 fw-bold" style="color: #1d3a6d;">{{ $index + 1 }}</td>
                                     <td class="py-3">
@@ -95,15 +103,42 @@
                                             {{ $detalle->TXT_OBSERVACION ?: '—' }}
                                         </div>
                                     </td>
+
+                                    <td class="text-center py-3 fw-semibold" style="white-space: nowrap;">
+                                        S/ {{ number_format($detalle->CAN_PRECIO, 2) }}
+                                    </td>
+
+                                    <td class="text-center py-3 fw-bold text-primary" style="white-space: nowrap;">
+                                        S/ {{ number_format($subtotal, 2) }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="text-center py-5 text-muted">No se encontraron productos en este pedido.</td>
+                                    <td colspan="{{ 8 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-center py-5 text-muted">No se encontraron productos en este pedido.</td>
                                 </tr>
                             @endforelse
                         </tbody>
+                        
+                        <tfoot>
+                            <tr style="background: #f8f9fc;">
+                                <td colspan="{{ 7 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle;">Total General</td>
+                                <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px; vertical-align: middle; white-space: nowrap;">S/ {{ number_format($total_general, 2) }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
+
+                <!-- GLOSA DE APROBACIÓN -->
+                @if(isset($pedido->TXT_GLOSA_APROBACION) && !empty($pedido->TXT_GLOSA_APROBACION))
+                    <div class="mt-4" style="background: #f4fbf7; border: 1px solid #d1f2e1; border-left: 4px solid #1cc88a; border-radius: 8px; padding: 15px 20px; box-shadow: 0 2px 6px rgba(28, 200, 138, 0.05);">
+                        <h6 class="fw-bold mb-1" style="font-size: 13.5px; color: #0f6847; letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; margin: 0 0 8px 0;">
+                            <i class="fa fa-check-circle" style="font-size: 14px; color: #1cc88a;"></i> Glosa de Aprobación (JEFE COMPRAS / GERENCIA ADM)
+                        </h6>
+                        <p class="mb-0 text-dark" style="font-size: 14px; line-height: 1.5; color: #2e3033 !important;">
+                            "{{ $pedido->TXT_GLOSA_APROBACION }}"
+                        </p>
+                    </div>
+                @endif
 
                 <!-- GLOSA DE RECHAZO (ESTILO DISCRETO PERO CLARO) -->
                 @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))

@@ -309,9 +309,9 @@ $(document).ready(function(){
                     if(operacion === 'DOCUMENTO_INTERNO_COMPRA' || operacion === 'ORDEN_COMPRA_ANTICIPO'  || operacion === 'CONTRATO_ANTICIPO'){
                         var total                       = parseFloat($(this).attr('data_total'));
                         var totalmerge                  = parseFloat($(this).attr('data_mergetotal'));
-                        var totalmax                    = total-totalmerge;
+                        var totalmax                    = parseFloat((total - totalmerge).toFixed(4));
 
-                        var input_mergetotal = parseFloat($(this).find('.input_mergetotal').val()) || 0;                        
+                        var input_mergetotal = parseFloat((parseFloat($(this).find('.input_mergetotal').val()) || 0).toFixed(4));                        
 
                         item.data_totalmax = totalmax;
                         item.data_mergetotal = input_mergetotal;

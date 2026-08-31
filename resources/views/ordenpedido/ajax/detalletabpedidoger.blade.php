@@ -47,15 +47,32 @@
                 
                 <!-- INFORMACIÓN GENERAL -->
                 <div class="row mb-5" style="background: #f8f9fc; border-radius: 10px; padding: 25px; border: 1px solid #edf0f7;">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="text-muted small fw-bold text-uppercase mb-1 d-block" style="letter-spacing: 0.5px;">Solicitante</label>
                         <p class="mb-0 text-dark fw-bold" style="font-size: 15px;">{{ $pedido->TXT_TRABAJADOR_SOLICITA }}</p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="text-muted small fw-bold text-uppercase mb-1 d-block" style="letter-spacing: 0.5px;">Área / Departamento</label>
                         <p class="mb-0 text-dark fw-bold" style="font-size: 15px;">{{ $pedido->TXT_AREA }}</p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        @php
+                            $centros_map = [
+                                'CEN0000000000001' => 'CHICLAYO',
+                                'CEN0000000000002' => 'LIMA',
+                                'CEN0000000000004' => 'RIOJA',
+                                'CEN0000000000006' => 'BELLAVISTA',
+                            ];
+                            $nombre_centro = $centros_map[$pedido->COD_CENTRO] ?? null;
+                            if (is_null($nombre_centro) && !empty($pedido->COD_CENTRO)) {
+                                $centro_db = DB::table('ALM.CENTRO')->where('COD_CENTRO', $pedido->COD_CENTRO)->first();
+                                $nombre_centro = $centro_db ? $centro_db->NOM_CENTRO : $pedido->COD_CENTRO;
+                            }
+                        @endphp
+                        <label class="text-muted small fw-bold text-uppercase mb-1 d-block" style="letter-spacing: 0.5px;">Centro del Pedido</label>
+                        <p class="mb-0 text-dark fw-bold" style="font-size: 15px;">{{ $nombre_centro ?? '—' }}</p>
+                    </div>
+                    <div class="col-md-3">
                         <label class="text-muted small fw-bold text-uppercase mb-1 d-block" style="letter-spacing: 0.5px;">Estado</label>
                         <div>
                             @php $item = ['COD_ESTADO' => $pedido->COD_ESTADO, 'TXT_ESTADO' => $pedido->TXT_ESTADO]; @endphp
@@ -153,6 +170,26 @@
                         </tfoot>
                     </table>
                 </div>
+
+                <!-- GLOSA DE APROBACIÓN -->
+                @if(isset($pedido->TXT_GLOSA_APROBACION) && !empty($pedido->TXT_GLOSA_APROBACION))
+                    <div class="mt-4" style="background: #f4fbf7; border: 1px solid #d1f2e1; border-left: 4px solid #1cc88a; border-radius: 8px; padding: 15px 20px; box-shadow: 0 2px 6px rgba(28, 200, 138, 0.05);">
+                        <h6 class="fw-bold mb-1" style="font-size: 13.5px; color: #0f6847; letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; margin: 0 0 8px 0;">
+                            <i class="fa fa-check-circle" style="font-size: 14px; color: #1cc88a;"></i> Glosa de Aprobación (JEFE COMPRAS / GERENCIA ADM)
+                        </h6>
+                        <p class="mb-0 text-dark" style="font-size: 14px; line-height: 1.5; color: #2e3033 !important;">
+                            "{{ $pedido->TXT_GLOSA_APROBACION }}"
+                        </p>
+                    </div>
+                @endif
+
+                <!-- GLOSA DE RECHAZO -->
+                @if(isset($pedido->TXT_GLOSA_RECHAZO) && !empty($pedido->TXT_GLOSA_RECHAZO))
+                    <div class="alert alert-danger mt-4" style="background: #fff; border: 1px solid #f5c6cb; border-left: 5px solid #d9534f; border-radius: 6px;">
+                        <h6 class="fw-bold text-danger mb-1" style="font-size: 14px;">Motivo del Rechazo:</h6>
+                        <p class="mb-0" style="font-size: 14px; color: #000 !important;">{{ $pedido->TXT_GLOSA_RECHAZO }}</p>
+                    </div>
+                @endif
 
                 <!-- PANEL DE SEGUIMIENTO (LÍNEA DE TIEMPO) -->
                 <!-- PANEL DE SEGUIMIENTO (CENTRADITO Y COMPACTO) -->

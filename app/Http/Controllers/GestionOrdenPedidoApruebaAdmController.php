@@ -111,6 +111,19 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
                 ""
             );
 
+            // Guardar glosa de aprobación
+            $glosa = $request->input('glosa', '');
+            DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->update(['TXT_GLOSA_APROBACION' => $glosa]);
+
+            // Re-replicar a zona para asegurar que se replique la glosa de aprobación
+            try {
+                $this->replicateOrdenPedidoToZona($orden_pedido_id);
+            } catch (\Exception $ez) {
+                Log::error('Error en réplica automática de pedido tras aprobación adm: ' . $ez->getMessage());
+            }
+
             $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
             $documento = new FeDocumentoHistorial;
             $documento->ID_DOCUMENTO = $orden_pedido_id;

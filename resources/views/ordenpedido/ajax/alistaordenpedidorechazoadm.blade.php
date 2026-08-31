@@ -38,7 +38,7 @@
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
-                            <td>{{ $item['TXT_GLOSA'] }}</td>
+                            <td class="col-glosa" title="{{ $item['TXT_GLOSA'] }}">{{ $item['TXT_GLOSA'] }}</td>
                             <td>@include('comprobante.ajax.estadospedido')</td>
                             <td class="text-center">
                                 <div class="grupo-acciones">
