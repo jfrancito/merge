@@ -69,6 +69,9 @@
                                         @elseif($item->TXT_ESTADO == 'ANULADO')
                                             <span class="label label-danger" style="padding: 5px 10px; border-radius: 20px;"
                                                 title="{{ $item->TXT_GLOSA_ANULACION }}">{{ $item->TXT_ESTADO }}</span>
+                                        @elseif($item->TXT_ESTADO == 'POR APROBAR GERENCIA ADMINISTRATIVA')
+                                            <span class="label label-warning"
+                                                style="padding: 5px 10px; border-radius: 20px;">{{ $item->TXT_ESTADO }}</span>
                                         @else
                                             <span class="label label-success"
                                                 style="padding: 5px 10px; border-radius: 20px;">{{ $item->TXT_ESTADO }}</span>

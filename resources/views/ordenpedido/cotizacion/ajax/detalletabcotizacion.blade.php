@@ -91,7 +91,15 @@
                                     style="font-size: 20px; vertical-align: middle; margin-right: 5px;">{{ $moneda == 'SOLES' ? 'S/' : '$' }}</span>{{ $total }}
                             </h3>
                             <div style="margin-top: 15px;">
-                                <span class="label {{ $estado == 'GENERADO' ? 'label-primary' : 'label-success' }}"
+                                @php
+                                    $clase_label = 'label-success';
+                                    if ($estado == 'GENERADO') {
+                                        $clase_label = 'label-primary';
+                                    } elseif ($estado == 'POR APROBAR GERENCIA ADMINISTRATIVA') {
+                                        $clase_label = 'label-warning';
+                                    }
+                                @endphp
+                                <span class="label {{ $clase_label }}"
                                     style="padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;">
                                     {{ $estado }}
                                 </span>
@@ -100,21 +108,42 @@
 
                         <!-- BOTONES DE ACCIÓN DEBAJO DEL TOTAL -->
                         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-                            @if($cotizacion->COD_ESTADO != 'ETM0000000000005')
-                                <button class="btn btn-warning editar-cotizacion" data-id="{{ $id_cotizacion }}"
-                                    style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                    <i class="fa fa-edit"></i> EDITAR
-                                </button>
-                                <button class="btn btn-success aprobar-cotizacion" data-id="{{ $id_cotizacion }}"
-                                    style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                    <i class="fa fa-check"></i> APROBAR
-                                </button>
+                            @if(isset($es_aprobacion) && $es_aprobacion)
+                                {{-- Pantalla de Aprobación de Gerencia --}}
+                                @if($cotizacion->COD_ESTADO == 'ETM0000000000018')
+                                    <button class="btn btn-success aprobar-cotizacion" data-id="{{ $id_cotizacion }}"
+                                        style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <i class="fa fa-check"></i> APROBAR
+                                    </button>
+                                    <button class="btn btn-danger eliminar-cotizacion" data-id="{{ $id_cotizacion }}" data-estado="{{ $cotizacion->COD_ESTADO }}"
+                                        style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #e3342f; border: none;">
+                                        <i class="fa fa-times-circle"></i> RECHAZAR / ANULAR
+                                    </button>
+                                @elseif($cotizacion->COD_ESTADO == 'ETM0000000000005')
+                                    <span class="text-success font-bold" style="font-size: 14px; font-weight: 700;"><i class="fa fa-check-circle"></i> COTIZACIÓN APROBADA</span>
+                                @elseif($cotizacion->COD_ESTADO == 'ETM0000000000014')
+                                    <span class="text-danger font-bold" style="font-size: 14px; font-weight: 700;"><i class="fa fa-times-circle"></i> COTIZACIÓN ANULADA</span>
+                                @endif
+                            @else
+                                {{-- Pantalla ordinaria (cotizacion-orden-pedido) --}}
+                                @if($cotizacion->COD_ESTADO != 'ETM0000000000005' && $cotizacion->COD_ESTADO != 'ETM0000000000018')
+                                    <button class="btn btn-warning editar-cotizacion" data-id="{{ $id_cotizacion }}"
+                                        style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <i class="fa fa-edit"></i> EDITAR
+                                    </button>
+                                    <button class="btn btn-success aprobar-cotizacion" data-id="{{ $id_cotizacion }}"
+                                        style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <i class="fa fa-check"></i> APROBAR
+                                    </button>
+                                @endif
+                                {{-- El botón ELIMINAR se queda siempre visible, incluso si está Aprobada, excepto si ya está anulada --}}
+                                @if($cotizacion->COD_ESTADO != 'ETM0000000000014')
+                                    <button class="btn btn-danger eliminar-cotizacion" data-id="{{ $id_cotizacion }}" data-estado="{{ $cotizacion->COD_ESTADO }}"
+                                        style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #e3342f; border: none;">
+                                        <i class="fa fa-trash"></i> ELIMINAR
+                                    </button>
+                                @endif
                             @endif
-                            <!-- El botón ELIMINAR se queda siempre visible, incluso si está Aprobada -->
-                            <button class="btn btn-danger eliminar-cotizacion" data-id="{{ $id_cotizacion }}" data-estado="{{ $cotizacion->COD_ESTADO }}"
-                                style="flex: 1; border-radius: 8px; font-weight: 700; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #e3342f; border: none;">
-                                <i class="fa fa-trash"></i> ELIMINAR
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -142,7 +171,7 @@
                                     <th class="text-center">Cantidad</th>
                                     <th class="text-center">Precio Unit.</th>
                                     <th class="text-center">Precio Unit. IGV</th>
-                                    @if($tiene_centro_costo)
+                                    @if($tiene_centro_costo && isset($es_servicio) && $es_servicio)
                                     <th class="text-center">Centro Costo</th>
                                     @endif
                                     <th class="text-center" style="padding-right: 25px;">Subtotal</th>
@@ -173,7 +202,7 @@
                                         <td class="text-center" style="color: #28a745; font-weight: 600;">
                                             {{ number_format($det->CAN_PRECIO_IGV, 2) }}
                                         </td>
-                                        @if($tiene_centro_costo)
+                                        @if($tiene_centro_costo && isset($es_servicio) && $es_servicio)
                                         <td class="text-center">
                                             <span class="label label-outline"
                                                 style="border: 1px solid #d1d3e2; color: #5a5c69; font-weight: 600; padding: 3px 10px;">

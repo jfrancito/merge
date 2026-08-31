@@ -21,6 +21,7 @@
                 $mostrarJefe = false;
                 $mostrarGer = false;
                 $mostrarAdm = false;
+                $total_general = 0;
 
                 foreach ($pedillodetalle as $item) {
                     if (!is_null($item->CAN_MODIF_JEF_AUT)) {
@@ -49,11 +50,18 @@
                     @if($mostrarAdm)
                     <th class="text-center" style="width: 100px;">Cant. Adm.</th>@endif
                     <th>Observación</th>
+                    <th class="text-center" style="width: 100px;">Precio Unit.</th>
+                    <th class="text-center" style="width: 120px;">Total Item</th>
                 </tr>
             </thead>
 
             <tbody>
                 @forelse($pedillodetalle as $index => $detalle)
+                    @php
+                        $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : $detalle->CANTIDAD));
+                        $subtotal = $valor_cantidad * $detalle->CAN_PRECIO;
+                        $total_general += $subtotal;
+                    @endphp
                     <tr>
                         <td class="text-center fw-semibold text-muted">
                             {{ $index + 1 }}
@@ -86,7 +94,7 @@
                                     </span>
                                 @else
                                     <span class="text-muted small">—</span>
-                                @endif
+                                  @endif
                             </td>
                         @endif
 
@@ -117,16 +125,31 @@
                         <td class="observacion-cell text-muted" title="{{ $detalle->TXT_OBSERVACION }}">
                             {{ $detalle->TXT_OBSERVACION ?: '—' }}
                         </td>
+
+                        <td class="text-center fw-semibold" style="white-space: nowrap;">
+                            S/ {{ number_format($detalle->CAN_PRECIO, 2) }}
+                        </td>
+
+                        <td class="text-center fw-bold text-primary" style="white-space: nowrap;">
+                            S/ {{ number_format($subtotal, 2) }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="text-center text-muted fst-italic py-5">
+                        <td colspan="{{ 8 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-center text-muted fst-italic py-5">
                             <i class="mdi mdi-information-outline" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
                             No hay productos en este pedido.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
+
+            <tfoot>
+                <tr style="background: #f8f9fc;">
+                    <td colspan="{{ 7 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle; border:none;">Total General</td>
+                    <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px; vertical-align: middle; white-space: nowrap; border:none;">S/ {{ number_format($total_general, 2) }}</td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 

@@ -235,6 +235,7 @@ class CotizacionOrdenPedidoController extends Controller
     public function actionAjaxListarDetalleCotizacion(Request $request)
     {
         $id_cotizacion = $request->input('id_cotizacion');
+        $es_aprobacion = $request->input('es_aprobacion', false);
 
         $cotizacion = DB::table('WEB.ORDEN_COTIZACION')
             ->where('ID_COTIZACION', $id_cotizacion)
@@ -264,10 +265,23 @@ class CotizacionOrdenPedidoController extends Controller
             ->where('ACTIVO', 1)
             ->get();
 
+        $es_servicio = false;
+        $primer_detalle = $lista_detalle->first();
+        if ($primer_detalle) {
+            $prod = DB::table('ALM.PRODUCTO')
+                ->where('COD_PRODUCTO', trim($primer_detalle->COD_PRODUCTO))
+                ->first();
+            if ($prod && isset($prod->IND_MATERIAL_SERVICIO) && trim($prod->IND_MATERIAL_SERVICIO) == 'S') {
+                $es_servicio = true;
+            }
+        }
+
         return view('ordenpedido.cotizacion.ajax.detalletabcotizacion', [
             'cotizacion' => $cotizacion,
             'lista_detalle' => $lista_detalle,
-            'archivos' => $archivos
+            'archivos' => $archivos,
+            'es_servicio' => $es_servicio,
+            'es_aprobacion' => $es_aprobacion
         ]);
     }
 
@@ -1413,12 +1427,68 @@ class CotizacionOrdenPedidoController extends Controller
             }
         }
 
+        // Obtener el límite de monto
+        $monto_config = DB::table('WEB.MONTO_ORDEN_PEDIDO')
+            ->where('COD_MONTO', 'IICHMO0000000002')
+            ->first();
+        $limite = $monto_config ? (float) $monto_config->MONTO : 5000.00;
+
+        // Determinar el nuevo estado y monto a evaluar (conversión si es dólares)
+        $monto_evaluar = $cot ? (float) $cot->CAN_TOTAL : 0.00;
+        $es_dolares = false;
+        $tipo_cambio_usado = 0;
+
+        if ($cot && trim($cot->COD_CATEGORIA_MONEDA) === 'MON0000000000002') { // DÓLARES
+            $es_dolares = true;
+            // Buscar tipo de cambio de hoy
+            $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+                ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+                ->where('COD_ESTADO', 1)
+                ->first();
+            
+            if ($tipo_cambio) {
+                $tipo_cambio_usado = $tipo_cambio->CAN_COMPRA;
+            } else {
+                // Fallback al último registrado si no se cargó hoy
+                $tipo_cambio_ultimo = DB::table('CMP.TIPO_CAMBIO')
+                    ->where('COD_ESTADO', 1)
+                    ->orderBy('FEC_CAMBIO', 'desc')
+                    ->first();
+                if ($tipo_cambio_ultimo) {
+                    $tipo_cambio_usado = $tipo_cambio_ultimo->CAN_COMPRA;
+                }
+            }
+
+            if ($tipo_cambio_usado > 100) {
+                $tipo_cambio_usado = $tipo_cambio_usado / 10000;
+            }
+
+            if ($tipo_cambio_usado > 0) {
+                $monto_evaluar = $monto_evaluar * $tipo_cambio_usado;
+            }
+        }
+
+        // Determinar el nuevo estado
+        $nuevo_cod_estado = 'ETM0000000000005';
+        $nuevo_txt_estado = 'APROBADO';
+        $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.';
+
+        if ($cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite) {
+            $nuevo_cod_estado = 'ETM0000000000018';
+            $nuevo_txt_estado = 'POR APROBAR GERENCIA ADMINISTRATIVA';
+            if ($es_dolares) {
+                $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ($ ' . number_format($cot->CAN_TOTAL, 2) . ') equivale a <b>S/ ' . number_format($monto_evaluar, 2) . '</b> (T.C. ' . number_format($tipo_cambio_usado, 4) . '), superando el límite de S/ ' . number_format($limite, 2) . ', y ha sido enviada a <b>POR APROBAR GERENCIA ADMINISTRATIVA</b>.';
+            } else {
+                $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> supera el límite de S/ ' . number_format($limite, 2) . ' y ha sido enviada a <b>POR APROBAR GERENCIA ADMINISTRATIVA</b>.';
+            }
+        }
+
         try {
             DB::table('WEB.ORDEN_COTIZACION')
                 ->where('ID_COTIZACION', $id_cotizacion)
                 ->update([
-                    'COD_ESTADO' => 'ETM0000000000005',
-                    'TXT_ESTADO' => 'APROBADO',
+                    'COD_ESTADO' => $nuevo_cod_estado,
+                    'TXT_ESTADO' => $nuevo_txt_estado,
                     'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
                     'COD_USUARIO_MODIF_AUD' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
                 ]);
@@ -1427,7 +1497,7 @@ class CotizacionOrdenPedidoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'mensaje' => 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.'
+                'mensaje' => $mensaje_exito
             ]);
 
         } catch (\Throwable $e) {

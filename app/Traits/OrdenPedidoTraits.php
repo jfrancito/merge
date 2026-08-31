@@ -449,6 +449,7 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
                 'OD.COD_PRODUCTO',
                 'OD.NOM_PRODUCTO',
+                'OD.TXT_OBSERVACION as TXT_OBSERVACION_DETALLE',
                 DB::raw("
                 COALESCE(
                     OD.CAN_MODIF_ADM,
@@ -783,39 +784,9 @@ trait OrdenPedidoTraits
                 'D.STOCK',
                 'D.RESERVADO',
                 'D.DIFERENCIA',
-                DB::raw("
-                STUFF((
-                    SELECT 
-                        ', ' 
-                        + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
-                        + ' - ' + OP.ID_PEDIDO
-                        + ' - ' + OP.TXT_AREA
-                        + ' - ' + ISNULL(OP.TXT_GLOSA,'')
-                        + ' (' + CAST(SUM(OPD.CANTIDAD) AS VARCHAR(10)) + ')'
-                    FROM CMP.REFERENCIA_ASOC RA
-                    INNER JOIN WEB.ORDEN_PEDIDO OP
-                        ON OP.ID_PEDIDO = RA.COD_TABLA
-                    INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
-                        ON OP.ID_PEDIDO = OPD.ID_PEDIDO
-                    WHERE RA.COD_TABLA_ASOC = C.ID_PEDIDO_CONSOLIDADO
-                      AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
-                      AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
-                      AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
-                      AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
-                              AND OPD.ACTIVO = 1
-                      AND OPD.ACTIVO = 1
-                    GROUP BY 
-                        OP.FEC_PEDIDO,
-                        OP.ID_PEDIDO,
-                        OP.TXT_AREA,
-                        OP.TXT_GLOSA
-                    ORDER BY OP.FEC_PEDIDO
-                    FOR XML PATH(''), TYPE
-                ).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
-                AS DETALLE_POR_AREA
-            ")
+                DB::raw("'' AS DETALLE_POR_AREA")
             )
-            ->orderBy('C.ID_PEDIDO_CONSOLIDADO', 'ASC')
+            ->orderBy('C.ID_PEDIDO_CONSOLIDADO', 'DESC')
             ->get()
             ->groupBy('ID_PEDIDO_CONSOLIDADO');
 

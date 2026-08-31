@@ -71,6 +71,12 @@ class GestionOrdenPedidoController extends Controller
                 ->whereIn('COD_CENTRO', [$cod_centro, 'CEN0000000000004', 'CEN0000000000006'])
                 ->pluck('NOM_CENTRO', 'COD_CENTRO')
                 ->toArray();
+        } elseif ($usuario_solicita == 'ISTR000000000387') {
+            // Habilitar Chiclayo y Lima para Franklyn Fabian Llontop Cruz
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
         }
 
         $tipoOrden = DB::table('WEB.TIPO_PEDIDO_ORDEN')->where('cod_estado', 1)->pluck('TXT_TIPO_PEDIDO', 'COD_TIPO_PEDIDO')->toArray();

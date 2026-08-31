@@ -1200,6 +1200,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-eliminar-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxEliminarCotizacion');
 	Route::post('/ajax-get-correlativo-sin-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxGetCorrelativoSinCotizacion');
 
+
+	//COTIZACION APRUEBA GERENCIA ADM
+	Route::get('/gestion-aprueba-cot-ger-administracion/{idopcion}', 'GestionApruebaCotGerenciaAdmController@actionGestionApruebaCotGerenciaAdm');
+	Route::post('/ajax-buscar-resumen-cotizacion', 'GestionApruebaCotGerenciaAdmController@actionAjaxBuscarResumenCotizacion');
+
 	//APROBAR OC
 
 	Route::get('/gestion-de-aprobar-orden-compras/{idopcion}', 'GestionAprobarOCController@actionAporbarOc');
