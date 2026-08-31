@@ -1468,12 +1468,39 @@ class CotizacionOrdenPedidoController extends Controller
             }
         }
 
+        // Determinar si la cotización es de tipo SERVICIO ('S')
+        $es_servicio = false;
+        $primer_detalle = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->first();
+
+        if ($primer_detalle) {
+            $prod = DB::table('ALM.PRODUCTO')
+                ->where('COD_PRODUCTO', trim($primer_detalle->COD_PRODUCTO))
+                ->first();
+            if ($prod && isset($prod->IND_MATERIAL_SERVICIO) && trim($prod->IND_MATERIAL_SERVICIO) === 'S') {
+                $es_servicio = true;
+            }
+        }
+
+        if (!$es_servicio) {
+            $tiene_ref_pedido = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_cotizacion)
+                ->where('TXT_TIPO_REFERENCIA', 'COTIZACION_PEDIDO')
+                ->exists();
+            if ($tiene_ref_pedido) {
+                $es_servicio = true;
+            }
+        }
+
         // Determinar el nuevo estado
         $nuevo_cod_estado = 'ETM0000000000005';
         $nuevo_txt_estado = 'APROBADO';
         $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.';
 
-        if ($cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite) {
+        // La validación de POR APROBAR GERENCIA ADMINISTRATIVA aplica ÚNICAMENTE a cotizaciones de SERVICIO
+        if ($es_servicio && $cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite) {
             $nuevo_cod_estado = 'ETM0000000000018';
             $nuevo_txt_estado = 'POR APROBAR GERENCIA ADMINISTRATIVA';
             if ($es_dolares) {

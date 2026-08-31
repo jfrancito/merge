@@ -38,13 +38,13 @@ trait EnviarCorreoVRDetalleImporteTraits
                 ->where('ID', $valerendir_id)
                 ->value('COD_CENTRO');
 
-            // Obtener el usuario modificador/aprobador de la tabla users
-            $user_modif = DB::table('users')->where('id', '=', $VALE_RENDIR->COD_USUARIO_MODIF_AUD)->first();
+            // Obtener el usuario modificador/administrador (de la sesión activa o de la cabecera del vale)
+            $usuario_id_modif = Session::has('usuario') ? Session::get('usuario')->id : $VALE_RENDIR->COD_USUARIO_MODIF_AUD;
+            $user_modif = DB::table('users')->where('id', '=', $usuario_id_modif)->first();
 
               /* =========================================================
                CORREOS Y NOMBRES - EMPRESA PRINCIPAL
             ========================================================= */
-
 
             $emailTrabajador = DB::table('WEB.VALE_RENDIR as vr')
             ->join('STD.EMPRESA as emp', 'emp.COD_EMPR', '=', 'vr.COD_EMPR_CLIENTE')
@@ -59,24 +59,24 @@ trait EnviarCorreoVRDetalleImporteTraits
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
             ->value('tra.emailcorp');
 
-            $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
-            ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
-            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'u.usuarioosiris_id')
-            ->where('vr.ID', $valerendir_id)
-            ->whereIn('tra.codempresa', [
-                'PRMAECEN000000000003',
-                'PRMAECEN000000000004'
-            ])
-            ->value('tra.emailcorp');
+            $emailTrabajadorAprueba = null;
+            $nombreAprobador = null;
 
+            if ($user_modif && !empty($user_modif->usuarioosiris_id)) {
+                $nombreAprobador = DB::table('WEB.ListaplatrabajadoresGenereal as tra')
+                    ->where('tra.COD_TRAB', '=', $user_modif->usuarioosiris_id)
+                    ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
+                    ->select('tra.nombres', 'tra.apellidopaterno', 'tra.apellidomaterno', 'tra.emailcorp')
+                    ->first();
 
-            $nombreAprobador = DB::table('WEB.VALE_RENDIR as vr')
-            ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
-            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'u.usuarioosiris_id')
-            ->where('vr.ID', $valerendir_id)
-            ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
-            ->select('tra.nombres', 'tra.apellidopaterno', 'tra.apellidomaterno')
-            ->first();
+                if ($nombreAprobador) {
+                    $emailTrabajadorAprueba = $nombreAprobador->emailcorp;
+                }
+            }
+
+            if (!$emailTrabajadorAprueba && $user_modif) {
+                $emailTrabajadorAprueba = $user_modif->email;
+            }
 
 
             $nombreTrabajador = DB::table('WEB.VALE_RENDIR as vr')

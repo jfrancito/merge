@@ -458,6 +458,14 @@ class GestionValeRendirController extends Controller
                     }
                 }
 
+                // Actualizar cabecera del vale con el usuario que modifica
+                DB::table('WEB.VALE_RENDIR')
+                    ->where('ID', $valeId)
+                    ->update([
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                        'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
                 DB::commit();
 
                 $this->enviarCorreoValeRendirDetalleImporte($valeId, $cambios);
