@@ -44,6 +44,15 @@ class GestionOrdenPedidoController extends Controller
         $nombre = $empresaSesion->NOM_EMPR;
         $combo = ['' => 'Seleccione Empresa'] + [$empresa => $nombre];
 
+        if ($usuario_solicita == 'IITR000000000482') {
+            $combo = [
+                'IACHEM0000010394' => 'INDUAMERICA INTERNACIONAL S.A.C.',
+                'IACHEM0000007086' => 'INDUAMERICA COMERCIAL S.A.C.'
+            ];
+            if (!array_key_exists($empresa, $combo)) {
+                $empresa = 'IACHEM0000010394';
+            }
+        }
 
         $dni = DB::table('STD.TRABAJADOR')
             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
@@ -57,8 +66,8 @@ class GestionOrdenPedidoController extends Controller
 
         $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $centro_id)->first();
 
-        $cod_centro = $centro->COD_CENTRO;
-        $nom_centro = $centro->NOM_CENTRO;
+        $cod_centro = $centro ? $centro->COD_CENTRO : '';
+        $nom_centro = $centro ? $centro->NOM_CENTRO : '';
 
         $combo_sede = [];
         if ($usuario_solicita == 'ISTR000000000205') {
@@ -77,6 +86,25 @@ class GestionOrdenPedidoController extends Controller
                 ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
                 ->pluck('NOM_CENTRO', 'COD_CENTRO')
                 ->toArray();
+        } elseif ($usuario_solicita == 'IITR000000000482') {
+            // Habilitar Sedes según Empresa:
+            // INTERNACIONAL: CHICLAYO y LIMA
+            // COMERCIAL: BELLAVISTA y RIOJA
+            if ($empresa == 'IACHEM0000007086') {
+                $combo_sede = DB::table('ALM.CENTRO')
+                    ->whereIn('COD_CENTRO', ['CEN0000000000006', 'CEN0000000000004'])
+                    ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                    ->toArray();
+            } else {
+                $combo_sede = DB::table('ALM.CENTRO')
+                    ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                    ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                    ->toArray();
+            }
+            if (!array_key_exists($cod_centro, $combo_sede)) {
+                $cod_centro = key($combo_sede);
+                $nom_centro = $combo_sede[$cod_centro];
+            }
         }
 
         $tipoOrden = DB::table('WEB.TIPO_PEDIDO_ORDEN')->where('cod_estado', 1)->pluck('TXT_TIPO_PEDIDO', 'COD_TIPO_PEDIDO')->toArray();
@@ -883,7 +911,7 @@ class GestionOrdenPedidoController extends Controller
     {
         $term = $request->input('term');
         $tipo = $request->input('tipo'); // 'M' o 'S' (Material o Servicio)
-        $empresa = Session::get('empresas')->COD_EMPR;
+        $empresa = $request->input('cod_empr') ? $request->input('cod_empr') : (Session::has('empresas') ? Session::get('empresas')->COD_EMPR : '');
 
         $productos_raw = DB::select(
             "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
@@ -960,6 +988,25 @@ class GestionOrdenPedidoController extends Controller
         return response()->json([
             'success' => true,
             'tiene_almacen' => $existe
+        ]);
+    }
+
+    public function actionAjaxObtenerPeriodosEmpresa(Request $request)
+    {
+        $cod_empr = $request->input('cod_empr') ? $request->input('cod_empr') : (Session::has('empresas') ? Session::get('empresas')->COD_EMPR : '');
+        $periodo_mes = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+        $registrosPeriodos = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->get(['COD_PERIODO', 'mes']);
+
+        return response()->json([
+            'periodo_mes' => $periodo_mes,
+            'registrosPeriodos' => $registrosPeriodos
         ]);
     }
 }

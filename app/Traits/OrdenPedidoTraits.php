@@ -48,7 +48,9 @@ trait OrdenPedidoTraits
                                                                         @COD_USUARIO_REGISTRO = ?');
 
             $cod_usuario_registro = Session::get('usuario')->id;
-            $cod_empr = Session::get('empresas')->COD_EMPR;
+            if (empty($cod_empr)) {
+                $cod_empr = Session::get('empresas')->COD_EMPR;
+            }
 
 
             $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
@@ -203,7 +205,9 @@ trait OrdenPedidoTraits
                                                                         @COD_USUARIO_REGISTRO = ?');
 
             $cod_usuario_registro = Session::get('usuario')->id;
-            $cod_empr = Session::get('empresas')->COD_EMPR;
+            if (empty($cod_empr)) {
+                $cod_empr = Session::get('empresas')->COD_EMPR;
+            }
 
 
             $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
@@ -238,7 +242,9 @@ trait OrdenPedidoTraits
         $array_lista_retail = array();
 
         $cod_usuario_registro = Session::get('usuario')->id;
-        $cod_empr = Session::get('empresas')->COD_EMPR;
+        if (empty($cod_empr)) {
+            $cod_empr = Session::get('empresas')->COD_EMPR;
+        }
 
 
         $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.ORDEN_PEDIDO_LISTAR

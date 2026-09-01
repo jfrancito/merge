@@ -566,6 +566,7 @@ $(document).ready(function () {
                 return {
                     term: params.term,
                     tipo: $('#tipo_material_servicio').val(),
+                    cod_empr: $('#cod_empr').val(),
                     _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content')
                 };
             },
@@ -719,7 +720,11 @@ $(document).ready(function () {
 
         let cod_centro = $(this).val();
         let cod_empr = $('#cod_empr').val();
-        let _token = $('#token').val();
+        let _token = $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content') || $('#token').val();
+
+        if (!cod_centro || !cod_empr) {
+            return;
+        }
 
         $.ajax({
             type: "POST",
@@ -736,6 +741,86 @@ $(document).ready(function () {
                 console.error("Error al obtener correlativo:", xhr);
             }
         });
+    });
+
+    $(document).on('change', '#cod_empr', function () {
+        // Si estamos editando un pedido existente, no recalculamos sedes ni correlativo
+        if ($('#orden_pedido_id').val()) {
+            return;
+        }
+
+        let cod_empr = $(this).val();
+        let cod_solicita = $('#cod_trabajador_solicita').val();
+        let _token = $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content') || $('#token').val();
+
+        // Si es el usuario especial IITR000000000482, actualizar sedes dinámicamente
+        if (cod_solicita === 'IITR000000000482') {
+            let $selectCentro = $('#cod_centro');
+            $selectCentro.empty();
+
+            if (cod_empr === 'IACHEM0000007086') {
+                // COMERCIAL: BELLAVISTA y RIOJA
+                $selectCentro.append(new Option('BELLAVISTA', 'CEN0000000000006', true, true));
+                $selectCentro.append(new Option('RIOJA', 'CEN0000000000004', false, false));
+            } else {
+                // INTERNACIONAL: CHICLAYO y LIMA
+                $selectCentro.append(new Option('CHICLAYO', 'CEN0000000000001', true, true));
+                $selectCentro.append(new Option('LIMA', 'CEN0000000000002', false, false));
+            }
+
+            $selectCentro.trigger('change'); // Dispara el cálculo del correlativo
+        } else {
+            let cod_centro = $('#cod_centro').val();
+            if (cod_empr && cod_centro) {
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-obtener-correlativo-pedido",
+                    data: {
+                        _token: _token,
+                        cod_empr: cod_empr,
+                        cod_centro: cod_centro
+                    },
+                    success: function (res) {
+                        $('#nro_pedido').val(res);
+                    },
+                    error: function (xhr) {
+                        console.error("Error al obtener correlativo:", xhr);
+                    }
+                });
+            }
+        }
+
+        // Cargar periodos para la nueva empresa
+        if (cod_empr) {
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/ajax-obtener-periodos-empresa",
+                data: {
+                    _token: _token,
+                    cod_empr: cod_empr
+                },
+                success: function (res) {
+                    if (res.registrosPeriodos) {
+                        registrosPeriodos = res.registrosPeriodos;
+                    }
+                    if (res.periodo_mes) {
+                        let $selectPeriodo = $('#cod_periodo');
+                        $selectPeriodo.empty();
+                        $selectPeriodo.append(new Option('Seleccione Mes', ''));
+                        $.each(res.periodo_mes, function (key, text) {
+                            $selectPeriodo.append(new Option(text, key));
+                        });
+                        $selectPeriodo.trigger('change');
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Error al obtener periodos de empresa:", xhr);
+                }
+            });
+        }
+
+        // Limpiar producto seleccionado para evitar inconsistencias de empresa
+        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').val(null).trigger('change');
     });
 
     /* ===============================
