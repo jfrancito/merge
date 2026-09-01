@@ -173,14 +173,26 @@
                         EMPRESA <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        <input type="text"
-                               class="form-control control"
-                               value="{{ $listaempresa[$empresa] ?? '' }}"
-                               readonly>
-                        <input type="hidden"
-                               id="cod_empr"
-                               name="cod_empr"
-                               value="{{ $empresa }}">
+                        @if(count($listaempresa) > 1 && !isset($listaempresa['']))
+                            {!! Form::select('cod_empr', $listaempresa, $empresa, [
+                                'id' => 'cod_empr',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @elseif(count($listaempresa) > 2)
+                            {!! Form::select('cod_empr', $listaempresa, $empresa, [
+                                'id' => 'cod_empr',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @else
+                            <input type="text"
+                                   class="form-control control"
+                                   value="{{ $listaempresa[$empresa] ?? '' }}"
+                                   readonly>
+                            <input type="hidden"
+                                   id="cod_empr"
+                                   name="cod_empr"
+                                   value="{{ $empresa }}">
+                        @endif
                     </div>
                 </div>
             </div>
