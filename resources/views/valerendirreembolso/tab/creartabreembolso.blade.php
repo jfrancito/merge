@@ -120,8 +120,6 @@
 
             <div class="ajaxvacio text-center fw-bold"></div>
 
-            <input type="text" id="vale_rendir_id" hidden>
-
             <div id="vale_rendir_detalle" style="display: none;">
 
 

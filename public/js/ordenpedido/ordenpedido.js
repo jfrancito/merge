@@ -2587,7 +2587,7 @@ $(document).ready(function () {
 
     let id_consolidado_seleccionado = '';
 
-    $(document).on('click', '.fila-consolidado-generado', function () {
+    $(document).on('click dblclick', '.fila-consolidado-generado', function () {
         $('.fila-consolidado-generado').removeClass('background-fila-activa');
         $(this).addClass('background-fila-activa');
 

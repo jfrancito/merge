@@ -3,6 +3,7 @@
     <thead>
         <tr>
             <th class="col">ID</th>
+            <th class="col">Fec Emisión</th>
             <th class="col">Autoriza</th>
             <th class="col">Aprueba</th>
             <th class="col">Motivo</th>
@@ -22,6 +23,7 @@
         @foreach($listarusuarios as $index=>$item)  
         <tr class="dobleclickpc" data_vale_rendir="{{$item['ID']}}" style="cursor:pointer;">
             <td>{{$item['ID']}}</td>
+            <td>{{ !empty($item['FEC_USUARIO_CREA_AUD']) ? date('d-m-Y', strtotime($item['FEC_USUARIO_CREA_AUD'])) : '' }}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>

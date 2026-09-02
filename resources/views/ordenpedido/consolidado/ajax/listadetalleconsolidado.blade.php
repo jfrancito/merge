@@ -202,6 +202,15 @@
                             data-almacen-actual="{{ trim($item->COD_ALMACEN ?? '') }}"
                             @if($item->COD_ESTADO == 'ETM0000000000015') disabled @endif>
                         <option value="">Seleccione...</option>
+                        @if(!empty($item->almacenes))
+                            @foreach($item->almacenes as $alm)
+                                @php
+                                    $cod_alm = trim($alm->COD_ALMACEN);
+                                    $selected = ($cod_alm === trim($item->almacen_seleccionado ?? '')) ? 'selected' : '';
+                                @endphp
+                                <option value="{{ $cod_alm }}" {{ $selected }}>{{ $alm->NOM_ALMACEN }}</option>
+                            @endforeach
+                        @endif
                     </select>
                 </td>
                 <td class="text-center">{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
@@ -323,11 +332,7 @@
             });
         }
 
-        // Cargar almacenes inicialmente para cada fila
-        let table = $('#tabla-detalle-consolidado').DataTable();
-        table.rows().nodes().to$().each(function() {
-            cargarAlmacenesFila($(this));
-        });
+
 
         // Escuchar cambios en el combo de compra
         $(document).on('change', '.combo-compra', function() {

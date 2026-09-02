@@ -448,9 +448,11 @@ class ValeRendirControllerReembolso extends Controller
                 ""
             );
 
-            $cod_empr_aux = Session::get('empresas')->COD_EMPR;
+            $cod_usuario_registro_aux = Session::get('usuario')->id;
             $ultimoVale = WEBValeRendirReembolso::where('COD_EMPR', $cod_empr_aux)
-                ->orderBy('id', 'DESC')
+                ->where('COD_CENTRO', $cod_centro)
+                ->where('COD_USUARIO_CREA_AUD', $cod_usuario_registro_aux)
+                ->orderBy('FEC_USUARIO_CREA_AUD', 'DESC')
                 ->first();
 
             if (!$ultimoVale) {

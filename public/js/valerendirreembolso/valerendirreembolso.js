@@ -14,9 +14,9 @@ $(document).ready(function(){
             let tipo_pago = $('#tipo_pago').val();
             let txt_categoria_banco = $('#txt_categoria_banco').val();
             let numero_cuenta = $('#numero_cuenta').val();
-            let vale_rendir_id = $('#vale_rendir_id').val();
-
-            let opcion = !vale_rendir_id ? 'I' : 'U';
+            let textoBoton = $('#asignarvalerendir').text().trim().toUpperCase();
+            let vale_rendir_id = (textoBoton === 'MODIFICAR') ? $('#vale_rendir_id').val() : '';
+            let opcion = (vale_rendir_id && textoBoton === 'MODIFICAR') ? 'U' : 'I';
 
 
             if (!usuario_autoriza) {
@@ -544,7 +544,6 @@ $(document).ready(function(){
             e.preventDefault(); 
             let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
 
-            $('#vale_rendir_id').val(valerendir_id); 
             var _token = $('#token').val();
            
             data                        =   {
@@ -562,7 +561,6 @@ $(document).ready(function(){
             e.preventDefault(); 
             let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
 
-            $('#vale_rendir_id').val(valerendir_id); 
             var _token = $('#token').val();
            
             data                        =   {
@@ -580,7 +578,6 @@ $(document).ready(function(){
             e.preventDefault(); 
             let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
 
-            $('#vale_rendir_id').val(valerendir_id); 
             var _token = $('#token').val();
            
             data                        =   {

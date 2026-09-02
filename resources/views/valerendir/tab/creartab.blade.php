@@ -110,7 +110,6 @@
             <div class="listadetalleajax"></div>
             @include('valerendir.ajax.modalvalerendircuentabancaria')
             <div class="ajaxvacio text-center fw-bold"></div>
-            <input type="hidden" id="vale_rendir_id">
 
 
 
