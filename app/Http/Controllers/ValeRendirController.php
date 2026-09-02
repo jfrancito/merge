@@ -593,7 +593,7 @@ class ValeRendirController extends Controller
             $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
                 ->where('COD_CENTRO', $cod_centro) 
                 ->where('COD_USUARIO_CREA_AUD', $cod_usuario_registro_aux)
-                ->orderBy('id', 'DESC')
+                ->orderBy('FEC_USUARIO_CREA_AUD', 'DESC')
                 ->first();
             if (!$ultimoVale) {
                 return response()->json(['error' => 'Error al recuperar el ID del vale recién insertado.']);

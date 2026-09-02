@@ -383,6 +383,104 @@ class ConsolidadoOrdenPedidoController extends Controller
 
         $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
 
+        // Pre-cargar almacenes para cada producto y centro correspondiente
+        $groups = [];
+        foreach ($listadetalle as $item) {
+            $current_ind_compra = trim($item->IND_COMPRA ?? '');
+            $current_cod_empr   = trim($item->COD_EMPR ?? '');
+            $current_cod_centro = trim($item->COD_CENTRO ?? '');
+
+            $selected_compra = $current_ind_compra;
+            if ($selected_compra == '') {
+                if ($current_cod_empr == 'IACHEM0000007086') {
+                    $selected_compra = 'CHICLAYO';
+                } elseif ($current_cod_empr == 'IACHEM0000010394') {
+                    if ($current_cod_centro == 'CEN0000000000002') {
+                        $selected_compra = 'LIMA';
+                    } elseif ($current_cod_centro == 'CEN0000000000001') {
+                        $selected_compra = 'CHICLAYO';
+                    }
+                }
+            }
+            if ($selected_compra == '' && $cod_centro_usuario === 'CEN0000000000001') {
+                $selected_compra = 'CHICLAYO';
+            }
+
+            $target_cod_centro = '';
+            if ($selected_compra == 'CHICLAYO') {
+                $target_cod_centro = 'CEN0000000000001';
+            } elseif ($selected_compra == 'LIMA') {
+                $target_cod_centro = 'CEN0000000000002';
+            } elseif ($selected_compra == $nom_centro_usuario && $nom_centro_usuario != '') {
+                $target_cod_centro = $cod_centro_usuario;
+            } else {
+                $target_cod_centro = $cod_centro_usuario ?: 'CEN0000000000001';
+            }
+
+            $target_cod_empr = $current_cod_empr ?: $empresa_sesion->COD_EMPR;
+
+            $item->selected_compra = $selected_compra;
+            $item->target_cod_centro = $target_cod_centro;
+            $item->target_cod_empr = $target_cod_empr;
+
+            $groupKey = $target_cod_empr . '|' . $target_cod_centro;
+            $groups[$groupKey]['empresa'] = $target_cod_empr;
+            $groups[$groupKey]['centro'] = $target_cod_centro;
+            $groups[$groupKey]['productos'][] = $item->COD_PRODUCTO;
+        }
+
+        $almacenesPorGrupoYProducto = [];
+        foreach ($groups as $groupKey => $g) {
+            $conexionbd = 'sqlsrv';
+            if ($g['centro'] == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($g['centro'] == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+
+            $alms = DB::connection($conexionbd)
+                ->table('ALM.REFERENCIA_ALMACEN as RA')
+                ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
+                ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
+                ->join('ALM.CENTRO as CE', 'CE.COD_CENTRO', '=', 'AL.COD_CENTRO')
+                ->where('RA.TXT_TABLA_ASOC', 'ALM.PRODUCTO')
+                ->whereIn('RA.COD_TABLA_ASOC', array_unique($g['productos']))
+                ->where('AL.COD_EMPR', $g['empresa'])
+                ->where('CE.COD_CENTRO', $g['centro'])
+                ->where('RA.COD_ESTADO', 1)
+                ->select('RA.COD_TABLA_ASOC as COD_PRODUCTO', 'AL.COD_ALMACEN', 'AL.NOM_ALMACEN')
+                ->orderBy('AL.NOM_ALMACEN', 'asc')
+                ->get();
+
+            foreach ($alms as $alm) {
+                $almacenesPorGrupoYProducto[$groupKey][trim($alm->COD_PRODUCTO)][] = $alm;
+            }
+        }
+
+        foreach ($listadetalle as $item) {
+            $groupKey = $item->target_cod_empr . '|' . $item->target_cod_centro;
+            $prodKey = trim($item->COD_PRODUCTO);
+            $item->almacenes = $almacenesPorGrupoYProducto[$groupKey][$prodKey] ?? [];
+
+            $almacen_actual = trim($item->COD_ALMACEN ?? '');
+            $valor_seleccionado = '';
+
+            if ($almacen_actual !== '') {
+                foreach ($item->almacenes as $alm) {
+                    if (trim($alm->COD_ALMACEN) === $almacen_actual) {
+                        $valor_seleccionado = $almacen_actual;
+                        break;
+                    }
+                }
+            }
+
+            if ($valor_seleccionado === '' && count($item->almacenes) === 1) {
+                $valor_seleccionado = trim($item->almacenes[0]->COD_ALMACEN);
+            }
+
+            $item->almacen_seleccionado = $valor_seleccionado;
+        }
+
         return view('ordenpedido.consolidado.ajax.listadetalleconsolidado', [
             'listadetalle' => $listadetalle,
             'cod_centro_usuario' => $cod_centro_usuario,
