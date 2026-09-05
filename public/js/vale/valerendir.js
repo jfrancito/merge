@@ -473,7 +473,7 @@ $(document).ready(function(){
                             alertajax('Vale de rendir rechazado con éxito.');
 
                             var row = $("tr[data_vale_rendir='" + valerendir_id + "']");
-                            row.find("td").eq(7).html('<span class="badge badge-danger">RECHAZADO</span>'); 
+                            row.find("td").eq(8).html('<span class="badge badge-danger">RECHAZADO</span>'); 
                             location.reload(); 
 
                             row.find(".autorizar-valerendir").hide();
@@ -545,7 +545,7 @@ $(document).ready(function(){
 
                             
                             var row = $("tr[data_vale_rendir='" + valerendir_id + "']");
-                            row.find("td").eq(7).html('<span class="badge badge-warning">AUTORIZADO</span>'); 
+                            row.find("td").eq(8).html('<span class="badge badge-warning">AUTORIZADO</span>'); 
                            
                             location.reload(); 
 

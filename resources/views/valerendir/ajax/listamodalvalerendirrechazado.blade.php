@@ -9,6 +9,7 @@
   <thead style="background-color: #1d3a6d; color: white;">
         <tr>
             <th>ID</th>
+            <th>Fec Emisión</th>
             <th>Solicita</th>
             <th>Autoriza</th>
             <th>Aprueba</th>
@@ -25,6 +26,7 @@
      
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
+            <td>{{ !empty($item['FEC_USUARIO_CREA_AUD']) ? date('d-m-Y', strtotime($item['FEC_USUARIO_CREA_AUD'])) : '' }}</td>
             <td>{{$item['USUARIO']}}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>

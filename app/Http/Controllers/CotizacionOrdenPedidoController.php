@@ -87,7 +87,7 @@ class CotizacionOrdenPedidoController extends Controller
         $cotizaciones_a_anular = DB::table('WEB.ORDEN_COTIZACION')
             ->where('COD_ESTADO', 'ETM0000000000005') // APROBADO
             ->where('ACTIVO', 1)
-            ->whereRaw('DATEDIFF(day, FEC_COTIZACION, GETDATE()) >= 7')
+            ->whereRaw('DATEDIFF(day, FEC_USUARIO_CREA_AUD, GETDATE()) >= 7')
             ->whereRaw("ID_COTIZACION NOT IN (
                 SELECT RA.COD_TABLA 
                 FROM CMP.REFERENCIA_ASOC RA
@@ -1499,8 +1499,45 @@ class CotizacionOrdenPedidoController extends Controller
         $nuevo_txt_estado = 'APROBADO';
         $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.';
 
+        // Verificar si el pedido de servicio asociado ya fue aprobado previamente por Gerencia Administrativa (IITR000000000391) con monto mayor al límite
+        $aprobado_previamente_ger_adm = false;
+        if ($es_servicio) {
+            $pedidos_asoc = DB::table('CMP.REFERENCIA_ASOC as RA')
+                ->join('WEB.ORDEN_PEDIDO as OP', 'OP.ID_PEDIDO', '=', 'RA.COD_TABLA')
+                ->where('RA.COD_TABLA_ASOC', $id_cotizacion)
+                ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_PEDIDO')
+                ->where('OP.ACTIVO', 1)
+                ->select('OP.ID_PEDIDO', 'OP.COD_TRABAJADOR_APRUEBA_ADM', 'OP.COD_ESTADO')
+                ->get();
+
+            if ($pedidos_asoc->isNotEmpty()) {
+                $todos_aprobados_ger_adm = true;
+                $total_monto_pedidos = 0.0;
+
+                foreach ($pedidos_asoc as $ped) {
+                    $fue_aprobado_adm = (trim($ped->COD_TRABAJADOR_APRUEBA_ADM) === 'IITR000000000391' && trim($ped->COD_ESTADO) === 'ETM0000000000005');
+                    if (!$fue_aprobado_adm) {
+                        $todos_aprobados_ger_adm = false;
+                    }
+
+                    $monto_ped = (float) DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                        ->where('ID_PEDIDO', $ped->ID_PEDIDO)
+                        ->where('ACTIVO', 1)
+                        ->sum(DB::raw('CANTIDAD * ISNULL(CAN_PRECIO, 0)'));
+
+                    $total_monto_pedidos += $monto_ped;
+                }
+
+                // Si todos los pedidos asociados fueron aprobados por Gerencia Administrativa y el total superaba el límite
+                if ($todos_aprobados_ger_adm && $total_monto_pedidos > $limite) {
+                    $aprobado_previamente_ger_adm = true;
+                }
+            }
+        }
+
         // La validación de POR APROBAR GERENCIA ADMINISTRATIVA aplica ÚNICAMENTE a cotizaciones de SERVICIO
-        if ($es_servicio && $cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite) {
+        // que no hayan sido aprobadas previamente por Gerencia Administrativa con monto mayor al límite
+        if ($es_servicio && $cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite && !$aprobado_previamente_ger_adm) {
             $nuevo_cod_estado = 'ETM0000000000018';
             $nuevo_txt_estado = 'POR APROBAR GERENCIA ADMINISTRATIVA';
             if ($es_dolares) {
