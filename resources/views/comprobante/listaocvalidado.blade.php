@@ -5,6 +5,67 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
+    <style>
+        .mdi--file-excel {
+            display: inline-block;
+            width: 1.25em;
+            height: 1.25em;
+            --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm1.8 18H14l-2-3.4l-2 3.4H8.2l2.9-4.5L8.2 11H10l2 3.4l2-3.4h1.8l-2.9 4.5zM13 9V3.5L18.5 9z'/%3E%3C/svg%3E");
+            background-color: #ffffff;
+            -webkit-mask-image: var(--svg);
+            mask-image: var(--svg);
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+            vertical-align: middle;
+        }
+        .btn-excel-premium {
+            background: linear-gradient(135deg, #107c41 0%, #1f4e2e 100%) !important;
+            border: 1px solid #107c41 !important;
+            color: #ffffff !important;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(16, 124, 65, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            width: 38px;
+            margin-left: 4px;
+        }
+        .btn-excel-premium:hover, .btn-excel-premium:focus {
+            background: linear-gradient(135deg, #0c5e31 0%, #153922 100%) !important;
+            box-shadow: 0 4px 10px rgba(16, 124, 65, 0.45);
+            transform: translateY(-1px);
+            color: #ffffff !important;
+        }
+        .btn-excel-premium .tooltiptext {
+            width: auto !important;
+            white-space: nowrap !important;
+            padding: 6px 12px !important;
+            left: 50% !important;
+            top: 125% !important;
+            bottom: auto !important;
+            transform: translateX(-50%) !important;
+            margin-left: 0 !important;
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            border-radius: 4px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+            line-height: 1.2 !important;
+            letter-spacing: 0.3px;
+        }
+        .btn-excel-premium .tooltiptext::after {
+            top: auto !important;
+            bottom: 100% !important;
+            left: 50% !important;
+            margin-left: -5px !important;
+            border-color: transparent transparent #1f2937 transparent !important;
+        }
+    </style>
 @stop
 @section('section')
   <div class="be-content contenido cfedocumento">
@@ -22,11 +83,34 @@
                             <span class="icon mdi mdi-search"></span>
                           </a>
 
+                          <a href="{{url('/gestion-de-oc-validado-excel-detallado')}}" 
+                             onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), f=$('#filtrofecha_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+f+'/'+id; return true;"
+                             class='btn btn-excel-premium tooltipcss opciones'
+                             target="_blank"
+                             id="descargargestionocvalidadoexceldetallado" 
+                             data-href="{{url('/gestion-de-oc-validado-excel-detallado')}}"
+                             title="Descargar excel detallado">
+                             <span class="tooltiptext">Descargar excel detallado</span>
+                             <span class="icon mdi--file-excel"></span>
+                          </a>
+
                           <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
 
                           <ul class="dropdown-menu" aria-labelledby="menudespacho"
                               style="margin: 7px -169px 0;">
+                              <li>
+                                  <a href="{{url('/gestion-de-oc-validado-excel-detallado')}}" 
+                                     onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), f=$('#filtrofecha_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+f+'/'+id; return true;"
+                                     class='btn btn-secondary botoncabecera tooltipcss opciones'
+                                     target="_blank"
+                                     id="descargargestionocvalidadoexceldetalladomenu" 
+                                     data-href="{{url('/gestion-de-oc-validado-excel-detallado')}}"
+                                     title="Descargar excel Detallado" style="width:100%">
+                                     <span class="tooltiptext">Descargar excel Detallado</span>
+                                     Descargar excel Detallado
+                                  </a>
+                              </li>
                               <li>
                                   <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
                                      onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"

@@ -41,6 +41,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use Hashids;
 use SplFileInfo;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GestionOCValidadoController extends Controller
 {
@@ -563,6 +564,56 @@ class GestionOCValidadoController extends Controller
                             'operacion_id'            =>  $operacion_id,
                             'funcion'               =>  $funcion
                          ]);
+    }
+
+    public function actionGestionOCValidadoExcelDetallado($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $filtrofecha_id, $idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_actual   =   date("Y-m-d");
+        $titulo         =   'OC-Validado-Detallado-'.$operacion_id;
+        $funcion        =   $this;
+
+        if($operacion_id == 'ORDEN_COMPRA'){
+            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+        } else {
+            if($operacion_id == 'ORDEN_COMPRA_ANTICIPO' || $operacion_id == 'CONTRATO_ANTICIPO'){
+                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+            } else {
+                if($operacion_id == 'CONTRATO'){
+                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                } else {
+                    if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO'){
+                        $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                    } else {
+                        if($operacion_id == 'NOTA_CREDITO'){
+                            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_credito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                        } else {
+                            if($operacion_id == 'NOTA_DEBITO'){
+                                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                            } else {
+                                if($operacion_id == 'PROVISION_GASTO'){
+                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                                } else {
+                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos, $titulo, $funcion, $operacion_id) {
+            $excel->sheet('OC DETALLADO', function($sheet) use ($listadatos, $titulo, $funcion, $operacion_id) {
+                $sheet->loadView('reporte/excel/listagestionocvalidadoexceldetallado')
+                      ->with('listadatos', $listadatos)
+                      ->with('titulo', $titulo)
+                      ->with('operacion_id', $operacion_id)
+                      ->with('funcion', $funcion);
+            });
+        })->export('xls');
     }
 
 
