@@ -18,7 +18,14 @@ var App = (function () {
         $("#nso").dataTable({
             dom: 'Bfrtip',
             buttons: [
-                'csv', 'excel', 'pdf'
+                'csv',
+                {
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: ':not(:last-child)'
+                    }
+                },
+                'pdf'
             ],
             "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]],
             columnDefs: [{
