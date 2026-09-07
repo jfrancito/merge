@@ -189,42 +189,42 @@
                                 Cierres de Corte de Integración y Aprobación
                             </h3>
                             <p class="m-0 small" style="color: #cbd5e1 !important; font-size: 13px; margin-top: 2px;">
-                                Fechas límites para documentación de compras
+                                Fechas límites para documentación de compras y Rendición de gastos
                             </p>
                         </div>
                     </div>
-                    <button type="button" class="close text-white d-none d-sm-block" data-dismiss="modal" aria-label="Close" style="opacity: 0.85; text-shadow: none; font-size: 28px; outline: none; margin-top: -10px;">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn btn-warning btn-sm font-weight-bold" data-dismiss="modal" style="border-radius: 8px; padding: 8px 18px; font-weight: 800; font-size: 13px; color: #1e293b; background: #fbbf24; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer;">
+                        ENTENDIDO <i class="fa fa-times ml-1"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Body -->
-            <div class="modal-body p-4" style="background: #f8fafc;">
+            <div class="modal-body p-4" style="background: #f8fafc; padding: 26px 28px !important;">
                 
                 <!-- Info banner -->
-                <div class="alert-cierre-intro mb-3">
+                <div class="alert-cierre-intro mb-4" style="margin-bottom: 22px !important;">
                     <div class="d-flex align-items-start" style="gap: 12px;">
                         <i class="fa fa-info-circle text-primary mt-1" style="font-size: 20px; min-width: 20px;"></i>
                         <div style="font-size: 13.5px; color: #334155; line-height: 1.55;">
-                            Estimado usuario, se hace de su conocimiento los días de <strong>cierre de corte de integración</strong> y de <strong>aprobación de documentación de compras</strong> para los meses próximos:
+                            Estimado usuario, se hace de su conocimiento los días de <strong>cierre de corte de integración</strong> y de <strong>aprobación de documentación de compras y rendición de gastos</strong> para los meses próximos:
                         </div>
                     </div>
                 </div>
 
                 <!-- Grid of dates -->
-                <div class="row" style="margin-left: -8px; margin-right: -8px;">
+                <div class="row" style="margin-left: -10px; margin-right: -10px; margin-bottom: 18px;">
                     @foreach($cierres_mostrar as $cierre)
-                    <div class="{{ count($cierres_mostrar) == 1 ? 'col-md-12 col-sm-12 col-xs-12' : 'col-md-6 col-sm-6 col-xs-12' }} mb-3" style="padding-left: 8px; padding-right: 8px;">
+                    <div class="{{ count($cierres_mostrar) == 1 ? 'col-md-12 col-sm-12 col-xs-12' : 'col-md-6 col-sm-6 col-xs-12' }} mb-3" style="padding-left: 10px; padding-right: 10px; margin-bottom: 14px;">
                         <div class="cierre-card {{ $cierre['border'] }}">
                             <div class="cierre-card-header">
                                 <div class="cierre-month">
-                                    <i class="fa fa-calendar-o mr-2" style="color: {{ $cierre['text_color'] }};"></i>
+                                    <i class="fa fa-calendar-o mr-2" style="color: {{ $cierre['text_color'] }}; font-size: 15px;"></i>
                                     <span>{{ $cierre['mes'] }}</span>
                                 </div>
                                 <span class="cierre-badge-year">{{ $cierre['anio'] }}</span>
                             </div>
-                            <div class="cierre-card-body">
+                            <div class="cierre-card-body" style="margin-top: 8px;">
                                 <div class="cierre-date-label">Fecha de corte:</div>
                                 <div class="cierre-date-value">
                                     <i class="fa fa-clock-o mr-1" style="color: {{ $cierre['text_color'] }};"></i> {{ $cierre['fecha'] }}
@@ -236,18 +236,19 @@
                 </div>
 
                 <!-- Callout warning -->
-                <div class="warning-cierre-box mt-1">
+                <div class="warning-cierre-box" style="margin-top: 8px; margin-bottom: 8px;">
                     <i class="fa fa-exclamation-triangle" style="font-size: 18px; color: #d97706; margin-right: 10px; min-width: 18px;"></i>
                     <span style="font-size: 12.5px; color: #92400e; line-height: 1.45;">
-                        <strong>Recomendación:</strong> Por favor gestionar y aprobar todos sus comprobantes y liquidaciones antes de cada fecha de corte para evitar observaciones o retrasos en los procesos administrativos.
+                        <strong>Recomendación:</strong> Por favor gestionar y aprobar todos sus comprobantes y liquidaciones de gastos antes de cada fecha de corte para evitar observaciones o retrasos en los procesos contables.
                     </span>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="modal-footer border-0 p-3 bg-white" style="text-align: center; display: flex; justify-content: center;">
-                <button type="button" class="btn btn-cierre-action px-5 py-2" data-dismiss="modal" style="min-width: 220px;">
-                    <i class="fa fa-check-circle mr-1"></i> ENTENDIDO, CONTINUAR
+            <!-- Footer con Botón Extra Grande -->
+            <div class="modal-footer border-0 bg-white" style="text-align: center; display: flex; justify-content: center; padding: 20px 28px 28px 28px !important;">
+                <button type="button" class="btn btn-cierre-action-lg w-100 py-3" data-dismiss="modal">
+                    <span><i class="fa fa-check-circle mr-2" style="font-size: 22px; vertical-align: middle;"></i> ENTENDIDO, CONTINUAR AL SISTEMA</span>
+                    <i class="fa fa-arrow-right ml-2 animate-bounce-right" style="font-size: 20px;"></i>
                 </button>
             </div>
         </div>
@@ -292,14 +293,14 @@
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 12px 16px;
+        padding: 15px 18px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .cierre-card {
         background: #ffffff;
         border-radius: 12px;
-        padding: 14px 16px;
+        padding: 16px 18px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         transition: transform 0.2s, box-shadow 0.2s;
@@ -352,7 +353,7 @@
         font-size: 18px;
         font-weight: 800;
         color: #0f172a;
-        margin-top: 2px;
+        margin-top: 3px;
         letter-spacing: -0.3px;
     }
 
@@ -360,31 +361,47 @@
         background: #fffbeb;
         border: 1px solid #fef3c7;
         border-radius: 10px;
-        padding: 12px 16px;
+        padding: 14px 18px;
         display: flex;
         align-items: center;
     }
 
-    .btn-cierre-action {
-        background: linear-gradient(135deg, #1d3a6d 0%, #2563eb 100%);
-        color: #ffffff !important;
-        border: none;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-        transition: all 0.2s ease;
-        cursor: pointer;
+    .btn-cierre-action-lg {
+        background: linear-gradient(135deg, #ffca28 0%, #ffa000 100%) !important;
+        color: #1e293b !important;
+        border: none !important;
+        border-radius: 14px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.8px !important;
+        font-size: 18px !important;
+        box-shadow: 0 10px 22px -5px rgba(255, 160, 0, 0.5) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        text-transform: uppercase !important;
+        padding: 18px 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        cursor: pointer !important;
     }
-    .btn-cierre-action:hover {
-        background: linear-gradient(135deg, #162b50 0%, #1d4ed8 100%);
-        transform: translateY(-1.5px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
-        color: #ffffff !important;
+    .btn-cierre-action-lg:hover {
+        background: linear-gradient(135deg, #ffd54f 0%, #ff8f00 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 15px 30px -5px rgba(255, 160, 0, 0.65) !important;
+        color: #000000 !important;
     }
-    .btn-cierre-action:active {
-        transform: translateY(0);
+    .btn-cierre-action-lg:active {
+        transform: translateY(0) !important;
+    }
+
+    .animate-bounce-right {
+        display: inline-block;
+        animation: bounce-right 1s infinite;
+    }
+    
+    @keyframes bounce-right {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(5px); }
     }
 
     @media (max-width: 768px) {
@@ -392,11 +409,18 @@
             max-width: 95% !important;
             margin: 10px auto !important;
         }
+        .modal-body {
+            padding: 16px 14px !important;
+        }
         .modal-header h3 {
             font-size: 16px !important;
         }
         .cierre-date-value {
             font-size: 16px !important;
+        }
+        .btn-cierre-action-lg {
+            font-size: 15px !important;
+            padding: 14px 16px !important;
         }
     }
 </style>
