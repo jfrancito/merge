@@ -212,6 +212,23 @@
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/entregabledetraccion.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/entregabledetraccion.js?v='.$version.'.'.time()) }}" type="text/javascript"></script>
+
+  {{-- Solo para gestion-de-pago-detracciones: quitar blur al abrir el modal --}}
+  <style>
+    .modal-open-blur .main-content,
+    .modal-open-blur .be-top-header,
+    .modal-open-blur .be-left-sidebar {
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+  </style>
+  <script>
+    // Solo para gestion-de-pago-detracciones: evitar blur al abrir modal
+    $(document).on('show', '.modal-container', function() {
+        $('.be-wrapper').removeClass('modal-open-blur');
+        $('body').removeClass('modal-open-blur');
+    });
+  </script>
 
 @stop

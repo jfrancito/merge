@@ -223,7 +223,6 @@ function ajax_normal_guardar_lista(data,link,btnclick) {
 
 
 function ajax_modal(data,link,modal,contenedor_ajax) {
-    debugger;
     abrircargando();
 
     $.ajax({
@@ -233,7 +232,7 @@ function ajax_modal(data,link,modal,contenedor_ajax) {
         success: function (data) {
             cerrarcargando();
             $('.'+contenedor_ajax).html(data);
-            $('#'+modal).niftyModal();
+            $('#'+modal).niftyModal('show');
 
         },
         error: function (data) {
