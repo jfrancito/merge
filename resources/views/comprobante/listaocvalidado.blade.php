@@ -100,18 +100,6 @@
                           <ul class="dropdown-menu" aria-labelledby="menudespacho"
                               style="margin: 7px -169px 0;">
                               <li>
-                                  <a href="{{url('/gestion-de-oc-validado-excel-detallado')}}" 
-                                     onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), f=$('#filtrofecha_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+f+'/'+id; return true;"
-                                     class='btn btn-secondary botoncabecera tooltipcss opciones'
-                                     target="_blank"
-                                     id="descargargestionocvalidadoexceldetalladomenu" 
-                                     data-href="{{url('/gestion-de-oc-validado-excel-detallado')}}"
-                                     title="Descargar excel Detallado" style="width:100%">
-                                     <span class="tooltiptext">Descargar excel Detallado</span>
-                                     Descargar excel Detallado
-                                  </a>
-                              </li>
-                              <li>
                                   <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
                                      onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
                                      class='btn btn-secondary botoncabecera tooltipcss opciones'
