@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/jquery-confirm.min.css') }} "/>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/style.css?v='.$version) }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/css/meta.css?v='.$version) }} "/>
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/css/meta.css?v='.$version.'.'.time()) }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/ugel.css?v='.$version) }} " />
 
     <style type="text/css">
@@ -108,7 +108,7 @@
     <script src="{{ asset('public/lib/scroll/js/jquery-scrollpanel-0.7.0.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/scroll/js/scroll.js') }}" type="text/javascript"></script>   
     <script src="{{ asset('public/js/general/general.js?v='.$version) }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/general/gmeta.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/gmeta.js?v='.$version.'.'.time()) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/jquery-confirm.min.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/comprobante/datospc.js?v='.$version) }}" type="text/javascript"></script>
 

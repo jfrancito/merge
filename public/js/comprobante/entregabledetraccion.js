@@ -64,7 +64,6 @@ $(document).ready(function(){
         if (isChecked) {
             alerterrorajax("Tiene que liberar del folio");
         } else {
-            debugger;
             data                        =   {
                                                 _token                  : _token,
                                                 prefijo_id              : prefijo_id,
@@ -213,6 +212,7 @@ $(document).ready(function(){
 
 
     $(".cfedocumento").on('click','.loteentregable', function(e) {
+        e.preventDefault();
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
         data                        =   {
@@ -365,8 +365,6 @@ $(document).ready(function(){
         var operacion_id         =   $('#operacion_id').val();
         var idopcion             =   $('#idopcion').val();
         var _token               =   $('#token').val();
-
-        debugger;
 
         href = $(this).attr('data-href')+'/'+operacion_id+'/'+idopcion;
         $(this).prop('href', href);
