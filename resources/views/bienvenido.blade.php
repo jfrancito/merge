@@ -193,38 +193,38 @@
                             </p>
                         </div>
                     </div>
-                    <button type="button" class="close text-white d-none d-sm-block" data-dismiss="modal" aria-label="Close" style="opacity: 0.85; text-shadow: none; font-size: 28px; outline: none; margin-top: -10px;">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn btn-light btn-sm font-weight-bold d-none d-sm-inline-flex" data-dismiss="modal" style="border-radius: 8px; padding: 7px 15px; font-size: 13px; font-weight: 700; color: #1e3a8a; background: #ffffff; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.15); cursor: pointer; align-items: center; gap: 6px;">
+                        <span>CERRAR</span> <i class="fa fa-times"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Body -->
-            <div class="modal-body p-4" style="background: #f8fafc;">
+            <div class="modal-body p-4 p-md-5" style="background: #f8fafc; padding: 28px 30px !important;">
                 
                 <!-- Info banner -->
-                <div class="alert-cierre-intro mb-3">
-                    <div class="d-flex align-items-start" style="gap: 12px;">
-                        <i class="fa fa-info-circle text-primary mt-1" style="font-size: 20px; min-width: 20px;"></i>
-                        <div style="font-size: 13.5px; color: #334155; line-height: 1.55;">
+                <div class="alert-cierre-intro mb-4" style="margin-bottom: 24px !important;">
+                    <div class="d-flex align-items-start" style="gap: 14px;">
+                        <i class="fa fa-info-circle text-primary mt-1" style="font-size: 22px; min-width: 22px;"></i>
+                        <div style="font-size: 14px; color: #334155; line-height: 1.6;">
                             Estimado usuario, se hace de su conocimiento los días de <strong>cierre de corte de integración</strong> y de <strong>aprobación de documentación de compras</strong> para los meses próximos:
                         </div>
                     </div>
                 </div>
 
                 <!-- Grid of dates -->
-                <div class="row" style="margin-left: -8px; margin-right: -8px;">
+                <div class="row" style="margin-left: -10px; margin-right: -10px; margin-bottom: 20px;">
                     @foreach($cierres_mostrar as $cierre)
-                    <div class="{{ count($cierres_mostrar) == 1 ? 'col-md-12 col-sm-12 col-xs-12' : 'col-md-6 col-sm-6 col-xs-12' }} mb-3" style="padding-left: 8px; padding-right: 8px;">
+                    <div class="{{ count($cierres_mostrar) == 1 ? 'col-md-12 col-sm-12 col-xs-12' : 'col-md-6 col-sm-6 col-xs-12' }} mb-3" style="padding-left: 10px; padding-right: 10px; margin-bottom: 16px;">
                         <div class="cierre-card {{ $cierre['border'] }}">
                             <div class="cierre-card-header">
                                 <div class="cierre-month">
-                                    <i class="fa fa-calendar-o mr-2" style="color: {{ $cierre['text_color'] }};"></i>
+                                    <i class="fa fa-calendar-o mr-2" style="color: {{ $cierre['text_color'] }}; font-size: 16px;"></i>
                                     <span>{{ $cierre['mes'] }}</span>
                                 </div>
                                 <span class="cierre-badge-year">{{ $cierre['anio'] }}</span>
                             </div>
-                            <div class="cierre-card-body">
+                            <div class="cierre-card-body" style="margin-top: 10px;">
                                 <div class="cierre-date-label">Fecha de corte:</div>
                                 <div class="cierre-date-value">
                                     <i class="fa fa-clock-o mr-1" style="color: {{ $cierre['text_color'] }};"></i> {{ $cierre['fecha'] }}
@@ -236,18 +236,19 @@
                 </div>
 
                 <!-- Callout warning -->
-                <div class="warning-cierre-box mt-1">
-                    <i class="fa fa-exclamation-triangle" style="font-size: 18px; color: #d97706; margin-right: 10px; min-width: 18px;"></i>
-                    <span style="font-size: 12.5px; color: #92400e; line-height: 1.45;">
-                        <strong>Recomendación:</strong> Por favor gestionar y aprobar todos sus comprobantes y liquidaciones antes de cada fecha de corte para evitar observaciones o retrasos en los procesos administrativos.
+                <div class="warning-cierre-box" style="margin-top: 10px; margin-bottom: 10px;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 20px; color: #d97706; margin-right: 12px; min-width: 20px;"></i>
+                    <span style="font-size: 13px; color: #92400e; line-height: 1.55;">
+                        <strong>Recomendación:</strong> Por favor gestionar y aprobar todos sus comprobantes y liquidaciones antes de cada fecha de corte para evitar observaciones o retrasos en los procesos contables.
                     </span>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="modal-footer border-0 p-3 bg-white" style="text-align: center; display: flex; justify-content: center;">
-                <button type="button" class="btn btn-cierre-action px-5 py-2" data-dismiss="modal" style="min-width: 220px;">
-                    <i class="fa fa-check-circle mr-1"></i> ENTENDIDO, CONTINUAR
+            <!-- Footer con Botón Grande -->
+            <div class="modal-footer border-0 bg-white" style="text-align: center; display: flex; justify-content: center; padding: 20px 30px 28px 30px !important;">
+                <button type="button" class="btn btn-cierre-action-lg w-100 py-3" data-dismiss="modal">
+                    <span><i class="fa fa-check-circle mr-2" style="font-size: 20px; vertical-align: middle;"></i> ENTENDIDO, CONTINUAR AL SISTEMA</span>
+                    <i class="fa fa-arrow-right ml-2 animate-bounce-right"></i>
                 </button>
             </div>
         </div>
@@ -256,7 +257,7 @@
 
 <style>
     .responsive-modal-cierre {
-        max-width: 720px;
+        max-width: 740px;
         margin: 2rem auto;
     }
 
@@ -265,8 +266,8 @@
     }
 
     .icon-cierre-header {
-        width: 46px;
-        height: 46px;
+        width: 48px;
+        height: 48px;
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.12);
         display: flex;
@@ -291,22 +292,22 @@
     .alert-cierre-intro {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 12px 16px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        border-radius: 14px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
 
     .cierre-card {
         background: #ffffff;
-        border-radius: 12px;
-        padding: 14px 16px;
+        border-radius: 14px;
+        padding: 18px 20px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     .cierre-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 14px rgba(0,0,0,0.07);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.07);
     }
 
     .border-left-blue { border-left: 5px solid #2563eb !important; }
@@ -318,14 +319,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
-        padding-bottom: 6px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
         border-bottom: 1px dashed #e2e8f0;
     }
 
     .cierre-month {
         font-weight: 700;
-        font-size: 14px;
+        font-size: 14.5px;
         color: #1e293b;
         display: flex;
         align-items: center;
@@ -336,7 +337,7 @@
         color: #64748b;
         font-size: 11px;
         font-weight: 600;
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: 6px;
     }
 
@@ -349,42 +350,58 @@
     }
 
     .cierre-date-value {
-        font-size: 18px;
+        font-size: 19px;
         font-weight: 800;
         color: #0f172a;
-        margin-top: 2px;
+        margin-top: 4px;
         letter-spacing: -0.3px;
     }
 
     .warning-cierre-box {
         background: #fffbeb;
         border: 1px solid #fef3c7;
-        border-radius: 10px;
-        padding: 12px 16px;
+        border-radius: 12px;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
     }
 
-    .btn-cierre-action {
-        background: linear-gradient(135deg, #1d3a6d 0%, #2563eb 100%);
+    .btn-cierre-action-lg {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
         color: #ffffff !important;
         border: none;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
+        border-radius: 14px;
+        font-weight: 800;
         letter-spacing: 0.5px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-        transition: all 0.2s ease;
+        font-size: 16px;
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.45);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-transform: uppercase;
+        padding: 16px 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
         cursor: pointer;
     }
-    .btn-cierre-action:hover {
-        background: linear-gradient(135deg, #162b50 0%, #1d4ed8 100%);
-        transform: translateY(-1.5px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    .btn-cierre-action-lg:hover {
+        background: linear-gradient(135deg, #172554 0%, #1d4ed8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.55);
         color: #ffffff !important;
     }
-    .btn-cierre-action:active {
+    .btn-cierre-action-lg:active {
         transform: translateY(0);
+    }
+
+    .animate-bounce-right {
+        display: inline-block;
+        animation: bounce-right 1s infinite;
+    }
+    
+    @keyframes bounce-right {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(5px); }
     }
 
     @media (max-width: 768px) {
@@ -392,11 +409,18 @@
             max-width: 95% !important;
             margin: 10px auto !important;
         }
+        .modal-body {
+            padding: 18px 15px !important;
+        }
         .modal-header h3 {
             font-size: 16px !important;
         }
         .cierre-date-value {
-            font-size: 16px !important;
+            font-size: 17px !important;
+        }
+        .btn-cierre-action-lg {
+            font-size: 14px !important;
+            padding: 13px 15px !important;
         }
     }
 </style>
