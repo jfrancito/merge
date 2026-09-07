@@ -121,339 +121,286 @@
 
   	@include('usuario.modal.musuario')
 
-@if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
-<!-- Modal de Aviso Importante - Ultra Professional Edition (EXACT TEXT) -->
-<!-- <div class="modal fade" id="modalAnuncioImportante" tabindex="-1" role="dialog" aria-labelledby="modalAnuncioImportanteLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
-    <div class="modal-dialog modal-lg modal-dialog-centered responsive-modal-width" role="document">
-        <div class="modal-content shadow-premium border-0" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
+@php
+    $fechas_cierre = [
+        [
+            'mes' => 'SETIEMBRE',
+            'anio' => '2026',
+            'fecha' => '30/09/2026',
+            'fecha_comparar' => '2026-09-30',
+            'border' => 'border-left-blue',
+            'text_color' => '#2563eb'
+        ],
+        [
+            'mes' => 'OCTUBRE',
+            'anio' => '2026',
+            'fecha' => '31/10/2026',
+            'fecha_comparar' => '2026-10-31',
+            'border' => 'border-left-indigo',
+            'text_color' => '#4f46e5'
+        ],
+        [
+            'mes' => 'NOVIEMBRE',
+            'anio' => '2026',
+            'fecha' => '30/11/2026',
+            'fecha_comparar' => '2026-11-30',
+            'border' => 'border-left-purple',
+            'text_color' => '#7c3aed'
+        ],
+        [
+            'mes' => 'DICIEMBRE',
+            'anio' => '2026',
+            'fecha' => '02/01/2026',
+            'fecha_comparar' => '2027-01-02',
+            'border' => 'border-left-emerald',
+            'text_color' => '#059669'
+        ],
+    ];
+
+    $hoy = date('Y-m-d');
+    $limite_pasado = date('Y-m-d', strtotime('-2 days'));
+
+    $cierres_mostrar = [];
+    foreach ($fechas_cierre as $item) {
+        if ($item['fecha_comparar'] >= $limite_pasado) {
+            $cierres_mostrar[] = $item;
+        }
+    }
+    // Tomar los 2 meses más próximos
+    $cierres_mostrar = array_slice($cierres_mostrar, 0, 2);
+@endphp
+
+@if(trim(Session::get('usuario')->rol_id) != '1CIX00000024' && count($cierres_mostrar) > 0)
+<!-- Modal de Aviso de Cierres de Corte de Integración y Aprobación de Documentación de Compras -->
+<div class="modal fade" id="modalAvisoCierre" tabindex="-1" role="dialog" aria-labelledby="modalAvisoCierreLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg modal-dialog-centered responsive-modal-cierre" role="document">
+        <div class="modal-content shadow-cierre border-0" style="border-radius: 18px; overflow: hidden; background: #ffffff;">
             
-            <div class="modal-header header-gradient text-white p-4" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: none;">
+            <!-- Header -->
+            <div class="modal-header header-cierre text-white p-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%); border: none; position: relative;">
                 <div class="d-flex align-items-center w-100 justify-content-between">
-                    <div>
-                        <h3 class="m-0 font-weight-bold" style="font-size: 18px; letter-spacing: -0.5px; color: #ffffff !important;">Nueva Funcionalidad: Planilla de Movilidad</h3>
-                        <p class="m-0 small opacity-80" style="color: #ffffff !important; opacity: 0.9 !important;">Integración con Liquidación de Gastos</p>
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="icon-cierre-header">
+                            <i class="fa fa-calendar-check-o" style="color: #fbbf24;"></i>
+                        </div>
+                        <div>
+                            <span class="badge-aviso-tag">COMUNICADO OFICIAL</span>
+                            <h3 class="m-0 font-weight-bold" style="font-size: 18px; letter-spacing: -0.3px; color: #ffffff !important; margin-top: 4px;">
+                                Cierres de Corte de Integración y Aprobación
+                            </h3>
+                            <p class="m-0 small" style="color: #cbd5e1 !important; font-size: 13px; margin-top: 2px;">
+                                Fechas límites para documentación de compras
+                            </p>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-warning btn-sm font-weight-bold d-none d-sm-block" data-dismiss="modal" style="border-radius: 8px; padding: 8px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-                        ENTENDIDO <i class="fa fa-times ml-1"></i>
+                    <button type="button" class="close text-white d-none d-sm-block" data-dismiss="modal" aria-label="Close" style="opacity: 0.85; text-shadow: none; font-size: 28px; outline: none; margin-top: -10px;">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             </div>
 
-
-            <div class="modal-body p-0" style="background: #fafbfc;">
+            <!-- Body -->
+            <div class="modal-body p-4" style="background: #f8fafc;">
                 
-
-                <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
-                    <video id="videoAnuncio" controls playsinline webkit-playsinline preload="metadata" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
-                        <source src="{{ asset('public/videos/video_planilla.mp4') }}" type="video/mp4">
-                        Tu navegador no soporta la reproducción de videos.
-                    </video>
-                </div>
-
-                <div class="px-5 py-4 responsive-px">
-                    <div class="premium-card border-accent-blue" style="border-top: 4px solid #3b82f6; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                        <h5 class="font-weight-bold text-dark mb-2" style="display: flex; align-items: center; font-size: 16px;">
-                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-right: 12px;"></span>
-                            ¿De qué trata esta actualización?
-                        </h5>
-                        <p class="text-muted text-justify" style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 0;">
-                            <b>COMUNICADO:</b> Las planillas de movilidad generadas desde el <b>1ero de Abril del 2026</b> se integrarán automáticamente a tus <b>Liquidaciones de Gastos</b>. Este proceso brinda mayor precisión y rapidez en tus trámites.
-                        </p>
-                        
-                        <div class="mt-3 p-3 rounded" style="background: #fff9c4; border: 1px solid #fff59d; color: #827717; font-size: 13px; display: flex; align-items: center;">
-                            <i class="fa fa-lightbulb-o mr-2" style="font-size: 18px;"></i>
-                            <span><b>Tip:</b> Mira el video completo para aprender a utilizar esta herramienta.</span>
+                <!-- Info banner -->
+                <div class="alert-cierre-intro mb-3">
+                    <div class="d-flex align-items-start" style="gap: 12px;">
+                        <i class="fa fa-info-circle text-primary mt-1" style="font-size: 20px; min-width: 20px;"></i>
+                        <div style="font-size: 13.5px; color: #334155; line-height: 1.55;">
+                            Estimado usuario, se hace de su conocimiento los días de <strong>cierre de corte de integración</strong> y de <strong>aprobación de documentación de compras</strong> para los meses próximos:
                         </div>
                     </div>
                 </div>
+
+                <!-- Grid of dates -->
+                <div class="row" style="margin-left: -8px; margin-right: -8px;">
+                    @foreach($cierres_mostrar as $cierre)
+                    <div class="{{ count($cierres_mostrar) == 1 ? 'col-md-12 col-sm-12 col-xs-12' : 'col-md-6 col-sm-6 col-xs-12' }} mb-3" style="padding-left: 8px; padding-right: 8px;">
+                        <div class="cierre-card {{ $cierre['border'] }}">
+                            <div class="cierre-card-header">
+                                <div class="cierre-month">
+                                    <i class="fa fa-calendar-o mr-2" style="color: {{ $cierre['text_color'] }};"></i>
+                                    <span>{{ $cierre['mes'] }}</span>
+                                </div>
+                                <span class="cierre-badge-year">{{ $cierre['anio'] }}</span>
+                            </div>
+                            <div class="cierre-card-body">
+                                <div class="cierre-date-label">Fecha de corte:</div>
+                                <div class="cierre-date-value">
+                                    <i class="fa fa-clock-o mr-1" style="color: {{ $cierre['text_color'] }};"></i> {{ $cierre['fecha'] }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- Callout warning -->
+                <div class="warning-cierre-box mt-1">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 18px; color: #d97706; margin-right: 10px; min-width: 18px;"></i>
+                    <span style="font-size: 12.5px; color: #92400e; line-height: 1.45;">
+                        <strong>Recomendación:</strong> Por favor gestionar y aprobar todos sus comprobantes y liquidaciones antes de cada fecha de corte para evitar observaciones o retrasos en los procesos administrativos.
+                    </span>
+                </div>
             </div>
 
-            <div class="modal-footer border-0 p-4 bg-white">
-                <button type="button" class="btn btn-warning-premium w-100 py-3" data-dismiss="modal">
-                    <span>ENTENDIDO, IR AL SISTEMA</span>
-                    <i class="fa fa-arrow-right ml-2 animate-bounce-right"></i>
+            <!-- Footer -->
+            <div class="modal-footer border-0 p-3 bg-white" style="text-align: center; display: flex; justify-content: center;">
+                <button type="button" class="btn btn-cierre-action px-5 py-2" data-dismiss="modal" style="min-width: 220px;">
+                    <i class="fa fa-check-circle mr-1"></i> ENTENDIDO, CONTINUAR
                 </button>
             </div>
         </div>
     </div>
-</div>  -->
-
+</div>
 
 <style>
-    /* Premium Design Tokens */
-    .header-gradient {
-        position: relative;
-        overflow: hidden;
+    .responsive-modal-cierre {
+        max-width: 720px;
+        margin: 2rem auto;
     }
-    .header-gradient::after {
-        content: "";
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 50%;
+
+    .shadow-cierre {
+        box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35);
     }
-    
-    .icon-box-header {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.1);
+
+    .icon-cierre-header {
+        width: 46px;
+        height: 46px;
         border-radius: 12px;
+        background: rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
-        backdrop-filter: blur(5px);
-    }
-    
-    .shadow-premium {
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-    
-    .alert-soft-indigo {
-        background-color: #f0f4ff;
-        border: 1px solid #d9e2ff;
-        color: #3f51b5;
-        border-radius: 12px;
-    }
-    
-    .premium-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-        transition: transform 0.2s, box-shadow 0.2s;
-        margin-bottom: 10px;
-    }
-    .premium-card:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .card-title-group {
-        display: flex;
-        align-items: center;
-    }
-    .dot-indicator {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 12px;
-    }
-    
-    .bg-blue { background-color: #3b82f6; }
-    .bg-amber { background-color: #f59e0b; }
-    .bg-emerald { background-color: #10b981; }
-    .bg-indigo { background-color: #6366f1; }
-    
-    .border-accent-blue { border-top: 4px solid #3b82f6; }
-    .border-accent-amber { border-top: 4px solid #f59e0b; }
-    .border-accent-emerald { border-top: 4px solid #10b981; }
-    .border-accent-indigo { border-top: 4px solid #6366f1; }
-    
-    .card-content p {
-        font-size: 14.5px;
-        color: #475569;
-        line-height: 1.6;
-        margin-bottom: 0;
-    }
-    
-    .time-list {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0;
-    }
-    .time-list li {
-        font-size: 14px;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-    }
-    .time-list li i { margin-right: 10px; font-size: 12px; }
-    
-    .exception-box {
-        background: #fff;
-        border: 1px solid #3b82f620;
-        padding: 10px;
-        border-radius: 8px;
-    }
-    .text-blue { color: #2563eb; }
-    
-    .day-badge {
-        padding: 6px 16px;
-        background: #fff8e1;
-        border: 1px solid #ffe082;
-        color: #ef6c00;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-    
-    .small-reason {
-        font-size: 12px;
-        color: #64748b;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 4px;
-    }
-    .small-reason::before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: #f59e0b;
-    }
-    
-    .warning-modern {
-        background: #fff1f2;
-        padding: 12px;
-        border-radius: 10px;
-        font-size: 13px;
-        color: #991b1b;
-        display: flex;
-        align-items: center;
-        border: 1px solid #fecaca;
-    }
-    
-    .sire-box {
-        padding: 10px;
-        background: #f1f5f9;
-        border-radius: 8px;
-        color: #1e293b;
-        text-align: center;
-    }
-    
-    .bg-danger-soft { background-color: #fef2f2; }
-    .border-left-danger { border-left: 4px solid #ef4444 !important; }
-    
-    .section-divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: #94a3b8;
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    .section-divider::before, .section-divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    .section-divider span { padding: 0 15px; }
-    
-    .modern-table-container {
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        overflow: hidden;
-        background: white;
-    }
-    .table-custom thead {
-        background: #f8fafc;
-        border-bottom: 2px solid #e2e8f0;
-    }
-    .table-custom th {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #64748b;
-        padding: 12px 0;
-        border: none;
-    }
-    .table-custom td {
-        padding: 15px 0;
-        font-size: 13px;
-        border: none;
-    }
-    .month-col { padding-left: 20px !important; text-align: left !important; }
-    
-    .btn-confirm {
-        background: #1e293b;
-        color: white;
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .btn-confirm:hover {
-        background: #0f172a;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
-        color: white;
-    }
-    .opacity-60 { opacity: 0.6; }
-    .opacity-80 { opacity: 0.8; }
-    
-    .btn-warning-premium {
-        background: linear-gradient(135deg, #ffca28 0%, #ffa000 100%);
-        color: #1e293b !important;
-        border: none;
-        border-radius: 12px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        font-size: 18px;
-        box-shadow: 0 10px 20px -5px rgba(255, 160, 0, 0.5);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        text-transform: uppercase;
-    }
-    .btn-warning-premium:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 30px -5px rgba(255, 160, 0, 0.6);
-        filter: brightness(1.05);
-        color: #000 !important;
-    }
-    .btn-warning-premium:active {
-        transform: translateY(-1px);
-    }
-    
-    .animate-bounce-right {
-        display: inline-block;
-        animation: bounce-right 1s infinite;
-    }
-    
-    @keyframes bounce-right {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(5px); }
+        font-size: 22px;
+        backdrop-filter: blur(4px);
     }
 
-    /* Responsive Improvements for iPhone/Mobile */
-    .responsive-modal-width {
-        max-width: 750px;
-        margin: 1.75rem auto;
+    .badge-aviso-tag {
+        display: inline-block;
+        padding: 2px 10px;
+        background: rgba(251, 191, 36, 0.2);
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #fde047;
+        letter-spacing: 0.5px;
+    }
+
+    .alert-cierre-intro {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .cierre-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cierre-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.07);
+    }
+
+    .border-left-blue { border-left: 5px solid #2563eb !important; }
+    .border-left-indigo { border-left: 5px solid #4f46e5 !important; }
+    .border-left-purple { border-left: 5px solid #7c3aed !important; }
+    .border-left-emerald { border-left: 5px solid #059669 !important; }
+
+    .cierre-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .cierre-month {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+    }
+
+    .cierre-badge-year {
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+    }
+
+    .cierre-date-label {
+        font-size: 11.5px;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .cierre-date-value {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 2px;
+        letter-spacing: -0.3px;
+    }
+
+    .warning-cierre-box {
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-cierre-action {
+        background: linear-gradient(135deg, #1d3a6d 0%, #2563eb 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-cierre-action:hover {
+        background: linear-gradient(135deg, #162b50 0%, #1d4ed8 100%);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+        color: #ffffff !important;
+    }
+    .btn-cierre-action:active {
+        transform: translateY(0);
     }
 
     @media (max-width: 768px) {
-        .responsive-modal-width {
+        .responsive-modal-cierre {
             max-width: 95% !important;
             margin: 10px auto !important;
         }
-        .responsive-px {
-            padding-left: 15px !important;
-            padding-right: 15px !important;
-        }
         .modal-header h3 {
-            font-size: 15px !important;
+            font-size: 16px !important;
         }
-        .btn-warning-premium {
-            font-size: 15px !important;
-            padding: 12px !important;
-        }
-        .premium-card {
-            padding: 15px !important;
+        .cierre-date-value {
+            font-size: 16px !important;
         }
     }
-
-    /* Scrollbar Styling */
-    #modalAnuncioImportante .modal-body::-webkit-scrollbar { width: 6px; }
-    #modalAnuncioImportante .modal-body::-webkit-scrollbar-track { background: #fafbfc; }
-    #modalAnuncioImportante .modal-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-    #modalAnuncioImportante .modal-body::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 </style>
 @endif
-
 
 @stop 
 @section('script')
@@ -539,31 +486,31 @@
     $(document).ready(function() {
         // Abrir modal automáticamente
         setTimeout(function() {
-            var anuncioVisto = sessionStorage.getItem('anuncio_importante_visto');
+            var avisoCierreVisto = sessionStorage.getItem('aviso_cierre_compras_visto');
 
             if ($('#modalListaNegra').length > 0) {
                 $('#modalListaNegra').modal('show');
                 
-                @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
-                    if (!anuncioVisto) {
-                        // Esperar a que se cierre el primero para mostrar el segundo
+                @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024' && count($cierres_mostrar) > 0)
+                    if (!avisoCierreVisto) {
+                        // Esperar a que se cierre el primero para mostrar el aviso de cierre
                         $('#modalListaNegra').on('hidden.bs.modal', function () {
-                            $('#modalAnuncioImportante').modal('show');
-                            sessionStorage.setItem('anuncio_importante_visto', 'true');
+                            $('#modalAvisoCierre').modal('show');
+                            sessionStorage.setItem('aviso_cierre_compras_visto', 'true');
                         });
                     }
                 @endif
             } else {
-                @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024')
-                    if (!anuncioVisto) {
-                        $('#modalAnuncioImportante').modal('show');
-                        sessionStorage.setItem('anuncio_importante_visto', 'true');
+                @if(trim(Session::get('usuario')->rol_id) != '1CIX00000024' && count($cierres_mostrar) > 0)
+                    if (!avisoCierreVisto) {
+                        $('#modalAvisoCierre').modal('show');
+                        sessionStorage.setItem('aviso_cierre_compras_visto', 'true');
                     }
                 @endif
             }
         }, 1000);
         
-        // Funcionalidad de búsqueda
+        // Funcionalidad de búsqueda en modalListaNegra
         $('#buscarProveedor').on('keyup', function() {
             var valor = $(this).val().toLowerCase();
             var filasMostradas = 0;
@@ -591,18 +538,10 @@
                 $('#noResultados').hide();
             }
         });
-        // Forzar cierre de modalAnuncioImportante
-        $(document).on('click', '#modalAnuncioImportante [data-dismiss="modal"]', function() {
-            $('#modalAnuncioImportante').modal('hide');
-        });
 
-        // Detener video al cerrar el modal
-        $('#modalAnuncioImportante').on('hidden.bs.modal', function () {
-            var video = $(this).find('video')[0];
-            if (video) {
-                video.pause();
-                video.currentTime = 0;
-            }
+        // Forzar cierre de modalAvisoCierre
+        $(document).on('click', '#modalAvisoCierre [data-dismiss="modal"]', function() {
+            $('#modalAvisoCierre').modal('hide');
         });
 
     });

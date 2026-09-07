@@ -202,6 +202,7 @@
         $('form').parsley();
         // Limpiar flag de anuncio al cargar el login para que se muestre en la nueva sesión
         sessionStorage.removeItem('anuncio_importante_visto');
+        sessionStorage.removeItem('aviso_cierre_compras_visto');
       });
     </script>
 
