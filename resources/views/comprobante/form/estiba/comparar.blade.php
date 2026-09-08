@@ -35,7 +35,7 @@
                 @IF($fedocumento->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
                   <td><p class='subtitulomerge'>{{number_format($documento_asociados->sum('CAN_TOTAL'), 4, '.', ',')}}</p></td>
                 @ELSE
-                  <td><p class='subtitulomerge'>{{number_format($fereftop1->TOTAL_MERGE, 4, '.', ',')}}</p></td>
+                  <td><p class='subtitulomerge'>{{number_format(isset($fereftop1) && $fereftop1 ? $fereftop1->TOTAL_MERGE : 0, 4, '.', ',')}}</p></td>
                 @ENDIF
                 <td>
                   <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
