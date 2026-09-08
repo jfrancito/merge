@@ -46,7 +46,6 @@
       </div>
     </div>
   </div>
-  @if($rol->ind_uc != 1)
   <div class="row xs-pt-15">
     <div class="col-xs-6">
         <div class="be-checkbox">
@@ -60,7 +59,6 @@
       </p>
     </div>
   </div>
-  @endif
 
 @else
   <div class="row">
@@ -96,21 +94,18 @@
     </div>
   </div>
 
-
-  @if($rol->ind_uc == 1)
-    <div class="row xs-pt-15">
-      <div class="col-xs-6">
-          <div class="be-checkbox">
-          </div>
-      </div>
-      <div class="col-xs-6">
-        <p class="text-right">
-          <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-          <button type="submit" class="btn btn-space btn-primary btnguardarcliente">Guardar</button>
-        </p>
-      </div>
+  <div class="row xs-pt-15">
+    <div class="col-xs-6">
+        <div class="be-checkbox">
+        </div>
     </div>
-  @endif
+    <div class="col-xs-6">
+      <p class="text-right">
+        <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+        <button type="submit" class="btn btn-space btn-primary btnguardarcliente">Guardar</button>
+      </p>
+    </div>
+  </div>
 
 @endif
 
