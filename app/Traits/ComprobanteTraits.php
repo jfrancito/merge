@@ -390,7 +390,7 @@ trait ComprobanteTraits
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->select(
                                         DB::raw('DISTINCT   CMP.DOCUMENTO_CTBLE.*, 
                                                     FE_DOCUMENTO.*, 
@@ -616,7 +616,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$empresa_id)
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->select(
                                     DB::raw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*'),
                                     DB::raw("(SELECT SUM(CAN_PRODUCTO)  FROM CMP.DETALLE_PRODUCTO WHERE CMP.DETALLE_PRODUCTO.COD_TABLA = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND CMP.DETALLE_PRODUCTO.COD_ESTADO = 1 AND CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO = 'M') AS TOTAL_CAN_SACOS")
@@ -882,6 +882,7 @@ trait ComprobanteTraits
                     'DOCUMENTO_INTERNO_SECADO',
                     'DOCUMENTO_INTERNO_PRODUCCION',
                     'DOCUMENTO_SERVICIO_BALANZA',
+                    'DOCUMENTO_INTERNO_COMPRA',
                     'ESTIBA'
                 )
                 AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -897,6 +898,7 @@ trait ComprobanteTraits
                 'DOCUMENTO_INTERNO_SECADO',
                 'DOCUMENTO_INTERNO_PRODUCCION',
                 'DOCUMENTO_SERVICIO_BALANZA',
+                'DOCUMENTO_INTERNO_COMPRA',
                 'ESTIBA'
             )
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -925,6 +927,7 @@ trait ComprobanteTraits
                     'DOCUMENTO_INTERNO_SECADO',
                     'DOCUMENTO_INTERNO_PRODUCCION',
                     'DOCUMENTO_SERVICIO_BALANZA',
+                    'DOCUMENTO_INTERNO_COMPRA',
                     'ESTIBA'
                 )
                 AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -940,6 +943,7 @@ trait ComprobanteTraits
                 'DOCUMENTO_INTERNO_SECADO',
                 'DOCUMENTO_INTERNO_PRODUCCION',
                 'DOCUMENTO_SERVICIO_BALANZA',
+                'DOCUMENTO_INTERNO_COMPRA',
                 'ESTIBA'
             )
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -967,6 +971,7 @@ trait ComprobanteTraits
                     'DOCUMENTO_INTERNO_SECADO',
                     'DOCUMENTO_INTERNO_PRODUCCION',
                     'DOCUMENTO_SERVICIO_BALANZA',
+                    'DOCUMENTO_INTERNO_COMPRA',
                     'ESTIBA'
                 )
                 AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -982,6 +987,7 @@ trait ComprobanteTraits
                 'DOCUMENTO_INTERNO_SECADO',
                 'DOCUMENTO_INTERNO_PRODUCCION',
                 'DOCUMENTO_SERVICIO_BALANZA',
+                'DOCUMENTO_INTERNO_COMPRA',
                 'ESTIBA'
             )
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
@@ -1324,7 +1330,7 @@ trait ComprobanteTraits
                                     ->where('FE_DOCUMENTO.FOLIO', $folio)
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                    ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                    ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                     ->distinct()
                                     ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
                                                     CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
@@ -1683,7 +1689,7 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
@@ -1771,7 +1777,7 @@ trait ComprobanteTraits
                                          ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
@@ -1796,7 +1802,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->select(DB::raw('FE_DOCUMENTO.COD_CATEGORIA_BANCO,FE_DOCUMENTO.TXT_CATEGORIA_BANCO'))
                                 ->groupBy('FE_DOCUMENTO.COD_CATEGORIA_BANCO')
                                 ->groupBy('FE_DOCUMENTO.TXT_CATEGORIA_BANCO')
@@ -10050,7 +10056,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION', $this->con_array_canjes())
                                 ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                 ->get();
 
