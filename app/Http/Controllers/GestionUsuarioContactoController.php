@@ -657,6 +657,7 @@ class GestionUsuarioContactoController extends Controller
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
                                         'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
                                         'PROVISION_GASTO'               => 'PROVISION DE GASTO',
                                         'NOTA_CREDITO'                  => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO'                   => 'NOTA DE DEBITO'
@@ -800,7 +801,8 @@ class GestionUsuarioContactoController extends Controller
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA'
                                     );
 
         $tipoarchivo_id     =   'ARCHIVO_VIRTUAL';
