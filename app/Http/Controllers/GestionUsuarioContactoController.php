@@ -2458,6 +2458,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
+            $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
 
             $funciones = $this;
 
@@ -2469,6 +2470,7 @@ class GestionUsuarioContactoController extends Controller
                                 'rol'                   =>  $rol,
                                 'documento_asociados'   =>  $documento_asociados,
                                 'documento_top'         =>  $documento_top,
+                                'fereftop1'             =>  $fereftop1,
                                 'lote'                  =>  $idoc,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'documentohistorial'    =>  $documentohistorial,
@@ -2671,6 +2673,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
+            $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
 
             $funciones = $this;
 
@@ -2680,6 +2683,7 @@ class GestionUsuarioContactoController extends Controller
                                 'rol'                   =>  $rol,
                                 'documento_asociados'   =>  $documento_asociados,
                                 'documento_top'         =>  $documento_top,
+                                'fereftop1'             =>  $fereftop1,
                                 'lote'                  =>  $idoc,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'documentohistorial'    =>  $documentohistorial,
