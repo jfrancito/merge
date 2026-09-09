@@ -60,9 +60,9 @@
                                 @if($mostrarGer) <th class="text-center py-3">Cant. Gerencia</th> @endif
                                 @if($mostrarAdm) <th class="text-center py-3">Cant. Admin</th> @endif
                                 
-                                <th class="py-3 pe-4">Observación</th>
-                                <th class="text-center py-3" style="width: 110px;">Precio Unit.</th>
-                                <th class="text-center py-3" style="width: 120px;">Total Item</th>
+                                <th class="py-3 pe-4" style="min-width: 200px; max-width: 320px;">Observación</th>
+                                <th class="text-center py-3" style="width: 110px; min-width: 110px; white-space: nowrap;">Precio Unit.</th>
+                                <th class="text-center py-3" style="width: 120px; min-width: 120px; white-space: nowrap;">Total Item</th>
                             </tr>
                         </thead>
                         <tbody style="font-size: 13.5px; color: #5a5c69;">
@@ -73,42 +73,42 @@
                                     $total_general += $subtotal;
                                 @endphp
                                 <tr style="border-bottom: 1px solid #eaecf4;">
-                                    <td class="text-center py-3 ps-4 fw-bold" style="color: #1d3a6d;">{{ $index + 1 }}</td>
-                                    <td class="py-3">
+                                    <td class="text-center py-3 ps-4 fw-bold" style="color: #1d3a6d; vertical-align: middle;">{{ $index + 1 }}</td>
+                                    <td class="py-3" style="vertical-align: middle;">
                                         <div style="font-weight: 600; color: #2e2f37;">{{ $detalle->NOM_PRODUCTO }}</div>
                                         <small class="text-muted">Cód: {{ $detalle->COD_PRODUCTO }}</small>
                                     </td>
-                                    <td class="py-3">{{ $detalle->NOM_CATEGORIA }}</td>
-                                    <td class="text-center py-3">
+                                    <td class="py-3" style="vertical-align: middle;">{{ $detalle->NOM_CATEGORIA }}</td>
+                                    <td class="text-center py-3" style="vertical-align: middle;">
                                         @if($detalle->IND_MATERIAL_SERVICIO == 'M')
                                             <span class="badge-corpo bg-light text-primary">Material</span>
                                         @else
                                             <span class="badge-corpo bg-light text-warning">Servicio</span>
                                         @endif
                                     </td>
-                                    <td class="text-center py-3 fw-bold">{{ $detalle->CANTIDAD }}</td>
+                                    <td class="text-center py-3 fw-bold" style="vertical-align: middle;">{{ $detalle->CANTIDAD }}</td>
 
                                     @if($mostrarJefe)
-                                        <td class="text-center py-3 fw-bold text-success">{{ $detalle->CAN_MODIF_JEF_AUT ?? '—' }}</td>
+                                        <td class="text-center py-3 fw-bold text-success" style="vertical-align: middle;">{{ $detalle->CAN_MODIF_JEF_AUT ?? '—' }}</td>
                                     @endif
                                     @if($mostrarGer)
-                                        <td class="text-center py-3 fw-bold text-info">{{ $detalle->CAN_MODIF_GER ?? '—' }}</td>
+                                        <td class="text-center py-3 fw-bold text-info" style="vertical-align: middle;">{{ $detalle->CAN_MODIF_GER ?? '—' }}</td>
                                     @endif
                                     @if($mostrarAdm)
-                                        <td class="text-center py-3 fw-bold text-danger">{{ $detalle->CAN_MODIF_ADM ?? '—' }}</td>
+                                        <td class="text-center py-3 fw-bold text-danger" style="vertical-align: middle;">{{ $detalle->CAN_MODIF_ADM ?? '—' }}</td>
                                     @endif
 
-                                    <td class="py-3 pe-4">
-                                        <div class="text-wrap" style="max-width: 200px; font-size: 12px; color: #858796;">
-                                            {{ $detalle->TXT_OBSERVACION ?: '—' }}
+                                    <td class="py-3 pe-4" style="vertical-align: middle; min-width: 200px; max-width: 320px;">
+                                        <div style="white-space: normal; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; font-size: 12px; color: #858796; line-height: 1.4;">
+                                            {!! $detalle->TXT_OBSERVACION ? nl2br(e($detalle->TXT_OBSERVACION)) : '—' !!}
                                         </div>
                                     </td>
 
-                                    <td class="text-center py-3 fw-semibold" style="white-space: nowrap;">
+                                    <td class="text-center py-3 fw-semibold" style="white-space: nowrap; width: 110px; min-width: 110px; vertical-align: middle;">
                                         S/ {{ number_format($detalle->CAN_PRECIO, 2) }}
                                     </td>
 
-                                    <td class="text-center py-3 fw-bold text-primary" style="white-space: nowrap;">
+                                    <td class="text-center py-3 fw-bold text-primary" style="white-space: nowrap; width: 120px; min-width: 120px; vertical-align: middle;">
                                         S/ {{ number_format($subtotal, 2) }}
                                     </td>
                                 </tr>

@@ -93,9 +93,9 @@
                                 <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
                                 @if($mostrarJefe) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th> @endif
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Gerencia</th>
-                                <th class="text-center" style="color: #000; font-weight: 700;">Observación</th>
-                                <th class="text-center" style="color: #000; font-weight: 700;">Precio Unit.</th>
-                                <th class="text-center" style="color: #000; font-weight: 700;">Total Item</th>
+                                <th class="text-center" style="color: #000; font-weight: 700; min-width: 180px; max-width: 280px;">Observación</th>
+                                <th class="text-center" style="color: #000; font-weight: 700; min-width: 100px; white-space: nowrap;">Precio Unit.</th>
+                                <th class="text-center" style="color: #000; font-weight: 700; min-width: 110px; white-space: nowrap;">Total Item</th>
                             </tr>
                         </thead>
                         <tbody style="font-size: 13.5px; color: #5a5c69;">
@@ -151,14 +151,14 @@
                                         @endif
                                     </td>
 
-                                    <td class="text-center" style="vertical-align: middle;">
-                                        <div class="text-muted" style="min-width: 120px; font-size: 13px;">
-                                            {{ $detalle->TXT_OBSERVACION ?: '—' }}
+                                    <td style="vertical-align: middle; min-width: 180px; max-width: 280px;">
+                                        <div class="text-muted" style="white-space: normal; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; font-size: 12px; line-height: 1.4;">
+                                            {!! $detalle->TXT_OBSERVACION ? nl2br(e($detalle->TXT_OBSERVACION)) : '—' !!}
                                         </div>
                                     </td>
 
-                                    <td class="text-center fw-bold cell-precio" data-precio="{{ $precio }}" style="vertical-align: middle;">S/ {{ number_format($precio, 2) }}</td>
-                                    <td class="text-center fw-bold text-dark cell-subtotal" style="vertical-align: middle;">S/ {{ number_format($subtotal, 2) }}</td>
+                                    <td class="text-center fw-bold cell-precio" data-precio="{{ $precio }}" style="vertical-align: middle; white-space: nowrap; min-width: 100px;">S/ {{ number_format($precio, 2) }}</td>
+                                    <td class="text-center fw-bold text-dark cell-subtotal" style="vertical-align: middle; white-space: nowrap; min-width: 110px;">S/ {{ number_format($subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
