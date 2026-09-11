@@ -428,6 +428,14 @@ class GestionOCValidadoController extends Controller
         $estado_id      =   'TODO';
         $combo_estado   =   $this->gn_combo_estado_fe_documento($estado_id);
 
+        $sede_id        =   'TODO';
+        $combo_sede     =   array(
+                                'TODO'              => 'TODOS',
+                                'CEN0000000000001'  => 'CHICLAYO',
+                                'CEN0000000000002'  => 'LIMA',
+                                'CEN0000000000004'  => 'RIOJA',
+                                'CEN0000000000006'  => 'BELLAVISTA',
+                            );
 
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
@@ -460,14 +468,14 @@ class GestionOCValidadoController extends Controller
 
         $array_canjes               =   $this->con_array_canjes();
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
             }else{
                 if (in_array($operacion_id, $array_canjes)) {
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
                 }
             }
         }
@@ -489,6 +497,8 @@ class GestionOCValidadoController extends Controller
                             'combo_operacion'      =>  $combo_operacion,
                             'filtrofecha_id'         =>  $filtrofecha_id,
                             'combo_filtrofecha'      =>  $combo_filtrofecha,
+                            'sede_id'              =>  $sede_id,
+                            'combo_sede'           =>  $combo_sede,
 
                          ]);
     }
@@ -504,36 +514,37 @@ class GestionOCValidadoController extends Controller
         $idopcion       =   $request['idopcion'];
         $operacion_id   =   $request['operacion_id'];
         $filtrofecha_id =   $request['filtrofecha_id'];
+        $sede_id        =   $request['sede_id'] ?? 'TODO';
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
         }else{
 
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
             }else{
                 if($operacion_id=='CONTRATO_ANTICIPO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
                 }else{
                 if($operacion_id=='CONTRATO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                 }else{
                     if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                     }else{
                         if($operacion_id=='NOTA_CREDITO'){
-                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nota_credito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nota_credito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                         }else{
                             if($operacion_id=='NOTA_DEBITO'){
-                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                             }else{
 
                                 if($operacion_id=='PROVISION_GASTO'){
-                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                                 }else{
-                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
                                 }
                             }
                         }
@@ -566,7 +577,7 @@ class GestionOCValidadoController extends Controller
                          ]);
     }
 
-    public function actionGestionOCValidadoExcelDetallado($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $filtrofecha_id, $idopcion)
+    public function actionGestionOCValidadoExcelDetallado($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $filtrofecha_id, $idopcion, $sede_id = 'TODO')
     {
         set_time_limit(0);
 
@@ -576,27 +587,27 @@ class GestionOCValidadoController extends Controller
         $funcion        =   $this;
 
         if($operacion_id == 'ORDEN_COMPRA'){
-            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
         } else {
             if($operacion_id == 'ORDEN_COMPRA_ANTICIPO' || $operacion_id == 'CONTRATO_ANTICIPO'){
-                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
             } else {
                 if($operacion_id == 'CONTRATO'){
-                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                 } else {
                     if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO'){
-                        $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                        $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                     } else {
                         if($operacion_id == 'NOTA_CREDITO'){
-                            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_credito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_credito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                         } else {
                             if($operacion_id == 'NOTA_DEBITO'){
-                                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                                $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                             } else {
                                 if($operacion_id == 'PROVISION_GASTO'){
-                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id);
                                 } else {
-                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                                    $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id);
                                 }
                             }
                         }

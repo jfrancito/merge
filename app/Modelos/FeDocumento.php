@@ -55,5 +55,11 @@ class FeDocumento extends Model
         }
     }
 
+    public function scopeSedeFE($query, $sede_id){
+        if(trim($sede_id) != 'TODO'){
+            $query->where('CMP.ORDEN.COD_CENTRO','=',$sede_id);
+        }
+    }
+
 
 }

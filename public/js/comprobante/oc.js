@@ -594,6 +594,7 @@ $(document).ready(function(){
         var estado_id            =   $('#estado_id').val();
         var operacion_id         =   $('#operacion_id').val();
         var filtrofecha_id       =   $('#filtrofecha_id').val();
+        var sede_id              =   $('#sede_id').val();
 
 
         debugger;
@@ -613,6 +614,7 @@ $(document).ready(function(){
                                 estado_id               : estado_id,
                                 operacion_id            : operacion_id,
                                 filtrofecha_id          : filtrofecha_id,
+                                sede_id                 : sede_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-fe");
