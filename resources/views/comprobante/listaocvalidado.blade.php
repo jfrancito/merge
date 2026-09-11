@@ -335,6 +335,6 @@
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/oc.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/oc.js?v='.$version.'_v3') }}" type="text/javascript"></script>
 
 @stop
