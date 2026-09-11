@@ -584,19 +584,19 @@ $(document).ready(function(){
 
 
 
-    $(".cfedocumento").on('change', '#operacion_id', function() {
+    $(document).on('change', '#operacion_id', function() {
         var op = $(this).val();
         if (op === 'ORDEN_COMPRA') {
             $('.caja_sede').show();
             $('#descargargestionocvalidadoexceldetallado').show();
         } else {
             $('.caja_sede').hide();
-            $('#sede_id').val('TODO').trigger('change.select2');
+            $('#sede_id').val('TODO').trigger('change');
             $('#descargargestionocvalidadoexceldetallado').hide();
         }
     });
 
-    $(".cfedocumento").on('click','.buscardocumento', function() {
+    $(".cfedocumento").on('click','.buscardocumento', function(event) {
 
         event.preventDefault();
 
@@ -607,9 +607,6 @@ $(document).ready(function(){
         var operacion_id         =   $('#operacion_id').val();
         var filtrofecha_id       =   $('#filtrofecha_id').val();
         var sede_id              =   (operacion_id === 'ORDEN_COMPRA') ? $('#sede_id').val() : 'TODO';
-
-
-        debugger;
 
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
