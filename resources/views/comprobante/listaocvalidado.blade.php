@@ -84,7 +84,7 @@
                           </a>
 
                           <a href="{{url('/gestion-de-oc-validado-excel-detallado')}}" 
-                             onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), f=$('#filtrofecha_id').val(), id=$('#idopcion').val(), s=$('#sede_id').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+f+'/'+id+'/'+s; return true;"
+                             onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), f=$('#filtrofecha_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+f+'/'+id; return true;"
                              class='btn btn-excel-premium tooltipcss opciones'
                              target="_blank"
                              id="descargargestionocvalidadoexceldetallado" 
@@ -249,22 +249,6 @@
                                                       [
                                                         'class'       => 'select2 form-control control input-sm' ,
                                                         'id'          => 'filtrofecha_id',
-                                                        'required'    => '',
-                                                        'data-aw'     => '1',
-                                                      ]) !!}
-                                  </div>
-                                </div>
-                            </div> 
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-
-                                <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Sede :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    {!! Form::select( 'sede_id', $combo_sede, array($sede_id),
-                                                      [
-                                                        'class'       => 'select2 form-control control input-sm' ,
-                                                        'id'          => 'sede_id',
                                                         'required'    => '',
                                                         'data-aw'     => '1',
                                                       ]) !!}

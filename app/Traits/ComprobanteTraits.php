@@ -4621,7 +4621,7 @@ trait ComprobanteTraits
         return $array;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -4652,10 +4652,9 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->SedeFE($sede_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.ORDEN.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
@@ -4672,9 +4671,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->SedeFE($sede_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.ORDEN.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
@@ -6231,7 +6229,7 @@ trait ComprobanteTraits
 
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6255,11 +6253,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','CONTRATO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
 
@@ -6275,15 +6270,12 @@ trait ComprobanteTraits
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                //>where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 ->where('OPERACION','=','CONTRATO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
         }
@@ -6297,7 +6289,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_nota_credito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_nota_credito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6322,11 +6314,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','NOTA_CREDITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
@@ -6345,11 +6334,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','NOTA_CREDITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
         }
@@ -6363,7 +6349,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_nota_debito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_nota_debito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6388,11 +6374,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','NOTA_DEBITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
@@ -6407,15 +6390,12 @@ trait ComprobanteTraits
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                //>where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 ->where('OPERACION','=','NOTA_DEBITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
         }
@@ -6429,7 +6409,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_pg($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_pg($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6450,11 +6430,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','PROVISION_GASTO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
@@ -6468,11 +6445,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','PROVISION_GASTO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
         }
@@ -6487,7 +6461,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6511,11 +6485,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('TES.AUTORIZACION.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, TES.AUTORIZACION.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
 
@@ -6535,11 +6506,8 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('TES.AUTORIZACION.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, TES.AUTORIZACION.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE, CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
         }
@@ -6553,7 +6521,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_estiba($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id,$sede_id='TODO') {
+    private function con_lista_cabecera_comprobante_total_gestion_estiba($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6562,34 +6530,26 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422'])){
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
-                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+            $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=',$operacion_id)
                                 ->where('usuario_pa','=',Session::get('usuario')->id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.ORDEN.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.ORDEN.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
 
         }else{
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
-                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+            $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=',$operacion_id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->when($sede_id != 'TODO', function($q) use($sede_id){
-                                    $q->where('CMP.ORDEN.COD_CENTRO','=',$sede_id);
-                                })
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('*, CMP.ORDEN.TXT_GLOSA AS TXT_GLOSA, FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->orderBy('fecha_pa', 'desc')
                                 ->get();
         }
