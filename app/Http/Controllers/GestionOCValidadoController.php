@@ -458,9 +458,12 @@ class GestionOCValidadoController extends Controller
         $filtrofecha_id     =   'RE';
         $combo_filtrofecha  =   array('RE' => 'REGISTRO','REA' => 'APROBACION');
 
+        $sede_id            =   'TODO';
+        $combo_sede         =   $this->gn_combo_centro_sede('TODO', 'SEDE');
+
         $array_canjes               =   $this->con_array_canjes();
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id, $sede_id);
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
@@ -485,10 +488,12 @@ class GestionOCValidadoController extends Controller
                             'combo_proveedor'   =>  $combo_proveedor,
                             'estado_id'         =>  $estado_id,
                             'combo_estado'      =>  $combo_estado,
-                            'operacion_id'         =>  $operacion_id,
-                            'combo_operacion'      =>  $combo_operacion,
-                            'filtrofecha_id'         =>  $filtrofecha_id,
-                            'combo_filtrofecha'      =>  $combo_filtrofecha,
+                            'operacion_id'      =>  $operacion_id,
+                            'combo_operacion'   =>  $combo_operacion,
+                            'filtrofecha_id'    =>  $filtrofecha_id,
+                            'combo_filtrofecha' =>  $combo_filtrofecha,
+                            'sede_id'           =>  $sede_id,
+                            'combo_sede'        =>  $combo_sede,
 
                          ]);
     }
@@ -504,11 +509,16 @@ class GestionOCValidadoController extends Controller
         $idopcion       =   $request['idopcion'];
         $operacion_id   =   $request['operacion_id'];
         $filtrofecha_id =   $request['filtrofecha_id'];
+        $sede_id        =   isset($request['sede_id']) ? $request['sede_id'] : 'TODO';
+
+        if($operacion_id != 'ORDEN_COMPRA'){
+            $sede_id    =   'TODO';
+        }
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id, $sede_id);
         }else{
 
             if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
@@ -549,6 +559,7 @@ class GestionOCValidadoController extends Controller
         }
 
         $funcion        =   $this;
+        $combo_sede     =   $this->gn_combo_centro_sede('TODO', 'SEDE');
 
         return View::make('comprobante/ajax/mergelistaocvalidado',
                          [
@@ -561,12 +572,14 @@ class GestionOCValidadoController extends Controller
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'ajax'                  =>  true,
-                            'operacion_id'            =>  $operacion_id,
+                            'operacion_id'          =>  $operacion_id,
+                            'sede_id'               =>  $sede_id,
+                            'combo_sede'            =>  $combo_sede,
                             'funcion'               =>  $funcion
                          ]);
     }
 
-    public function actionGestionOCValidadoExcelDetallado($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $filtrofecha_id, $idopcion)
+    public function actionGestionOCValidadoExcelDetallado($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $filtrofecha_id, $idopcion, $sede_id = 'TODO')
     {
         set_time_limit(0);
 
@@ -576,7 +589,7 @@ class GestionOCValidadoController extends Controller
         $funcion        =   $this;
 
         if($operacion_id == 'ORDEN_COMPRA'){
-            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            $listadatos = $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id, $sede_id);
         } else {
             if($operacion_id == 'ORDEN_COMPRA_ANTICIPO' || $operacion_id == 'CONTRATO_ANTICIPO'){
                 $listadatos = $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);

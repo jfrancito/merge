@@ -596,7 +596,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-suspension/{idopcion}/{lote}', 'GestionEstibaController@actionAgregarSuspensionEstibas');
 	Route::any('/ajax-eliminar-lote-comision', 'GestionOCTesoreriaController@actionEliminacionLoteComision');
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
-	Route::any('/gestion-de-oc-validado-excel-detallado/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{filtrofecha_id}/{idopcion}', 'GestionOCValidadoController@actionGestionOCValidadoExcelDetallado');
+	Route::any('/gestion-de-oc-validado-excel-detallado/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{filtrofecha_id}/{idopcion}/{sede_id?}', 'GestionOCValidadoController@actionGestionOCValidadoExcelDetallado');
 	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
 	Route::any('/gestion-de-historial-comprobantes/{idopcion}', 'GestionOCValidadoController@actionListarOCHistorial');
 	Route::any('/ajax-buscar-documento-fe', 'GestionOCValidadoController@actionListarAjaxBuscarDocumento');

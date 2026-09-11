@@ -120,6 +120,20 @@ trait ComprobanteTraits
         return $combo;
     }
 
+    public function gn_combo_centro_sede($todo, $titulo)
+    {
+        $array_t = DB::table('ALM.CENTRO')
+            ->where('COD_ESTADO', '=', '1')
+            ->pluck('NOM_CENTRO', 'COD_CENTRO')
+            ->toArray();
+        if ($todo == 'TODO') {
+            $combo = array('TODO' => 'TODOS LAS SEDES') + $array_t;
+        } else {
+            $combo = $array_t;
+        }
+        return $combo;
+    }
+
     public function con_categoria_canje($valor) {
         $array = [  'ESTIBA'=>'TDO0000000000067',
                     'DOCUMENTO_INTERNO_PRODUCCION'=>'TDO0000000000092',
@@ -4621,7 +4635,7 @@ trait ComprobanteTraits
         return $array;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$sede_id = 'TODO') {
 
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -4640,7 +4654,7 @@ trait ComprobanteTraits
         if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
 
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+            $query     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
@@ -4653,15 +4667,20 @@ trait ComprobanteTraits
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','');
+
+            if($sede_id != 'TODO'){
+                $query->where('CMP.Orden.COD_CENTRO', '=', $sede_id);
+            }
+
+            $listadatos = $query->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC, CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
 
         }else{
 
-            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+            $query     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000009227')
@@ -4671,8 +4690,13 @@ trait ComprobanteTraits
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','');
+
+            if($sede_id != 'TODO'){
+                $query->where('CMP.Orden.COD_CENTRO', '=', $sede_id);
+            }
+
+            $listadatos = $query->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC, CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 
