@@ -19,8 +19,14 @@ $(document).ready(function() {
     var selectedPdfFiles = [];
     var parsedPdfsData = [];
 
-    // Cargar la librería pdf.js dinámicamente si no está presente
+    // Cargar la librería pdf.js y pako dinámicamente si no están presentes
     function cargarPdfJs(callback) {
+        if (typeof pako === 'undefined' && typeof DecompressionStream === 'undefined') {
+            var scriptPako = document.createElement('script');
+            scriptPako.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js';
+            document.head.appendChild(scriptPako);
+        }
+
         if (typeof pdfjsLib !== 'undefined') {
             callback();
             return;
@@ -177,143 +183,368 @@ $(document).ready(function() {
         });
     });
 
+    // Descompresión de streams usando DecompressionStream nativo del navegador o pako
+    async function descomprimirStreamBrowser(streamBytes) {
+        if (typeof DecompressionStream !== 'undefined') {
+            try {
+                var ds = new DecompressionStream('deflate');
+                var writer = ds.writable.getWriter();
+                writer.write(streamBytes);
+                writer.close();
+                var response = new Response(ds.readable);
+                var ab = await response.arrayBuffer();
+                var u8 = new Uint8Array(ab);
+                var s = '';
+                for (var j = 0; j < u8.length; j += 8192) {
+                    s += String.fromCharCode.apply(null, u8.subarray(j, j + 8192));
+                }
+                return s;
+            } catch(e) {
+                try {
+                    var dsRaw = new DecompressionStream('deflate-raw');
+                    var writerRaw = dsRaw.writable.getWriter();
+                    writerRaw.write(streamBytes.subarray(2));
+                    writerRaw.close();
+                    var respRaw = new Response(dsRaw.readable);
+                    var abRaw = await respRaw.arrayBuffer();
+                    var u8Raw = new Uint8Array(abRaw);
+                    var sRaw = '';
+                    for (var k = 0; k < u8Raw.length; k += 8192) {
+                        sRaw += String.fromCharCode.apply(null, u8Raw.subarray(k, k + 8192));
+                    }
+                    return sRaw;
+                } catch(e2) {
+                    // Continuar al fallback pako
+                }
+            }
+        }
+
+        if (typeof pako !== 'undefined') {
+            try {
+                var decomp = pako.inflate(streamBytes);
+                var sPako = '';
+                for (var p = 0; p < decomp.length; p += 8192) {
+                    sPako += String.fromCharCode.apply(null, decomp.subarray(p, p + 8192));
+                }
+                return sPako;
+            } catch(ePako) {
+                try {
+                    var decompRaw = pako.inflateRaw(streamBytes.subarray(2));
+                    var sPakoRaw = '';
+                    for (var pr = 0; pr < decompRaw.length; pr += 8192) {
+                        sPakoRaw += String.fromCharCode.apply(null, decompRaw.subarray(pr, pr + 8192));
+                    }
+                    return sPakoRaw;
+                } catch(ePakoRaw) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    // Extractor directo de texto desde streams del PDF y CMap ToUnicode
+    async function extraerTextoDirectoDePdf(typedarray, fileName) {
+        var binaryString = '';
+        var chunkSize = 8192;
+        for (var i = 0; i < typedarray.length; i += chunkSize) {
+            var chunk = typedarray.subarray(i, i + chunkSize);
+            binaryString += String.fromCharCode.apply(null, chunk);
+        }
+
+        // 1. Extraer ToUnicode CMap
+        var cmap = {};
+        var toUnicodeMatch = binaryString.match(/\/ToUnicode\s+(\d+)\s+(\d+)\s+R/);
+        if (toUnicodeMatch) {
+            var objNum = toUnicodeMatch[1];
+            var objRegex = new RegExp('\\b' + objNum + '\\s+0\\s+obj([\\s\\S]*?)endobj');
+            var objM = binaryString.match(objRegex);
+            if (objM) {
+                var cmapText = objM[1];
+                var streamM = cmapText.match(/stream\r?\n([\s\S]*?)\r?\nendstream/);
+                if (streamM) {
+                    var streamBytes = new Uint8Array(streamM[1].length);
+                    for (var sb = 0; sb < streamM[1].length; sb++) {
+                        streamBytes[sb] = streamM[1].charCodeAt(sb);
+                    }
+                    var un = await descomprimirStreamBrowser(streamBytes);
+                    if (un) {
+                        cmapText = un;
+                    }
+                }
+
+                // Parsear ONLY inside beginbfchar ... endbfchar
+                var bfcM = cmapText.match(/beginbfchar([\s\S]*?)endbfchar/);
+                if (bfcM) {
+                    var bfcharRegex = /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>/g;
+                    var mBf;
+                    while ((mBf = bfcharRegex.exec(bfcM[1])) !== null) {
+                        cmap[parseInt(mBf[1], 16)] = String.fromCharCode(parseInt(mBf[2], 16));
+                    }
+                }
+
+                // Parsear ONLY inside beginbfrange ... endbfrange
+                var bfrM = cmapText.match(/beginbfrange([\s\S]*?)endbfrange/);
+                if (bfrM) {
+                    var bfrangeRegex = /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>/g;
+                    var mBr;
+                    while ((mBr = bfrangeRegex.exec(bfrM[1])) !== null) {
+                        var start = parseInt(mBr[1], 16);
+                        var end = parseInt(mBr[2], 16);
+                        var destStart = parseInt(mBr[3], 16);
+                        for (var c = start; c <= end; c++) {
+                            cmap[c] = String.fromCharCode(destStart + (c - start));
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Extraer y decodificar streams de contenido
+        var allObjRegex = /\b(\d+)\s+0\s+obj([\s\S]*?)endobj/g;
+        var objMatch;
+        var allDecoded = [];
+
+        while ((objMatch = allObjRegex.exec(binaryString)) !== null) {
+            var objBody = objMatch[2];
+            if (objBody.indexOf('/FontFile') !== -1 || objBody.indexOf('/Length1') !== -1 || objBody.indexOf('/Image') !== -1) {
+                continue;
+            }
+
+            var streamObjM = objBody.match(/stream\r?\n([\s\S]*?)\r?\nendstream/);
+            if (streamObjM) {
+                var streamObjBytes = new Uint8Array(streamObjM[1].length);
+                for (var sob = 0; sob < streamObjM[1].length; sob++) {
+                    streamObjBytes[sob] = streamObjM[1].charCodeAt(sob);
+                }
+                var unStream = await descomprimirStreamBrowser(streamObjBytes);
+                if (!unStream) {
+                    unStream = streamObjM[1];
+                }
+
+                if (unStream.indexOf('TJ') !== -1 || unStream.indexOf('Tj') !== -1) {
+                    // Decodificar arrays TJ
+                    var tjRegex = /\[([\s\S]*?)\]\s*TJ/g;
+                    var tjM;
+                    while ((tjM = tjRegex.exec(unStream)) !== null) {
+                        var hexRegex = /<([0-9a-fA-F]+)>/g;
+                        var hM;
+                        var line = '';
+                        while ((hM = hexRegex.exec(tjM[1])) !== null) {
+                            var h = hM[1];
+                            for (var hi = 0; hi < h.length; hi += 4) {
+                                var code = parseInt(h.substr(hi, 4), 16);
+                                line += cmap[code] || String.fromCharCode(code);
+                            }
+                        }
+                        if (line.trim()) allDecoded.push(line);
+                    }
+
+                    // Decodificar Tj individual
+                    var tjSingleRegex = /\(([\s\S]*?)\)\s*Tj/g;
+                    var singleM;
+                    while ((singleM = tjSingleRegex.exec(unStream)) !== null) {
+                        if (singleM[1].trim()) allDecoded.push(singleM[1]);
+                    }
+                }
+            }
+        }
+
+        var cleanText = allDecoded.join(' ').replace(/\s+/g, ' ').trim();
+        return parsearDatosDeTextoLimpio(cleanText, fileName);
+    }
+
+    // Parsea campos a partir del texto limpio
+    function parsearDatosDeTextoLimpio(cleanText, fileName) {
+        // 1. Extraer Serie y Número
+        var serie = 'SS00';
+        var numero = '0000000000';
+        var matchSN = cleanText.match(/([FfBbEe][A-Za-z0-9]{3})-([0-9]+)/);
+        if (matchSN) {
+            serie = matchSN[1].toUpperCase();
+            numero = matchSN[2];
+        }
+        if (serie === 'SS00' || numero === '0000000000') {
+            var matchFN = fileName.match(/([FfBbEe][A-Za-z0-9]{3})-?([0-9]+)/i);
+            if (matchFN) {
+                serie = matchFN[1].toUpperCase();
+                numero = matchFN[2];
+            }
+        }
+
+        // 2. Extraer IGV
+        var igv = 0;
+        var matchIgv = cleanText.match(/I\.?G\.?V\.?(?:\s*\d+%)?\s*(?::|S\/\.?|\$|\bPEN\b|\bSOLES\b)?\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i);
+        if (matchIgv) {
+            igv = parseFloat(matchIgv[1].replace(/,/g, ''));
+        }
+
+        // 3. Extraer Total
+        var regexesTotal = [
+            /(?:Importe\s+Total|Total\s+Venta|PRECIO\s+VENTA\s+TOTAL|Precio\s+Total|Monto\s+Total|Total\s+(?:a\s+pagar|factura|general)|(?:^|[^\w\-])TOTAL)\s*(?::|S\/\.?|\$|\bPEN\b|\bSOLES\b)?\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /Importe\s+Total\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /PRECIO\s+VENTA\s+TOTAL\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /Total\s+Venta\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /Precio\s+Total\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /Monto\s+Total\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /(?:^|[^\w\-])TOTAL\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i,
+            /Total\s*:\s*([\d,]+\.\d{2})/i,
+            /Total\s*([\d,]+\.\d{2})/i
+        ];
+
+        var total = 0;
+        for (var i = 0; i < regexesTotal.length; i++) {
+            var match = cleanText.match(regexesTotal[i]);
+            if (match) {
+                total = parseFloat(match[1].replace(/,/g, ''));
+                break;
+            }
+        }
+
+        // 4. Extraer Subtotal
+        var subtotal = 0;
+        var matchSub = cleanText.match(/SUB[- ]*TOTAL\s*(?::|S\/\.?|\$|\bPEN\b|\bSOLES\b)?\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i);
+        if (matchSub) {
+            subtotal = parseFloat(matchSub[1].replace(/,/g, ''));
+        } else {
+            subtotal = total > 0 ? parseFloat((total - igv).toFixed(2)) : 0;
+        }
+
+        var interes = { subtotal: 0, igv: 0, total: 0 };
+        var comisiones = { subtotal: 0, igv: 0, total: 0 };
+
+        // 5. Layout continuo de columnas
+        var matchCol = cleanText.match(/Inter[eé\u00E9]s\s+Adelantado\s+Comisiones\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
+        if (matchCol) {
+            interes.subtotal = parseFloat(matchCol[1].replace(/,/g, ''));
+            interes.igv = parseFloat(matchCol[2].replace(/,/g, ''));
+            interes.total = parseFloat(matchCol[3].replace(/,/g, ''));
+            
+            comisiones.subtotal = parseFloat(matchCol[4].replace(/,/g, ''));
+            comisiones.igv = parseFloat(matchCol[5].replace(/,/g, ''));
+            comisiones.total = parseFloat(matchCol[6].replace(/,/g, ''));
+        } else {
+            // 6. Layout fila por fila
+            var matchInteres = cleanText.match(/Inter[eé\u00E9]s\s+Adelantado\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
+            if (matchInteres) {
+                interes.subtotal = parseFloat(matchInteres[1].replace(/,/g, ''));
+                interes.igv = parseFloat(matchInteres[2].replace(/,/g, ''));
+                interes.total = parseFloat(matchInteres[3].replace(/,/g, ''));
+            } else {
+                var matchInteresSimple = cleanText.match(/Inter[eé\u00E9]s\s+Adelantado\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i);
+                if (matchInteresSimple) {
+                    interes.subtotal = parseFloat(matchInteresSimple[1].replace(/,/g, ''));
+                    interes.total = interes.subtotal;
+                }
+            }
+
+            var matchComisiones = cleanText.match(/Comisiones\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
+            if (matchComisiones) {
+                comisiones.subtotal = parseFloat(matchComisiones[1].replace(/,/g, ''));
+                comisiones.igv = parseFloat(matchComisiones[2].replace(/,/g, ''));
+                comisiones.total = parseFloat(matchComisiones[3].replace(/,/g, ''));
+            } else {
+                var matchComisionesSimple = cleanText.match(/Comisiones\s*(?::|S\/\.?|\$)?\s*([\d,]+\.\d{2})/i);
+                if (matchComisionesSimple) {
+                    comisiones.subtotal = parseFloat(matchComisionesSimple[1].replace(/,/g, ''));
+                    comisiones.total = comisiones.subtotal;
+                }
+            }
+        }
+
+        // Si el total no se detectó por regex pero sí interes y comisiones
+        if (total === 0 && (interes.total > 0 || comisiones.total > 0)) {
+            total = parseFloat((interes.total + comisiones.total).toFixed(2));
+            if (subtotal === 0) {
+                subtotal = parseFloat((total - igv).toFixed(2));
+            }
+        }
+
+        // 7. Fallback matemático si no se pudieron extraer montos específicos
+        if (interes.total === 0 && comisiones.total === 0 && total > 3.50) {
+            comisiones.subtotal = 3.50;
+            comisiones.igv = 0.00;
+            comisiones.total = 3.50;
+
+            interes.subtotal = parseFloat((total - 3.50).toFixed(2));
+            interes.igv = 0.00;
+            interes.total = interes.subtotal;
+        }
+
+        return {
+            name: fileName,
+            serie: serie,
+            numero: numero,
+            subtotal: subtotal,
+            igv: igv,
+            total: total,
+            interes: interes,
+            comisiones: comisiones
+        };
+    }
+
     // Función promesa que extrae el texto del PDF y parsea los campos principales
     function obtenerTotalDePdf(file) {
         return new Promise(function(resolve, reject) {
             var reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = async function() {
                 var typedarray = new Uint8Array(this.result);
-                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                    pdf.getPage(1).then(function(page) {
-                        page.getTextContent().then(function(textContent) {
-                            var text = textContent.items.map(function(item) {
-                                return item.str;
-                            }).join(' ');
-                            
-                            console.log("Texto extraido de " + file.name + ":", text);
-                            
-                            // 1. Extraer Serie y Número
-                            var serie = 'SS00';
-                            var numero = '0000000000';
-                            var matchSN = text.match(/([FfBbEe][A-Za-z0-9]{3})-([0-9]+)/);
-                            if (matchSN) {
-                                serie = matchSN[1].toUpperCase();
-                                numero = matchSN[2];
-                            }
-                            // Fallback a extraer del nombre de archivo si no coincide
-                            if (serie === 'SS00' || numero === '0000000000') {
-                                var matchFN = file.name.match(/([FfBbEe][A-Za-z0-9]{3})-?([0-9]+)/i);
-                                if (matchFN) {
-                                    serie = matchFN[1].toUpperCase();
-                                    numero = matchFN[2];
-                                }
-                            }
+                var parseadoPdfJs = null;
 
-                            // 2. Extraer IGV
-                            var igv = 0;
-                            var matchIgv = text.match(/I\.?G\.?V\.?\s*([\d,]+\.\d{2})/i);
-                            if (matchIgv) {
-                                igv = parseFloat(matchIgv[1].replace(/,/g, ''));
-                            }
+                // 1. Intentar primero con PDF.js
+                try {
+                    var loadingTask = pdfjsLib.getDocument({
+                        data: typedarray,
+                        cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/cmaps/',
+                        cMapPacked: true
+                    });
+                    var pdf = await loadingTask.promise;
+                    var page = await pdf.getPage(1);
+                    var textContent = await page.getTextContent();
+                    var text = textContent.items.map(function(item) {
+                        return item.str;
+                    }).join(' ');
+                    
+                    var cleanText = text.replace(/\s+/g, ' ').trim();
+                    console.log("Texto extraido por PDF.js de " + file.name + ":", cleanText);
+                    parseadoPdfJs = parsearDatosDeTextoLimpio(cleanText, file.name);
+                } catch(errPdfJs) {
+                    console.warn("PDF.js no pudo procesar completamente " + file.name + ":", errPdfJs);
+                }
 
-                            // 3. Extraer Total
-                            var regexesTotal = [
-                                /Importe\s+Total\s*([\d,]+\.\d{2})/i,
-                                /Importe\s+Total\s*:\s*([\d,]+\.\d{2})/i,
-                                /Total\s*:\s*([\d,]+\.\d{2})/i,
-                                /Total\s+Venta\s*([\d,]+\.\d{2})/i,
-                                /PRECIO\s+VENTA\s+TOTAL\s*([\d,]+\.\d{2})/i,
-                                /Total\s*([\d,]+\.\d{2})/i
-                            ];
+                // Si PDF.js obtuvo el total exitosamente (> 0), retornarlo
+                if (parseadoPdfJs && parseadoPdfJs.total > 0) {
+                    resolve(parseadoPdfJs);
+                    return;
+                }
 
-                            var total = 0;
-                            for (var i = 0; i < regexesTotal.length; i++) {
-                                var match = text.match(regexesTotal[i]);
-                                if (match) {
-                                    total = parseFloat(match[1].replace(/,/g, ''));
-                                    break;
-                                }
-                            }
+                // 2. Si PDF.js devolvió 0 o falló (ej. fuentes CIDFont con CMap custom), extraer directo de los streams
+                try {
+                    var parseadoDirecto = await extraerTextoDirectoDePdf(typedarray, file.name);
+                    if (parseadoDirecto && parseadoDirecto.total > 0) {
+                        console.log("Extracción directa exitosa para " + file.name + ":", parseadoDirecto);
+                        resolve(parseadoDirecto);
+                        return;
+                    }
+                } catch(errDirect) {
+                    console.warn("Extracción directa falló para " + file.name + ":", errDirect);
+                }
 
-                            // Normalizar espacios para evitar inconsistencias
-                            var cleanText = text.replace(/\s+/g, ' ');
-
-                            // 4. Extraer Subtotal
-                            var subtotal = 0;
-                            var matchSub = cleanText.match(/Sub\s*Total\s*([\d,]+\.\d{2})/i);
-                            if (matchSub) {
-                                subtotal = parseFloat(matchSub[1].replace(/,/g, ''));
-                            } else {
-                                subtotal = total - igv;
-                            }
-
-                            var interes = { subtotal: 0, igv: 0, total: 0 };
-                            var comisiones = { subtotal: 0, igv: 0, total: 0 };
-
-                            // 5. Intentar matching de columnas continuas (Layout Columna por Columna)
-                            // "Interés Adelantado Comisiones 1,154.36 0.00 1,154.36 3.50 0.00 3.50"
-                            var matchCol = cleanText.match(/Inter[eé]s\s+Adelantado\s+Comisiones\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
-                            if (matchCol) {
-                                interes.subtotal = parseFloat(matchCol[1].replace(/,/g, ''));
-                                interes.igv = parseFloat(matchCol[2].replace(/,/g, ''));
-                                interes.total = parseFloat(matchCol[3].replace(/,/g, ''));
-                                
-                                comisiones.subtotal = parseFloat(matchCol[4].replace(/,/g, ''));
-                                comisiones.igv = parseFloat(matchCol[5].replace(/,/g, ''));
-                                comisiones.total = parseFloat(matchCol[6].replace(/,/g, ''));
-                            } else {
-                                // 6. Intentar matching de filas individuales (Layout Fila por Fila)
-                                var matchInteres = cleanText.match(/Inter[eé]s\s+Adelantado\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
-                                if (matchInteres) {
-                                    interes.subtotal = parseFloat(matchInteres[1].replace(/,/g, ''));
-                                    interes.igv = parseFloat(matchInteres[2].replace(/,/g, ''));
-                                    interes.total = parseFloat(matchInteres[3].replace(/,/g, ''));
-                                } else {
-                                    var matchInteresSimple = cleanText.match(/Inter[eé]s\s+Adelantado\s+([\d,]+\.\d{2})/i);
-                                    if (matchInteresSimple) {
-                                        interes.subtotal = parseFloat(matchInteresSimple[1].replace(/,/g, ''));
-                                        interes.total = interes.subtotal;
-                                    }
-                                }
-
-                                var matchComisiones = cleanText.match(/Comisiones\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/i);
-                                if (matchComisiones) {
-                                    comisiones.subtotal = parseFloat(matchComisiones[1].replace(/,/g, ''));
-                                    comisiones.igv = parseFloat(matchComisiones[2].replace(/,/g, ''));
-                                    comisiones.total = parseFloat(matchComisiones[3].replace(/,/g, ''));
-                                } else {
-                                    var matchComisionesSimple = cleanText.match(/Comisiones\s+([\d,]+\.\d{2})/i);
-                                    if (matchComisionesSimple) {
-                                        comisiones.subtotal = parseFloat(matchComisionesSimple[1].replace(/,/g, ''));
-                                        comisiones.total = comisiones.subtotal;
-                                    }
-                                }
-                            }
-
-                            // 7. Fallback matemático por si falló la extracción de los montos específicos del PDF
-                            if (interes.total === 0 && comisiones.total === 0 && total > 3.50) {
-                                comisiones.subtotal = 3.50;
-                                comisiones.igv = 0.00;
-                                comisiones.total = 3.50;
-
-                                interes.subtotal = total - 3.50;
-                                interes.igv = 0.00;
-                                interes.total = total - 3.50;
-                            }
-
-                            resolve({
-                                name: file.name,
-                                serie: serie,
-                                numero: numero,
-                                subtotal: subtotal,
-                                igv: igv,
-                                total: total,
-                                interes: interes,
-                                comisiones: comisiones
-                            });
-                        }).catch(function() { resolve({ name: file.name, serie: 'SS00', numero: '0000000000', subtotal: 0, igv: 0, total: 0, interes: { subtotal: 0, igv: 0, total: 0 }, comisiones: { subtotal: 0, igv: 0, total: 0 } }); });
-                    }).catch(function() { resolve({ name: file.name, serie: 'SS00', numero: '0000000000', subtotal: 0, igv: 0, total: 0, interes: { subtotal: 0, igv: 0, total: 0 }, comisiones: { subtotal: 0, igv: 0, total: 0 } }); });
-                }).catch(function() { resolve({ name: file.name, serie: 'SS00', numero: '0000000000', subtotal: 0, igv: 0, total: 0, interes: { subtotal: 0, igv: 0, total: 0 }, comisiones: { subtotal: 0, igv: 0, total: 0 } }); });
+                // Si se obtuvo al menos serie/número de PDF.js, retornarlo
+                if (parseadoPdfJs) {
+                    resolve(parseadoPdfJs);
+                } else {
+                    resolve({
+                        name: file.name,
+                        serie: 'SS00',
+                        numero: '0000000000',
+                        subtotal: 0,
+                        igv: 0,
+                        total: 0,
+                        interes: { subtotal: 0, igv: 0, total: 0 },
+                        comisiones: { subtotal: 0, igv: 0, total: 0 }
+                    });
+                }
             };
             reader.readAsArrayBuffer(file);
         });
