@@ -30,7 +30,8 @@
                                 <th class="text-center" style="padding: 15px;">PROVEEDOR</th>
                                 <th class="text-center" style="padding: 15px;">MONEDA</th>
                                 <th class="text-center" style="padding: 15px;">TIPO PAGO</th>
-                                <th class="text-center" style="padding: 15px;">TOTAL</th>
+                                <th class="text-center" style="padding: 15px;">IMPORTE PEDIDO</th>
+                                <th class="text-center" style="padding: 15px;">IMPORTE COTIZADO</th>
                                 <th class="text-center" style="padding: 15px;">ESTADO</th>
                                 <th class="text-center" style="padding: 15px;">ACCIONES</th>
                             </tr>
@@ -61,6 +62,9 @@
                                         </td>
                                         <td class="text-center">{{ $item->TXT_CATEGORIA_TIPO_PAGO }}</td>
                                         <td class="text-center">
+                                            <b style="font-size: 14px;">{{ number_format($item->CAN_TOTAL_PEDIDO, 2, '.', ',') }}</b>
+                                        </td>
+                                        <td class="text-center">
                                             <b style="font-size: 14px;">{{ number_format($item->CAN_TOTAL, 2, '.', ',') }}</b>
                                         </td>
                                         <td class="text-center">
@@ -82,7 +86,7 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="12" class="text-center" style="padding: 30px; color: #999;">
+                                    <td colspan="13" class="text-center" style="padding: 30px; color: #999;">
                                         <i class="fa fa-info-circle fa-2x" style="margin-bottom: 10px; display: block;"></i>
                                         No se encontraron cotizaciones pendientes de aprobación de Gerencia Administrativa.
                                     </td>

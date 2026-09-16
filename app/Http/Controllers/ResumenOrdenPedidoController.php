@@ -201,6 +201,10 @@ class ResumenOrdenPedidoController extends Controller
             ->orderBy('FECHA', 'asc')
             ->get();
 
+        $tiene_consolidado = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA', $id_buscar)
+            ->exists();
+
         return view('ordenpedido.modal.modaldetallepedidores', [
             'ajax' => true,
             'pedido' => $pedido,
@@ -210,7 +214,8 @@ class ResumenOrdenPedidoController extends Controller
             'cantidad' => $cantidad,
             'txt_observacion' => $txt_observacion,
             'pedillodetalle' => $pedillodetalle,
-            'historial' => $historial
+            'historial' => $historial,
+            'tiene_consolidado' => $tiene_consolidado
         ]);
     }
 

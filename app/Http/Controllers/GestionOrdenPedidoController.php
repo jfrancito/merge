@@ -660,6 +660,7 @@ class GestionOrdenPedidoController extends Controller
     public function actionDetallePedido(Request $request)
     {
         $id_buscar = $request->input('orden_pedido_id');
+        $es_resumen = $request->input('es_resumen', 0);
 
         $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
         
@@ -675,11 +676,17 @@ class GestionOrdenPedidoController extends Controller
             ->orderBy('FECHA', 'asc')
             ->get();
 
+        $tiene_consolidado = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA', $id_buscar)
+            ->exists();
+
         return view('ordenpedido.ajax.detalletabpedido', [
             'ajax' => true,
             'pedido' => $pedido,
             'pedillodetalle' => $pedillodetalle,
-            'historial' => $historial
+            'historial' => $historial,
+            'tiene_consolidado' => $tiene_consolidado,
+            'es_resumen' => (bool)$es_resumen
         ]);
     }
 

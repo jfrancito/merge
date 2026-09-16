@@ -24,7 +24,8 @@
                         <th class="text-center" style="padding: 12px 15px;">PROVEEDOR</th>
                         <th class="text-center" style="padding: 12px 15px;">MONEDA</th>
                         <th class="text-center" style="padding: 12px 15px;">TIPO PAGO</th>
-                        <th class="text-center" style="padding: 12px 15px;">TOTAL</th>
+                        <th class="text-center" style="padding: 12px 15px;">IMPORTE PEDIDO</th>
+                        <th class="text-center" style="padding: 12px 15px;">IMPORTE COTIZADO</th>
                         <th class="text-center" style="padding: 12px 15px;">ESTADO</th>
                         <th class="text-center" style="padding: 12px 15px;">ACCIONES</th>
                     </tr>
@@ -51,6 +52,9 @@
                                 </span>
                             </td>
                             <td class="text-center">{{ $item->TXT_CATEGORIA_TIPO_PAGO }}</td>
+                            <td class="text-center">
+                                <b style="font-size: 14px;">{{ number_format($item->CAN_TOTAL_PEDIDO, 2, '.', ',') }}</b>
+                            </td>
                             <td class="text-center">
                                 <b style="font-size: 14px;">{{ number_format($item->CAN_TOTAL, 2, '.', ',') }}</b>
                             </td>

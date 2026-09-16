@@ -244,7 +244,12 @@
     @endif
 </div>
 
-<div class="modal-footer justify-content-center bg-white border-top" style="flex: 0 0 auto; padding: 15px;">
+<div class="modal-footer justify-content-center bg-white border-top" style="flex: 0 0 auto; padding: 15px; display: flex; gap: 10px; align-items: center;">
+    @if ($pedido->COD_ESTADO === 'ETM0000000000005' && (!isset($tiene_consolidado) ? !DB::table('CMP.REFERENCIA_ASOC')->where('COD_TABLA', $pedido->ID_PEDIDO)->exists() : !$tiene_consolidado))
+        <button type="button" class="btn btn-danger rechazar-pedido-adm shadow-sm" data-id="{{ $pedido->ID_PEDIDO }}" style="border-radius: 20px; padding: 6px 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px;">
+            <i class="fa fa-times-circle me-1"></i> Rechazar Pedido
+        </button>
+    @endif
     <button type="button" data-dismiss="modal" class="btn btn-primary modal-close shadow-sm" style="border-radius: 20px; padding: 6px 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px;">
         Cerrar Detalle
     </button>
