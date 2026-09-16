@@ -2137,14 +2137,15 @@ $(document).ready(function () {
             url: carpeta + '/ver_detalle_orden_pedido',
             data: {
                 _token: _token,
-                orden_pedido_id: id_pedido
+                orden_pedido_id: id_pedido,
+                es_resumen: 1
             },
             success: function (data) {
                 cerrarcargando();
                 $("#detalle-pedido-container").html(data);
 
                 // Ocultar botones de acción de edición si estamos en el resumen
-                $("#detalle-pedido-container").find(".editar-pedido, .emitir-pedido").hide();
+                $("#detalle-pedido-container").find(".editar-pedido, .emitir-pedido, .anular-pedido").hide();
 
                 $("#tab-detalle-pedido").show();
                 $('.nav-tabs a[href="#detallepedido"]').tab('show');

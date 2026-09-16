@@ -293,6 +293,11 @@
                                 data-id="{{ $pedido->ID_PEDIDO }}">
                             <i class="fa fa-times-circle me-1"></i> Rechazar Pedido
                         </button>
+                    @elseif ($pedido->COD_ESTADO == 'ETM0000000000005' && (!isset($tiene_consolidado) ? !DB::table('CMP.REFERENCIA_ASOC')->where('COD_TABLA', $pedido->ID_PEDIDO)->exists() : !$tiene_consolidado))
+                        <button class="btn-corpo btn-corpo-danger rechazar-pedido-adm" 
+                                data-id="{{ $pedido->ID_PEDIDO }}">
+                            <i class="fa fa-times-circle me-1"></i> Rechazar Pedido
+                        </button>
                     @endif
                     
                     <button class="btn-corpo btn-corpo-secondary" onclick="$('#tab-detalle-pedido-adm').hide(); $('.nav-tabs a[href=\'#ordenpedidoadm\']').tab('show');">

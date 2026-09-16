@@ -20,12 +20,22 @@ class GestionApruebaCotGerenciaAdmController extends Controller
 {
     public function actionGestionApruebaCotGerenciaAdm($idopcion)
     {
+        $subquery_total_pedido = DB::raw('(SELECT ISNULL(SUM(OPD.CAN_PRECIO), 0) 
+                                           FROM WEB.ORDEN_PEDIDO_DETALLE AS OPD 
+                                           WHERE OPD.ACTIVO = 1 
+                                             AND OPD.ID_PEDIDO IN (
+                                                 SELECT REF.COD_TABLA 
+                                                 FROM CMP.REFERENCIA_ASOC AS REF 
+                                                 WHERE REF.COD_TABLA_ASOC = C.ID_COTIZACION
+                                             )
+                                          ) as CAN_TOTAL_PEDIDO');
+
         // 1. Cotizaciones Pendientes (ETM0000000000018)
         $pendientes = DB::table('WEB.ORDEN_COTIZACION as C')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
             ->where('C.ACTIVO', 1)
             ->where('C.COD_ESTADO', 'ETM0000000000018')
-            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO')
+            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', $subquery_total_pedido)
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();
 
@@ -35,7 +45,7 @@ class GestionApruebaCotGerenciaAdmController extends Controller
             ->where('C.ACTIVO', 1)
             ->where('C.COD_ESTADO', 'ETM0000000000005')
             ->where('C.COD_USUARIO_MODIF_AUD', '1CIX00000401')
-            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO')
+            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', $subquery_total_pedido)
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();
 
@@ -45,7 +55,7 @@ class GestionApruebaCotGerenciaAdmController extends Controller
             ->where('C.ACTIVO', 1)
             ->where('C.COD_ESTADO', 'ETM0000000000014')
             ->where('C.COD_USUARIO_MODIF_AUD', '1CIX00000401')
-            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO')
+            ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', $subquery_total_pedido)
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();
 
@@ -69,6 +79,16 @@ class GestionApruebaCotGerenciaAdmController extends Controller
         $f_inicio = date('Y-m-d', strtotime($fecha_inicio));
         $f_fin = date('Y-m-d', strtotime($fecha_fin));
 
+        $subquery_total_pedido = DB::raw('(SELECT ISNULL(SUM(OPD.CAN_PRECIO), 0) 
+                                           FROM WEB.ORDEN_PEDIDO_DETALLE AS OPD 
+                                           WHERE OPD.ACTIVO = 1 
+                                             AND OPD.ID_PEDIDO IN (
+                                                 SELECT REF.COD_TABLA 
+                                                 FROM CMP.REFERENCIA_ASOC AS REF 
+                                                 WHERE REF.COD_TABLA_ASOC = C.ID_COTIZACION
+                                             )
+                                          ) as CAN_TOTAL_PEDIDO');
+
         $query = DB::table('WEB.ORDEN_COTIZACION as C')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
             ->whereBetween(DB::raw('CAST(C.FEC_COTIZACION AS DATE)'), [$f_inicio, $f_fin])
@@ -89,7 +109,8 @@ class GestionApruebaCotGerenciaAdmController extends Controller
 
         $listacotizaciones = $query->select(
                 'C.*',
-                'CEN.TXT_ABREVIATURA as ABREV_CENTRO'
+                'CEN.TXT_ABREVIATURA as ABREV_CENTRO',
+                $subquery_total_pedido
             )
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();

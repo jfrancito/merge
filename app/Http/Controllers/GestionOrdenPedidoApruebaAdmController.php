@@ -261,6 +261,10 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             ->orderBy('FECHA', 'asc')
             ->get();
 
+        $tiene_consolidado = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA', $id_buscar)
+            ->exists();
+
         return view('ordenpedido.ajax.detalletabpedidoadm', [
             'ajax' => true,
             'pedido' => $pedido,
@@ -272,7 +276,8 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             'pedillodetalle' => $pedillodetalle,
             'can_precio' => $can_precio,
             'cod_usuario_session' => $cod_usuario_session,
-            'historial' => $historial
+            'historial' => $historial,
+            'tiene_consolidado' => $tiene_consolidado
         ]);
     }
 
