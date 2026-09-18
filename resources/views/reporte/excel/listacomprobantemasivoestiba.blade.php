@@ -177,18 +177,20 @@
             </td>
 
 
-            <td>          
-                @IF($item->CAN_DETRACCION>0)
-                    SI
-                @ELSE
-                    NO
-                @ENDIF
-            </td>
-            <td>-</td>
-            <td>{{$item->CAN_DETRACCION}}</td>
-            <td>-</td>
-            <td>-</td>
-            <td>{{$item->NRO_CUENTA}}</td>
+            @php
+                $es_tipo_det_valido = (!empty($item->TIPO_DETRACCION) && !in_array(trim($item->TIPO_DETRACCION), ['Credito', 'Contado']));
+                $tiene_detraccion = (((float)$item->MONTO_DETRACCION_RED > 0) || (!empty($item->CTA_DETRACCION)) || $es_tipo_det_valido);
+                $monto_detraccion = $tiene_detraccion ? (((float)$item->MONTO_DETRACCION_RED > 0) ? (float)$item->MONTO_DETRACCION_RED : (((float)$item->CAN_DETRACCION > 0) ? (float)$item->CAN_DETRACCION : 0)) : 0;
+                $tiene_constancia = (!empty($item->FOLIO_DETRACCION) || !empty($item->FOLIO_DETRACCION_RESERVA) || !empty($item->COD_PAGO_DETRACCION));
+                $nro_constancia = !empty($item->FOLIO_DETRACCION) ? $item->FOLIO_DETRACCION : (!empty($item->FOLIO_DETRACCION_RESERVA) ? $item->FOLIO_DETRACCION_RESERVA : (!empty($item->COD_PAGO_DETRACCION) ? $item->COD_PAGO_DETRACCION : '-'));
+                $cta_detraccion = !empty($item->CTA_DETRACCION) ? $item->CTA_DETRACCION : (!empty($item->NRO_CUENTA) ? $item->NRO_CUENTA : '-');
+            @endphp
+            <td>{{ $tiene_detraccion ? 'SI' : 'NO' }}</td>
+            <td>{{ $es_tipo_det_valido ? trim($item->TIPO_DETRACCION) : '-' }}</td>
+            <td>{{ $monto_detraccion }}</td>
+            <td>{{ $tiene_constancia ? 'SI' : 'NO' }}</td>
+            <td>{{ $nro_constancia }}</td>
+            <td>{{ $cta_detraccion }}</td>
             <td>{{$item->TXT_CONTACTO_N}}</td>
             <td>          
                 @IF(count($item->productos_reparable)>0)
