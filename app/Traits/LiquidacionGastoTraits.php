@@ -583,7 +583,9 @@ trait LiquidacionGastoTraits
         $accion                                         =       'I';
         $vacio                                          =       '';
         $valor_cero                                     =       '0';
+        $valor_cero_int                                 =       0;
         $cod_estado                                     =       1;
+        $cod_estado_int                                 =       1;
 
         $cod_usuario_registro                           =       Session::get('usuario')->name;
 
@@ -620,45 +622,61 @@ trait LiquidacionGastoTraits
             $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='',
             $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@TXT_NOMBRES='',
             $stmt->bindParam(18, $fecha_ilimitada ,PDO::PARAM_STR);                         //@FEC_NACIMIENTO='1901-01-01 00:00:00',
-            $stmt->bindParam(19, $valor_cero ,PDO::PARAM_STR);                              //@IND_CHOFER=0,
+            $stmt->bindValue(19, 0, PDO::PARAM_INT);                                      //@IND_CHOFER=0,
             $stmt->bindParam(20, $vacio ,PDO::PARAM_STR);                                   //@COD_TIPO_BREVETE='                ',
 
 
             $stmt->bindParam(21, $vacio ,PDO::PARAM_STR);                                   //@NRO_BREVETE='',
             $stmt->bindParam(22, $COD_CATEGORIA_EMPR ,PDO::PARAM_STR);                      //@COD_CATEGORIA_EMPR='TEM0000000000001',
             $stmt->bindParam(23, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA='',
-            $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@IND_SISTEMA=0,
-            $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@IND_CLIENTE=0,
-            $stmt->bindParam(26, $cod_estado ,PDO::PARAM_STR);                              //@IND_PROVEEDOR=1,
-            $stmt->bindParam(27, $valor_cero  ,PDO::PARAM_STR);                             //@IND_SUPERMERCADO=0,
-            $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                              //@IND_TRANSPORTISTA=0,
-            $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                              //@IND_CUADRILLA=0,
-            $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                             //@IND_ACOPIADOR=0,
+            $stmt->bindValue(24, 0, PDO::PARAM_INT);                                      //@IND_SISTEMA=0,
+            $stmt->bindValue(25, 0, PDO::PARAM_INT);                                      //@IND_CLIENTE=0,
+            $stmt->bindValue(26, 1, PDO::PARAM_INT);                                      //@IND_PROVEEDOR=1,
+            $stmt->bindValue(27, 0, PDO::PARAM_INT);                                      //@IND_SUPERMERCADO=0,
+            $stmt->bindValue(28, 0, PDO::PARAM_INT);                                      //@IND_TRANSPORTISTA=0,
+            $stmt->bindValue(29, 0, PDO::PARAM_INT);                                      //@IND_CUADRILLA=0,
+            $stmt->bindValue(30, 0, PDO::PARAM_INT);                                      //@IND_ACOPIADOR=0,
 
 
-            $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@IND_GARANTE=0,
-            $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                              //@IND_FORMAL=0,
-            $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@IND_RELACIONADO=0,
-            $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                              //@IND_COMERCIAL_ACOPIO=0,
+            $stmt->bindValue(31, 0, PDO::PARAM_INT);                                      //@IND_GARANTE=0,
+            $stmt->bindValue(32, 0, PDO::PARAM_INT);                                      //@IND_FORMAL=0,
+            $stmt->bindValue(33, 0, PDO::PARAM_INT);                                      //@IND_RELACIONADO=0,
+            $stmt->bindValue(34, 0, PDO::PARAM_INT);                                      //@IND_COMERCIAL_ACOPIO=0,
             $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_GARANTIA='                ',
             $stmt->bindParam(36, $TXT_TIPO_GARANTIA  ,PDO::PARAM_STR);                      //@TXT_TIPO_GARANTIA='ESPECIFICAR',
             $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@TXT_DESCRIPCION_GARANTIA='',
-            $stmt->bindParam(38, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0,
-            $stmt->bindParam(39, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_LIMITE=0,
-            $stmt->bindParam(40, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
+            $stmt->bindValue(38, 0.0, PDO::PARAM_STR);                                      //@CAN_GARANTIA=0, [decimal]
+            $stmt->bindValue(39, 0.0, PDO::PARAM_STR);                                      //@CAN_LIMITE=0, [decimal]
+            $stmt->bindValue(40, 1, PDO::PARAM_INT);                                      //@COD_ESTADO=1,
 
             $stmt->bindParam(41, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
-            $stmt->bindParam(42, $valor_cero  ,PDO::PARAM_STR);                             //@IND_INAFECTOIGV=0,
-            $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GEN_DOC_ELEC=0,
-            $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COMERCIAL_SERVICIO=0,
-            $stmt->bindParam(45, $valor_cero  ,PDO::PARAM_STR);                             //@IND_BOLETEO_INTERES=0,
-            $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0,
-            $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
+            $stmt->bindValue(42, 0, PDO::PARAM_INT);                                      //@IND_INAFECTOIGV=0,
+            $stmt->bindValue(43, 0, PDO::PARAM_INT);                                      //@IND_GEN_DOC_ELEC=0,
+            $stmt->bindValue(44, 0, PDO::PARAM_INT);                                      //@IND_COMERCIAL_SERVICIO=0,
+            $stmt->bindValue(45, 0, PDO::PARAM_INT);                                      //@IND_BOLETEO_INTERES=0,
+            $stmt->bindValue(46, 0, PDO::PARAM_INT);                                      //@IND_COSTO=0,
+            $stmt->bindValue(47, 0, PDO::PARAM_INT);                                      //@IND_GASTO=0,
             $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
             $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
-            if($centro_id == 'CEN0000000000001' || $centro_id == 'CEN0000000000002'){
+            if($centro_id != 'CEN0000000000004' && $centro_id != 'CEN0000000000006'){
                 $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                              //@TXT_CLAVE_LLAVE=''
             }
+            \Log::debug('EMPRESA_IUD params', [
+                'centro_id'             => $centro_id,
+                'empresa_id'            => $empresa_id,
+                'rz'                    => $rz,
+                'ruc'                   => $ruc,
+                'direccion'             => $direccion,
+                'departamento_id'       => $departamento_id,
+                'provincia_id'          => $provincia_id,
+                'distrito_id'           => $distrito_id,
+                'ind_empresa'           => $ind_empresa,
+                'ind_empresa_type'      => gettype($ind_empresa),
+                'ind_contrato'          => $ind_contrato,
+                'ind_contrato_type'     => gettype($ind_contrato),
+                'cod_usuario_registro'  => $cod_usuario_registro,
+                'fecha_ilimitada'       => $fecha_ilimitada,
+            ]);
             $stmt->execute();
             $coddocumento = $stmt->fetch();
 
@@ -670,10 +688,11 @@ trait LiquidacionGastoTraits
 
 
             $COD_ESTABLECIMIENTO_SUNAT  = '0001';
-            $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            $cod_empr_nuevo = $coddocumento[0];
+            $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
             $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
             $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_DIRECCION='                ',
-            $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_EMPR='IICHEM0000009259',
+            $stmt->bindParam(3, $cod_empr_nuevo ,PDO::PARAM_STR);                           //@COD_EMPR='IICHEM0000009259',
             $stmt->bindParam(4, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
             $stmt->bindParam(5, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
             $stmt->bindParam(6, $direccion  ,PDO::PARAM_STR);                               //@NOM_DIRECCION='CAL. CRISTOBAL COLON NRO 222 CERCADO DE CHICLAYO ',
@@ -682,11 +701,13 @@ trait LiquidacionGastoTraits
             $stmt->bindParam(8, $provincia_id  ,PDO::PARAM_STR);                            //@COD_PROVINCIA='PRO0000000000125',
             $stmt->bindParam(9, $distrito_id  ,PDO::PARAM_STR);                             //@COD_DISTRITO='DIS0000000001211',
 
-            $stmt->bindParam(10, $valor_cero  ,PDO::PARAM_STR);                             //@IND_DEFAULT=0,
-            $stmt->bindParam(11, $cod_estado  ,PDO::PARAM_STR);                             //@IND_DIRECCION_FISCAL=1,
-            $stmt->bindParam(12, $cod_estado ,PDO::PARAM_STR);                              //@COD_ESTADO=1,
-            $stmt->bindParam(13, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
-            $stmt->bindParam(14, $COD_ESTABLECIMIENTO_SUNAT  ,PDO::PARAM_STR);              //@COD_ESTABLECIMIENTO_SUNAT='0001           '
+            $stmt->bindValue(10, 0, PDO::PARAM_INT);                                      //@IND_DEFAULT=0,
+            $stmt->bindValue(11, 1, PDO::PARAM_INT);                                      //@IND_DIRECCION_FISCAL=1,
+            $stmt->bindValue(12, 0, PDO::PARAM_INT);                                      //@IND_DIRECCION_ENTREGA=0,
+            $stmt->bindValue(13, 1, PDO::PARAM_INT);                                      //@COD_ESTADO=1,
+            $stmt->bindParam(14, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
+            $stmt->bindParam(15, $COD_ESTABLECIMIENTO_SUNAT  ,PDO::PARAM_STR);              //@COD_ESTABLECIMIENTO_SUNAT='0001           '
+            \Log::debug('EMPRESA_DIRECCION_IUD - antes execute', ['cod_empr_nuevo' => $cod_empr_nuevo, 'empresa_id' => $empresa_id, 'centro_id' => $centro_id]);
             $stmt->execute();
 
             $cod_id = $coddocumento[0];
@@ -754,15 +775,15 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(25, $FEC_CONTRATO ,PDO::PARAM_STR);                           //@FEC_CONTRATO='2025-05-06 00:00:00'
         $stmt->bindParam(26, $fecha_ilimitada ,PDO::PARAM_STR);                        //@FEC_INICIO_CAMPANA='1901-01-01 00:00:00'
         $stmt->bindParam(27, $fecha_ilimitada  ,PDO::PARAM_STR);                       //@FEC_FIN_CAMPANA='1901-01-01 00:00:00'
-        $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                             //@CAN_LIMITE_CREDITO=0
-        $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0
-        $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_HECTAREAS=0
+        $stmt->bindValue(28, 0.0, PDO::PARAM_STR);                                          //@CAN_LIMITE_CREDITO=0 [decimal]
+        $stmt->bindValue(29, 0.0, PDO::PARAM_STR);                                          //@CAN_GARANTIA=0 [decimal]
+        $stmt->bindValue(30, 0.0, PDO::PARAM_STR);                                          //@CAN_HECTAREAS=0 [decimal]
 
 
-        $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                             //@CAN_TEA=0
-        $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_MN=0
-        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_ME=0
-        $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_INTERES=0
+        $stmt->bindValue(31, 0.0, PDO::PARAM_STR);                                          //@CAN_TEA=0 [decimal]
+        $stmt->bindValue(32, 0.0, PDO::PARAM_STR);                                          //@CAN_SALDO_MN=0 [decimal]
+        $stmt->bindValue(33, 0.0, PDO::PARAM_STR);                                          //@CAN_SALDO_ME=0 [decimal]
+        $stmt->bindValue(34, 0.0, PDO::PARAM_STR);                                          //@CAN_SALDO_INTERES=0 [decimal]
         $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                 //@TXT_CAMPANA=''
         $stmt->bindParam(36, $vacio  ,PDO::PARAM_STR);                                 //@TXT_DESCRIPCION_HABILITACION=''
         $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_GARANTIA=''
@@ -770,12 +791,13 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(39, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_REFERENCIA=''
         $stmt->bindParam(40, $vacio  ,PDO::PARAM_STR);                                 //@TXT_REFERENCIA=''
 
-        $stmt->bindParam(41, $cod_estado  ,PDO::PARAM_STR);                            //@COD_ESTADO=1
+        $stmt->bindValue(41, 1, PDO::PARAM_INT);                                          //@COD_ESTADO=1
         $stmt->bindParam(42, $cod_usuario_registro  ,PDO::PARAM_STR);                  //@COD_USUARIO_REGISTRO='JSALDANR        '
-        $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_SALDO_SGI=0
-        $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_DIFERENCIA_SGI=0
+        $stmt->bindValue(43, 0.0, PDO::PARAM_STR);                                          //@CAN_SALDO_SGI=0 [decimal]
+        $stmt->bindValue(44, 0.0, PDO::PARAM_STR);                                          //@CAN_DIFERENCIA_SGI=0 [decimal]
         $stmt->bindParam(45, $FEC_CONTRATO  ,PDO::PARAM_STR);                          //@FEC_CIERRE_SGI='2025-05-06'
 
+        \Log::debug('CONTRATO_IUD - antes execute', ['cod_id' => $cod_id, 'empresa_id' => $empresa_id, 'centro_id' => $centro_id, 'FEC_CONTRATO' => $FEC_CONTRATO]);
         $stmt->execute();
 
 
@@ -796,9 +818,10 @@ trait LiquidacionGastoTraits
 
 
 
+        $cod_contrato_nuevo = $codcontrato[0];
         $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.CONTRATO_CULTIVO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                 //@IND_TIPO_OPERACION='I',
-        $stmt->bindParam(2, $codcontrato[0]  ,PDO::PARAM_STR);                        //@COD_CONTRATO='IICHRC0000012002',
+        $stmt->bindParam(2, $cod_contrato_nuevo  ,PDO::PARAM_STR);                        //@COD_CONTRATO='IICHRC0000012002',
         $stmt->bindParam(3, $vacio ,PDO::PARAM_STR);                                  //@COD_CULTIVO=default,
         $stmt->bindParam(4, $COD_ZONA_COMERCIAL ,PDO::PARAM_STR);                     //@COD_ZONA_COMERCIAL='IICHZON000000001',
         $stmt->bindParam(5, $TXT_ZONA_COMERCIAL ,PDO::PARAM_STR);                     //@TXT_ZONA_COMERCIAL='CHICLAYO',
@@ -808,7 +831,7 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(9, $fecha_ilimitada  ,PDO::PARAM_STR);                       //@FEC_COSECHA='1901-01-01 00:00:00',
         $stmt->bindParam(10, $TXT_DESCRIPCION  ,PDO::PARAM_STR);                      //@TXT_DESCRIPCION='GENERADO AUTOMATICO',
 
-        $stmt->bindParam(11, $valor_cero  ,PDO::PARAM_STR);                           //@CAN_HECTAREA=0,
+        $stmt->bindValue(11, 0, PDO::PARAM_INT);                                           //@CAN_HECTAREA=0,
         $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                 //@TXT_DIRECCION='',
         $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                //@COD_CATEGORIA_DEPARTAMENTO='                ',
         $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                //@TXT_CATEGORIA_DEPARTAMENTO='',
@@ -826,7 +849,7 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(25, $CAN_LIMITE_CREDITO_INDIVIDUAL ,PDO::PARAM_STR);         //@CAN_LIMITE_CREDITO_SERVICIO=9999999.0000,
         $stmt->bindParam(26, $COD_CATEGORIA_ESTADO ,PDO::PARAM_STR);                  //@COD_CATEGORIA_ESTADO='ECO0000000000001',
         $stmt->bindParam(27, $TXT_CATEGORIA_ESTADO  ,PDO::PARAM_STR);                 //@TXT_CATEGORIA_ESTADO='GENERADO',
-        $stmt->bindParam(28, $cod_estado ,PDO::PARAM_STR);                            //@COD_ESTADO=1,
+        $stmt->bindValue(28, 1, PDO::PARAM_INT);                                         //@COD_ESTADO=1,
         $stmt->bindParam(29, $cod_usuario_registro ,PDO::PARAM_STR);                  //@COD_USUARIO_REGISTRO='                '
         $stmt->execute();
 
