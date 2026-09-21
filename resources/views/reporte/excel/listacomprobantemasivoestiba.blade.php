@@ -183,14 +183,14 @@
                 $monto_detraccion = $tiene_detraccion ? (((float)$item->MONTO_DETRACCION_RED > 0) ? (float)$item->MONTO_DETRACCION_RED : (((float)$item->CAN_DETRACCION > 0) ? (float)$item->CAN_DETRACCION : 0)) : 0;
                 $tiene_constancia = (!empty($item->FOLIO_DETRACCION) || !empty($item->FOLIO_DETRACCION_RESERVA) || !empty($item->COD_PAGO_DETRACCION));
                 $nro_constancia = !empty($item->FOLIO_DETRACCION) ? $item->FOLIO_DETRACCION : (!empty($item->FOLIO_DETRACCION_RESERVA) ? $item->FOLIO_DETRACCION_RESERVA : (!empty($item->COD_PAGO_DETRACCION) ? $item->COD_PAGO_DETRACCION : '-'));
-                $cta_detraccion = !empty($item->CTA_DETRACCION) ? $item->CTA_DETRACCION : (!empty($item->NRO_CUENTA) ? $item->NRO_CUENTA : '-');
+                $nro_cuenta = !empty($item->NRO_CUENTA) ? $item->NRO_CUENTA : '-';
             @endphp
             <td>{{ $tiene_detraccion ? 'SI' : 'NO' }}</td>
             <td>{{ $es_tipo_det_valido ? trim($item->TIPO_DETRACCION) : '-' }}</td>
             <td>{{ $monto_detraccion }}</td>
             <td>{{ $tiene_constancia ? 'SI' : 'NO' }}</td>
             <td>{{ $nro_constancia }}</td>
-            <td>{{ $cta_detraccion }}</td>
+            <td>{{ $nro_cuenta }}</td>
             <td>{{$item->TXT_CONTACTO_N}}</td>
             <td>          
                 @IF(count($item->productos_reparable)>0)
