@@ -7609,7 +7609,7 @@ trait ComprobanteTraits
         return  $registros;
     }
 
-    private function gn_lista_comision_asociados_top_terminado_cambio_moneda($array, $lote) {
+    private function gn_lista_comision_asociados_top_terminado_cambio_moneda($array, $lote, $fedocumento = null) {
 
         $registros = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('FE_REF_ASOC', function ($leftJoin) use ($lote){
@@ -7620,7 +7620,7 @@ trait ComprobanteTraits
                     ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
                     ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
                     ->leftJoin('STD.EMPRESA as EMP', function($join) {
-                        $join->on(DB::raw("ISNULL(NULLIF(TES.COD_PROVEEDOR, ''), TCB.COD_BANCO)"), '=', 'EMP.COD_EMPR');
+                        $join->on(DB::raw("ISNULL(NULLIF(LTRIM(RTRIM(TES.COD_PROVEEDOR)), ''), TCB.COD_BANCO)"), '=', 'EMP.COD_EMPR');
                     })
                     ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
                     ->leftJoin('CMP.CATEGORIA as CME', function($join) {

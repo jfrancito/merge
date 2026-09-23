@@ -746,14 +746,21 @@ class GestionOCTesoreriaController extends Controller
                                 ->toArray();
 
 
-                            $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
-                            $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-                            // VALIDAR SI ES OPERACION DE CAMBIO DE MONEDA O SI ES NULL
-                            if(!$documento_top){
-                                $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc);
+                            $es_cambio_moneda = DB::table('TES.OPERACION_CAJA')
+                                ->whereIn('COD_OPERACION_CAJA', $lotes)
+                                ->where(function($q) {
+                                    $q->where('TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
+                                      ->orWhere('TXT_GLOSA', 'like', '%WESTERN UNION%');
+                                })
+                                ->exists();
+
+                            if ($es_cambio_moneda) {
+                                $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc, $fedocumento);
                                 $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $idoc);
                                 $this->con_validar_documento_proveedor_comision_cambio_moneda($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
-                            }else{
+                            } else {
+                                $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
+                                $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
                                 $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
                             }
                                         //dd("hola");
@@ -1197,11 +1204,20 @@ class GestionOCTesoreriaController extends Controller
             ->toArray();
 
 
-        $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
-        $documento_top = $this->gn_lista_comision_asociados_top($lotes);
-        if (!$documento_top) {
-            $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $lote);
+        $es_cambio_moneda = DB::table('TES.OPERACION_CAJA')
+            ->whereIn('COD_OPERACION_CAJA', $lotes)
+            ->where(function($q) {
+                $q->where('TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
+                  ->orWhere('TXT_GLOSA', 'like', '%WESTERN UNION%');
+            })
+            ->exists();
+
+        if ($es_cambio_moneda) {
+            $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $lote, $fedocumento);
             $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $lote);
+        } else {
+            $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
+            $documento_top = $this->gn_lista_comision_asociados_top($lotes);
         }
 
         $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $idoc)
