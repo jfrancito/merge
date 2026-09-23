@@ -331,6 +331,9 @@ class GestionOCTesoreriaController extends Controller
 
                 $documento_asociados = $this->gn_lista_comision_asociados($lotes);
                 $documento_top = $this->gn_lista_comision_asociados_top($lotes);
+                if (!$documento_top) {
+                    $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc);
+                }
 
                 FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
@@ -745,9 +748,14 @@ class GestionOCTesoreriaController extends Controller
 
                             $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
                             $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-                            //dd($documento_top);
-                            //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
-                            $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
+                            // VALIDAR SI ES OPERACION DE CAMBIO DE MONEDA O SI ES NULL
+                            if(!$documento_top){
+                                $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc);
+                                $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $idoc);
+                                $this->con_validar_documento_proveedor_comision_cambio_moneda($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
+                            }else{
+                                $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
+                            }
                                         //dd("hola");
                             $token = '';
                             if ($prefijocarperta == 'II') {
@@ -1191,6 +1199,10 @@ class GestionOCTesoreriaController extends Controller
 
         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
         $documento_top = $this->gn_lista_comision_asociados_top($lotes);
+        if (!$documento_top) {
+            $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $lote);
+            $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $lote);
+        }
 
         $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $idoc)
             ->where('ACTIVO', '=', 1)

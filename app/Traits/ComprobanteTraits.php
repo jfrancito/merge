@@ -7393,6 +7393,65 @@ trait ComprobanteTraits
         return  $registros;
     }
 
+    private function gn_lista_comision_asociados_atendidos_cambio_moneda($array, $lote) {
+
+        $registros = DB::table('TES.OPERACION_CAJA as TES')
+                    ->leftJoin('FE_REF_ASOC', function ($leftJoin) use ($lote){
+                        $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                            ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                            ->Where('FE_REF_ASOC.LOTE', $lote);
+                    })
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA = 0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw("
+                            CASE 
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                                ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                            END AS MONTO
+                        "),
+                        DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                        DB::raw("
+                            CASE 
+                                WHEN ISNULL(FE_REF_ASOC.ATENDIDO, 0) > 0 THEN FE_REF_ASOC.ATENDIDO
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                                ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                            END AS MONTOATENDIDOREAL
+                        "),
+                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
+                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'TCB.COD_BANCO'
+                    )
+                    ->whereIn('TES.COD_OPERACION_CAJA', $array)
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->get();
+
+        return $registros;
+    }
 
     private function gn_lista_comision_asociados($array) {
 
@@ -7548,6 +7607,56 @@ trait ComprobanteTraits
 
 
         return  $registros;
+    }
+
+    private function gn_lista_comision_asociados_top_terminado_cambio_moneda($array, $lote) {
+
+        $registros = DB::table('TES.OPERACION_CAJA as TES')
+                    ->leftJoin('FE_REF_ASOC', function ($leftJoin) use ($lote){
+                        $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                            ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                            ->Where('FE_REF_ASOC.LOTE', $lote);
+                    })
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('STD.EMPRESA as EMP', function($join) {
+                        $join->on(DB::raw("ISNULL(NULLIF(TES.COD_PROVEEDOR, ''), TCB.COD_BANCO)"), '=', 'EMP.COD_EMPR');
+                    })
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA = 0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
+                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                        DB::raw("ISNULL(FE_REF_ASOC.ATENDIDO,0) AS MONTOATENDIDOREAL"),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'EMP.NRO_DOCUMENTO AS RUC'
+                    )
+                    ->whereIn('TES.COD_OPERACION_CAJA', $array)
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->first();
+
+        return $registros;
     }
 
     private function gn_lista_comision_asociados_top($array) {
@@ -8998,6 +9107,65 @@ trait ComprobanteTraits
 
                             ]);
 
+    }
+
+    private function con_validar_documento_proveedor_comision_cambio_moneda($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc){
+        if(!$documento_top) {
+            return;
+        }
+
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   0;
+        $ind_formapago      =   0;
+        $ind_errototal      =   1;
+
+        // RUC
+        $ind_ruc            =   0;
+        if(trim($documento_top->RUC) == trim($fedocumento->RUC_PROVEEDOR)){
+            $ind_ruc            =   1;
+        }else{  $ind_errototal      =   0;  }
+
+        $ind_rz             =   1;
+        // Moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($documento_top->MONEDA == $txtmoneda){
+            $ind_moneda             =   1;
+        }else{  $ind_errototal      =   0;  }
+
+        $total_1 = $documento_asociados->sum('MONTOATENDIDOREAL');
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+        $diferencia_total = 0;
+
+        // Tolerancia
+        if($tt_totales <= 0.09){
+            $ind_total          =   1;
+            $diferencia_total = round($total_1 - $total_2,2);
+        }else{  $ind_errototal      =   0;  }
+
+        $ind_cantidaditem           =   1;
+        $ind_formapago              =   1;
+
+        FeDocumento::where('ID_DOCUMENTO','=',$idoc)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                                'CAN_CENTIMO'=>$diferencia_total,
+                            ]);
     }
 
 
