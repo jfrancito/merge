@@ -103,10 +103,10 @@ class ValeRendirController extends Controller
             ->value('emp.COD_EMPR');
 
         $empresatrabjador = STDEmpresa::where('COD_EMPR','=',$cod_empr_cli)->first();
-        $nrodocumentotrab = $empresatrabjador->NRO_DOCUMENTO;
+        $nrodocumentotrab = $empresatrabjador ? $empresatrabjador->NRO_DOCUMENTO : '';
 
         $values                 =   [$nrodocumentotrab,$cod_empr];
-        $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);   
+        $datoscuentasueldo      =   !empty($nrodocumentotrab) ? DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values) : [];   
 
         /*$txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
         $numero_cuenta  = $datoscuentasueldo[0]->numcuenta ?? null;*/
@@ -142,7 +142,7 @@ class ValeRendirController extends Controller
         ->value('cadarea');
 
         $codlinea = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
-                  ->where('COD_PERSONAL', $trabajador->COD_TRAB)
+                  ->where('COD_PERSONAL', $trabajador ? $trabajador->COD_TRAB : Session::get('usuario')->usuarioosiris_id)
                   ->value('COD_LINEA');
 
 

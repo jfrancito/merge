@@ -44,7 +44,7 @@ class GestionApruebaCotGerenciaAdmController extends Controller
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
             ->where('C.ACTIVO', 1)
             ->where('C.COD_ESTADO', 'ETM0000000000005')
-            ->where('C.COD_USUARIO_MODIF_AUD', '1CIX00000401')
+            ->whereIn('C.COD_USUARIO_MODIF_AUD', ['1CIX00000401', '1CIX00000080'])
             ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', $subquery_total_pedido)
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();
@@ -54,7 +54,7 @@ class GestionApruebaCotGerenciaAdmController extends Controller
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
             ->where('C.ACTIVO', 1)
             ->where('C.COD_ESTADO', 'ETM0000000000014')
-            ->where('C.COD_USUARIO_MODIF_AUD', '1CIX00000401')
+            ->whereIn('C.COD_USUARIO_MODIF_AUD', ['1CIX00000401', '1CIX00000080'])
             ->select('C.*', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', $subquery_total_pedido)
             ->orderBy('C.FEC_COTIZACION', 'desc')
             ->get();

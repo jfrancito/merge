@@ -1515,7 +1515,7 @@ class CotizacionOrdenPedidoController extends Controller
                 $total_monto_pedidos = 0.0;
 
                 foreach ($pedidos_asoc as $ped) {
-                    $fue_aprobado_adm = (trim($ped->COD_TRABAJADOR_APRUEBA_ADM) === 'IITR000000000391' && trim($ped->COD_ESTADO) === 'ETM0000000000005');
+                    $fue_aprobado_adm = (in_array(trim($ped->COD_TRABAJADOR_APRUEBA_ADM), ['IITR000000000391', 'IATR000000000061', 'IATR000000000199']) && trim($ped->COD_ESTADO) === 'ETM0000000000005');
                     if (!$fue_aprobado_adm) {
                         $todos_aprobados_ger_adm = false;
                     }

@@ -170,7 +170,8 @@ class GestionOrdenPedidoController extends Controller
             ])
             ->whereIn('cod_trab', [
                 'IITR000000000391',
-                'IATR000000000199'
+                'IATR000000000199',
+                'IATR000000000061'
             ])
             ->orderBy('apellidopaterno')
             ->orderBy('apellidomaterno')
