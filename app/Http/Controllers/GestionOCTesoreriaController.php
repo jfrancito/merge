@@ -331,7 +331,17 @@ class GestionOCTesoreriaController extends Controller
 
                 $documento_asociados = $this->gn_lista_comision_asociados($lotes);
                 $documento_top = $this->gn_lista_comision_asociados_top($lotes);
-                if (!$documento_top) {
+
+                $tiene_proveedor_o_cm = DB::table('TES.OPERACION_CAJA')
+                    ->whereIn('COD_OPERACION_CAJA', $lotes)
+                    ->where(function($q) {
+                        $q->whereNotNull('COD_PROVEEDOR')
+                          ->where('COD_PROVEEDOR', '<>', '')
+                          ->orWhere('TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%');
+                    })
+                    ->exists();
+
+                if ($tiene_proveedor_o_cm || !$documento_top) {
                     $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc);
                 }
 
@@ -748,8 +758,17 @@ class GestionOCTesoreriaController extends Controller
 
                             $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
                             $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-                            // VALIDAR SI ES OPERACION DE CAMBIO DE MONEDA O SI ES NULL
-                            if(!$documento_top){
+
+                            $tiene_proveedor_o_cm = DB::table('TES.OPERACION_CAJA')
+                                ->whereIn('COD_OPERACION_CAJA', $lotes)
+                                ->where(function($q) {
+                                    $q->whereNotNull('COD_PROVEEDOR')
+                                      ->where('COD_PROVEEDOR', '<>', '')
+                                      ->orWhere('TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%');
+                                })
+                                ->exists();
+
+                            if($tiene_proveedor_o_cm || !$documento_top){
                                 $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $idoc);
                                 $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $idoc);
                                 $this->con_validar_documento_proveedor_comision_cambio_moneda($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
@@ -1199,7 +1218,17 @@ class GestionOCTesoreriaController extends Controller
 
         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
         $documento_top = $this->gn_lista_comision_asociados_top($lotes);
-        if (!$documento_top) {
+
+        $tiene_proveedor_o_cm = DB::table('TES.OPERACION_CAJA')
+            ->whereIn('COD_OPERACION_CAJA', $lotes)
+            ->where(function($q) {
+                $q->whereNotNull('COD_PROVEEDOR')
+                  ->where('COD_PROVEEDOR', '<>', '')
+                  ->orWhere('TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%');
+            })
+            ->exists();
+
+        if ($tiene_proveedor_o_cm || !$documento_top) {
             $documento_top = $this->gn_lista_comision_asociados_top_terminado_cambio_moneda($lotes, $lote);
             $documento_asociados = $this->gn_lista_comision_asociados_atendidos_cambio_moneda($lotes, $lote);
         }
