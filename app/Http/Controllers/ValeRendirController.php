@@ -95,12 +95,20 @@ class ValeRendirController extends Controller
         //CUENTA BANCARIA
     
          $cod_empr_cli = DB::table('users as usu')
-            ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
-            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
+            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'usu.usuarioosiris_id')
             ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
             ->where('usu.id', $cod_usuario_registro)
             ->where('emp.COD_ESTADO', 1)
             ->value('emp.COD_EMPR');
+
+        if (!$cod_empr_cli) {
+            $cod_empr_cli = DB::table('users as usu')
+                ->join('terceros as ter', 'ter.USER_ID', '=', 'usu.id')
+                ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'ter.DNI')
+                ->where('usu.id', $cod_usuario_registro)
+                ->where('emp.COD_ESTADO', 1)
+                ->value('emp.COD_EMPR');
+        }
 
         $empresatrabjador = STDEmpresa::where('COD_EMPR','=',$cod_empr_cli)->first();
         $nrodocumentotrab = $empresatrabjador ? $empresatrabjador->NRO_DOCUMENTO : '';
@@ -345,12 +353,20 @@ class ValeRendirController extends Controller
         $txt_nom_aprueba  = $registro_aprueba->TXT_APRUEBA ?? '';
 
         $cod_empr_cli = DB::table('users as usu')
-            ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
-            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
+            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'usu.usuarioosiris_id')
             ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
             ->where('usu.id', $cod_usuario_registro)
             ->where('emp.COD_ESTADO', 1)
             ->value('emp.COD_EMPR');
+
+        if (!$cod_empr_cli) {
+            $cod_empr_cli = DB::table('users as usu')
+                ->join('terceros as ter', 'ter.USER_ID', '=', 'usu.id')
+                ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'ter.DNI')
+                ->where('usu.id', $cod_usuario_registro)
+                ->where('emp.COD_ESTADO', 1)
+                ->value('emp.COD_EMPR');
+        }
 
        $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
