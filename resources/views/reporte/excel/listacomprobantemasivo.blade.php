@@ -61,7 +61,8 @@
         </style>
     <table>
         <tr>
-            <th class= 'tabladp'>FECHA EMISIÓN DE COMPROBANTE</th>
+            <th class= 'tabladp'>FECHA EMISIÓN DE LA ORDEN</th>
+			<th class= 'tabladp'>FECHA EMISIÓN DE COMPROBANTE</th>
             <th class= 'tabladp'>FECHA REVISION CONTABILIDAD</th>
 
             <th class= 'tabladp'>FECHA AUTORIZACION</th>
@@ -110,6 +111,7 @@
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
+			<td>{{date_format(date_create($item->FEC_ORDEN), 'd-m-Y')}}</td>
             <td>{{date_format(date_create($item->FEC_VENTA), 'd-m-Y')}}</td>
             <td>{{date_format(date_create($item->fecha_pr), 'd-m-Y')}}</td>
             <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
