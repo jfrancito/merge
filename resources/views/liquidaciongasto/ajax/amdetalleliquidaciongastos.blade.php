@@ -9,6 +9,12 @@
           <div id="documentos" class="tab-pane @if($active=='documentos') active @endif cont">
             <div class="panel-heading">
               <div class="tools tooltiptop" style="text-align:right;">
+                <a href="{{ url('/exportar-excel-detalle-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" 
+                   class="btn btn-rounded btn-space btn-success btn-sm"
+                   style="background-color: #1d7e43; border-color: #1d7e43; color: #fff; margin-right: 5px;"
+                   title="Exportar a Excel">
+                  <i class="mdi mdi-file-excel"></i> EXPORTAR EXCEL
+                </a>
                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8)).'/-1') }}" class="btn btn-rounded btn-space btn-success btn-sm"
                   data_planilla_movilidad_id = '{{$liquidaciongastos->ID_DOCUMENTO}}'>
                   AGREGAR DOCUMENTO            
@@ -21,7 +27,16 @@
                       <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
                         <thead>
                           <tr>
-                            <th>DETALLE DE LIQUIDACION GASTO</th> 
+                            <th>
+                              DETALLE DE LIQUIDACION GASTO
+                              <a href="{{ url('/exportar-excel-detalle-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" 
+                                 class="btn btn-rounded btn-xs btn-success pull-right" 
+                                 style="background-color: #1d7e43; border-color: #1d7e43; color: #fff; margin-top: -3px;" 
+                                 title="Exportar a Excel"
+                                 onclick="event.stopPropagation();">
+                                <i class="mdi mdi-file-excel"></i> Exportar Excel
+                              </a>
+                            </th> 
                           </tr>
                         </thead>
                         <tbody>

@@ -165,6 +165,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-liquidacion-gastos/{idopcion}', 'GestionLiquidacionGastosController@actionAgregarLiquidacionGastos');
 	Route::any('/ajax-combo-cuenta', 'GestionLiquidacionGastosController@actionAjaxComboCuenta');
 	Route::any('/modificar-liquidacion-gastos/{idopcion}/{iddocumento}/{valor}', 'GestionLiquidacionGastosController@actionModificarLiquidacionGastos');
+	Route::any('/exportar-excel-detalle-liquidacion-gastos/{idopcion}/{iddocumento?}', 'GestionLiquidacionGastosController@actionExportarExcelDetalleLiquidacionGastos');
+	Route::any('/exportar-excel-detalle-liquidacion/{iddocumento}', 'GestionLiquidacionGastosController@actionExportarExcelDetalleLiquidacionGastos');
 	Route::any('/ajax-combo-subcuenta', 'GestionLiquidacionGastosController@actionAjaxComboSubCuenta');
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');

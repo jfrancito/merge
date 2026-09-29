@@ -5872,6 +5872,52 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionExportarExcelDetalleLiquidacionGastos($idopcion, $iddocumento = null)
+    {
+        set_time_limit(0);
+
+        if (is_null($iddocumento)) {
+            $iddocumento = $idopcion;
+        }
+
+        // Decodificar si viene con Hashids
+        $idcab = $iddocumento;
+        if (strpos($iddocumento, 'LIQG') === false) {
+            $iddeco = $this->funciones->decodificarmaestrapre($iddocumento, 'LIQG');
+            if (!empty($iddeco)) {
+                $iddocumento = $iddeco;
+            }
+        }
+
+        $liquidaciongasto = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+        $listadetalle = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)
+            ->where('ACTIVO', '=', 1)
+            ->orderby('FECHA_EMISION', 'asc')
+            ->get();
+
+        $fecha_actual = date("Y-m-d");
+        $titulo = 'Detalle-Liquidacion-' . $iddocumento;
+
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $liquidaciongasto, $iddocumento, $titulo) {
+            $excel->sheet('DOCUMENTOS', function ($sheet) use ($listadetalle, $liquidaciongasto, $iddocumento, $titulo) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name' => 'Calibri',
+                        'size' => 10
+                    )
+                ));
+                $sheet->setAutoSize(true);
+                $sheet->loadView('liquidaciongasto/excel/detalledocumentos', [
+                    'listadetalle' => $listadetalle,
+                    'liquidaciongasto' => $liquidaciongasto,
+                    'iddocumento' => $iddocumento,
+                    'titulo' => $titulo
+                ]);
+            });
+        })->export('xls');
+    }
+
+
     public function actionAgregarLiquidacionGastos($idopcion, Request $request)
     {
 
