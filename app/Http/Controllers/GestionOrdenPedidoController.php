@@ -116,7 +116,9 @@ class GestionOrdenPedidoController extends Controller
                     ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
                     ->orWhere('COD_TRAB', 'IITR000000000391')
                     ->orWhere('COD_TRAB', 'ICTR000000000250')
-                    ->orWhere('COD_TRAB', 'IATR000000000097');
+                    ->orWhere('COD_TRAB', 'IATR000000000097')
+                    ->orWhere('COD_TRAB', 'ICTR000000000274')
+                    ->orWhere('COD_TRAB', '1CIX00000291');
             })
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->whereIn('empresa_osiris_id', [
