@@ -3913,7 +3913,10 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cliente_id,$operacion_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+                                $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                                     ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+                            })
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'),
@@ -4467,7 +4470,10 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_estiba_dic($cliente_id,$operacion_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+                                $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                                     ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+                            })
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'),
@@ -4606,7 +4612,10 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cliente_id,$operacion_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+                                $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                                     ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+                            })
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'),
