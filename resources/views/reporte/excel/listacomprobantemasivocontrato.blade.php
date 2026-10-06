@@ -167,9 +167,10 @@
 
 
             @php
-                $es_tipo_det_valido = (!empty($item->TIPO_DETRACCION) && !in_array(trim($item->TIPO_DETRACCION), ['Credito', 'Contado']));
-                $tiene_detraccion = (((float)$item->MONTO_DETRACCION_RED > 0) || (!empty($item->CTA_DETRACCION)) || $es_tipo_det_valido);
-                $monto_detraccion = $tiene_detraccion ? (((float)$item->MONTO_DETRACCION_RED > 0) ? (float)$item->MONTO_DETRACCION_RED : (((float)$item->CAN_DETRACCION > 0) ? (float)$item->CAN_DETRACCION : 0)) : 0;
+                $monto_real_detraccion = (float)$item->MONTO_DETRACCION_RED > 0 ? (float)$item->MONTO_DETRACCION_RED : (((float)$item->CAN_DETRACCION > 0) ? (float)$item->CAN_DETRACCION : (((float)$item->MONTO_DETRACCION_XML > 0) ? (float)$item->MONTO_DETRACCION_XML : 0));
+                $tiene_detraccion = ($monto_real_detraccion > 0);
+                $es_tipo_det_valido = ($tiene_detraccion && !empty($item->TIPO_DETRACCION) && !in_array(trim($item->TIPO_DETRACCION), ['Credito', 'Contado']));
+                $monto_detraccion = $tiene_detraccion ? $monto_real_detraccion : 0;
                 $tiene_constancia = (!empty($item->FOLIO_DETRACCION) || !empty($item->FOLIO_DETRACCION_RESERVA) || !empty($item->COD_PAGO_DETRACCION));
                 $nro_constancia = !empty($item->FOLIO_DETRACCION) ? $item->FOLIO_DETRACCION : (!empty($item->FOLIO_DETRACCION_RESERVA) ? $item->FOLIO_DETRACCION_RESERVA : (!empty($item->COD_PAGO_DETRACCION) ? $item->COD_PAGO_DETRACCION : '-'));
                 $nro_cuenta = !empty($item->NRO_CUENTA) ? $item->NRO_CUENTA : '-';
