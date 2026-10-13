@@ -5184,7 +5184,7 @@ trait ComprobanteTraits
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                                         CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                                         FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
-                                        FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                                        COALESCE((SELECT TOP 1 u_sub.nombre FROM users u_sub WHERE u_sub.usuarioosiris_id = FE_DOCUMENTO.COD_CONTACTO AND u_sub.activo = 1), (SELECT TOP 1 (t_sub.TXT_APE_PATERNO + ' ' + t_sub.TXT_APE_MATERNO + ' ' + t_sub.TXT_NOMBRES) FROM STD.TRABAJADOR t_sub WHERE t_sub.COD_TRAB = FE_DOCUMENTO.COD_CONTACTO), FE_DOCUMENTO.TXT_CONTACTO) AS TXT_CONTACTO_N,
                                         CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                         (
                                             SELECT STUFF(
@@ -6081,7 +6081,7 @@ trait ComprobanteTraits
                                 FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                                 CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
                                 FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
-                                FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                                COALESCE((SELECT TOP 1 u_sub.nombre FROM users u_sub WHERE u_sub.usuarioosiris_id = FE_DOCUMENTO.COD_CONTACTO AND u_sub.activo = 1), (SELECT TOP 1 (t_sub.TXT_APE_PATERNO + ' ' + t_sub.TXT_APE_MATERNO + ' ' + t_sub.TXT_NOMBRES) FROM STD.TRABAJADOR t_sub WHERE t_sub.COD_TRAB = FE_DOCUMENTO.COD_CONTACTO), FE_DOCUMENTO.TXT_CONTACTO) AS TXT_CONTACTO_N,
 
                                 (
                                     SELECT STUFF((
@@ -6164,7 +6164,7 @@ trait ComprobanteTraits
                 FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                 CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                 FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
-                FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                COALESCE((SELECT TOP 1 u_sub.nombre FROM users u_sub WHERE u_sub.usuarioosiris_id = FE_DOCUMENTO.COD_CONTACTO AND u_sub.activo = 1), (SELECT TOP 1 (t_sub.TXT_APE_PATERNO + ' ' + t_sub.TXT_APE_MATERNO + ' ' + t_sub.TXT_NOMBRES) FROM STD.TRABAJADOR t_sub WHERE t_sub.COD_TRAB = FE_DOCUMENTO.COD_CONTACTO), FE_DOCUMENTO.TXT_CONTACTO) AS TXT_CONTACTO_N,
                 CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                 (
                     SELECT STUFF(
