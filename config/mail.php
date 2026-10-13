@@ -89,7 +89,7 @@ return [
     //'username' => env('MAIL_USERNAME'),
     //'password' => env('MAIL_PASSWORD'),
     'username' => 'avisos.ia@induamerica.com.pe',
-    'password' => '7$iain$26@&%5@',
+    'password' => 'Y$Sfl(xSwfhlj0_V',
 
 
     /*
