@@ -80,7 +80,7 @@
             <th class= 'tabladp'>CORREO USUARIO</th>
             <th class= 'tabladp'>JEFE</th>
             <th class= 'tabladp'>CORREO JEFE</th>
-            <th class= 'tabladp'>CUENTA CONTABLE</th>
+
         </tr>
         @foreach($listadatos as $index => $item)
         <tr>
@@ -103,7 +103,7 @@
             <td>{{$item->EMAIL_USUARIO}}</td>
             <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
             <td>{{$item->EMAIL_JEFE}}</td>
-            <td>{{$item->CUENTA}}</td>
+
         </tr>
         @endforeach
     </table>

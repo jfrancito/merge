@@ -466,15 +466,15 @@ trait LiquidacionGastoTraits
                      ->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ITEM', '=', 'LQG_DETLIQUIDACIONGASTO.ITEM');
             })
             ->join('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'LQG_DETLIQUIDACIONGASTO.COD_EMPRESA_PROVEEDOR')
-            ->leftJoin('WEB.asientos', function($join) {
-                $join->on(DB::raw("WEB.asientos.TXT_REFERENCIA"), '=', 
-                          DB::raw("CAST(LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO AS VARCHAR) + '-' + CAST(LQG_DETLIQUIDACIONGASTO.ITEM AS VARCHAR)"))
-                     ->where('WEB.asientos.COD_ESTADO', '=', 1);
-            })
-            ->leftJoin('WEB.asientomovimientos', function($join) {
-                $join->on('WEB.asientos.COD_ASIENTO', '=', 'WEB.asientomovimientos.COD_ASIENTO')
-                     ->where('WEB.asientomovimientos.TXT_CUENTA_CONTABLE', 'like', '6%');
-            })
+            // ->leftJoin('WEB.asientos', function($join) {
+            //     $join->on(DB::raw("WEB.asientos.TXT_REFERENCIA"), '=', 
+            //               DB::raw("CAST(LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO AS VARCHAR) + '-' + CAST(LQG_DETLIQUIDACIONGASTO.ITEM AS VARCHAR)"))
+            //          ->where('WEB.asientos.COD_ESTADO', '=', 1);
+            // })
+            // ->leftJoin('WEB.asientomovimientos', function($join) {
+            //     $join->on('WEB.asientos.COD_ASIENTO', '=', 'WEB.asientomovimientos.COD_ASIENTO')
+            //          ->where('WEB.asientomovimientos.TXT_CUENTA_CONTABLE', 'like', '6%');
+            // })
             ->ProveedorLG($proveedor_id)
             ->EstadoLG($estado_id)
             ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -498,8 +498,8 @@ trait LiquidacionGastoTraits
                 'LQG_LIQUIDACION_GASTO.TXT_USUARIO_AUTORIZA',
                 // Emails por subconsultas
                 DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.USUARIO_CREA)) as EMAIL_USUARIO"),
-                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.COD_USUARIO_AUTORIZA)) as EMAIL_JEFE"),
-                DB::raw('WEB.asientomovimientos.TXT_CUENTA_CONTABLE AS CUENTA')
+                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.COD_USUARIO_AUTORIZA)) as EMAIL_JEFE")
+                // DB::raw('WEB.asientomovimientos.TXT_CUENTA_CONTABLE AS CUENTA')
             ])
             ->distinct()
             ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_EMI', 'desc')

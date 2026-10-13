@@ -1012,6 +1012,7 @@ trait ComprobanteTraits
         ");
 
 
+
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id          =       $trabajador->COD_ZONA_TIPO;
 
