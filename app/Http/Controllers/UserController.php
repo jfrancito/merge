@@ -526,13 +526,19 @@ class UserController extends Controller
 		$usuario_id = $request['usuario_id'];
 		$fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $orden_id)->first();
 		$usuario = User::where('id', $usuario_id)->first();
+		$trabajador = STDTrabajador::where('COD_TRAB', '=', $usuario->usuarioosiris_id)->first();
+		$dni = $trabajador ? $trabajador->NRO_DOCUMENTO : '';
+
+		$datosActualizar = [
+			'COD_CONTACTO' => $usuario->usuarioosiris_id,
+			'TXT_CONTACTO' => $usuario->nombre,
+		];
+		if (!empty($dni)) {
+			$datosActualizar['dni_usuariocontacto'] = $dni;
+		}
 
 		FeDocumento::where('ID_DOCUMENTO', $orden_id)
-			->update(
-				[
-					'COD_CONTACTO' => $usuario->usuarioosiris_id
-				]
-			);
+			->update($datosActualizar);
 
 		$documento = new FeDocumentoHistorial;
 		$documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
