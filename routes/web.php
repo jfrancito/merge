@@ -1203,6 +1203,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-aprobar-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxAprobarCotizacion');
 	Route::post('/ajax-eliminar-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxEliminarCotizacion');
 	Route::post('/ajax-get-correlativo-sin-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxGetCorrelativoSinCotizacion');
+	Route::post('/ajax-obtener-correlativo-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxObtenerCorrelativoCotizacion');
 
 
 	//COTIZACION APRUEBA GERENCIA ADM

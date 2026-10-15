@@ -116,6 +116,58 @@ $(document).ready(function () {
         }
     });
 
+    function getCodCentroActual() {
+        if ($('#centro_id_cotizacion').length > 0) {
+            return $('#centro_id_cotizacion').val();
+        }
+        return $('#cod_centro_usuario').val();
+    }
+
+    /* ===============================
+       CAMBIO DE CENTRO (EXCLUSIVO KELY)
+       =============================== */
+    if ($('#centro_id_cotizacion').length > 0) {
+        $('#cod_centro_usuario').val($('#centro_id_cotizacion').val());
+    }
+
+    $(document).on('change', '#centro_id_cotizacion', function (e) {
+        var cod_centro = $(this).val();
+        $('#cod_centro_usuario').val(cod_centro);
+
+        var hasItems = $('.precio-producto').length > 0;
+        if (hasItems) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Cambio de Centro',
+                mensaje: 'Ha cambiado de centro. Se limpiarán los productos seleccionados para evitar mezclar pedidos de distintos centros.',
+                ancho: '450px'
+            });
+            $('#lista-productos-cotizacion').empty();
+            $('#total').val('0.00');
+            $('#subtotal').val('0.00');
+            $('#igv').val('0.00');
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-obtener-correlativo-cotizacion',
+            data: {
+                _token: _token,
+                cod_centro: cod_centro
+            },
+            success: function (res) {
+                if (res.success && res.nro_cotizacion) {
+                    $('#nro_cotizacion').val(res.nro_cotizacion);
+                }
+            }
+        });
+
+        if ($('#txt_tipo_cotizacion').val() === 'SIN COTIZACION') {
+            $('#txt_tipo_cotizacion').trigger('change');
+        }
+    });
+
 
     /* ===============================
        BUSCAR PROVEEDOR POR RUC O NOMBRE
@@ -224,7 +276,8 @@ $(document).ready(function () {
             url: carpeta + '/ajax-listar-consolidado-general-aprobado',
             data: {
                 _token: _token,
-                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+                id_cotizacion_edit: $('#id_cotizacion_edit').val(),
+                cod_centro: getCodCentroActual()
             },
             success: function (data) {
                 cerrarcargando();
@@ -270,7 +323,8 @@ $(document).ready(function () {
             url: carpeta + '/ajax-listar-pedidos-aprobados-servicio',
             data: {
                 _token: _token,
-                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+                id_cotizacion_edit: $('#id_cotizacion_edit').val(),
+                cod_centro: getCodCentroActual()
             },
             success: function (data) {
                 cerrarcargando();
@@ -302,7 +356,8 @@ $(document).ready(function () {
                 type: 'POST',
                 url: carpeta + '/ajax-get-correlativo-sin-cotizacion',
                 data: {
-                    _token: _token
+                    _token: _token,
+                    cod_centro: getCodCentroActual()
                 },
                 success: function (res) {
                     cerrarcargando();
@@ -392,7 +447,8 @@ $(document).ready(function () {
             data: {
                 _token: _token,
                 selected_ids: selected,
-                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+                id_cotizacion_edit: $('#id_cotizacion_edit').val(),
+                cod_centro: getCodCentroActual()
             },
             success: function (data) {
                 cerrarcargando();
@@ -558,7 +614,8 @@ $(document).ready(function () {
             data: {
                 _token: _token,
                 selected_ids: selected,
-                id_cotizacion_edit: $('#id_cotizacion_edit').val()
+                id_cotizacion_edit: $('#id_cotizacion_edit').val(),
+                cod_centro: getCodCentroActual()
             },
             success: function (data) {
                 cerrarcargando();
@@ -1071,6 +1128,7 @@ $(document).ready(function () {
         formData.append('ind_igv', $('#incluir_igv').is(':checked') ? 1 : 0);
         var tableTipo = $('#table-productos-seleccionados').data('tipo') || 'M';
         formData.append('ind_mat_o_ser', tableTipo);
+        formData.append('cod_centro', getCodCentroActual());
         formData.append('detalles', JSON.stringify(detalles));
         formData.append('archivos_a_eliminar', JSON.stringify(archivos_a_eliminar));
 
@@ -1232,6 +1290,12 @@ $(document).ready(function () {
                         var id_cot = getVal(cot, 'ID_COTIZACION');
                         $('#id_cotizacion_edit').val(id_cot);
                         $('#nro_cotizacion').val(id_cot);
+
+                        var cod_centro_cot = getVal(cot, 'COD_CENTRO');
+                        if (cod_centro_cot && $('#centro_id_cotizacion').length > 0) {
+                            $('#centro_id_cotizacion').val(cod_centro_cot).prop('disabled', true);
+                            $('#cod_centro_usuario').val(cod_centro_cot);
+                        }
                         
                         var fec_cot = getVal(cot, 'FEC_COTIZACION');
                         if (fec_cot && typeof fec_cot === 'string') {
@@ -1429,6 +1493,25 @@ $(document).ready(function () {
         $('#lista-archivos-existentes').empty();
         $('#archivo_cotizacion_crear').val('');
         archivos_a_eliminar = [];
+
+        if ($('#centro_id_cotizacion').length > 0) {
+            $('#centro_id_cotizacion').prop('disabled', false);
+            var cod_centro_actual = $('#centro_id_cotizacion').val();
+            $('#cod_centro_usuario').val(cod_centro_actual);
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/ajax-obtener-correlativo-cotizacion',
+                data: {
+                    _token: _token,
+                    cod_centro: cod_centro_actual
+                },
+                success: function (res) {
+                    if (res.success && res.nro_cotizacion) {
+                        $('#nro_cotizacion').val(res.nro_cotizacion);
+                    }
+                }
+            });
+        }
     }
 
     $(document).on('click', '.btn-cancelar', function (e) {

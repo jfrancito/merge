@@ -25,8 +25,18 @@
 
             <!-- SECCIÓN: DATOS DE CABECERA -->
             <div class="panel panel-default box-seccion">
-                <div class="panel-heading subheader-seccion">
-                    <i class="mdi mdi-file-document"></i> Datos Generales
+                <div class="panel-heading subheader-seccion" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span><i class="mdi mdi-file-document"></i> Datos Generales</span>
+                        @if(Session::has('usuario') && Session::get('usuario')->id == '1CIX00000422')
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                <select id="centro_id_cotizacion" class="form-control input-sm select-centro-kely" style="width: 140px; height: 30px; border-radius: 6px; font-weight: bold; border-color: #34aadc; color: #1d3a6d; display: inline-block; padding: 2px 8px; font-size: 13px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                    <option value="CEN0000000000001" {{ $cod_centro == 'CEN0000000000001' ? 'selected' : '' }}>CHICLAYO</option>
+                                    <option value="CEN0000000000002" {{ $cod_centro == 'CEN0000000000002' ? 'selected' : '' }}>LIMA</option>
+                                </select>
+                            </div>
+                        @endif
+                    </div>
                 </div>
                 <div class="panel-body">
                     <div class="row">

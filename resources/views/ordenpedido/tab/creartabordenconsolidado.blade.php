@@ -20,7 +20,9 @@
                         <div class="col-md-2">
                             <label>Centro</label>
                             {!! Form::select('centro_id', $combo_centro, $centro_id,
-                                ['class'=>'select2 form-control','id'=>'centro_id', 'disabled' => 'disabled']) !!}
+                                count($combo_centro) <= 1
+                                    ? ['class'=>'select2 form-control','id'=>'centro_id', 'disabled' => 'disabled']
+                                    : ['class'=>'select2 form-control','id'=>'centro_id']) !!}
                         </div>
 
                         <div class="col-md-2">

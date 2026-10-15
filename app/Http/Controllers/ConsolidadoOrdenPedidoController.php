@@ -137,11 +137,20 @@ class ConsolidadoOrdenPedidoController extends Controller
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
             ->first();
 
-        if (!$ind_compras) {
-            $centro_id = $centro->COD_CENTRO;
-            $combo_centro = [
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
+        if ($usuario_actual_id == '1CIX00000422') {
+            $centro_id = $centro ? $centro->COD_CENTRO : 'CEN0000000000001';
+            $combo_centro = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                ->where('COD_ESTADO', 1)
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+        } else if (!$ind_compras) {
+            $centro_id = $centro ? $centro->COD_CENTRO : '';
+            $combo_centro = $centro ? [
                 $centro->COD_CENTRO => $centro->NOM_CENTRO
-            ];
+            ] : [];
         } else {
             $centro_id = 'CEN0000000000001';
             $combo_centro = DB::table('ALM.CENTRO')

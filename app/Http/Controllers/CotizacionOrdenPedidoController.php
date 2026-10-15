@@ -62,7 +62,7 @@ class CotizacionOrdenPedidoController extends Controller
             // Asumiendo longitud total de 16 caracteres como en el ejemplo IICOT00000000001
             $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
         } else {
-            $nro_cotizacion = $prefijo . str_pad(1, 11, '0', STR_PAD_LEFT);
+            $nro_cotizacion = $prefijo . str_pad(1, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
         }
 
         // Obtener tipo de cambio actual (específico para la fecha de hoy, usando la lógica nativa SQL Server)
@@ -213,12 +213,16 @@ class CotizacionOrdenPedidoController extends Controller
                 FOR XML PATH('')
             ), 1, 1, '')) as RUTAS_ARCHIVOS"))
             ->where('C.COD_EMPR', isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : ''))
-            ->where('C.ACTIVO', 1)
-            ->when($cod_centro != '', function ($query) use ($cod_centro) {
-                return $query->where('C.COD_CENTRO', $cod_centro);
-            })
-            ->orderBy('C.ID_COTIZACION', 'DESC')
-            ->get();
+            ->where('C.ACTIVO', 1);
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        if ($usuario_actual_id == '1CIX00000422') {
+            $listacotizaciones = $listacotizaciones->whereIn('C.COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002']);
+        } else if ($cod_centro != '') {
+            $listacotizaciones = $listacotizaciones->where('C.COD_CENTRO', $cod_centro);
+        }
+
+        $listacotizaciones = $listacotizaciones->orderBy('C.ID_COTIZACION', 'DESC')->get();
 
         return view('ordenpedido.cotizacion.cotizacionordenpedido', [
             'combo_tipo_pago' => $combo_tipo_pago,
@@ -352,10 +356,11 @@ class CotizacionOrdenPedidoController extends Controller
             ->toArray();
 
         $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+        $cod_centro_cot = $cotizacion ? trim($cotizacion->COD_CENTRO) : null;
         if ($es_servicio) {
-            $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion);
+            $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion, $cod_centro_cot);
         } else {
-            $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion);
+            $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion, $cod_centro_cot);
         }
 
         // Enriquecer y agrupar detalles en PHP
@@ -468,22 +473,56 @@ class CotizacionOrdenPedidoController extends Controller
         return response()->json(['success' => false, 'message' => 'Proveedor no encontrado']);
     }
 
+    public function actionAjaxObtenerCorrelativoCotizacion(Request $request)
+    {
+        $cod_centro = $request->input('cod_centro');
+        $empresa_sesion = Session::get('empresas');
+
+        $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro)->first();
+        $abrev_empresa = trim($empresa_sesion->TXT_ABREVIATURA ?? '');
+        $abrev_centro = $centro ? trim($centro->TXT_ABREVIATURA) : '';
+        $prefijo = $abrev_empresa . $abrev_centro . 'COT';
+
+        $max_id = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', 'LIKE', $prefijo . '%')
+            ->max('ID_COTIZACION');
+
+        if ($max_id) {
+            $number = (int) substr($max_id, strlen($prefijo));
+            $new_number = $number + 1;
+            $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        } else {
+            $nro_cotizacion = $prefijo . str_pad(1, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        }
+
+        return response()->json([
+            'success' => true,
+            'nro_cotizacion' => $nro_cotizacion,
+            'prefijo' => $prefijo
+        ]);
+    }
+
     public function actionAjaxGetCorrelativoSinCotizacion(Request $request)
     {
         $serie = 'C001';
         $empresa_sesion = Session::get('empresas');
         $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
 
-        // Obtener el centro del trabajador
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->select('P.centro_osiris_id')
-            ->first();
+        if ($usuario_actual_id == '1CIX00000422' && $request->filled('cod_centro')) {
+            $cod_centro = trim($request->input('cod_centro'));
+        } else {
+            // Obtener el centro del trabajador
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->select('P.centro_osiris_id')
+                ->first();
 
-        $cod_centro = $centro ? $centro->centro_osiris_id : '';
+            $cod_centro = $centro ? $centro->centro_osiris_id : '';
+        }
 
         // Obtener el máximo número para la serie 0001 y tipo SIN COTIZACION filtrado por Empresa y Centro
         $ultimo = DB::table('WEB.ORDEN_COTIZACION')
@@ -511,17 +550,25 @@ class CotizacionOrdenPedidoController extends Controller
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
         $id_cotizacion_edit = $request->input('id_cotizacion_edit');
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.NOM_CENTRO')
-            ->first();
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
 
-        $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_req)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
+
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
 
         $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
@@ -547,7 +594,7 @@ class CotizacionOrdenPedidoController extends Controller
             ->get();
 
         // Calcular saldos pendientes usando FIFO en PHP
-        $saldos = $this->obtenerSaldosPendientesConsolidados(null, $id_cotizacion_edit);
+        $saldos = $this->obtenerSaldosPendientesConsolidados(null, $id_cotizacion_edit, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
 
         $lista_consolidado = $lista_consolidado->filter(function ($item) use ($saldos, $nom_centro_usuario) {
             $detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
@@ -579,17 +626,24 @@ class CotizacionOrdenPedidoController extends Controller
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
         $id_cotizacion_edit = $request->input('id_cotizacion_edit');
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
-            ->first();
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
 
-        $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $cod_centro_usuario = trim($cod_centro_req);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
+                ->first();
+
+            $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+        }
 
         $lista_pedidos = DB::table('WEB.ORDEN_PEDIDO as O')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'O.COD_CENTRO')
@@ -602,7 +656,7 @@ class CotizacionOrdenPedidoController extends Controller
             ->get();
 
         // Calcular saldos pendientes de servicio usando FIFO
-        $saldos = $this->obtenerSaldosPendientesPedidos(null, $id_cotizacion_edit);
+        $saldos = $this->obtenerSaldosPendientesPedidos(null, $id_cotizacion_edit, $cod_centro_usuario);
 
         $lista_pedidos = $lista_pedidos->filter(function ($item) use ($saldos) {
             $detalles = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
@@ -633,17 +687,25 @@ class CotizacionOrdenPedidoController extends Controller
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
         $id_cotizacion_edit = $request->input('id_cotizacion_edit');
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.NOM_CENTRO')
-            ->first();
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
 
-        $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_req)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
+
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
 
         $detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
             ->select(
@@ -663,7 +725,7 @@ class CotizacionOrdenPedidoController extends Controller
             ->get();
 
         $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
-        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion_edit);
+        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion_edit, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
 
         // Agrupar por COD_PRODUCTO
         $grouped = [];
@@ -714,6 +776,9 @@ class CotizacionOrdenPedidoController extends Controller
         $id_pedidos = $request->input('selected_ids');
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
         $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+        $cod_centro_param = ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) ? $cod_centro_req : null;
 
         $detalles = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
             ->join('WEB.ORDEN_PEDIDO as OP', 'OP.ID_PEDIDO', '=', 'D.ID_PEDIDO')
@@ -741,7 +806,7 @@ class CotizacionOrdenPedidoController extends Controller
             ->get();
 
         $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
-        $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion_edit);
+        $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion_edit, $cod_centro_param);
 
         $detalles = $detalles->map(function ($d) use ($saldos) {
             $cod_prod = trim($d->COD_PRODUCTO);
@@ -772,17 +837,22 @@ class CotizacionOrdenPedidoController extends Controller
         try {
             $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
-            // 1. Obtener el centro actual del usuario
-            $centro = DB::table('STD.TRABAJADOR as T')
-                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-                ->where('T.COD_TRAB', $usuario_id)
-                ->where('P.situacion_id', 'PRMAECEN000000000002')
-                ->where('C.COD_ESTADO', 1)
-                ->select('C.COD_CENTRO')
-                ->first();
+            $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+            if ($usuario_actual_id == '1CIX00000422' && $request->filled('cod_centro')) {
+                $cod_centro = trim($request->input('cod_centro'));
+            } else {
+                // 1. Obtener el centro actual del usuario
+                $centro = DB::table('STD.TRABAJADOR as T')
+                    ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                    ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                    ->where('T.COD_TRAB', $usuario_id)
+                    ->where('P.situacion_id', 'PRMAECEN000000000002')
+                    ->where('C.COD_ESTADO', 1)
+                    ->select('C.COD_CENTRO')
+                    ->first();
 
-            $cod_centro = $centro ? trim($centro->COD_CENTRO) : '';
+                $cod_centro = $centro ? trim($centro->COD_CENTRO) : '';
+            }
 
             // Determinar la conexión de réplica según el centro
             $conexionbd = 'sqlsrv';
@@ -1074,7 +1144,7 @@ class CotizacionOrdenPedidoController extends Controller
 
                         // 3. Actualizar estado de TXT_COTIZACION en el consolidado (SOLO SI ES MATERIAL)
                         if (!$es_tipo_servicio) {
-                            $saldos_actuales = $this->obtenerSaldosPendientesConsolidados([$det['cod_producto']], null);
+                            $saldos_actuales = $this->obtenerSaldosPendientesConsolidados([$det['cod_producto']], null, $cod_centro);
                             $saldo_cons = isset($saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea])
                                 ? $saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea]
                                 : 0;
@@ -1573,23 +1643,29 @@ class CotizacionOrdenPedidoController extends Controller
         }
     }
 
-    public function obtenerSaldosPendientesConsolidados($codigos_productos = null, $id_cotizacion_excluir = null)
+    public function obtenerSaldosPendientesConsolidados($codigos_productos = null, $id_cotizacion_excluir = null, $cod_centro_param = null)
     {
         $empresa_sesion = Session::get('empresas');
         $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.NOM_CENTRO')
-            ->first();
+        if (!empty($cod_centro_param) && ($usuario_actual_id == '1CIX00000422' || !empty($id_cotizacion_excluir))) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_param)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
 
-        $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
 
         // 1. Obtener detalles de consolidados activos aprobados
         $consolidado_detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
@@ -1604,7 +1680,7 @@ class CotizacionOrdenPedidoController extends Controller
             })
             ->select('D.ID_PEDIDO_CONSOLIDADO', 'D.COD_PRODUCTO', 'D.CAN_COMPRADA', 'C.FEC_PEDIDO')
             ->orderBy('C.FEC_PEDIDO', 'asc')
-            ->orderBy('C.ID_PEDIDO_CONSOLIDADO', 'asc')
+            ->orderBy('D.ID_PEDIDO_CONSOLIDADO', 'asc')
             ->get();
 
         if ($consolidado_detalles->isEmpty()) {
@@ -1679,23 +1755,28 @@ class CotizacionOrdenPedidoController extends Controller
         return $saldos;
     }
 
-    public function obtenerSaldosPendientesPedidos($codigos_productos = null, $id_cotizacion_excluir = null)
+    public function obtenerSaldosPendientesPedidos($codigos_productos = null, $id_cotizacion_excluir = null, $cod_centro_param = null)
     {
         $empresa_sesion = Session::get('empresas');
         $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.COD_CENTRO')
-            ->first();
+        if (!empty($cod_centro_param) && ($usuario_actual_id == '1CIX00000422' || !empty($id_cotizacion_excluir))) {
+            $cod_centro_usuario = trim($cod_centro_param);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO')
+                ->first();
 
-        $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+            $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+        }
 
         // 1. Obtener detalles de pedidos de servicio activos aprobados
         $pedido_detalles = DB::table('WEB.ORDEN_PEDIDO as O')
@@ -1791,17 +1872,24 @@ class CotizacionOrdenPedidoController extends Controller
         $id_consolidado = $request->input('id_consolidado');
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
-        // Obtener el centro del trabajador logueado
-        $centro = DB::table('STD.TRABAJADOR as T')
-            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
-            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
-            ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.situacion_id', 'PRMAECEN000000000002')
-            ->where('C.COD_ESTADO', 1)
-            ->select('C.COD_CENTRO')
-            ->first();
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
 
-        $cod_centro_usuario = $centro ? trim($centro->COD_CENTRO) : '---';
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $cod_centro_usuario = trim($cod_centro_req);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO')
+                ->first();
+
+            $cod_centro_usuario = $centro ? trim($centro->COD_CENTRO) : '---';
+        }
 
         // 1. Obtener todos los productos activos del consolidado asignados al centro del usuario
         $productos_todos = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
@@ -1813,7 +1901,7 @@ class CotizacionOrdenPedidoController extends Controller
 
         // 2. Obtener los saldos pendientes de los productos del consolidado
         $codigos_productos = $productos_todos->pluck('COD_PRODUCTO')->unique()->toArray();
-        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, null);
+        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, null, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
 
         // 3. Filtrar aquellos productos que tengan saldo pendiente > 0
         $productos = $productos_todos->filter(function ($prod) use ($saldos, $id_consolidado) {
