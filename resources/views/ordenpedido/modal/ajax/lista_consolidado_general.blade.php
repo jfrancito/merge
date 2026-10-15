@@ -100,7 +100,8 @@
                 url: carpeta + '/ajax-productos-consolidado-sin-cotizar',
                 data: {
                     _token: $('#token').val() || (typeof _token !== 'undefined' ? _token : ''),
-                    id_consolidado: id
+                    id_consolidado: id,
+                    cod_centro: ($('#centro_id_cotizacion').length > 0 ? $('#centro_id_cotizacion').val() : $('#cod_centro_usuario').val())
                 },
                 success: function (data) {
                     cerrarcargando();
