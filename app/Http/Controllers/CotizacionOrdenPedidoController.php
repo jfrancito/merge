@@ -510,7 +510,7 @@ class CotizacionOrdenPedidoController extends Controller
         $usuario_id = Session::get('usuario')->usuarioosiris_id;
         $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
 
-        if ($usuario_actual_id == '1CIX00000422' && $request->filled('cod_centro')) {
+        if ($usuario_actual_id == '1CIX00000422' && !empty($request->input('cod_centro'))) {
             $cod_centro = trim($request->input('cod_centro'));
         } else {
             // Obtener el centro del trabajador
@@ -838,7 +838,7 @@ class CotizacionOrdenPedidoController extends Controller
             $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
             $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
-            if ($usuario_actual_id == '1CIX00000422' && $request->filled('cod_centro')) {
+            if ($usuario_actual_id == '1CIX00000422' && !empty($request->input('cod_centro'))) {
                 $cod_centro = trim($request->input('cod_centro'));
             } else {
                 // 1. Obtener el centro actual del usuario
