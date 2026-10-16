@@ -401,7 +401,11 @@ class ConsolidadoOrdenPedidoController extends Controller
 
             $selected_compra = $current_ind_compra;
             if ($selected_compra == '') {
-                if ($current_cod_empr == 'IACHEM0000007086') {
+                if ($current_cod_centro == 'CEN0000000000002') {
+                    $selected_compra = 'LIMA';
+                } elseif ($current_cod_centro == 'CEN0000000000001') {
+                    $selected_compra = 'CHICLAYO';
+                } elseif ($current_cod_empr == 'IACHEM0000007086') {
                     $selected_compra = 'CHICLAYO';
                 } elseif ($current_cod_empr == 'IACHEM0000010394') {
                     if ($current_cod_centro == 'CEN0000000000002') {
@@ -411,7 +415,7 @@ class ConsolidadoOrdenPedidoController extends Controller
                     }
                 }
             }
-            if ($selected_compra == '' && $cod_centro_usuario === 'CEN0000000000001') {
+            if ($selected_compra == '' && $cod_centro_usuario === 'CEN0000000000001' && $current_cod_centro !== 'CEN0000000000002') {
                 $selected_compra = 'CHICLAYO';
             }
 
@@ -678,10 +682,15 @@ class ConsolidadoOrdenPedidoController extends Controller
 
         $cod_centro_usuario = $planilla ? trim($planilla->COD_CENTRO) : '';
 
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
         $familia_id = 'TODO';
         $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
 
-        if ($cod_centro_usuario !== '') {
+        if ($usuario_actual_id == '1CIX00000422') {
+            // Usuario Kely tiene permisos para Chiclayo y Lima
+            $listadetalle = collect($listadetalle)->values();
+        } else if ($cod_centro_usuario !== '') {
             $listadetalle = collect($listadetalle)->filter(function ($item) use ($cod_centro_usuario) {
                 // 1. Obtener el código de centro de compra guardado en base de datos
                 $item_cod_centro_compra = trim($item->COD_CENTRO_COMPRA ?? '');
@@ -763,7 +772,11 @@ class ConsolidadoOrdenPedidoController extends Controller
         $listadetalle_raw = $this->lg_lista_detalle_consolidado_masivo($ids_array);
 
         // Filtrar dinámicamente por la zona/sede del usuario logueado usando códigos únicos de centros
-        if ($cod_centro_usuario !== '') {
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        if ($usuario_actual_id == '1CIX00000422') {
+            // Usuario Kely tiene permisos para Chiclayo y Lima
+            $listadetalle_raw = collect($listadetalle_raw)->values();
+        } else if ($cod_centro_usuario !== '') {
             $listadetalle_raw = collect($listadetalle_raw)->filter(function ($item) use ($cod_centro_usuario) {
                 // 1. Obtener el código de centro de compra guardado en base de datos
                 $item_cod_centro_compra = trim($item->COD_CENTRO_COMPRA ?? '');

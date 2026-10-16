@@ -3754,19 +3754,26 @@ $(document).ready(function () {
             }
         });
 
-        // Extensión de búsqueda personalizada de DataTables para filtrar por estado
+        // Extensión de búsqueda personalizada de DataTables para filtrar por estado y centro
         $.fn.dataTable.ext.search.push(
             function(settings, data, dataIndex) {
                 if (settings.nTable.id !== 'tabla-consolidados-sede') {
                     return true;
                 }
-                var filtroValue = $('#filtro-estado-consolidado').val();
-                if (filtroValue === 'TODO') {
-                    return true;
-                }
                 var rowNode = tableConsolidados.row(dataIndex).node();
                 var codEstado = $(rowNode).data('estado');
+                var codCentro = $(rowNode).data('centro');
 
+                // 1. Filtro por Centro
+                var filtroCentro = $('#filtro-centro-consolidado').val();
+                if (filtroCentro && filtroCentro !== 'TODO') {
+                    if (codCentro !== filtroCentro) {
+                        return false;
+                    }
+                }
+
+                // 2. Filtro por Estado
+                var filtroValue = $('#filtro-estado-consolidado').val();
                 if (filtroValue === 'GENERADO') {
                     return codEstado === 'ETM0000000000001';
                 } else if (filtroValue === 'CERRADO') {
@@ -3783,6 +3790,13 @@ $(document).ready(function () {
         }
 
         $(document).on('change', '#filtro-estado-consolidado', function () {
+            actualizarFiltroConsolidados();
+        });
+
+        $(document).on('change', '#filtro-centro-consolidado', function () {
+            $('.fila-consolidado-generado').removeClass('background-fila-activa');
+            $('#lista-detalle-consolidado-container').html('');
+            id_consolidado_seleccionado = '';
             actualizarFiltroConsolidados();
         });
 
