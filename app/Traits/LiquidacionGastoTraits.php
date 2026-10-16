@@ -2216,7 +2216,7 @@ trait LiquidacionGastoTraits
 
             $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
                                     ->where('IND_OBSERVACION','=',1)
-                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    //->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
                                     ->where('COD_ESTADO','=','ETM0000000000003')
                                     ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                     ->orderby('FECHA_EMI','ASC')
