@@ -183,7 +183,10 @@
                     <select class="form-control input-sm select2-compra combo-compra" 
                             data-empresa="{{ trim($item->COD_EMPR ?? '') }}"
                             @if($item->COD_ESTADO == 'ETM0000000000015') disabled @endif>
-                        @if($cod_centro_usuario === 'CEN0000000000001')
+                        @if((Session::has('usuario') && Session::get('usuario')->id == '1CIX00000422') || $current_cod_centro == 'CEN0000000000002')
+                            <option value="CHICLAYO" data-codigo="CEN0000000000001" {{ $selected_compra == 'CHICLAYO' ? 'selected' : '' }}>CHICLAYO</option>
+                            <option value="LIMA" data-codigo="CEN0000000000002" {{ $selected_compra == 'LIMA' ? 'selected' : '' }}>LIMA</option>
+                        @elseif($cod_centro_usuario === 'CEN0000000000001')
                             <option value="CHICLAYO" data-codigo="CEN0000000000001" selected>CHICLAYO</option>
                         @else
                             <option value="">Seleccione...</option>

@@ -1,25 +1,59 @@
 <div class="panel panel-default" style="margin-bottom: 15px; border-radius: 8px; border: 1px solid #e1e6ef; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
     <div class="panel-body" style="padding: 12px 20px; background: #f9fbfd;">
         <div class="row">
-            <div class="col-sm-5 col-md-4">
-                <label style="font-weight: 700; color: #34495e; font-size: 12px; display: block; margin-bottom: 5px;">
-                    <i class="mdi mdi-filter-variant" style="font-size: 16px; vertical-align: middle;"></i> FILTRAR LISTA POR ESTADO:
-                </label>
-                <select id="filtro-estado-consolidado" class="form-control input-sm select2">
-                    <option value="TODO">MOSTRAR TODOS LOS REGISTROS</option>
-                    <option value="GENERADO" selected>SÓLO EN ESTADO "GENERADO"</option>
-                    <option value="CERRADO">SÓLO CERRADOS / APROBADOS</option>
-                </select>
-                <p class="text-muted" style="font-size: 11px; margin-top: 5px; margin-bottom: 0;">
-                    * Por defecto solo se muestran los consolidados activos (GENERADO).
-                </p>
-            </div>
-            <div class="col-sm-7 col-md-8 text-right" style="padding-top: 15px;">
-                 <h4 style="margin: 0; font-weight: 700; color: #2c3e50;"> 
-                    <small style="font-weight: 600;">Total listado:</small> 
-                    <span id="contador-consolidados" class="text-primary">0</span>
-                 </h4>
-            </div>
+            @if(Session::has('usuario') && Session::get('usuario')->id == '1CIX00000422')
+                <div class="col-sm-4 col-md-3">
+                    <label style="font-weight: 700; color: #34495e; font-size: 12px; display: block; margin-bottom: 5px;">
+                        <i class="mdi mdi-filter-variant" style="font-size: 16px; vertical-align: middle;"></i> FILTRAR LISTA POR ESTADO:
+                    </label>
+                    <select id="filtro-estado-consolidado" class="form-control input-sm select2">
+                        <option value="TODO">MOSTRAR TODOS LOS REGISTROS</option>
+                        <option value="GENERADO" selected>SÓLO EN ESTADO "GENERADO"</option>
+                        <option value="CERRADO">SÓLO CERRADOS / APROBADOS</option>
+                    </select>
+                    <p class="text-muted" style="font-size: 11px; margin-top: 5px; margin-bottom: 0;">
+                        * Por defecto solo se muestran los consolidados activos (GENERADO).
+                    </p>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <label style="font-weight: 700; color: #34495e; font-size: 12px; display: block; margin-bottom: 5px;">
+                        <i class="mdi mdi-city" style="font-size: 16px; vertical-align: middle;"></i> FILTRAR POR CENTRO:
+                    </label>
+                    <select id="filtro-centro-consolidado" class="form-control input-sm select2">
+                        <option value="CEN0000000000001" selected>CHICLAYO</option>
+                        <option value="CEN0000000000002">LIMA</option>
+                    </select>
+                    <p class="text-muted" style="font-size: 11px; margin-top: 5px; margin-bottom: 0;">
+                        * Por defecto seleccionado Chiclayo.
+                    </p>
+                </div>
+                <div class="col-sm-4 col-md-6 text-right" style="padding-top: 15px;">
+                     <h4 style="margin: 0; font-weight: 700; color: #2c3e50;"> 
+                        <small style="font-weight: 600;">Total listado:</small> 
+                        <span id="contador-consolidados" class="text-primary">0</span>
+                     </h4>
+                </div>
+            @else
+                <div class="col-sm-5 col-md-4">
+                    <label style="font-weight: 700; color: #34495e; font-size: 12px; display: block; margin-bottom: 5px;">
+                        <i class="mdi mdi-filter-variant" style="font-size: 16px; vertical-align: middle;"></i> FILTRAR LISTA POR ESTADO:
+                    </label>
+                    <select id="filtro-estado-consolidado" class="form-control input-sm select2">
+                        <option value="TODO">MOSTRAR TODOS LOS REGISTROS</option>
+                        <option value="GENERADO" selected>SÓLO EN ESTADO "GENERADO"</option>
+                        <option value="CERRADO">SÓLO CERRADOS / APROBADOS</option>
+                    </select>
+                    <p class="text-muted" style="font-size: 11px; margin-top: 5px; margin-bottom: 0;">
+                        * Por defecto solo se muestran los consolidados activos (GENERADO).
+                    </p>
+                </div>
+                <div class="col-sm-7 col-md-8 text-right" style="padding-top: 15px;">
+                     <h4 style="margin: 0; font-weight: 700; color: #2c3e50;"> 
+                        <small style="font-weight: 600;">Total listado:</small> 
+                        <span id="contador-consolidados" class="text-primary">0</span>
+                     </h4>
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -34,6 +68,7 @@
             <tr>
                 <th>ID CONSOLIDADO</th>
                 <th>EMPRESA</th>
+                <th>CENTRO</th>
                 <th>FEC PEDIDO</th>
                 <th>MES</th>
                 <th>FAMILIA</th>
@@ -64,9 +99,11 @@
                 data-consolidado="{{ $cabecera->ID_PEDIDO_CONSOLIDADO }}"
                 data-familias="{{ json_encode($familias_unicas) }}"
                 data-estado="{{ $cabecera->COD_ESTADO }}"
+                data-centro="{{ $cabecera->COD_CENTRO }}"
                 style="cursor: pointer;">
                 <td>{{ $cabecera->ID_PEDIDO_CONSOLIDADO }}</td>
                 <td>{{ $cabecera->NOM_EMPR }}</td>
+                <td>{{ $cabecera->NOM_CENTRO }}</td>
                 <td>{{ $cabecera->FEC_PEDIDO }}</td>
                 <td>{{ $cabecera->TXT_NOMBRE }}</td>
                 <td>{{ $cabecera->NOM_CATEGORIA_FAMILIA }}</td>

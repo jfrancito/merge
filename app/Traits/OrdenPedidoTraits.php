@@ -763,17 +763,24 @@ trait OrdenPedidoTraits
         }
         */
 
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
         $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D',
                 'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'C.COD_EMPR')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
-            ->where('C.COD_EMPR', $empresa_session_id)
-            ->where('C.COD_CENTRO', $centro->COD_CENTRO)
-            //->whereIn('C.COD_EMPR', $empresas->pluck('COD_EMPR')->toArray())
-            //->whereIn('C.COD_CENTRO', $centro->pluck('COD_CENTRO')->toArray())
-            ->select(
+            ->where('C.COD_EMPR', $empresa_session_id);
+
+        if ($usuario_actual_id == '1CIX00000422') {
+            $query->whereIn('C.COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002']);
+        } else if ($centro) {
+            $query->where('C.COD_CENTRO', $centro->COD_CENTRO);
+        }
+
+        $query = $query->select(
                 'C.ID_PEDIDO_CONSOLIDADO',
+                'C.COD_CENTRO',
                 'C.FEC_PEDIDO',
                 'C.TXT_NOMBRE',
                 'E.NOM_EMPR',
