@@ -86,6 +86,16 @@ class GestionOrdenPedidoController extends Controller
                 ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
                 ->pluck('NOM_CENTRO', 'COD_CENTRO')
                 ->toArray();
+        } elseif ($usuario_solicita == 'IITR000000000490' || (isset($usuarioSesion->id) && $usuarioSesion->id == '1CIX00000473')) {
+            // Habilitar Chiclayo y Lima para Lily Jannet Gonzales Tarrillo (users id: 1CIX00000473)
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+            if (!array_key_exists($cod_centro, $combo_sede)) {
+                $cod_centro = key($combo_sede);
+                $nom_centro = $combo_sede[$cod_centro];
+            }
         } elseif ($usuario_solicita == 'IITR000000000482') {
             // Habilitar Sedes según Empresa:
             // INTERNACIONAL: CHICLAYO y LIMA

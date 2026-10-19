@@ -149,7 +149,7 @@ trait ComprobanteTraits
 
     public function con_usuarios_cambio_cuenta() {
         $sw = 0;
-        $array = ['1CIX00000422','1CIX00000001'];
+        $array = ['1CIX00000422','1CIX00000001','1CIX00000548'];
         $valor = Session::get('usuario')->id;
 
         if (in_array($valor, $array)) {
@@ -4636,7 +4636,7 @@ trait ComprobanteTraits
 
 
     private function array_usuario_jefes() {
-        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000422'];
+        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000422','1CIX00000548'];
         return $array;
     }
 
@@ -6562,7 +6562,7 @@ trait ComprobanteTraits
         $centro_id      =       $trabajador->COD_ZONA_TIPO;
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-        if($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422'])){
+        if($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422','1CIX00000548'])){
 
             $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -9702,7 +9702,7 @@ trait ComprobanteTraits
         $fecha_corte            =   date('Ymd');
 
 
-        if(Session::get('usuario')->id == '1CIX00000422'){
+        if(Session::get('usuario')->id == '1CIX00000422' || Session::get('usuario')->id == '1CIX00000548'){
 
             //UPDATE DE CENTIMOS ORDEN DE COMPRAS
             DB::update("
