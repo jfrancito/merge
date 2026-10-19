@@ -63,6 +63,7 @@
         <tr>
             <th class= 'tabladp'>ID LIQUIDACION</th>
             <th class= 'tabladp'>TRABAJADOR</th>
+            <th class= 'tabladp'>ÁREA</th>
             <th class= 'tabladp'>FECHA EMISIÓN DE LIQUIDACION</th>
             <th class= 'tabladp'>FECHA EMISIÓN DE COMPROBANTE</th>
             <th class= 'tabladp'>TIPO DE DOCUMENTO</th>
@@ -88,6 +89,7 @@
         <tr>
             <td>{{$item->ID_DOCUMENTO}}</td>
             <td>{{$item->TXT_EMPRESA_TRABAJADOR}}</td>
+            <td>{{$item->TXT_AREA}}</td>
             <td>{{date_format(date_create($item->FECHA_EMI), 'd-m-Y')}}</td>
             <td>{{date_format(date_create($item->FECHA_EMISION), 'd-m-Y')}}</td>
             <td>{{$item->TXT_TIPODOCUMENTO}}</td>

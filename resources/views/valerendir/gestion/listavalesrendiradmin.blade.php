@@ -31,15 +31,15 @@
                           <ul class="dropdown-menu" aria-labelledby="menudespacho"
                               style="margin: 7px -169px 0;">
                               <li>
-                             {{--   <a href="{{url('/comprobante-masivo-excel-lg')}}" 
-                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                <a href="{{url('/descargar-excel-vl')}}" 
+                                   class='btn btn-secondary botoncabecera tooltipcss opciones'
                                    target="_blank"
-                                   id="descargarcomprobantemasivoexcel" 
-                                   data-href="{{url('/comprobante-masivo-excel-lg')}}"
+                                   id="descargarvaleexcel" 
+                                   data-href="{{url('/descargar-excel-vl')}}"
                                    title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Contabilidada</span>
-                                   Descargar excel Contabilidada
-                                </a> --}}
+                                   <span class="tooltiptext">Descargar excel</span>
+                                   Descargar excel
+                                </a>
                               </li>
                           </ul>
                       </div>
