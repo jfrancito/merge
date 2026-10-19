@@ -38,6 +38,17 @@
                                    Descargar excel Contabilidada
                                 </a>
                               </li>
+                              <li>
+                                <a href="{{url('/comprobante-masivo-excel-lg-cuenta')}}" 
+                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                   target="_blank"
+                                   id="descargarcomprobantemasivoexcelcuenta" 
+                                   data-href="{{url('/comprobante-masivo-excel-lg-cuenta')}}"
+                                   title="Descargar excel cuenta contable" style="width:100%">
+                                   <span class="tooltiptext">Descargar excel Contabilidad (Cuentas Contables)</span>
+                                   Descargar excel Cuentas Contables
+                                </a>
+                              </li>
                           </ul>
                       </div>
                   </div>
@@ -181,8 +192,29 @@
       $('[data-toggle="tooltip"]').tooltip();
       $('form').parsley();
 
+      $('body').on('click', '#descargarcomprobantemasivoexcel, #descargarcomprobantemasivoexcelcuenta', function () {
+          var fecha_inicio = $('#fecha_inicio').val();
+          var fecha_fin = $('#fecha_fin').val();
+          var proveedor_id = $('#proveedor_id').val() || 'TODO';
+          var estado_id = $('#estado_id').val() || 'TODO';
+          var idopcion = $('#idopcion').val() || '';
+
+          if (fecha_inicio == '') {
+              alerterrorajax("Seleccione una fecha inicio.");
+              return false;
+          }
+          if (fecha_fin == '') {
+              alerterrorajax("Seleccione una fecha fin.");
+              return false;
+          }
+
+          var href = $(this).attr('data-href') + '/' + fecha_inicio + '/' + fecha_fin + '/' + proveedor_id + '/' + estado_id + '/' + idopcion;
+          $(this).prop('href', href);
+          return true;
+      });
+
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version.'.1') }}" type="text/javascript"></script>
 
 @stop

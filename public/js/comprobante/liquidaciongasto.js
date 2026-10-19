@@ -3040,7 +3040,7 @@ $(document).ready(function () {
     });
 
 
-    $(".liquidaciongasto").on('click', '#descargarcomprobantemasivoexcel', function () {
+    $(".liquidaciongasto").on('click', '#descargarcomprobantemasivoexcel, #descargarcomprobantemasivoexcelcuenta', function () {
 
         var fecha_inicio = $('#fecha_inicio').val();
         var fecha_fin = $('#fecha_fin').val();

@@ -81,7 +81,9 @@
             <th class= 'tabladp'>CORREO USUARIO</th>
             <th class= 'tabladp'>JEFE</th>
             <th class= 'tabladp'>CORREO JEFE</th>
-
+            @if(isset($con_cuenta) && $con_cuenta)
+            <th class= 'tabladp'>CUENTA CONTABLE</th>
+            @endif
         </tr>
         @foreach($listadatos as $index => $item)
         <tr>
@@ -105,7 +107,9 @@
             <td>{{$item->EMAIL_USUARIO}}</td>
             <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
             <td>{{$item->EMAIL_JEFE}}</td>
-
+            @if(isset($con_cuenta) && $con_cuenta)
+            <td>{{$item->CUENTA}}</td>
+            @endif
         </tr>
         @endforeach
     </table>

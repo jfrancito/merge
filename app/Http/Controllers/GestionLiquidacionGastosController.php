@@ -1175,6 +1175,36 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionComprobanteMasivoExcelLgCuenta($fecha_inicio = null, $fecha_fin = null, $proveedor_id = 'TODO', $estado_id = 'TODO', $idopcion = '')
+    {
+        set_time_limit(0);
+
+        if (empty($fecha_inicio) || empty($fecha_fin)) {
+            $fecha_inicio = date('01-m-Y');
+            $fecha_fin = date('d-m-Y');
+        }
+
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+        $fechadia = date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual = date("Y-m-d");
+        $titulo = 'Liquidacion-Gastos-Cuentas-Merge';
+        $funcion = $this;
+
+        $listadatos = $this->lg_lista_cabecera_comprobante_total_gestion_excel_cuenta($cod_empresa, $fecha_inicio, $fecha_fin, $proveedor_id, $estado_id);
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadatos, $titulo, $funcion) {
+            $excel->sheet('LIQUIDACION', function ($sheet) use ($listadatos, $titulo, $funcion) {
+
+                $sheet->loadView('reporte/excel/listacomprobantemasivolq')->with('listadatos', $listadatos)
+                    ->with('titulo', $titulo)
+                    ->with('con_cuenta', true)
+                    ->with('funcion', $funcion);
+            });
+        })->export('xls');
+
+
+    }
+
+
     public function actionListarLGValidado($idopcion)
     {
         /******************* validar url **********************/
