@@ -32,6 +32,29 @@ $(document).ready(function () {
     });
 
 
+    $(".valerendir").on('click', '#descargarvaleexcel', function () {
+
+        var fecha_inicio = $('#fecha_inicio').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var estado_id = $('#estado_id').val();
+        var tipo_vale = $('#tipo_vale').val();
+        var idopcion = $('#idopcion').val();
+
+        if ($.trim(fecha_inicio) === '') {
+            alerterrorajax("Seleccione una fecha inicio.");
+            return false;
+        }
+        if ($.trim(fecha_fin) === '') {
+            alerterrorajax("Seleccione una fecha fin.");
+            return false;
+        }
+
+        var href = $(this).attr('data-href') + '/' + fecha_inicio + '/' + fecha_fin + '/' + estado_id + '/' + tipo_vale + '/' + idopcion;
+        $(this).prop('href', href);
+        return true;
+    });
+
+
     $(".valerendir").on('click', '.verdetalleimporte-valegestion', function(e) {
         e.preventDefault();
 

@@ -482,6 +482,7 @@ trait LiquidacionGastoTraits
             ->select([
                 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO',
                 'LQG_LIQUIDACION_GASTO.TXT_EMPRESA_TRABAJADOR',
+                'LQG_LIQUIDACION_GASTO.TXT_AREA',
                 'LQG_LIQUIDACION_GASTO.FECHA_EMI',
                 'LQG_DETLIQUIDACIONGASTO.FECHA_EMISION',
                 'LQG_DETLIQUIDACIONGASTO.TXT_TIPODOCUMENTO',

@@ -20,6 +20,7 @@ use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
 use View;
 use Validator;
+use Excel;
 
 class GestionValeRendirController extends Controller
 {
@@ -74,6 +75,39 @@ class GestionValeRendirController extends Controller
             'tipo_vale' => $tipo_vale
         ]);
 
+    }
+
+
+    public function actionExportarExcelVL($fecha_inicio = null, $fecha_fin = null, $estado_id = 'TODO', $tipo_vale = 'TODO', $idopcion = null, Request $request = null)
+    {
+        set_time_limit(0);
+
+        if (is_null($fecha_inicio)) {
+            $fecha_inicio = request()->get('fecha_inicio', $this->fecha_menos_diez_dias);
+        }
+        if (is_null($fecha_fin)) {
+            $fecha_fin = request()->get('fecha_fin', $this->fecha_sin_hora);
+        }
+        if ($estado_id == '' || is_null($estado_id)) {
+            $estado_id = request()->get('estado_id', 'TODO');
+        }
+        if ($tipo_vale == '' || is_null($tipo_vale)) {
+            $tipo_vale = request()->get('tipo_vale', 'TODO');
+        }
+
+        $titulo = 'Vales-Rendir-Merge';
+        $fecha_actual = date("Y-m-d");
+        $funcion = $this;
+
+        $listavale = $this->lg_lista_cabecera_vale_rendir_excel($fecha_inicio, $fecha_fin, $estado_id, $tipo_vale);
+
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listavale, $titulo, $funcion) {
+            $excel->sheet('VALES', function ($sheet) use ($listavale, $titulo, $funcion) {
+                $sheet->loadView('reporte/excel/listavalerendirmasivo')->with('listavale', $listavale)
+                    ->with('titulo', $titulo)
+                    ->with('funcion', $funcion);
+            });
+        })->export('xls');
     }
 
 
