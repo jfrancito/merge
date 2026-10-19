@@ -509,6 +509,61 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_lista_cabecera_comprobante_total_gestion_excel_cuenta($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+
+        $listadatos = LqgLiquidacionGasto::join('LQG_DETLIQUIDACIONGASTO', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+            ->join('LQG_DETDOCUMENTOLIQUIDACIONGASTO', function($join) {
+                $join->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+                     ->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ITEM', '=', 'LQG_DETLIQUIDACIONGASTO.ITEM');
+            })
+            ->join('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'LQG_DETLIQUIDACIONGASTO.COD_EMPRESA_PROVEEDOR')
+            ->ProveedorLG($proveedor_id)
+            ->EstadoLG($estado_id)
+            ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+            ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+            ->select([
+                'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO',
+                'LQG_LIQUIDACION_GASTO.TXT_EMPRESA_TRABAJADOR',
+                'LQG_LIQUIDACION_GASTO.FECHA_EMI',
+                'LQG_DETLIQUIDACIONGASTO.FECHA_EMISION',
+                'LQG_DETLIQUIDACIONGASTO.TXT_TIPODOCUMENTO',
+                'LQG_DETLIQUIDACIONGASTO.SERIE',
+                'LQG_DETLIQUIDACIONGASTO.NUMERO',
+                'LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR',
+                'STD.EMPRESA.NRO_DOCUMENTO',
+                'LQG_DETDOCUMENTOLIQUIDACIONGASTO.TXT_PRODUCTO',
+                'LQG_LIQUIDACION_GASTO.TXT_CATEGORIA_MONEDA',
+                'LQG_DETDOCUMENTOLIQUIDACIONGASTO.CANTIDAD',
+                'LQG_DETDOCUMENTOLIQUIDACIONGASTO.SUBTOTAL',
+                'LQG_DETDOCUMENTOLIQUIDACIONGASTO.IGV',
+                'LQG_DETDOCUMENTOLIQUIDACIONGASTO.TOTAL',
+                'LQG_LIQUIDACION_GASTO.TXT_USUARIO_AUTORIZA',
+                // Emails por subconsultas
+                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.USUARIO_CREA)) as EMAIL_USUARIO"),
+                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.COD_USUARIO_AUTORIZA)) as EMAIL_JEFE"),
+                DB::raw("ISNULL((
+                    SELECT STUFF((
+                        SELECT DISTINCT ',' + ASM2.TXT_CUENTA_CONTABLE
+                        FROM WEB.asientos AST2 (NOLOCK)
+                        INNER JOIN WEB.asientomovimientos ASM2 (NOLOCK)
+                            ON AST2.COD_ASIENTO = ASM2.COD_ASIENTO
+                            AND ASM2.COD_ESTADO = 1
+                            AND ASM2.TXT_CUENTA_CONTABLE LIKE '6%'
+                        WHERE AST2.COD_ESTADO = 1
+                            AND AST2.TXT_REFERENCIA = (CAST(LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO AS VARCHAR) + '-' + CAST(LQG_DETLIQUIDACIONGASTO.ITEM AS VARCHAR))
+                            AND (AST2.GLOSA_EXTORNO IS NULL OR AST2.GLOSA_EXTORNO <> 'COMPENSACION')
+                        FOR XML PATH('')
+                    ), 1, 1, '')
+                ), '') AS CUENTA")
+            ])
+            ->distinct()
+            ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_EMI', 'desc')
+            ->get();
+
+        return  $listadatos;
+    }
+
+
 
 
     private function lg_descargar_archivo_sunat_lg() {

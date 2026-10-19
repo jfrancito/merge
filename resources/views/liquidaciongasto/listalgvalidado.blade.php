@@ -38,6 +38,17 @@
                                    Descargar excel Contabilidada
                                 </a>
                               </li>
+                              <li>
+                                <a href="{{url('/comprobante-masivo-excel-lg-cuenta')}}" 
+                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                   target="_blank"
+                                   id="descargarcomprobantemasivoexcelcuenta" 
+                                   data-href="{{url('/comprobante-masivo-excel-lg-cuenta')}}"
+                                   title="Descargar excel cuenta contable" style="width:100%">
+                                   <span class="tooltiptext">Descargar excel Contabilidad (Cuentas Contables)</span>
+                                   Descargar excel Cuentas Contables
+                                </a>
+                              </li>
                           </ul>
                       </div>
                   </div>
