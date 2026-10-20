@@ -223,6 +223,23 @@
                                           </div>
                                         </div> 
                                       @endif
+                                    @elseif($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000006')
+                                      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                        <div class="form-group sectioncargarimagen">
+                                          <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
+                                            <br><br>
+                                            <div class="col-sm-12">
+                                                <div class="file-loading">
+                                                    <input 
+                                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                    class="file-es"  
+                                                    type="file" 
+                                                    multiple data-max-file-count="1">
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </div>
                                     @else
                                       @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
                                         <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion">
@@ -257,7 +274,7 @@
                                                       class="file-es"  
                                                       type="file" 
                                                       multiple data-max-file-count="1"
-                                                      required>
+                                                      @if($item->IND_OBLIGATORIO == 1) required @endif>
                                                   </div>
                                               </div>
                                           </div>

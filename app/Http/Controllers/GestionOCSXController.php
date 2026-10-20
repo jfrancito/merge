@@ -160,6 +160,8 @@ class GestionOCSXController extends Controller
         $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
 
+        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->delete();
+
         $docasociar                              =   New CMPDocAsociarCompra;
         $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
         $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000001';
@@ -172,6 +174,19 @@ class GestionOCSXController extends Controller
         $docasociar->COD_ESTADO                  =   1;
         $docasociar->TIP_DOC                     =   'N';
         $docasociar->save();
+
+        $docasociar_inf                          =   New CMPDocAsociarCompra;
+        $docasociar_inf->COD_ORDEN               =   $ordencompra->COD_DOCUMENTO_CTBLE;
+        $docasociar_inf->COD_CATEGORIA_DOCUMENTO =   'DCC0000000000006';
+        $docasociar_inf->NOM_CATEGORIA_DOCUMENTO =   'INFORME';
+        $docasociar_inf->IND_OBLIGATORIO         =   0;
+        $docasociar_inf->TXT_FORMATO             =   'PDF';
+        $docasociar_inf->TXT_ASIGNADO            =   'CONTACTO';
+        $docasociar_inf->COD_USUARIO_CREA_AUD    =   Session::get('usuario')->id;
+        $docasociar_inf->FEC_USUARIO_CREA_AUD    =   $this->fechaactual;
+        $docasociar_inf->COD_ESTADO              =   1;
+        $docasociar_inf->TIP_DOC                 =   'N';
+        $docasociar_inf->save();
 
         $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                     ->whereIn('TXT_FORMATO', ['PDF'])
@@ -936,6 +951,10 @@ class GestionOCSXController extends Controller
                     if(!is_null($filescdm)){
 
                         foreach($filescdm as $file){
+
+                            if(empty($file) || is_null($file) || !($file instanceof \Illuminate\Http\UploadedFile) || !$file->isValid()){
+                                continue;
+                            }
 
                             $contadorArchivos = Archivo::count();
                             $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
