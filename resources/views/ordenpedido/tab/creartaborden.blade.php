@@ -335,8 +335,38 @@
     <!-- FIN panel-body ORDEN -->
 
     <!-- ================= HEADER DETALLE ================= -->
+    @php
+        if (!isset($can_tipo_cambio_venta)) {
+            $tc_query = DB::table('CMP.TIPO_CAMBIO')
+                ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+                ->where('COD_ESTADO', 1)
+                ->first();
+            if (!$tc_query) {
+                $tc_query = DB::table('CMP.TIPO_CAMBIO')
+                    ->where('COD_ESTADO', 1)
+                    ->orderBy('FEC_CAMBIO', 'desc')
+                    ->first();
+            }
+            $can_tipo_cambio_venta = $tc_query ? (float)$tc_query->CAN_VENTA : 0;
+            if ($can_tipo_cambio_venta > 100) $can_tipo_cambio_venta /= 10000;
+        }
+    @endphp
+
     <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
+            <span id="alerta-tipo-cambio-servicio" style="display: none; float: right; margin-top: -2px;">
+                <span class="badge-tc-header" style="background: rgba(255, 255, 255, 0.98); border-radius: 20px; padding: 2px 10px 2px 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.7); vertical-align: middle;">
+                    <span style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; box-shadow: 0 1px 3px rgba(16, 185, 129, 0.5);">
+                        <i class="fa fa-dollar"></i>
+                    </span>
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #475569;">
+                        Tipo de Cambio:
+                    </span>
+                    <span style="background: #1d3a6d; color: #ffffff; padding: 1px 8px; border-radius: 10px; font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 2px;">
+                        <span style="color: #34d399; font-weight: 700; font-size: 10px;">S/</span>{{ number_format($can_tipo_cambio_venta, 3, '.', '') }}
+                    </span>
+                </span>
+            </span>
             DETALLE ORDEN PEDIDO
         </div>
     </div>
@@ -561,6 +591,19 @@
         text-transform: uppercase;
     }
 
+    @keyframes pulseTc {
+        0% { transform: scale(1); box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+        50% { transform: scale(1.03); box-shadow: 0 2px 8px rgba(16,185,129,0.45); }
+        100% { transform: scale(1); box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+    }
 
+    .badge-tc-header {
+        animation: pulseTc 2.8s infinite ease-in-out;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .badge-tc-header:hover {
+        transform: scale(1.05);
+    }
 </style>
 

@@ -154,7 +154,7 @@ trait ComprobanteTraits
     {
         $sw = 0;
 
-        $array = ['1CIX00000422','1CIX00000001','1CIX00000548'];
+        $array = ['1CIX00000422', '1CIX00000001', '1CIX00000548'];
 
         $valor = Session::get('usuario')->id;
 
@@ -6730,7 +6730,7 @@ trait ComprobanteTraits
         $rol = WEBRol::where('id', '=', Session::get('usuario')->rol_id)->first();
 
 
-        if($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422','1CIX00000548'])){
+        if ($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422', '1CIX00000548'])) {
 
 
             $listadatos = FeDocumento::Fecha($filtrofecha_id, $fecha_inicio, $fecha_fin)
@@ -9857,7 +9857,7 @@ trait ComprobanteTraits
                 $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
                     ->addBinding($oi->getBindings());
             })
-            ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(documentos.CAN_TOTAL AS FLOAT)')
+            ->whereRaw('ROUND(ABS(CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) - CAST(documentos.CAN_TOTAL AS FLOAT)), 2) <= 0.01')
             ->where('FOLIO', '=', $folio)
             ->where('CMP.ORDEN.COD_CATEGORIA_MONEDA', '=', $moneda_id)
             ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
@@ -9902,7 +9902,7 @@ trait ComprobanteTraits
                 $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
                     ->addBinding($oi->getBindings());
             })
-            ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(documentos.CAN_TOTAL AS FLOAT)')
+            ->whereRaw('ROUND(ABS(CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) - CAST(documentos.CAN_TOTAL AS FLOAT)), 2) <= 0.01')
             ->where('FOLIO', '=', $folio)
             ->where('CMP.ORDEN.COD_CATEGORIA_MONEDA', '=', $moneda_id)
             ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
@@ -10032,7 +10032,7 @@ trait ComprobanteTraits
         $fecha_corte = date('Ymd');
 
 
-        if(Session::get('usuario')->id == '1CIX00000422' || Session::get('usuario')->id == '1CIX00000548'){
+        if (Session::get('usuario')->id == '1CIX00000422' || Session::get('usuario')->id == '1CIX00000548') {
 
 
             //UPDATE DE CENTIMOS ORDEN DE COMPRAS

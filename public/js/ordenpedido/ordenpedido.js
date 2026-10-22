@@ -10,6 +10,9 @@ $(document).ready(function () {
     // Inicializar totales y visibilidad de campos
     setTimeout(() => {
         calcularTotalPedido();
+        if (typeof actualizarVisibilidadTipoCambioServicio === 'function') {
+            actualizarVisibilidadTipoCambioServicio();
+        }
     }, 500);
 
     // Activar pestaña por hash en la URL
@@ -611,14 +614,25 @@ $(document).ready(function () {
         }
     });
 
+    function actualizarVisibilidadTipoCambioServicio() {
+        var tipo = $('#tipo_material_servicio').val();
+        if (tipo === 'S') {
+            $('#alerta-tipo-cambio-servicio').stop(true, true).fadeIn(250);
+        } else {
+            $('#alerta-tipo-cambio-servicio').stop(true, true).fadeOut(200);
+        }
+    }
+
     $(document).on('change', '#tipo_material_servicio', function () {
         var tipo = $(this).val();
 
         // VALIDACIÓN: Si es SERVICIO (S), cantidad = 1 y bloqueado
         if (tipo === 'S') {
             $('#cantidad').val(1).prop('disabled', true);
+            $('#alerta-tipo-cambio-servicio').stop(true, true).fadeIn(250);
         } else {
             $('#cantidad').val('').prop('disabled', false);
+            $('#alerta-tipo-cambio-servicio').stop(true, true).fadeOut(200);
         }
 
         // Limpiar el producto seleccionado y vaciar opciones anteriores

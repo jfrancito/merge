@@ -297,6 +297,40 @@ class GestionOrdenPedidoController extends Controller
         // Convertir el resultado a array asociativo para mantener compatibilidad con la vista
         $listapedido = json_decode(json_encode($listapedido), true);
 
+        // Tipo de Cambio del día para requerimientos de Servicios (CMP.TIPO_CAMBIO)
+        $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+            ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+            ->where('COD_ESTADO', 1)
+            ->first();
+
+        $es_tipo_cambio_hoy = true;
+        if (!$tipo_cambio) {
+            $es_tipo_cambio_hoy = false;
+            $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+                ->where('COD_ESTADO', 1)
+                ->orderBy('FEC_CAMBIO', 'desc')
+                ->first();
+        }
+
+        $can_tipo_cambio_venta = 0;
+        $can_tipo_cambio_compra = 0;
+        $fec_tipo_cambio = '';
+        $fec_aud_tipo_cambio = '';
+
+        if ($tipo_cambio) {
+            $can_tipo_cambio_venta = (float) $tipo_cambio->CAN_VENTA;
+            if ($can_tipo_cambio_venta > 100) {
+                $can_tipo_cambio_venta = $can_tipo_cambio_venta / 10000;
+            }
+
+            $can_tipo_cambio_compra = (float) $tipo_cambio->CAN_COMPRA;
+            if ($can_tipo_cambio_compra > 100) {
+                $can_tipo_cambio_compra = $can_tipo_cambio_compra / 10000;
+            }
+
+            $fec_tipo_cambio = date('d/m/Y', strtotime($tipo_cambio->FEC_CAMBIO));
+            $fec_aud_tipo_cambio = $tipo_cambio->FEC_USUARIO_CREA_AUD ? date('d/m/Y H:i', strtotime($tipo_cambio->FEC_USUARIO_CREA_AUD)) : '';
+        }
 
         return view('ordenpedido.ajax.ordenpedido', [
             'listaempresa' => $combo,
@@ -322,6 +356,12 @@ class GestionOrdenPedidoController extends Controller
             'area_id' => $area_id,
             'registrosMonto' => $registrosMonto,
             'registrosPeriodos' => $registrosPeriodos,
+            'tipo_cambio' => $tipo_cambio,
+            'can_tipo_cambio_venta' => $can_tipo_cambio_venta,
+            'can_tipo_cambio_compra' => $can_tipo_cambio_compra,
+            'fec_tipo_cambio' => $fec_tipo_cambio,
+            'fec_aud_tipo_cambio' => $fec_aud_tipo_cambio,
+            'es_tipo_cambio_hoy' => $es_tipo_cambio_hoy,
             'ajax' => true,
         ]);
     }
