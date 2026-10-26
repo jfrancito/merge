@@ -17,7 +17,8 @@ trait OrdenPedidoTraits
 
     public function insertOrdenPedido($ind_tipo_operacion, $id_pedido, $fec_pedido, $cod_periodo, $txt_nombre, $cod_anio, $cod_empr, $cod_centro,
                                       $cod_tipo_pedido, $txt_tipo_pedido, $cod_trabajador_solicita, $txt_trabajador_solicita,
-                                      $cod_trabajador_autoriza, $txt_trabajador_autoriza, $cod_trabajador_aprueba_ger, $txt_trabajador_aprueba_ger, $cod_trabajador_aprueba_adm, $txt_trabajador_aprueba_adm, $txt_glosa, $cod_estado, $txt_estado, $cod_area, $txt_area, $activo, $cod_usuario_registro)
+                                      $cod_trabajador_autoriza, $txt_trabajador_autoriza, $cod_trabajador_aprueba_ger, $txt_trabajador_aprueba_ger, $cod_trabajador_aprueba_adm, $txt_trabajador_aprueba_adm, $txt_glosa, $cod_estado, $txt_estado, $cod_area, $txt_area, $activo, $cod_usuario_registro,
+                                      $cod_trabajador_confirma = '', $txt_trabajador_confirma = '')
     {
         try {
             $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.ORDEN_PEDIDO_IUD
@@ -85,6 +86,36 @@ trait OrdenPedidoTraits
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $id_pedido = $resultado['ID_PEDIDO'];
 
+            // Guardar confirmación de mantenimiento (jefe de mantenimiento)
+            try {
+                if (!empty($cod_trabajador_confirma) || !empty($txt_trabajador_confirma)) {
+                    DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO')
+                        ->where('ID_PEDIDO', $id_pedido)
+                        ->update([
+                            'COD_TRABAJADOR_AUTORIZA_MAN' => $cod_trabajador_confirma,
+                            'TXT_TRABAJADOR_AUTORIZA_MAN' => $txt_trabajador_confirma
+                        ]);
+                } else {
+                    $planner_info = DB::connection('sqlsrv')->table('dbo.users_planner_mantenimiento')
+                        ->where(function ($q) {
+                            $q->where('activo', 1)->orWhereNull('activo');
+                        })
+                        ->where('usuarioosiris_id', $cod_trabajador_solicita)
+                        ->first();
+
+                    if ($planner_info) {
+                        DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO')
+                            ->where('ID_PEDIDO', $id_pedido)
+                            ->update([
+                                'COD_TRABAJADOR_AUTORIZA_MAN' => $planner_info->usuarioosiris_id_jefe ?? '',
+                                'TXT_TRABAJADOR_AUTORIZA_MAN' => $planner_info->nombre_jefe_man ?? ''
+                            ]);
+                    }
+                }
+            } catch (\Exception $eman) {
+                Log::warning('No se pudo actualizar COD_TRABAJADOR_AUTORIZA_MAN en WEB.ORDEN_PEDIDO: ' . $eman->getMessage());
+            }
+
             try {
                 $this->replicateOrdenPedidoToZona($id_pedido);
             } catch (\Exception $ez) {
@@ -150,6 +181,15 @@ trait OrdenPedidoTraits
 
                 // Replicar cabecera
                 $cab_array = $safe_format_dates((array)$pedido);
+                try {
+                    $columnsInDest = DB::connection($conexionbd)->getSchemaBuilder()->getColumnListing('ORDEN_PEDIDO');
+                    if (!empty($columnsInDest)) {
+                        $cab_array = array_intersect_key($cab_array, array_flip($columnsInDest));
+                    }
+                } catch (\Exception $ecol) {
+                    Log::warning('Error al obtener columnas de destino en réplica: ' . $ecol->getMessage());
+                }
+
                 DB::connection($conexionbd)->table('WEB.ORDEN_PEDIDO')
                     ->updateOrInsert(
                         ['ID_PEDIDO' => $id_pedido],
@@ -310,6 +350,8 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
                 'OP.COD_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_AUTORIZA_MAN',
+                'OP.TXT_TRABAJADOR_AUTORIZA_MAN',
                 'OP.TXT_GLOSA',
                 'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
@@ -404,6 +446,8 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
                 'OP.COD_TRABAJADOR_APRUEBA_ADM',
+                'OP.COD_TRABAJADOR_AUTORIZA_MAN',
+                'OP.TXT_TRABAJADOR_AUTORIZA_MAN',
                 'OP.TXT_GLOSA',
                 'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
@@ -1635,6 +1679,8 @@ WHERE OP.CONSOLIDADO = 'SI'
                 OP.TXT_ESTADO,
                 OP.TXT_TRABAJADOR_SOLICITA,
                 OP.TXT_TRABAJADOR_AUTORIZA,
+                OP.COD_TRABAJADOR_AUTORIZA_MAN,
+                OP.TXT_TRABAJADOR_AUTORIZA_MAN,
                 OP.TXT_TRABAJADOR_APRUEBA_GER,
                 OP.TXT_GLOSA,
                 OP.TXT_TRABAJADOR_APRUEBA_ADM,

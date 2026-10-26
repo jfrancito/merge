@@ -127,6 +127,171 @@
             </div>
         </div>
 
+        @if(isset($es_planner_mantenimiento) && $es_planner_mantenimiento)
+        <!-- ================= FILAS MODO PLANNER MANTENIMIENTO ================= -->
+        <div class="row">
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <!-- MES -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        MES <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_periodo', $periodo_mes, '', [
+                          'id' => 'cod_periodo',
+                          'class' => 'form-control control select2'
+                        ]) !!}
+                    </div>
+                </div>
+
+                <!-- EMPRESA -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        EMPRESA <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        @if(count($listaempresa) > 1 && !isset($listaempresa['']))
+                            {!! Form::select('cod_empr', $listaempresa, $empresa, [
+                                'id' => 'cod_empr',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @elseif(count($listaempresa) > 2)
+                            {!! Form::select('cod_empr', $listaempresa, $empresa, [
+                                'id' => 'cod_empr',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @else
+                            <input type="text"
+                                   class="form-control control"
+                                   value="{{ $listaempresa[$empresa] ?? '' }}"
+                                   readonly>
+                            <input type="hidden"
+                                   id="cod_empr"
+                                   name="cod_empr"
+                                   value="{{ $empresa }}">
+                        @endif
+                    </div>
+                </div>
+
+                <!-- SEDE -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        SEDE <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        @if(count($combo_sede) > 0)
+                            {!! Form::select('cod_centro', $combo_sede, $cod_centro, [
+                                'id' => 'cod_centro',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @else
+                            <input type="text"
+                                   class="form-control control"
+                                   value="{{ $nom_centro }}"
+                                   readonly>
+                            <input type="hidden"
+                                   id="cod_centro"
+                                   name="cod_centro"
+                                   value="{{ $cod_centro }}">
+                        @endif
+                    </div>
+                </div>
+
+                <!-- TIPO -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        TIPO <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
+                            'id' => 'cod_tipo_pedido',
+                            'class' => 'form-control control select2',
+                            'disabled' => 'disabled'
+                        ]) !!}
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA -->
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <!-- CONFIRMADO POR -->
+                <div class="row form-row" id="fila_confirmado_por">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        CONFIRMADO POR <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        <input type="text"
+                               id="txt_trabajador_confirma"
+                               name="txt_trabajador_confirma"
+                               class="form-control control text-uppercase"
+                               value="{{ $confirmado_por ?? '' }}"
+                               readonly="">
+                        <input type="hidden"
+                               id="cod_trabajador_confirma"
+                               name="cod_trabajador_confirma"
+                               value="{{ $cod_trabajador_confirma ?? '' }}">
+                    </div>
+                </div>
+
+                <!-- AUTORIZADO POR -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        AUTORIZADO POR <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_trabajador_autoriza', $usuario_autoriza, '', [
+                            'id' => 'cod_trabajador_autoriza',
+                            'class' => 'form-control control select2'
+                        ]) !!}
+                    </div>
+                </div>
+
+                <!-- APROBADO GERENCIA -->
+                <div class="row form-row fila-aprueba-ger" id="fila_aprueba_ger">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        APROBADO GERENCIA <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_trabajador_aprueba_ger', $usuario_aprueba_ger, '', [
+                            'id' => 'cod_trabajador_aprueba_ger',
+                            'class' => 'form-control control select2'
+                        ]) !!}
+                    </div>
+                </div>
+
+                <!-- APROBADO ADMIN -->
+                <div class="row form-row fila-aprueba-adm" id="fila_aprueba_adm">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        APROBADO ADMIN <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_trabajador_aprueba_adm', $usuario_aprueba_adm, '', [
+                             'id' => 'cod_trabajador_aprueba_adm',
+                             'class' => 'form-control control select2'
+                        ]) !!}
+                    </div>
+                </div>
+
+                <!-- OBSERVACIÓN -->
+                <div class="row form-row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        OBSERVACIÓN <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        <textarea id="txt_glosa"
+                                  name="txt_glosa"
+                                  class="form-control"
+                                  rows="2"
+                                  required
+                                  placeholder="Observación"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @else
+        <!-- ================= FILAS MODO ORIGINAL (NO PLANNER) ================= -->
         <!-- FILA 4 -->
         <div class="row form-row">
             <div class="col-md-6">
@@ -135,20 +300,13 @@
                         MES <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {{--  {!! Form::select('cod_periodo', ['' => 'Seleccione Mes'], '', [
-                                   'id' => 'cod_periodo',
-                                   'class' => 'form-control control select2'
-                               ]) !!}  --}}
-
                         {!! Form::select('cod_periodo', $periodo_mes, '', [
                           'id' => 'cod_periodo',
                           'class' => 'form-control control select2'
                       ]) !!}
-
                     </div>
                 </div>
             </div>
-
 
             <div class="col-md-6">
                 <div class="row">
@@ -197,7 +355,6 @@
                 </div>
             </div>
 
-
             <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
@@ -208,7 +365,6 @@
                             'id' => 'cod_trabajador_aprueba_ger',
                             'class' => 'form-control control select2'
                         ]) !!}
-
                     </div>
                 </div>
             </div>
@@ -241,7 +397,6 @@
                 </div>
             </div>
 
-
             <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
@@ -252,16 +407,13 @@
                              'id' => 'cod_trabajador_aprueba_adm',
                              'class' => 'form-control control select2'
                          ]) !!}
-
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- FILA 7 -->
-        <!-- FILA 7 -->
         <div class="row form-row">
-
             <!-- TIPO -->
             <div class="col-md-6">
                 <div class="row">
@@ -269,17 +421,11 @@
                         TIPO <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                      {{--  {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
-                            'id' => 'cod_tipo_pedido',
-                            'class' => 'form-control control select2'
-                        ]) !!} --}}
-
-                            {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
+                        {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
                             'id' => 'cod_tipo_pedido',
                             'class' => 'form-control control select2',
-                             'disabled' => 'disabled'
+                            'disabled' => 'disabled'
                         ]) !!}
-
                     </div>
                 </div>
             </div>
@@ -291,17 +437,17 @@
                         OBSERVACIÓN <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                <textarea id="txt_glosa"
-                          name="txt_glosa"
-                          class="form-control"
-                          rows="2"
-                          required
-                          placeholder="Observación"></textarea>
+                        <textarea id="txt_glosa"
+                                  name="txt_glosa"
+                                  class="form-control"
+                                  rows="2"
+                                  required
+                                  placeholder="Observación"></textarea>
                     </div>
                 </div>
             </div>
-
         </div>
+        @endif
 
         <!-- FILA 7 -->
         <div class="row form-row">

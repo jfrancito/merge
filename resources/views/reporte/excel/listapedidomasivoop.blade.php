@@ -41,27 +41,34 @@
 <tr>
     <td style="background-color:#eeeeee; border : 1px solid #000000"><b>MES</b></td>
     <td style="border : 1px solid #000000">{{ $cab->TXT_NOMBRE }}</td>
-    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>AUTORIZA JEFE</b></td>
-    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_AUTORIZA }}</td>
+    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>AUTORIZA JEFE MANTENIMIENTO</b></td>
+    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_AUTORIZA_MAN ?? '' }}</td>
 </tr>
 
 <tr>
     <td style="background-color:#eeeeee; border : 1px solid #000000"><b>EMPRESA</b></td>
     <td style="border : 1px solid #000000">{{ $cab->NOM_EMPR }}</td>
-    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>APRUEBA GERENCIA</b></td>
-    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_APRUEBA_GER }}</td>
+    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>AUTORIZA JEFE</b></td>
+    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_AUTORIZA }}</td>
 </tr>
 
 <tr>
     <td style="background-color:#eeeeee; border : 1px solid #000000"><b>SEDE</b></td>
     <td style="border : 1px solid #000000">{{ $cab->NOM_CENTRO }}</td>
-    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>APRUEBA ADMINISTRACIÓN</b></td>
-    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
+    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>APRUEBA GERENCIA</b></td>
+    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_APRUEBA_GER }}</td>
 </tr>
 
 <tr>
     <td style="background-color:#eeeeee; border : 1px solid #000000"><b>TIPO</b></td>
     <td style="border : 1px solid #000000">{{ $cab->TXT_TIPO_PEDIDO }}</td>
+    <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>APRUEBA ADMINISTRACIÓN</b></td>
+    <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
+</tr>
+
+<tr>
+    <td style="background-color:#eeeeee; border : 1px solid #000000"></td>
+    <td style="border : 1px solid #000000"></td>
     <td colspan="2" style="background-color:#eeeeee; border : 1px solid #000000"><b>OBSERVACIÓN</b></td>
     <td colspan="2" style="border : 1px solid #000000">{{ $cab->TXT_GLOSA }}</td>
 </tr>

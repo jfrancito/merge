@@ -18,11 +18,15 @@
     <div class="table-responsive detalle-scroll">
         <table class="table table-hover align-middle mb-0 detalle-table">
             @php
+                $mostrarMan = false;
                 $mostrarJefe = false;
                 $mostrarGer = false;
                 $mostrarAdm = false;
 
                 foreach ($pedillodetalle as $item) {
+                    if (!is_null($item->CAN_MODIF_MAN)) {
+                        $mostrarMan = true;
+                    }
                     if (!is_null($item->CAN_MODIF_JEF_AUT)) {
                         $mostrarJefe = true;
                     }
@@ -42,6 +46,8 @@
                     <th style="width:10%">Tipo Producto</th>
                     <th style="width:20%">Categoría</th>
                     <th style="width:10%" class="text-center">Cant.</th>
+                    @if($mostrarMan)
+                    <th style="width:10%" class="text-center">Cant. Mantenimiento</th> @endif
                     @if($mostrarJefe)
                     <th style="width:10%" class="text-center">Cant. Jefe</th> @endif
                     @if($mostrarGer)
@@ -77,6 +83,18 @@
                                 {{ $detalle->CANTIDAD }}
                             </span>
                         </td>
+                        {{-- CANTIDAD JEFE MANTENIMIENTO --}}
+                        @if($mostrarMan)
+                            <td class="text-center">
+                                @if(!is_null($detalle->CAN_MODIF_MAN))
+                                    <span class="badge badge-cantidad" style="background: #e0f2fe; color: #0369a1; font-weight: bold;">
+                                        {{ $detalle->CAN_MODIF_MAN }}
+                                    </span>
+                                @else
+                                    —
+                                @endif
+                            </td>
+                        @endif
                         {{-- CANTIDAD JEFE --}}
                         @if($mostrarJefe)
                             <td class="text-center">
@@ -122,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted fst-italic py-4">
+                        <td colspan="{{ 5 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-center text-muted fst-italic py-4">
                             No hay productos en este pedido.
                         </td>
                     </tr>

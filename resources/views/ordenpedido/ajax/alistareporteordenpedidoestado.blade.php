@@ -22,6 +22,7 @@
         <th class="text-center">CENTRO</th>
         <th class="text-center">ESTADO</th>
         <th class="text-center">USUARIO<br>SOLICITA</th>
+        <th class="text-center">AUTORIZA JEFE<br>MANTENIMIENTO</th>
         <th class="text-center">JEFE<br>AUTORIZA</th>
         <th class="text-center">APRUEBA GERENCIA<br>DE AREA</th>
         <th class="text-center">APRUEBA GERENCIA ADM<br>O JEFE DE COMPRAS</th>
@@ -52,6 +53,7 @@
                 @endif
             </td>
             <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>
+            <td>{{$item->TXT_TRABAJADOR_AUTORIZA_MAN ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_AUTORIZA ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_GER ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>

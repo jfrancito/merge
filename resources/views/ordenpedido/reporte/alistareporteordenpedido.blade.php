@@ -18,6 +18,7 @@
             <th>AREA</th>
             <th>TIPO PEDIDO</th>
             <th>USUARIO SOLICITA</th>
+            <th>AUTORIZA JEFE MANTENIMIENTO</th>
             <th>AUTORIZA JEFE AREA</th>
             <th>APRUEBA GERENCIA AREA</th>
             <th>APRUEBA GER ADM - JEF. COMPRAS</th>
@@ -62,6 +63,7 @@
             <td>{{ $item->TXT_AREA }}</td>
             <td>{{ $item->TXT_TIPO_PEDIDO }}</td>
             <td>{{ $item->TXT_TRABAJADOR_SOLICITA }}</td>
+            <td>{{ $item->TXT_TRABAJADOR_AUTORIZA_MAN ?? '' }}</td>
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_GER }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
@@ -70,6 +72,10 @@
                @if(isset($item->COD_ESTADO) && $item->COD_ESTADO == 'ETM0000000000015' && isset($item->COD_TRABAJADOR_APRUEBA_ADM) && $item->COD_TRABAJADOR_APRUEBA_ADM == 'IITR000000000391')
                    <span class="badge" style="background-color: #f57c00; color: #fff;">
                        POR APROBAR GERENCIA ADM
+                   </span>
+               @elseif((isset($item->COD_ESTADO) && $item->COD_ESTADO == 'ETM0000000000019') || $estado == 'POR APROBAR JEFE MANTENIMIENTO')
+                   <span class="badge" style="background-color: #E8DAEF; color: #5B2C6F; font-weight: bold; padding: 4px 8px; border-radius: 4px;">
+                       {{ $item->TXT_ESTADO }}
                    </span>
                @else
                    <span class="badge {{ $clase }}">

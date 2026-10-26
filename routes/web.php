@@ -1146,6 +1146,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ver_detalle_orden_pedido_aut', 'GestionOrdenPedidoAutorizaController@actionDetallePedidoAut');
 	Route::post('/guardar_editar_detalle_pedido_aut', 'GestionOrdenPedidoAutorizaController@actionGuardarEditarDetalleAut');
 
+	Route::get('/gestion-de-autorizacion-orden-pedido-man/{idopcion}', 'GestionOrdenPedidoAutorizaManController@actionOrdenPedidoAutorizaMan');
+	Route::post('/autorizar_orden_pedido_man', 'GestionOrdenPedidoAutorizaManController@insertAutorizaOrdenPedidoMan');
+	Route::post('/rechazar_orden_pedido_man', 'GestionOrdenPedidoAutorizaManController@insertRechazarOrdenPedidoMan');
+	Route::post('/ver_detalle_orden_pedido_man', 'GestionOrdenPedidoAutorizaManController@actionDetallePedidoMan');
+	Route::post('/guardar_editar_detalle_pedido_man', 'GestionOrdenPedidoAutorizaManController@actionGuardarEditarDetalleMan');
+
 	Route::get('/gestion-de-aprobacion-orden-pedido-ger/{idopcion}', 'GestionOrdenPedidoApruebaGerController@actionOrdenPedidoApruebaGer');
 	Route::post('/ap_ger_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertApruebaOrdenPedidoGer');
 	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertRechazarOrdenPedidoGer');

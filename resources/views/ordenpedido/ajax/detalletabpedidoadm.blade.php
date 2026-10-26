@@ -1,9 +1,11 @@
 @php
     $cod_usuario_session = Session::get('usuario')->usuarioosiris_id ?? null;
+    $mostrarMan  = false;
     $mostrarJefe = false;
     $mostrarGer  = false;
 
     foreach($pedillodetalle as $item){
+        if(!is_null($item->CAN_MODIF_MAN)) $mostrarMan = true;
         if(!is_null($item->CAN_MODIF_JEF_AUT)) $mostrarJefe = true;
         if(!is_null($item->CAN_MODIF_GER)) $mostrarGer = true;
     }
@@ -93,6 +95,7 @@
                                 <th class="text-center" style="color: #000; font-weight: 700;">Tipo</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Original</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
+                                @if($mostrarMan) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Jefe Mantenimiento</th> @endif
                                 @if($mostrarJefe) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th> @endif
                                 @if($mostrarGer) <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Gerencia</th> @endif
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Aprob. Admin</th>
@@ -106,11 +109,12 @@
                             @foreach($pedillodetalle as $index => $detalle)
                                 @php
                                     $cant_original = $detalle->CANTIDAD;
+                                    $cant_man      = $detalle->CAN_MODIF_MAN;
                                     $cant_jefe     = $detalle->CAN_MODIF_JEF_AUT;
                                     $cant_ger      = $detalle->CAN_MODIF_GER;
                                     $cant_adm      = $detalle->CAN_MODIF_ADM;
 
-                                    $valor_editar = $cant_adm ?? $cant_ger ?? $cant_jefe ?? $cant_original;
+                                    $valor_editar = $cant_adm ?? $cant_ger ?? $cant_jefe ?? $cant_man ?? $cant_original;
                                     $precio = $detalle->CAN_PRECIO ?? 0;
                                     $subtotal = $valor_editar * $precio;
                                     $suma_total_general += $subtotal;
@@ -135,6 +139,12 @@
                                         {{ $detalle->NOM_UNIDAD_MEDIDA ?? 'UND' }}
                                     </td>
                                     
+                                    @if($mostrarMan)
+                                        <td class="text-center" style="vertical-align: middle; width: 140px;">
+                                            <span class="fw-bold text-success" style="font-size: 14px;">{{ !is_null($cant_man) ? (int)$cant_man : '—' }}</span>
+                                        </td>
+                                    @endif
+
                                     @if($mostrarJefe)
                                         <td class="text-center" style="vertical-align: middle;">
                                             <span class="fw-bold text-success" style="font-size: 15px;">{{ (int)$cant_jefe }}</span>
@@ -174,7 +184,7 @@
                         </tbody>
                         <tfoot>
                             <tr style="background: #f8f9fc;">
-                                <td colspan="{{ 8 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d;">Total General</td>
+                                <td colspan="{{ 8 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d;">Total General</td>
                                 <td class="text-center fw-bold text-primary total-general-adm" style="padding: 15px; font-size: 18px;">S/ {{ number_format($suma_total_general, 2) }}</td>
                             </tr>
                         </tfoot>

@@ -47,15 +47,17 @@
                                 <th class="text-center py-3">Cantidad</th>
                                 
                                 @php
-                                    $mostrarJefe = false; $mostrarGer = false; $mostrarAdm = false;
+                                    $mostrarMan = false; $mostrarJefe = false; $mostrarGer = false; $mostrarAdm = false;
                                     $total_general = 0;
                                     foreach ($pedillodetalle as $item) {
+                                        if (!is_null($item->CAN_MODIF_MAN)) $mostrarMan = true;
                                         if (!is_null($item->CAN_MODIF_JEF_AUT)) $mostrarJefe = true;
                                         if (!is_null($item->CAN_MODIF_GER)) $mostrarGer = true;
                                         if (!is_null($item->CAN_MODIF_ADM)) $mostrarAdm = true;
                                     }
                                 @endphp
 
+                                @if($mostrarMan) <th class="text-center py-3">Cant. Jefe Mantenimiento</th> @endif
                                 @if($mostrarJefe) <th class="text-center py-3">Cant. Jefe</th> @endif
                                 @if($mostrarGer) <th class="text-center py-3">Cant. Gerencia</th> @endif
                                 @if($mostrarAdm) <th class="text-center py-3">Cant. Admin</th> @endif
@@ -68,7 +70,7 @@
                         <tbody style="font-size: 13.5px; color: #5a5c69;">
                             @forelse($pedillodetalle as $index => $detalle)
                                 @php
-                                    $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : $detalle->CANTIDAD));
+                                    $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : (!is_null($detalle->CAN_MODIF_MAN) ? $detalle->CAN_MODIF_MAN : $detalle->CANTIDAD)));
                                     $subtotal = $valor_cantidad * $detalle->CAN_PRECIO;
                                     $total_general += $subtotal;
                                 @endphp
@@ -87,6 +89,10 @@
                                         @endif
                                     </td>
                                     <td class="text-center py-3 fw-bold" style="vertical-align: middle;">{{ $detalle->CANTIDAD }}</td>
+
+                                    @if($mostrarMan)
+                                        <td class="text-center py-3 fw-bold text-success" style="vertical-align: middle;">{{ $detalle->CAN_MODIF_MAN ?? '—' }}</td>
+                                    @endif
 
                                     @if($mostrarJefe)
                                         <td class="text-center py-3 fw-bold text-success" style="vertical-align: middle;">{{ $detalle->CAN_MODIF_JEF_AUT ?? '—' }}</td>
@@ -114,14 +120,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ 8 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-center py-5 text-muted">No se encontraron productos en este pedido.</td>
+                                    <td colspan="{{ 8 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-center py-5 text-muted">No se encontraron productos en este pedido.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                         
                         <tfoot>
                             <tr style="background: #f8f9fc;">
-                                <td colspan="{{ 7 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle;">Total General</td>
+                                <td colspan="{{ 7 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle;">Total General</td>
                                 <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px; vertical-align: middle; white-space: nowrap;">S/ {{ number_format($total_general, 2) }}</td>
                             </tr>
                         </tfoot>

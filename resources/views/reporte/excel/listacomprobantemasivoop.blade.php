@@ -70,6 +70,7 @@
             <th class= 'tabladp'>AREA</th>
             <th class= 'tabladp'>TIPO PEDIDO</th>
             <th class= 'tabladp'>SOLICITA</th>
+            <th class= 'tabladp'>AUTORIZA JEFE MANTENIMIENTO</th>
             <th class= 'tabladp'>AUTORIZA</th>
             <th class= 'tabladp'>APRUEBA GER</th>
             <th class= 'tabladp'>APRUEBA ADM</th>
@@ -95,6 +96,7 @@
             <td>{{ $item->TXT_AREA }}</td>
             <td>{{ $item->TXT_TIPO_PEDIDO }}</td>
             <td>{{ $item->TXT_TRABAJADOR_SOLICITA }}</td>
+            <td>{{ $item->TXT_TRABAJADOR_AUTORIZA_MAN ?? '' }}</td>
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_GER }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>

@@ -34,6 +34,30 @@ class GestionOrdenPedidoController extends Controller
     {
         $usuarioSesion = Session::get('usuario');
         $usuario_solicita = $usuarioSesion->usuarioosiris_id;
+        $usuario_id = $usuarioSesion->id ?? '';
+        $usuario_name = $usuarioSesion->name ?? '';
+
+        // Buscar si el usuario actual pertenece a users_planner_mantenimiento
+        $planner_user = DB::table('dbo.users_planner_mantenimiento')
+            ->where(function ($q) {
+                $q->where('activo', 1)->orWhereNull('activo');
+            })
+            ->where(function ($q) use ($usuario_id, $usuario_solicita, $usuario_name) {
+                if (!empty($usuario_id)) {
+                    $q->orWhere('id', $usuario_id);
+                }
+                if (!empty($usuario_solicita)) {
+                    $q->orWhere('usuarioosiris_id', $usuario_solicita);
+                }
+                if (!empty($usuario_name)) {
+                    $q->orWhere('name', $usuario_name);
+                }
+            })
+            ->first();
+
+        $es_planner_mantenimiento = $planner_user ? true : false;
+        $confirmado_por = $planner_user ? ($planner_user->nombre_jefe_man ?? '') : '';
+        $cod_trabajador_confirma = $planner_user ? ($planner_user->usuarioosiris_id_jefe ?? '') : '';
 
         $nombre_solicita = $usuarioSesion->nombre;
         $combo4 = ['' => 'Seleccione Empresa'] + [$usuario_solicita => $nombre_solicita];
@@ -362,6 +386,9 @@ class GestionOrdenPedidoController extends Controller
             'fec_tipo_cambio' => $fec_tipo_cambio,
             'fec_aud_tipo_cambio' => $fec_aud_tipo_cambio,
             'es_tipo_cambio_hoy' => $es_tipo_cambio_hoy,
+            'es_planner_mantenimiento' => $es_planner_mantenimiento,
+            'confirmado_por' => $confirmado_por,
+            'cod_trabajador_confirma' => $cod_trabajador_confirma,
             'ajax' => true,
         ]);
     }
@@ -423,6 +450,8 @@ class GestionOrdenPedidoController extends Controller
             $cod_tipo_pedido = $request->input('cod_tipo_pedido');
             $cod_trabajador_solicita = $request->input('cod_trabajador_solicita');
             $cod_trabajador_autoriza = $request->input('cod_trabajador_autoriza');
+            $cod_trabajador_confirma = $request->input('cod_trabajador_confirma', '');
+            $txt_trabajador_confirma = $request->input('txt_trabajador_confirma', '');
             $cod_trabajador_aprueba_ger = $request->input('cod_trabajador_aprueba_ger');
             $cod_trabajador_aprueba_adm = $request->input('cod_trabajador_aprueba_adm');
             $txt_glosa = $request->input('txt_glosa');
@@ -560,7 +589,9 @@ class GestionOrdenPedidoController extends Controller
                     $cod_area,
                     $txt_area,
                     true,
-                    ""
+                    "",
+                    $cod_trabajador_confirma,
+                    $txt_trabajador_confirma
                 );
 
             // determine if update, deactivate existing details
@@ -754,11 +785,32 @@ class GestionOrdenPedidoController extends Controller
             $pedido = DB::table('WEB.ORDEN_PEDIDO')
                 ->where('ID_PEDIDO', $orden_pedido_id)
                 ->first();
+
+            if (!$pedido) {
+                ob_clean();
+                return response()->json(['success' => false, 'mensaje' => 'No se encontró el pedido.'], 404);
+            }
+
+            // Verificar si el usuario que solicita está configurado en users_planner_mantenimiento
+            $es_planner = DB::table('dbo.users_planner_mantenimiento')
+                ->where('usuarioosiris_id', $pedido->COD_TRABAJADOR_SOLICITA)
+                ->where(function ($q) {
+                    $q->where('activo', 1)->orWhereNull('activo');
+                })
+                ->exists();
+
+            if (!$es_planner && !empty($pedido->COD_TRABAJADOR_AUTORIZA_MAN)) {
+                $es_planner = true;
+            }
+
+            // Si es usuario planner mantenimiento, el primer proceso es pasar a ETM0000000000019 (POR APROBAR JEFE MANTENIMIENTO)
+            // Caso contrario, el flujo estándar pasa a ETM0000000000010 (POR APROBAR AUTORIZACION)
+            $cod_estado_destino = $es_planner ? 'ETM0000000000019' : 'ETM0000000000010';
+
             $estado = DB::table('CMP.CATEGORIA')
                 ->where('TXT_GRUPO', 'ESTADO_MERGE')
-                ->where('COD_CATEGORIA', 'ETM0000000000010')
+                ->where('COD_CATEGORIA', $cod_estado_destino)
                 ->first();
-
 
             $this->insertOrdenPedido(
                 'U',
@@ -785,10 +837,14 @@ class GestionOrdenPedidoController extends Controller
                 $pedido->COD_AREA,
                 $pedido->TXT_AREA,
                 true,
-                ""
+                "",
+                $pedido->COD_TRABAJADOR_AUTORIZA_MAN ?? '',
+                $pedido->TXT_TRABAJADOR_AUTORIZA_MAN ?? ''
             );
 
-            $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+            if (!$es_planner) {
+                $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+            }
 
             $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
             $documento = new FeDocumentoHistorial;

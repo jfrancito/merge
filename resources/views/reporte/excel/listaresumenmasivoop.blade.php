@@ -68,6 +68,7 @@
             <th class= 'tabladp'>FAMILIA</th>
             <th class= 'tabladp'>GLOSA</th>
             <th class= 'tabladp'>SOLICITA</th>
+            <th class= 'tabladp'>AUTORIZA JEFE MANTENIMIENTO</th>
             <th class= 'tabladp'>AUTORIZA</th>
             <th class= 'tabladp'>APRUEBA ADM</th>
         </tr>
@@ -87,6 +88,7 @@
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
             <td>{{ $item->TXT_GLOSA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_SOLICITA }}</td>
+            <td>{{ $item->TXT_TRABAJADOR_AUTORIZA_MAN ?? '' }}</td>
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
         </tr>
