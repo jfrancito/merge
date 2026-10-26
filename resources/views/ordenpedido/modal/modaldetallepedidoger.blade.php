@@ -21,13 +21,16 @@
 <div class="modal-body p-0 bg-light">
 
 @php
+    $mostrarMan = false;
     $mostrarJefe = false;
     $total_general = 0;
 
     foreach($pedillodetalle as $item){
+        if(!is_null($item->CAN_MODIF_MAN)){
+            $mostrarMan = true;
+        }
         if(!is_null($item->CAN_MODIF_JEF_AUT)){
             $mostrarJefe = true;
-            break;
         }
     }
 @endphp
@@ -44,6 +47,10 @@
     <th style="width:5%" class="text-center">Cant.</th>
     <th style="width:5%" class="text-center">Precio.</th>
 
+    @if($mostrarMan)
+        <th style="width:10%" class="text-center">Cant. Mantenimiento</th>
+    @endif
+
     @if($mostrarJefe)
         <th style="width:10%" class="text-center">Cant. Jefe</th>
     @endif
@@ -57,6 +64,7 @@
 
 @php
     $cantidad_original = $detalle->CANTIDAD;
+    $cantidad_man      = $detalle->CAN_MODIF_MAN;
     $cantidad_jefe     = $detalle->CAN_MODIF_JEF_AUT;
 @endphp
 
@@ -106,6 +114,15 @@
 
     </td>
 
+    {{-- COLUMNA JEFE MANTENIMIENTO SOLO SI EXISTE MODIFICACIÓN --}}
+    @if($mostrarMan)
+    <td class="text-center">
+        <span class="badge badge-cantidad" style="background: #e0f2fe; color: #0369a1; font-weight: bold;">
+            {{ !is_null($cantidad_man) ? (int)$cantidad_man : '—' }}
+        </span>
+    </td>
+    @endif
+
     {{-- COLUMNA JEFE SOLO SI EXISTE MODIFICACIÓN --}}
     @if($mostrarJefe)
     <td class="text-center">
@@ -152,7 +169,7 @@
 
 @empty
 <tr>
-    <td colspan="{{ $mostrarJefe ? 6 : 5 }}" class="text-center text-muted fst-italic py-4">
+    <td colspan="{{ 5 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) }}" class="text-center text-muted fst-italic py-4">
         No hay productos en este pedido.
     </td>
 </tr>

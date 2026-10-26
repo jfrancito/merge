@@ -221,6 +221,8 @@ $(document).ready(function () {
         let cod_tipo_pedido = $('#cod_tipo_pedido').val();
         let cod_trabajador_solicita = $('#cod_trabajador_solicita').val();
         let cod_trabajador_autoriza = $('#cod_trabajador_autoriza').val();
+        let cod_trabajador_confirma = $('#cod_trabajador_confirma').length ? $('#cod_trabajador_confirma').val() : '';
+        let txt_trabajador_confirma = $('#txt_trabajador_confirma').length ? $('#txt_trabajador_confirma').val() : '';
         let cod_trabajador_aprueba_ger = $('#cod_trabajador_aprueba_ger').val();
         let cod_trabajador_aprueba_adm = $('#cod_trabajador_aprueba_adm').val();
         let txt_glosa = $('#txt_glosa').val();
@@ -295,6 +297,8 @@ $(document).ready(function () {
         formData.append('cod_tipo_pedido', cod_tipo_pedido);
         formData.append('cod_trabajador_solicita', cod_trabajador_solicita);
         formData.append('cod_trabajador_autoriza', cod_trabajador_autoriza);
+        formData.append('cod_trabajador_confirma', cod_trabajador_confirma);
+        formData.append('txt_trabajador_confirma', txt_trabajador_confirma);
         formData.append('cod_trabajador_aprueba_ger', cod_trabajador_aprueba_ger);
         formData.append('cod_trabajador_aprueba_adm', cod_trabajador_aprueba_adm);
         formData.append('txt_glosa', txt_glosa);
@@ -976,9 +980,12 @@ $(document).ready(function () {
             // OBTENER UMBRALES
             // =========================
 
-            // Gerencia
-            let configGerencia = registrosMonto.find(r => r.COD_MONTO === 'IICHMO0000000001');
-            let umbralGerencia = configGerencia ? parseFloat(configGerencia.MONTO) : 0;
+            let esPlanner = (typeof esPlannerMantenimiento !== 'undefined' && esPlannerMantenimiento) || ($('#fila_confirmado_por').length > 0);
+
+            // Gerencia (para usuarios planner mantenimiento coge IICHMO0000000003 - 2000 soles, para el resto IICHMO0000000001)
+            let codMontoGerencia = esPlanner ? 'IICHMO0000000003' : 'IICHMO0000000001';
+            let configGerencia = registrosMonto.find(r => r.COD_MONTO === codMontoGerencia);
+            let umbralGerencia = configGerencia ? parseFloat(configGerencia.MONTO) : (esPlanner ? 2000 : 0);
 
             // Administración
             let configAdminMaestra = registrosMonto.find(r => r.COD_MONTO === 'IICHMO0000000002');
@@ -988,27 +995,33 @@ $(document).ready(function () {
             // =========================
             // LÓGICA GERENCIA
             // =========================
-            // Se muestra cuando supera el umbral de Administración (ej: 800)
+            // Para usuarios planner mantenimiento es mayor o igual (>= 2000)
+            let superaGerencia = esPlanner ? (totalPedido >= umbralGerencia) : (totalPedido > umbralGerencia);
 
-            if (totalPedido > umbralGerencia) {
+            let $wrapperGer = $('#fila_aprueba_ger').length ? $('#fila_aprueba_ger') : $('#cod_trabajador_aprueba_ger').closest('.col-md-6');
+            let $wrapperAdm = $('#fila_aprueba_adm').length ? $('#fila_aprueba_adm') : $('#cod_trabajador_aprueba_adm').closest('.col-md-6');
 
-                if ($('#cod_trabajador_aprueba_ger').closest('.col-md-6').is(':hidden')) {
+            if (superaGerencia) {
+
+                if ($wrapperGer.is(':hidden')) {
+
+                    let textoAlerta = esPlanner
+                        ? 'El monto total es <b>mayor o igual a ' + umbralGerencia.toFixed(2) + '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
+                        : 'El monto total <b>superó los ' + umbralGerencia.toFixed(2) + '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.';
 
                     modalBonito({
                         tipo: 'warn',
                         icono: '⚠️',
                         titulo: 'Atención',
-                        mensaje: 'El monto total <b>superó los ' +
-                            umbralGerencia.toFixed(2) +
-                            '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
+                        mensaje: textoAlerta
                     });
                 }
 
-                $('#cod_trabajador_aprueba_ger').closest('.col-md-6').show();
+                $wrapperGer.show();
 
             } else {
 
-                $('#cod_trabajador_aprueba_ger').closest('.col-md-6').hide();
+                $wrapperGer.hide();
                 $('#cod_trabajador_aprueba_ger').val('').trigger('change');
             }
 
@@ -1019,7 +1032,7 @@ $(document).ready(function () {
 
             if (totalPedido > 0) {
 
-                $('#cod_trabajador_aprueba_adm').closest('.col-md-6').show();
+                $wrapperAdm.show();
 
                 // Valor base (0 – 800)
                 let selectedAdmin = 'IATR000000000199';
@@ -1036,7 +1049,7 @@ $(document).ready(function () {
 
             } else {
 
-                $('#cod_trabajador_aprueba_adm').closest('.col-md-6').hide();
+                $wrapperAdm.hide();
                 $('#cod_trabajador_aprueba_adm')
                     .val('')
                     .trigger('change')
@@ -1222,6 +1235,12 @@ $(document).ready(function () {
                     $('#cod_centro').val(p.COD_CENTRO).trigger('change');
                     $('#txt_glosa').val(p.TXT_GLOSA);
                     $('#cod_estado').val(p.COD_ESTADO);
+                    if ($('#txt_trabajador_confirma').length) {
+                        $('#txt_trabajador_confirma').val(p.TXT_TRABAJADOR_AUTORIZA_MAN || p.TXT_TRABAJADOR_CONFIRMA || '');
+                    }
+                    if ($('#cod_trabajador_confirma').length) {
+                        $('#cod_trabajador_confirma').val(p.COD_TRABAJADOR_AUTORIZA_MAN || p.COD_TRABAJADOR_CONFIRMA || '');
+                    }
 
                     // Limpiar tabla detalle
                     let tbody = $('#tabla_detalle_pedido tbody');

@@ -1,10 +1,14 @@
 @php
     $cod_usuario_session = Session::get('usuario')->usuarioosiris_id ?? null;
 
+    $mostrarMan  = false;
     $mostrarJefe = false;
     $mostrarGer  = false;
 
     foreach($pedillodetalle as $item){
+        if(!is_null($item->CAN_MODIF_MAN)){
+            $mostrarMan = true;
+        }
         if(!is_null($item->CAN_MODIF_JEF_AUT)){
             $mostrarJefe = true;
         }
@@ -44,6 +48,10 @@
     <th style="width:20%">Categoría</th>
     <th style="width:10%" class="text-center">Cant.</th>
 
+    @if($mostrarMan)
+        <th style="width:10%" class="text-center">Cant. Mantenimiento</th>
+    @endif
+
     @if($mostrarJefe)
         <th style="width:10%" class="text-center">Cant. Jefe</th>
     @endif
@@ -63,6 +71,7 @@
 
 @php
     $cant_original = $detalle->CANTIDAD;
+    $cant_man      = $detalle->CAN_MODIF_MAN;
     $cant_jefe     = $detalle->CAN_MODIF_JEF_AUT;
     $cant_ger      = $detalle->CAN_MODIF_GER;
     $cant_adm      = $detalle->CAN_MODIF_ADM;
@@ -70,10 +79,11 @@
     $valor_editar = $cant_adm 
                     ?? $cant_ger 
                     ?? $cant_jefe 
+                    ?? $cant_man 
                     ?? $cant_original;
 
     // NUEVA CONDICIÓN
-    $sin_modificaciones = is_null($cant_jefe) && is_null($cant_ger);
+    $sin_modificaciones = is_null($cant_man) && is_null($cant_jefe) && is_null($cant_ger);
 @endphp
 
 <tr>
@@ -121,6 +131,15 @@
     @endif
 
     </td>
+
+    {{-- CANTIDAD JEFE MANTENIMIENTO --}}
+    @if($mostrarMan)
+    <td class="text-center">
+        <span class="badge badge-cantidad" style="background: #e0f2fe; color: #0369a1; font-weight: bold;">
+            {{ !is_null($cant_man) ? (int)$cant_man : '—' }}
+        </span>
+    </td>
+    @endif
 
     {{-- CANTIDAD JEFE --}}
     @if($mostrarJefe)

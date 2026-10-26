@@ -58,7 +58,7 @@
      <script>
         var registrosMonto = {!! json_encode($registrosMonto, JSON_UNESCAPED_UNICODE) !!};
         var registrosPeriodos = {!! json_encode($registrosPeriodos, JSON_UNESCAPED_UNICODE) !!};
-        
+        var esPlannerMantenimiento = {!! json_encode(!empty($es_planner_mantenimiento)) !!};
     </script>
 
     <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>

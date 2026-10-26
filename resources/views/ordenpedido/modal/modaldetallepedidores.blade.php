@@ -18,12 +18,16 @@
     <div class="table-responsive detalle-scroll" style="flex: 1 1 auto; width: 100%;">
         <table class="table table-hover align-middle mb-0 detalle-table">
             @php
+                $mostrarMan = false;
                 $mostrarJefe = false;
                 $mostrarGer = false;
                 $mostrarAdm = false;
                 $total_general = 0;
 
                 foreach ($pedillodetalle as $item) {
+                    if (!is_null($item->CAN_MODIF_MAN)) {
+                        $mostrarMan = true;
+                    }
                     if (!is_null($item->CAN_MODIF_JEF_AUT)) {
                         $mostrarJefe = true;
                     }
@@ -43,6 +47,8 @@
                     <th style="width: 120px;">Tipo</th>
                     <th style="width: 150px;">Categoría</th>
                     <th class="text-center" style="width: 80px;">Cant.</th>
+                    @if($mostrarMan)
+                    <th class="text-center" style="width: 100px;">Cant. Man.</th> @endif
                     @if($mostrarJefe)
                     <th class="text-center" style="width: 100px;">Cant. Jefe</th> @endif
                     @if($mostrarGer)
@@ -58,7 +64,7 @@
             <tbody>
                 @forelse($pedillodetalle as $index => $detalle)
                     @php
-                        $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : $detalle->CANTIDAD));
+                        $valor_cantidad = !is_null($detalle->CAN_MODIF_ADM) ? $detalle->CAN_MODIF_ADM : (!is_null($detalle->CAN_MODIF_GER) ? $detalle->CAN_MODIF_GER : (!is_null($detalle->CAN_MODIF_JEF_AUT) ? $detalle->CAN_MODIF_JEF_AUT : (!is_null($detalle->CAN_MODIF_MAN) ? $detalle->CAN_MODIF_MAN : $detalle->CANTIDAD)));
                         $subtotal = $valor_cantidad * $detalle->CAN_PRECIO;
                         $total_general += $subtotal;
                     @endphp
@@ -85,6 +91,18 @@
                                 {{ $detalle->CANTIDAD }}
                             </span>
                         </td>
+
+                        @if($mostrarMan)
+                            <td class="text-center">
+                                @if(!is_null($detalle->CAN_MODIF_MAN))
+                                    <span class="badge-cantidad badge-jefe" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+                                        {{ $detalle->CAN_MODIF_MAN }}
+                                    </span>
+                                @else
+                                    <span class="text-muted small">—</span>
+                                @endif
+                            </td>
+                        @endif
 
                         @if($mostrarJefe)
                             <td class="text-center">
@@ -146,7 +164,7 @@
 
             <tfoot>
                 <tr style="background: #f8f9fc;">
-                    <td colspan="{{ 7 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle; border:none;">Total General</td>
+                    <td colspan="{{ 7 + ($mostrarMan ? 1 : 0) + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) + ($mostrarAdm ? 1 : 0) }}" class="text-right fw-bold text-uppercase" style="padding: 15px; color: #1d3a6d; vertical-align: middle; border:none;">Total General</td>
                     <td class="text-center fw-bold text-primary" style="padding: 15px; font-size: 18px; vertical-align: middle; white-space: nowrap; border:none;">S/ {{ number_format($total_general, 2) }}</td>
                 </tr>
             </tfoot>

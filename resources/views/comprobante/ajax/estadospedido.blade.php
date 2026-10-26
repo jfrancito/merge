@@ -69,7 +69,7 @@
                                                                     <span class="badge badge-warning">{{ $item['TXT_ESTADO'] }}</span>
                                                                 @else
                                                                     @if($item['COD_ESTADO'] == 'ETM0000000000019')
-                                                                        <span class="badge" style="background-color: #D8C5F2; color: #5E3A83;">{{ $item['TXT_ESTADO'] }}</span>
+                                                                        <span class="badge" style="background-color: #E8DAEF; color: #5B2C6F; font-weight: bold; padding: 4px 8px; border-radius: 4px;">{{ $item['TXT_ESTADO'] }}</span>
                                                                     @else
                                                                         <span class="badge badge-default">{{ $item['TXT_ESTADO'] ?? 'SIN ESTADO' }}</span>
                                                                     @endif

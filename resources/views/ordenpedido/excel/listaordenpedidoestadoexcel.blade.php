@@ -36,6 +36,7 @@
         <th class='tabladp'>CENTRO</th>
         <th class='tabladp'>ESTADO</th>
         <th class='tabladp'>USUARIO SOLICITA</th>
+        <th class='tabladp'>AUTORIZA JEFE MANTENIMIENTO</th>
         <th class='tabladp'>JEFE AUTORIZA</th>
         <th class='tabladp'>APRUEBA GERENCIA DE AREA</th>
         <th class='tabladp'>APRUEBA GERENCIA ADM O JEFE DE COMPRAS</th>
@@ -61,6 +62,7 @@
                 @endif
             </td>
             <td>{{$item->TXT_TRABAJADOR_SOLICITA}}</td>
+            <td>{{$item->TXT_TRABAJADOR_AUTORIZA_MAN ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_AUTORIZA ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_GER ?: '—'}}</td>
             <td>{{$item->TXT_TRABAJADOR_APRUEBA_ADM ?: '—'}}</td>

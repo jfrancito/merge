@@ -1,5 +1,9 @@
 @php
     $cod_usuario_session = Session::get('usuario')->usuarioosiris_id ?? null;
+    $mostrarMan = false;
+    foreach($pedillodetalle as $item){
+        if(!is_null($item->CAN_MODIF_MAN)) $mostrarMan = true;
+    }
 @endphp
 
 <!-- HEADER -->
@@ -32,6 +36,9 @@
           <th style="width:10%">Tipo Producto</th>
           <th style="width:15%">Categoría</th>
           <th style="width:10%" class="text-center">CANT ORIGEN</th>
+          @if($mostrarMan)
+          <th style="width:10%" class="text-center">CANT JEFE MAN</th>
+          @endif
           <th style="width:10%" class="text-center">CANT A MODIF</th>
           <th style="width:10%" class="text-right">Precio</th>
           <th style="width:10%" class="text-right">Total</th>
@@ -47,6 +54,7 @@
         $cantidad_mostrar = $detalle->CAN_MODIF_ADM 
                              ?? $detalle->CAN_MODIF_GER 
                              ?? $detalle->CAN_MODIF_JEF_AUT 
+                             ?? $detalle->CAN_MODIF_MAN 
                              ?? $detalle->CANTIDAD;
         
         $precio = $detalle->CAN_PRECIO ?? 0;
@@ -77,6 +85,14 @@
               {{ (int)$detalle->CANTIDAD }}
             </span>
           </td>
+
+          @if($mostrarMan)
+          <td class="text-center">
+            <span class="badge badge-cantidad" style="background: #e0f2fe; color: #0369a1; font-weight: bold;">
+              {{ !is_null($detalle->CAN_MODIF_MAN) ? (int)$detalle->CAN_MODIF_MAN : '—' }}
+            </span>
+          </td>
+          @endif
 
           <td class="text-center">
             @if (

@@ -15,6 +15,7 @@
                         <th>TIPO PEDIDO</th>
                         <th>USUARIO SOLICITA</th>
                         <th>AREA</th>
+                        <th>AUTORIZA JEFE MANTENIMIENTO</th>
                         <th>AUTORIZA JEFE AREA</th>
                         <th>APRUEBA GERENCIA AREA</th>
                         <th>APRUEBA GER ADM - JEF. COMPRAS</th>
@@ -41,6 +42,7 @@
                             <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA_MAN'] ?? '' }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>

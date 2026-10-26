@@ -1,5 +1,9 @@
 @php
     $cod_usuario_session = Session::get('usuario')->usuarioosiris_id ?? null;
+    $mostrarMan = false;
+    foreach($pedillodetalle as $item){
+        if(!is_null($item->CAN_MODIF_MAN)) $mostrarMan = true;
+    }
 @endphp
 
 <div class="row">
@@ -93,6 +97,9 @@
                                 <th class="text-center" style="color: #000; font-weight: 700;">Tipo</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Origen</th>
                                 <th class="text-center" style="color: #000; font-weight: 700;">Uni. Medida</th>
+                                @if($mostrarMan)
+                                    <th class="text-center" style="color: #000; font-weight: 700;">Cant. Jefe Mantenimiento</th>
+                                @endif
                                 <th class="text-center" style="color: #000; font-weight: 700;">Cant. Autoriza Jefe</th>
                                 <th class="text-center" style="color: #000; font-weight: 700; min-width: 180px; max-width: 280px;">Observación</th>
                                 <th class="text-center" style="color: #000; font-weight: 700; min-width: 100px; white-space: nowrap;">Precio Unit.</th>
@@ -106,6 +113,7 @@
                                     $cantidad_mostrar = $detalle->CAN_MODIF_ADM
                                         ?? $detalle->CAN_MODIF_GER
                                         ?? $detalle->CAN_MODIF_JEF_AUT
+                                        ?? $detalle->CAN_MODIF_MAN
                                         ?? $detalle->CANTIDAD;
 
                                     $precio = $detalle->CAN_PRECIO ?? 0;
@@ -128,6 +136,12 @@
                                     <td class="text-center fw-bold" style="vertical-align: middle;">{{ (int) $detalle->CANTIDAD }}</td>
                                     <td class="text-center text-uppercase" style="vertical-align: middle;">{{ $detalle->NOM_UNIDAD_MEDIDA ?? 'UND' }}</td>
                                     
+                                    @if($mostrarMan)
+                                        <td class="text-center" style="vertical-align: middle; width: 140px;">
+                                            <span class="fw-bold text-success" style="font-size: 14px;">{{ !is_null($detalle->CAN_MODIF_MAN) ? (int)$detalle->CAN_MODIF_MAN : '—' }}</span>
+                                        </td>
+                                    @endif
+
                                     <!-- Cantidad Autorizada (Editable o Texto) -->
                                     <td class="text-center" style="vertical-align: middle; width: 140px;">
                                         @if ($pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session && $pedido->COD_ESTADO == 'ETM0000000000010')
@@ -155,7 +169,7 @@
                         </tbody>
                         <tfoot>
                             <tr style="background: #f8f9fc;">
-                                <td colspan="8" class="text-right fw-bold text-uppercase"
+                                <td colspan="{{ $mostrarMan ? 9 : 8 }}" class="text-right fw-bold text-uppercase"
                                     style="padding: 15px; color: #1d3a6d;">Total General</td>
                                 <td class="text-center fw-bold text-primary total-general-aut" style="padding: 15px; font-size: 18px;">S/
                                     {{ number_format($suma_total_general, 2) }}</td>
