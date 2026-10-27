@@ -15382,6 +15382,13 @@ class GestionOCContabilidadController extends Controller
 
     public function actionRegistrarActivoFijoCategoria($idopcion, $idoc, $COD_PRODUCTO, Request $request)
     {
+        if (!$this->es_documento_valido_para_activo_fijo($idoc)) {
+            return response()->json([
+                'error' => true,
+                'mensaje' => 'El comprobante asociado (Ticket u otro) no califica como Activo Fijo.',
+                'idcheckbox' => $request['idcheckbox']
+            ]);
+        }
         $COD_CAT_ACTFIJO = $request['COD_CATEGORIA_AF'];
         $COD_PRODUCTO = $request['COD_PRODUCTO'];
         $COD_TABLA = $request['COD_TABLA'];
@@ -15391,6 +15398,36 @@ class GestionOCContabilidadController extends Controller
         $TXT_DETALLE_PRODUCTO = $request['TXT_DETALLE_PRODUCTO'];
         $TXT_NOMBRE_PRODUCTO = $request['TXT_NOMBRE_PRODUCTO'];
         $idcheckbox = $request['idcheckbox'];
+
+        // Respaldo automático: si NRO_LINEA o COD_LOTE vienen vacíos o 0, obtener los valores reales de CMP.DETALLE_PRODUCTO
+        if (empty($NRO_LINEA) || $NRO_LINEA == '0' || empty(trim($COD_LOTE))) {
+            $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                ->where('COD_TABLA', $idoc)
+                ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                ->where('COD_ESTADO', 1)
+                ->first();
+            if (!$realItemModal) {
+                $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                    ->where('COD_TABLA', $idoc)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                    ->orderBy('NRO_LINEA', 'desc')
+                    ->first();
+            }
+            if ($realItemModal) {
+                if (empty($NRO_LINEA) || $NRO_LINEA == '0') {
+                    $NRO_LINEA = $realItemModal->NRO_LINEA;
+                }
+                if (empty(trim($COD_LOTE))) {
+                    $COD_LOTE = !empty($realItemModal->COD_LOTE) ? $realItemModal->COD_LOTE : '0000000000000000';
+                }
+                if (empty($CAN_PRODUCTO) || (float)$CAN_PRODUCTO <= 0) {
+                    $CAN_PRODUCTO = $realItemModal->CAN_PRODUCTO;
+                }
+            }
+        }
+        if (empty(trim($COD_LOTE))) {
+            $COD_LOTE = '0000000000000000';
+        }
         $error = false;
         $mensaje = 'REGISTRO CATEGORIA EXITOSO';
 
@@ -15440,6 +15477,189 @@ class GestionOCContabilidadController extends Controller
                 $oeRegistro->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO ?? '';
                 $oeRegistro->save();
             }
+
+            // =========================================================================
+            // GUARDAR / ACTUALIZAR EN dbo.TablaBasePuente
+            // =========================================================================
+            try {
+                $tasa_deprec = (float)($request['tasa_depreciacion'] ?? 10.00);
+                $es_arrendamiento = !empty($request['es_arrendamiento']);
+                $es_leasing = !empty($request['es_leasing']) ? 1 : 0;
+                // La Fecha de Inicio de Depreciación se define exclusivamente en Meta/SIC al transferir
+                $fecha_inicio_deprec = null;
+
+                // Consultar datos de la categoría
+                $catInfo = DB::table('WEB.categoriaactivofijo')->where('id', $COD_CAT_ACTFIJO)->first();
+                $cuentaActivo = ($catInfo && !empty($catInfo->cuenta_activo)) ? (float)$catInfo->cuenta_activo : 333111;
+                $tipoActivoNombre = ($catInfo && !empty($catInfo->nombre)) ? $catInfo->nombre : 'ACTIVO FIJO';
+
+                // Area y Proceso solicitados por Contabilidad
+                $areaCentroCosto = !empty($request['area']) ? trim($request['area']) : 'Produccion';
+                $procesoPlanta = !empty($request['proceso']) ? trim($request['proceso']) : 'Pilado';
+                if ($areaCentroCosto == 'Gasto adm') {
+                    $procesoPlanta = 'Gastos Adm';
+                } else if ($areaCentroCosto == 'Gasto de venta') {
+                    $procesoPlanta = 'Gastos de Venta';
+                }
+
+                if ($es_arrendamiento) {
+                    if ($COD_CAT_ACTFIJO == 'CAF0000000000006' || stripos($tipoActivoNombre, 'MAQUINARIA') !== false) {
+                        $cuentaActivo = 322411;
+                    } else if ($COD_CAT_ACTFIJO == 'CAF0000000000005' || stripos($tipoActivoNombre, 'EDIFICACION') !== false) {
+                        $cuentaActivo = 322311;
+                    } else if ($COD_CAT_ACTFIJO == 'CAF0000000000007' || stripos($tipoActivoNombre, 'TRANSPORTE') !== false) {
+                        $cuentaActivo = 322511;
+                    }
+                }
+
+                if ($es_leasing) {
+                    if (stripos($tipoActivoNombre, 'LEASING') === false) {
+                        $tipoActivoNombre .= ' - LEASING';
+                    }
+                }
+
+                // Consultar datos del comprobante contable y orden de compra
+                $docCtble = DB::table('CMP.REFERENCIA_ASOC as RA')
+                    ->join('CMP.DOCUMENTO_CTBLE as DC', 'RA.COD_TABLA_ASOC', '=', 'DC.COD_DOCUMENTO_CTBLE')
+                    ->leftJoin('STD.EMPRESA as E', 'DC.COD_EMPR_EMISOR', '=', 'E.COD_EMPR')
+                    ->where('RA.COD_TABLA', $COD_TABLA)
+                    ->select(
+                        'DC.COD_DOCUMENTO_CTBLE',
+                        'DC.NRO_SERIE',
+                        'DC.NRO_DOC',
+                        'DC.FEC_EMISION',
+                        'DC.COD_CENTRO',
+                        'E.NRO_DOCUMENTO as RUC_PROVEEDOR',
+                        'E.NOM_EMPR as NOM_PROVEEDOR'
+                    )
+                    ->first();
+
+                // Consultar detalle de costo del producto en la OC (priorizando la línea activa COD_ESTADO = 1)
+                $dpQuery = DB::table('CMP.DETALLE_PRODUCTO')
+                    ->where('COD_TABLA', $COD_TABLA)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO);
+                if (!empty($NRO_LINEA) && $NRO_LINEA != '0') {
+                    $dpQuery->where('NRO_LINEA', $NRO_LINEA);
+                } else {
+                    $dpQuery->where('COD_ESTADO', 1);
+                }
+                $dpItem = $dpQuery->first();
+                if (!$dpItem) {
+                    $dpItem = DB::table('CMP.DETALLE_PRODUCTO')
+                        ->where('COD_TABLA', $COD_TABLA)
+                        ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                        ->where('COD_ESTADO', 1)
+                        ->first();
+                }
+
+                $baseCalculo = ($dpItem && !empty($dpItem->CAN_VALOR_VTA)) 
+                    ? (float)$dpItem->CAN_VALOR_VTA 
+                    : (($dpItem && !empty($dpItem->CAN_PRECIO_UNIT)) ? (float)$dpItem->CAN_PRECIO_UNIT * (float)$CAN_PRODUCTO : 0.0);
+
+                $facturaTexto = $docCtble ? (trim($docCtble->NRO_SERIE) . '-' . trim($docCtble->NRO_DOC)) : '';
+                $rucProveedor = $docCtble ? trim($docCtble->RUC_PROVEEDOR) : '';
+                $fecAdq = ($docCtble && !empty($docCtble->FEC_EMISION)) ? date('Y-m-d', strtotime($docCtble->FEC_EMISION)) : date('Y-m-d');
+                $centroCosto = (!empty($docCtble) && !empty($docCtble->COD_CENTRO)) ? trim($docCtble->COD_CENTRO) : 'CEN0000000000001';
+                
+                // Fórmulas contables idénticas al Excel de Activos Fijos (Escritorio/202608 Registro Activo Fijo IAIN)
+                $tasaDecimal = $tasa_deprec / 100.0; // Tasa en decimal (ej: 10% -> 0.10, 25% -> 0.25)
+                // DEPRECIACION POR HORA (Columna AK): = (Tasa / (365 * 24)) * Base de Cálculo
+                $deprecPorHora = ($baseCalculo > 0 && $tasaDecimal > 0) ? round(($tasaDecimal / (365.0 * 24.0)) * $baseCalculo, 2) : 0.0;
+                
+                // Días a depreciar en el mes de inicio (Columna V): Fin de mes - Día de inicio + 1
+                $diasMesInicio = 0.0;
+                $deprecMesInicio = 0.0;
+                if (!empty($fecha_inicio_deprec)) {
+                    $tsInicio = strtotime($fecha_inicio_deprec);
+                    $ultimoDiaMes = (int)date('t', $tsInicio);
+                    $diaInicio = (int)date('j', $tsInicio);
+                    $diasMesInicio = (float)($ultimoDiaMes - $diaInicio + 1);
+                    if ($diasMesInicio < 0) $diasMesInicio = 0.0;
+                    // Depreciación del primer mes (Columna X..AF): = (Tasa / 365) * Base * Días
+                    $deprecMesInicio = round(($tasaDecimal / 365.0) * $baseCalculo * $diasMesInicio, 2);
+                }
+                
+                // Depreciación Acumulada inicial y Saldo a depreciar
+                $deprecAcumuladaPuente = $deprecMesInicio;
+                $saldoDepreciarPuente = round($baseCalculo - $deprecAcumuladaPuente, 2);
+                
+                $mesesEspanol = [
+                    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                ];
+                $numMesInicio = !empty($fecha_inicio_deprec) ? (int)date('n', strtotime($fecha_inicio_deprec)) : (int)date('n', strtotime($fecAdq));
+                $columnaMesNombre = $mesesEspanol[$numMesInicio] ?? null;
+
+                // Formatear fechas a YYYYMMDD para evitar error de conversión regional en SQL Server
+                $fecAdqSql = date('Ymd', strtotime($fecAdq));
+                $fechaInicioSql = date('Ymd', strtotime($fecha_inicio_deprec));
+
+                // Buscar si ya existe en TablaBasePuente para actualizar o insertar
+                $existePuente = DB::table('dbo.TablaBasePuente')
+                    ->where('categoria_activo_fijo_id', $COD_CAT_ACTFIJO)
+                    ->where('RUC', $rucProveedor)
+                    ->where('FACTURA', $facturaTexto)
+                    ->first();
+
+                if ($existePuente) {
+                    DB::table('dbo.TablaBasePuente')
+                        ->where('codigo', $existePuente->codigo)
+                        ->update([
+                            'Cuenta' => $cuentaActivo,
+                            'Descripcion' => $TXT_NOMBRE_PRODUCTO,
+                            'Tipo De Activo' => $tipoActivoNombre,
+                            'Base de Calculo' => $baseCalculo,
+                            'Fecha De Adq' => DB::raw("CONVERT(datetime, '$fecAdqSql', 112)"),
+                            'Fecha De Inicio' => !empty($fecha_inicio_deprec) ? DB::raw("CONVERT(datetime, '$fechaInicioSql', 112)") : null,
+                            'Tasa' => $tasa_deprec,
+                            'Dias_depreciar_nuevo_mes' => $diasMesInicio,
+                            'depreciacion_por_hora' => $deprecPorHora,
+                            'Depreciación 2024' => $deprecMesInicio,
+                            'Depreciación Acumulada' => $deprecAcumuladaPuente,
+                            'Saldo Depr 30#09#2024' => $saldoDepreciarPuente,
+                            ($columnaMesNombre ?: 'Septiembre') => $deprecMesInicio,
+                            'Centrocosto' => $areaCentroCosto,
+                            'proceso' => $procesoPlanta,
+                            'es_leasing' => $es_leasing,
+                        ]);
+                } else {
+                    $maxCodigo = DB::table('dbo.TablaBasePuente')->max('codigo');
+                    $nuevoCodigo = ($maxCodigo ? (int)$maxCodigo : 0) + 1;
+
+                    DB::table('dbo.TablaBasePuente')->insert([
+                        'codigo' => $nuevoCodigo,
+                        'Cuenta' => $cuentaActivo,
+                        'Descripcion' => $TXT_NOMBRE_PRODUCTO,
+                        'ITEM         PLE' => 'IMA' . str_pad($nuevoCodigo, 3, '0', STR_PAD_LEFT),
+                        'RUC' => $rucProveedor,
+                        'FACTURA' => $facturaTexto,
+                        'categoria_activo_fijo_id' => $COD_CAT_ACTFIJO,
+                        'Tipo De Activo' => $tipoActivoNombre,
+                        'centro' => $centroCosto,
+                        // Mes correspondiente a la fecha de inicio de depreciación o adquisición
+                        'Mes' => (float)(!empty($fecha_inicio_deprec) ? date('n', strtotime($fecha_inicio_deprec)) : date('n', strtotime($fecAdq))),
+                        'Saldo Inicial' => null,
+                        'Adiciones_2024' => $baseCalculo,
+                        'Base de Calculo' => $baseCalculo,
+                        'Fecha De Adq' => DB::raw("CONVERT(datetime, '$fecAdqSql', 112)"),
+                        'Fecha De Inicio' => !empty($fecha_inicio_deprec) ? DB::raw("CONVERT(datetime, '$fechaInicioSql', 112)") : null,
+                        'Tasa' => $tasa_deprec,
+                        'Saldo Inicial Deprec Acum   #' => 0.0,
+                        'Dias_depreciar_nuevo_mes' => $diasMesInicio,
+                        'depreciacion_por_hora' => $deprecPorHora,
+                        'Depreciación 2024' => $deprecMesInicio,
+                        'Depreciación Acumulada' => $deprecAcumuladaPuente,
+                        'Saldo Depr 30#09#2024' => $saldoDepreciarPuente,
+                        ($columnaMesNombre ?: 'Septiembre') => $deprecMesInicio,
+                        'Centrocosto' => $areaCentroCosto,
+                        'proceso' => $procesoPlanta,
+                        'es_leasing' => $es_leasing,
+                    ]);
+                }
+            } catch (\Throwable $exPuente) {
+                \Log::error('Error guardando en TablaBasePuente: ' . $exPuente->getMessage());
+            }
         } catch (\Throwable $ex) {
             $error = true;
             $mensaje = 'Error al guardar: ' . $ex->getMessage() . ' (Línea ' . $ex->getLine() . ')';
@@ -15460,6 +15680,10 @@ class GestionOCContabilidadController extends Controller
 
     public function actionAjaxModalActivoFijoCategoria(Request $request)
     {
+        $idoc = $request['idoc'];
+        if (!$this->es_documento_valido_para_activo_fijo($idoc)) {
+            return "<div class='alert alert-danger' style='margin:20px;'><b>Acción No Permitida:</b> El tipo de comprobante asociado (Ticket u otro no admitido) no califica como Activo Fijo contable.</div>";
+        }
         // ajax-modal-detalle-deuda-contrato
         $idopcion = $request['idopcion'];
         $COD_PRODUCTO = $request['codprod'];
@@ -15470,6 +15694,36 @@ class GestionOCContabilidadController extends Controller
         $TXT_DETALLE_PRODUCTO = $request['txtdetprod'];
         $idoc = $request['idoc'];
         $idcheckbox = $request['idcheckbox'];
+
+        // Respaldo automático: si NRO_LINEA o COD_LOTE vienen vacíos o 0, obtener los valores reales de CMP.DETALLE_PRODUCTO
+        if (empty($NRO_LINEA) || $NRO_LINEA == '0' || empty(trim($COD_LOTE))) {
+            $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                ->where('COD_TABLA', $idoc)
+                ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                ->where('COD_ESTADO', 1)
+                ->first();
+            if (!$realItemModal) {
+                $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                    ->where('COD_TABLA', $idoc)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                    ->orderBy('NRO_LINEA', 'desc')
+                    ->first();
+            }
+            if ($realItemModal) {
+                if (empty($NRO_LINEA) || $NRO_LINEA == '0') {
+                    $NRO_LINEA = $realItemModal->NRO_LINEA;
+                }
+                if (empty(trim($COD_LOTE))) {
+                    $COD_LOTE = !empty($realItemModal->COD_LOTE) ? $realItemModal->COD_LOTE : '0000000000000000';
+                }
+                if (empty($CAN_PRODUCTO) || (float)$CAN_PRODUCTO <= 0) {
+                    $CAN_PRODUCTO = $realItemModal->CAN_PRODUCTO;
+                }
+            }
+        }
+        if (empty(trim($COD_LOTE))) {
+            $COD_LOTE = '0000000000000000';
+        }
 
         $oeProductoQuery = CMPDetalleProducto::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc);
         if ($COD_LOTE != '') {
@@ -15512,6 +15766,205 @@ class GestionOCContabilidadController extends Controller
         
         $select_categoria_id = ($oeProductoAF) ? $oeProductoAF->COD_CAT_ACTFIJO : '';
         
+        // Categorias Principales (9 opciones contables)
+        $combo_categoria_activo_fijo = [
+            '' => 'SELECCIONE CATEGORÍA',
+            'CAF0000000000006' => '1.- Maquinaria',
+            'CAF0000000000005' => '2.- Edificaciones',
+            'CAF0000000000007' => '3.- Transporte',
+            'CAF0000000000004' => '4.- Terrenos',
+            'CAF0000000000009' => '5.- Muebles y Enseres',
+            'CAF0000000000011' => '6.- Equipos Diversos',
+            'CAF0000000000020' => '7.- Intangible',
+            'OBRAS_EN_CURSO'   => '8.- Obras en curso',
+            'POR_RECIBIR'      => '9.- Por recibir'
+        ];
+
+        // Sub-opciones para Obras en curso y Por recibir
+        $subopciones_obras = [
+            '' => 'SELECCIONE SUB-OPCIÓN (OBRAS EN CURSO)',
+            'CAF0000000000018' => 'Maquinaria',
+            'CAF0000000000017' => 'Edificaciones',
+            'CAF0000000000007' => 'Transporte',
+            'CAF0000000000009' => 'Muebles y Enseres',
+            'CAF0000000000011' => 'Equipos Diversos',
+        ];
+
+        $subopciones_por_recibir = [
+            '' => 'SELECCIONE SUB-OPCIÓN (POR RECIBIR)',
+            'CAF0000000000012' => 'Maquinaria',
+            'CAF0000000000005' => 'Edificaciones',
+            'CAF0000000000013' => 'Transporte',
+            'CAF0000000000014' => 'Muebles y Enseres',
+            'CAF0000000000015' => 'Equipos Diversos',
+        ];
+
+        // Mapeo inicial si ya tiene categoría registrada
+        $select_cat_principal = '';
+        $select_sub_opcion = '';
+        $es_arrendamiento_inicial = false;
+        $es_leasing_inicial = false;
+
+        if (!empty($select_categoria_id)) {
+            if (in_array($select_categoria_id, ['CAF0000000000001', 'CAF0000000000002', 'CAF0000000000003'])) {
+                $es_arrendamiento_inicial = true;
+                $es_leasing_inicial = true;
+                if ($select_categoria_id == 'CAF0000000000001') $select_cat_principal = 'CAF0000000000006';
+                if ($select_categoria_id == 'CAF0000000000002') $select_cat_principal = 'CAF0000000000005';
+                if ($select_categoria_id == 'CAF0000000000003') $select_cat_principal = 'CAF0000000000007';
+            } elseif (in_array($select_categoria_id, ['CAF0000000000017', 'CAF0000000000018', 'CAF0000000000019'])) {
+                $select_cat_principal = 'OBRAS_EN_CURSO';
+                $select_sub_opcion = $select_categoria_id;
+            } elseif (in_array($select_categoria_id, ['CAF0000000000012', 'CAF0000000000013', 'CAF0000000000014', 'CAF0000000000015', 'CAF0000000000016'])) {
+                $select_cat_principal = 'POR_RECIBIR';
+                $select_sub_opcion = $select_categoria_id;
+            } elseif (in_array($select_categoria_id, ['CAF0000000000010', 'CAF0000000000011'])) {
+                $select_cat_principal = 'CAF0000000000011';
+            } elseif (in_array($select_categoria_id, ['CAF0000000000020', 'CAF0000000000021'])) {
+                $select_cat_principal = 'CAF0000000000020';
+            } else {
+                $select_cat_principal = $select_categoria_id;
+            }
+        }
+
+        // Tasa por defecto
+        $mapa_tasas_categorias = DB::table('WEB.categoriaactivofijo')->pluck('tasa_depreciacion', 'id')->toArray();
+        $tasa_depreciacion_defecto = (!empty($select_categoria_id) && isset($mapa_tasas_categorias[$select_categoria_id])) ? $mapa_tasas_categorias[$select_categoria_id] : '10.00';
+        $fecha_inicio_deprec_defecto = date('Y-m-01');
+
+        // Area y Proceso
+        $puenteExistente = null;
+        try {
+            $docCtbleModal = DB::table('CMP.REFERENCIA_ASOC as RA')
+                ->join('CMP.DOCUMENTO_CTBLE as DC', 'RA.COD_TABLA_ASOC', '=', 'DC.COD_DOCUMENTO_CTBLE')
+                ->leftJoin('STD.EMPRESA as E', 'DC.COD_EMPR_EMISOR', '=', 'E.COD_EMPR')
+                ->where('RA.COD_TABLA', $idoc)
+                ->select(
+                    'DC.COD_DOCUMENTO_CTBLE',
+                    'DC.NRO_SERIE',
+                    'DC.NRO_DOC',
+                    'E.NRO_DOCUMENTO as RUC_PROVEEDOR'
+                )
+                ->first();
+
+            if ($docCtbleModal) {
+                $rucProv = trim($docCtbleModal->RUC_PROVEEDOR ?? '');
+                $facProv = trim(($docCtbleModal->NRO_SERIE ?? '') . '-' . ($docCtbleModal->NRO_DOC ?? ''), '-');
+
+                if (!empty($facProv) || !empty($rucProv)) {
+                    $qPuente = DB::table('dbo.TablaBasePuente');
+                    if (!empty($rucProv)) {
+                        $qPuente->where('RUC', $rucProv);
+                    }
+                    if (!empty($facProv)) {
+                        $qPuente->where('FACTURA', $facProv);
+                    }
+                    if (!empty($select_categoria_id)) {
+                        $qPuente->where('categoria_activo_fijo_id', $select_categoria_id);
+                    } elseif (!empty($TXT_NOMBRE_PRODUCTO)) {
+                        $qPuente->where('Descripcion', $TXT_NOMBRE_PRODUCTO);
+                    }
+                    $puenteExistente = $qPuente->first();
+
+                    if (!$puenteExistente && !empty($facProv) && !empty($rucProv)) {
+                        $puenteExistente = DB::table('dbo.TablaBasePuente')
+                            ->where('RUC', $rucProv)
+                            ->where('FACTURA', $facProv)
+                            ->first();
+                    }
+                }
+            }
+        } catch (\Throwable $exPuenteModal) {
+            \Log::error('Error buscando puenteExistente: ' . $exPuenteModal->getMessage());
+        }
+
+        $ordenCompra = DB::table('CMP.ORDEN')->where('COD_ORDEN', $idoc)->first();
+        $area_oc_raw = ($ordenCompra && !empty($ordenCompra->TXT_CATEGORIA_AREA_EMPRESA)) ? strtoupper(trim($ordenCompra->TXT_CATEGORIA_AREA_EMPRESA)) : '';
+
+        $centro_oc = ($ordenCompra && !empty($ordenCompra->COD_CENTRO)) ? trim($ordenCompra->COD_CENTRO) : '';
+        $nom_prod_upper = strtoupper($TXT_NOMBRE_PRODUCTO ?? '');
+
+        $area_defecto = 'Produccion';
+        if (
+            strpos($area_oc_raw, 'ADM') !== false ||
+            strpos($area_oc_raw, 'GERENC') !== false ||
+            strpos($area_oc_raw, 'SISTEMA') !== false ||
+            strpos($area_oc_raw, 'CONTAB') !== false ||
+            strpos($area_oc_raw, 'FINAN') !== false ||
+            strpos($area_oc_raw, 'LEGAL') !== false ||
+            strpos($area_oc_raw, 'RRHH') !== false ||
+            strpos($area_oc_raw, 'RECURSOS') !== false
+        ) {
+            $area_defecto = 'Gasto adm';
+        } elseif (
+            strpos($area_oc_raw, 'VENT') !== false ||
+            strpos($area_oc_raw, 'COMERC') !== false ||
+            strpos($area_oc_raw, 'MARKET') !== false
+        ) {
+            $area_defecto = 'Gasto de venta';
+        } elseif (
+            strpos($area_oc_raw, 'PROD') !== false ||
+            strpos($area_oc_raw, 'PLANTA') !== false ||
+            strpos($area_oc_raw, 'OPERAC') !== false
+        ) {
+            $area_defecto = 'Produccion';
+        } elseif (empty($area_oc_raw)) {
+            // Detección complementaria por centro o tipo de producto si la OC no tiene área explícita
+            if (
+                $centro_oc == 'CEN0000000000013' ||
+                strpos($nom_prod_upper, 'LAPTOP') !== false ||
+                strpos($nom_prod_upper, 'COMPUTADOR') !== false ||
+                strpos($nom_prod_upper, 'IMPRESORA') !== false ||
+                strpos($nom_prod_upper, 'LICENCIA') !== false ||
+                strpos($nom_prod_upper, 'SOFTWARE') !== false ||
+                in_array($select_categoria_id, ['CAF0000000000010', 'CAF0000000000020', 'CAF0000000000021'])
+            ) {
+                $area_defecto = 'Gasto adm';
+            } elseif (
+                strpos($nom_prod_upper, 'FURGON') !== false ||
+                strpos($nom_prod_upper, 'CAMIONETA') !== false
+            ) {
+                $area_defecto = 'Gasto de venta';
+            }
+        }
+
+        $proceso_defecto = 'Pilado';
+        if ($puenteExistente) {
+            if (!empty($puenteExistente->Centrocosto)) {
+                $area_defecto = $puenteExistente->Centrocosto;
+            }
+            if (!empty($puenteExistente->proceso)) {
+                $proceso_defecto = $puenteExistente->proceso;
+            }
+            if (!empty($puenteExistente->Tasa)) {
+                $tasa_depreciacion_defecto = number_format($puenteExistente->Tasa, 2, '.', '');
+            }
+            if (isset($puenteExistente->es_leasing) && (int)$puenteExistente->es_leasing == 1) {
+                $es_leasing_inicial = true;
+            } elseif (stripos($puenteExistente->{'Tipo De Activo'} ?? '', 'LEASING') !== false) {
+                $es_leasing_inicial = true;
+            }
+            if (isset($puenteExistente->Cuenta) && in_array((int)$puenteExistente->Cuenta, [322411, 322311, 322511])) {
+                $es_arrendamiento_inicial = true;
+            }
+        }
+
+        $lista_areas = [
+            'Gasto adm' => 'Gasto Adm (Administración)',
+            'Gasto de venta' => 'Gasto de Venta (Ventas)',
+            'Produccion' => 'Producción (Planta)',
+        ];
+
+        $lista_procesos = [
+            'Pilado' => 'Pilado',
+            'Añejamiento' => 'Añejamiento',
+            'Mezcla Artesanal' => 'Mezcla Artesanal',
+            'Reproceso' => 'Reproceso',
+            'Embolsado' => 'Embolsado',
+            'Saneamiento' => 'Saneamiento',
+            'Secado' => 'Secado',
+        ];
+
         return View::make('comprobante/modal/ajax/mcategoriaactivofijo',
             [
                 'COD_PRODUCTO' => $COD_PRODUCTO,
@@ -15521,11 +15974,24 @@ class GestionOCContabilidadController extends Controller
                 'TXT_DETALLE_PRODUCTO' => $TXT_DETALLE_PRODUCTO,
                 'TXT_NOMBRE_PRODUCTO' => $TXT_NOMBRE_PRODUCTO,
                 'combo_categoria_activo_fijo' => $combo_categoria_activo_fijo,
+                'subopciones_obras' => $subopciones_obras,
+                'subopciones_por_recibir' => $subopciones_por_recibir,
                 'select_categoria_id' => $select_categoria_id,
+                'select_cat_principal' => $select_cat_principal,
+                'select_sub_opcion' => $select_sub_opcion,
+                'es_arrendamiento_inicial' => $es_arrendamiento_inicial,
+                'es_leasing_inicial' => $es_leasing_inicial,
                 'idopcion' => $idopcion,
                 'oeProducto' => $oeProducto,
                 'idcheckbox' => $idcheckbox,
                 'idoc' => $idoc,
+                'mapa_tasas_categorias' => $mapa_tasas_categorias,
+                'tasa_depreciacion_defecto' => $tasa_depreciacion_defecto,
+                'fecha_inicio_deprec_defecto' => $fecha_inicio_deprec_defecto,
+                'lista_areas' => $lista_areas,
+                'area_defecto' => $area_defecto,
+                'lista_procesos' => $lista_procesos,
+                'proceso_defecto' => $proceso_defecto,
                 'ajax' => true,
             ]);
 
@@ -15539,6 +16005,36 @@ class GestionOCContabilidadController extends Controller
         $NRO_LINEA = $request['nrolinea'];
         $COD_LOTE = $request['codlote'];
         $idcheckbox = $request['idcheckbox'];
+
+        // Respaldo automático: si NRO_LINEA o COD_LOTE vienen vacíos o 0, obtener los valores reales de CMP.DETALLE_PRODUCTO
+        if (empty($NRO_LINEA) || $NRO_LINEA == '0' || empty(trim($COD_LOTE))) {
+            $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                ->where('COD_TABLA', $idoc)
+                ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                ->where('COD_ESTADO', 1)
+                ->first();
+            if (!$realItemModal) {
+                $realItemModal = DB::table('CMP.DETALLE_PRODUCTO')
+                    ->where('COD_TABLA', $idoc)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                    ->orderBy('NRO_LINEA', 'desc')
+                    ->first();
+            }
+            if ($realItemModal) {
+                if (empty($NRO_LINEA) || $NRO_LINEA == '0') {
+                    $NRO_LINEA = $realItemModal->NRO_LINEA;
+                }
+                if (empty(trim($COD_LOTE))) {
+                    $COD_LOTE = !empty($realItemModal->COD_LOTE) ? $realItemModal->COD_LOTE : '0000000000000000';
+                }
+                if (empty($CAN_PRODUCTO) || (float)$CAN_PRODUCTO <= 0) {
+                    $CAN_PRODUCTO = $realItemModal->CAN_PRODUCTO;
+                }
+            }
+        }
+        if (empty(trim($COD_LOTE))) {
+            $COD_LOTE = '0000000000000000';
+        }
         $error = false;
         $mensaje = 'ELIMINACION DE CATEGORIA AF EXITOSA';
 

@@ -60,10 +60,19 @@
                                               <td>{{number_format($item->CAN_VALOR_VENTA_IGV, 4, '.', ',')}}</td>
                                               
                                               <td class="tdopcionesordaf" style="display: flex;align-content: center;flex-wrap: nowrap;flex-direction: row;justify-content: center;align-items: baseline;">
-                                                  <input type="checkbox" id="checkboxcataf{{$index}}" class="checkboxcataf" attd="{{ json_encode($item) }}" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" style="accent-color: green;width: 15px;height:15px;border-radius: 5px; transform: scale(1.5);cursor: not-allowed;margin-right: 5px;" {{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? 'checked' : '' }}>
-                                                  <button type="button" name="btnActivoFijo" class="btn btn-xs btn-primary btnActivoFijo" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" id="btnActivoFijo{{ $index }}" idcheckbox="checkboxcataf{{$index}}" title="Asignar categoría de Activo Fijo" style="font-size: 24px !important;border-radius: 5px; margin-top: -10px;">
-                                                      <span class="mdi mdi-assignment"></span>
-                                                  </button>
+                                                  @php
+                                                      $esDocValidoAF = isset($funcion) && method_exists($funcion, 'es_documento_valido_para_activo_fijo') ? $funcion->es_documento_valido_para_activo_fijo($idoc, $fedocumento ?? null) : true;
+                                                  @endphp
+                                                  @if($esDocValidoAF)
+                                                      <input type="checkbox" id="checkboxcataf{{$index}}" class="checkboxcataf" attd="{{ json_encode($item) }}" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" style="accent-color: green;width: 15px;height:15px;border-radius: 5px; transform: scale(1.5);cursor: not-allowed;margin-right: 5px;" {{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? 'checked' : '' }}>
+                                                      <button type="button" name="btnActivoFijo" class="btn btn-xs btn-primary btnActivoFijo" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" id="btnActivoFijo{{ $index }}" idcheckbox="checkboxcataf{{$index}}" title="Asignar categoría de Activo Fijo" style="font-size: 24px !important;border-radius: 5px; margin-top: -10px;">
+                                                          <span class="mdi mdi-assignment"></span>
+                                                      </button>
+                                                  @else
+                                                      <span class="badge badge-warning" title="Comprobante tipo Ticket u otro no califica para Activo Fijo" style="cursor: not-allowed;font-size: 10px;padding: 4px 6px;">
+                                                          <span class="mdi mdi-block-helper" style="font-size: 14px;vertical-align: middle;"></span> No A/F
+                                                      </span>
+                                                  @endif
                                               </td>
                                             </tr>
                                           @endforeach

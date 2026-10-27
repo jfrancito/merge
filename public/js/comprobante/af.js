@@ -2,7 +2,7 @@
 $(document).ready(function () {
 
 	var carpeta = $("#carpeta").val();
-	$('.tablainformacion .checkboxcataf').on('change', function(e) {
+	$(document).on('change', '.checkboxcataf', function(e) {
 	    let $checkbox = $(this);  // Guardamos referencia al checkbox
 	    let estadoAnterior = !$checkbox.prop('checked'); // Estado previo al cambio
 
@@ -32,7 +32,7 @@ $(document).ready(function () {
 	
 
 
-	$(".tablainformacion .btnActivoFijo").on('click', function (e) {
+	$(document).on('click', '.btnActivoFijo', function (e) {
 		// debugger;
 		e.preventDefault();
 		let codprod     =   $(this).attr("attcodprod");
@@ -80,56 +80,83 @@ $(document).ready(function () {
 
 	    let COD_CATEGORIA_AF    =   $('#COD_CATEGORIA_AF').val();
 	    let COD_PRODUCTO     	=   $('#COD_PRODUCTO').val();
-	    let COD_TABLA     		=   $('#COD_TABLA').val();
-	    let NRO_LINEA     		=   $('#NRO_LINEA').val();
-	    let COD_LOTE     		=   $('#COD_LOTE').val();
-	    let CAN_PRODUCTO     	=   $('#CAN_PRODUCTO').val();
-	    let TXT_DETALLE_PRODUCTO =   $('#TXT_DETALLE_PRODUCTO').val();
-	    let TXT_NOMBRE_PRODUCTO =   $('#TXT_NOMBRE_PRODUCTO').val();
-	    let idcheckbox     		=   $('#idcheckbox').val();
-		
-	    var data	=	{
-						_token		:	_token,
-						idoc		:	idoc,
-						idopcion	:	idopcion,
-						COD_CATEGORIA_AF:	COD_CATEGORIA_AF,
-						COD_PRODUCTO	:	COD_PRODUCTO,
-						COD_TABLA		:	COD_TABLA,
-						NRO_LINEA		:	NRO_LINEA,
-						COD_LOTE		:	COD_LOTE,
-						CAN_PRODUCTO	:	CAN_PRODUCTO,
-						TXT_NOMBRE_PRODUCTO	:	TXT_NOMBRE_PRODUCTO,
-						TXT_DETALLE_PRODUCTO	:	TXT_DETALLE_PRODUCTO,
-						idcheckbox		:	idcheckbox,
-					};
-	    $.ajax({
-	        type: "POST",
-	        url: url,
-	        data: data,
-	        success: function(response){
-	              if(!response.error){
-				        $('#modal-content-categoria-af').niftyModal('hide');
-	    				$('body').css('overflow', 'auto');
-	    				$('.be-wrapper').css('filter', 'none');
-				        alertajax(response.mensaje);
-				       	console.log(response.mensaje);
-				       	$('#'+response.idcheckbox).prop('checked',true);
-				  } else {
-				  		$('#modal-content-categoria-af').niftyModal('hide');
-	    				$('body').css('overflow', 'auto');
-	    				$('.be-wrapper').css('filter', 'none');
-				       alertajax(response.mensaje);
-				  }
+	    let catPrincipal        =   $('#cat_principal').val();
 
-	        },
-	        error: function(xhr){
-	            console.error(xhr.responseText);
-	            $('#modal-content-categoria-af').niftyModal('hide');
-	    		$('body').css('overflow', 'auto');
-	    		$('.be-wrapper').css('filter', 'none');
-	            alert('Ocurrió un error al guardar: ' + xhr.responseText);
-	        }
-	    });
+	    if (!COD_CATEGORIA_AF || COD_CATEGORIA_AF === '' || COD_CATEGORIA_AF === 'OBRAS_EN_CURSO' || COD_CATEGORIA_AF === 'POR_RECIBIR') {
+	        alerterrorajax('Debe seleccionar una categoría o sub-opción válida.');
+	        return false;
+	    }
+
+	    let area = $('#area_clasif').val() || 'Produccion';
+	    let proceso = (area === 'Produccion') ? ($('#proceso_clasif').val() || 'Pilado') : ((area === 'Gasto adm') ? 'Gastos Adm' : 'Gastos de Venta');
+
+	    function enviarClasificacionAF() {
+	        let COD_TABLA     		=   $('#COD_TABLA').val();
+	        let NRO_LINEA     		=   $('#NRO_LINEA').val();
+	        let COD_LOTE     		=   $('#COD_LOTE').val();
+	        let CAN_PRODUCTO     	=   $('#CAN_PRODUCTO').val();
+	        let TXT_DETALLE_PRODUCTO =   $('#TXT_DETALLE_PRODUCTO').val();
+	        let TXT_NOMBRE_PRODUCTO =   $('#TXT_NOMBRE_PRODUCTO').val();
+	        let idcheckbox     		=   $('#idcheckbox').val();
+	        let tasa_depreciacion   =   $('#txt_tasa_depreciacion').val();
+	        let es_arrendamiento    =   $('#chk_es_arrendamiento').is(':checked') ? 1 : 0;
+	        let es_leasing          =   $('#chk_es_leasing').is(':checked') ? 1 : 0;
+	        let anios_contrato      =   $('#anios_contrato').val();
+			
+	        var data	=	{
+							_token		:	_token,
+							idoc		:	idoc,
+							idopcion	:	idopcion,
+							COD_CATEGORIA_AF:	COD_CATEGORIA_AF,
+							COD_PRODUCTO	:	COD_PRODUCTO,
+							COD_TABLA		:	COD_TABLA,
+							NRO_LINEA		:	NRO_LINEA,
+							COD_LOTE		:	COD_LOTE,
+							CAN_PRODUCTO	:	CAN_PRODUCTO,
+							TXT_NOMBRE_PRODUCTO	:	TXT_NOMBRE_PRODUCTO,
+							TXT_DETALLE_PRODUCTO	:	TXT_DETALLE_PRODUCTO,
+							idcheckbox		:	idcheckbox,
+							tasa_depreciacion:	tasa_depreciacion,
+							es_arrendamiento:	es_arrendamiento,
+							es_leasing		:	es_leasing,
+							anios_contrato:		anios_contrato,
+							area			:	area,
+							proceso			:	proceso,
+						};
+
+	        abrircargando('Guardando Clasificación...', 1);
+
+	        $.ajax({
+	            type: "POST",
+	            url: url,
+	            data: data,
+	            success: function(response){
+	                cerrarcargando();
+	                if(!response.error){
+	                    $('#modal-content-categoria-af').niftyModal('hide');
+	                    $('body').css('overflow', 'auto');
+	                    $('.be-wrapper').css('filter', 'none');
+	                    alertajax(response.mensaje);
+	                    $('#'+response.idcheckbox).prop('checked',true);
+	                } else {
+	                    $('#modal-content-categoria-af').niftyModal('hide');
+	                    $('body').css('overflow', 'auto');
+	                    $('.be-wrapper').css('filter', 'none');
+	                    alerterrorajax(response.mensaje);
+	                }
+	            },
+	            error: function(xhr){
+	                cerrarcargando();
+	                console.error(xhr.responseText);
+	                $('#modal-content-categoria-af').niftyModal('hide');
+	                $('body').css('overflow', 'auto');
+	                $('.be-wrapper').css('filter', 'none');
+	                alerterrorajax('Ocurrió un error al guardar la categoría.');
+	            }
+	        });
+	    }
+
+	    enviarClasificacionAF();
 	});
 
 
