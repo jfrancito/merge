@@ -923,10 +923,7 @@ trait ValeRendirTraits
             ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
                 $query->where('V.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
             })
-            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
-                $query->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
-                    ->orWhereBetween(DB::raw("CAST(V.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
-            });
+            ->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
 
        
         $queryReembolso = DB::table('WEB.VALE_RENDIR_REEMBOLSO as R')
@@ -947,10 +944,7 @@ trait ValeRendirTraits
             ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
                 $query->where('R.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
             })
-            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
-                $query->whereBetween(DB::raw("CAST(R.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
-                    ->orWhereBetween(DB::raw("CAST(R.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
-            });
+            ->whereBetween(DB::raw("CAST(R.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
 
         
             if ($tipo_vale === 'REEMBOLSO') {
@@ -1012,7 +1006,7 @@ trait ValeRendirTraits
                     ELSE V.COD_MONEDA 
                 END as MONEDA"),
                 'V.TXT_GLOSA as GLOSA',
-                'V.CAN_TOTAL_IMPORTE as TOTAL',
+                DB::raw('ISNULL(D.CAN_TOTAL_IMPORTE, V.CAN_TOTAL_IMPORTE) as TOTAL'),
                 'V.TXT_CATEGORIA_ESTADO_VALE as ESTADO',
                 'D.FEC_INICIO',
                 'D.FEC_FIN',
@@ -1023,10 +1017,7 @@ trait ValeRendirTraits
             ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
                 $query->where('V.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
             })
-            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
-                $query->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
-                    ->orWhereBetween(DB::raw("CAST(V.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
-            });
+            ->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
 
         $queryReembolso = DB::table('WEB.VALE_RENDIR_REEMBOLSO as R')
             ->leftJoin('WEB.VALE_RENDIR_DETALLE_REEMBOLSO as D', 'R.ID', '=', 'D.ID')
@@ -1056,7 +1047,7 @@ trait ValeRendirTraits
                     ELSE R.COD_MONEDA 
                 END as MONEDA"),
                 'R.TXT_GLOSA as GLOSA',
-                'R.CAN_TOTAL_IMPORTE as TOTAL',
+                DB::raw('ISNULL(D.CAN_TOTAL_IMPORTE, R.CAN_TOTAL_IMPORTE) as TOTAL'),
                 'R.TXT_CATEGORIA_ESTADO_VALE as ESTADO',
                 'D.FEC_INICIO',
                 'D.FEC_FIN',
@@ -1067,10 +1058,7 @@ trait ValeRendirTraits
             ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
                 $query->where('R.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
             })
-            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
-                $query->whereBetween(DB::raw("CAST(R.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
-                    ->orWhereBetween(DB::raw("CAST(R.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
-            });
+            ->whereBetween(DB::raw("CAST(R.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
 
         if ($tipo_vale === 'REEMBOLSO') {
             $listavale = $queryReembolso
