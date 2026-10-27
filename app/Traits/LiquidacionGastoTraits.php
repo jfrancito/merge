@@ -477,6 +477,7 @@ trait LiquidacionGastoTraits
             // })
             ->ProveedorLG($proveedor_id)
             ->EstadoLG($estado_id)
+            ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
             ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
             ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
             ->select([
@@ -520,6 +521,7 @@ trait LiquidacionGastoTraits
             ->join('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'LQG_DETLIQUIDACIONGASTO.COD_EMPRESA_PROVEEDOR')
             ->ProveedorLG($proveedor_id)
             ->EstadoLG($estado_id)
+            ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
             ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
             ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
             ->select([
