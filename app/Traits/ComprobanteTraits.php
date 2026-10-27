@@ -12386,6 +12386,38 @@ trait ComprobanteTraits
             ->exists();   // devuelve true o false
     }
 
+    public function es_documento_valido_para_activo_fijo($idoc, $fedocumento = null)
+    {
+        $tipos_permitidos = ['TDO0000000000001', 'TDO0000000000003', 'TDO0000000000002'];
+
+        // 1. Verificar si tiene documento contable asociado en CMP.REFERENCIA_ASOC -> CMP.DOCUMENTO_CTBLE
+        $docCtble = \Illuminate\Support\Facades\DB::connection('sqlsrv')->table('CMP.REFERENCIA_ASOC as RA')
+            ->join('CMP.DOCUMENTO_CTBLE as DC', 'RA.COD_TABLA_ASOC', '=', 'DC.COD_DOCUMENTO_CTBLE')
+            ->where('RA.COD_TABLA', $idoc)
+            ->select('DC.COD_CATEGORIA_TIPO_DOC')
+            ->first();
+
+        if ($docCtble && !empty($docCtble->COD_CATEGORIA_TIPO_DOC)) {
+            return in_array($docCtble->COD_CATEGORIA_TIPO_DOC, $tipos_permitidos);
+        }
+
+        // 2. Si no tiene en CMP.DOCUMENTO_CTBLE, verificar por FeDocumento (01=Factura, 03=Boleta, 02=RHE)
+        if ($fedocumento) {
+            $tipoDoc = trim($fedocumento->ID_TIPO_DOC);
+            if (!empty($tipoDoc)) {
+                return in_array($tipoDoc, ['01', '03', '02', 'RHE']);
+            }
+        }
+
+        // 3. Buscar en BD FeDocumento
+        $fe = \App\Modelos\FeDocumento::where('ID_DOCUMENTO', $idoc)->first();
+        if ($fe && !empty(trim($fe->ID_TIPO_DOC))) {
+            return in_array(trim($fe->ID_TIPO_DOC), ['01', '03', '02', 'RHE']);
+        }
+
+        return true;
+    }
+
 
 
 }

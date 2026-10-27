@@ -56,6 +56,11 @@
 											  <td>{{number_format($item->CAN_PRECIO_UNIT_IGV, 4, '.', ',')}}</td>
 											  <td>{{number_format($item->CAN_VALOR_VENTA_IGV, 4, '.', ',')}}</td>
 											  <td class="tdopcionesordaf" style="	display: flex;align-content: center;flex-wrap: nowrap;flex-direction: row;justify-content: center;align-items: baseline;">
+													@php
+														$helperAF = isset($funciones) ? $funciones : (isset($funcion) ? $funcion : null);
+														$esDocValidoAF = ($helperAF && method_exists($helperAF, 'es_documento_valido_para_activo_fijo')) ? $helperAF->es_documento_valido_para_activo_fijo($idoc, $fedocumento ?? null) : true;
+													@endphp
+													@if($esDocValidoAF)
 													 	<input 
 											                type="checkbox" 
 											                id="checkboxcataf{{$index}}" 
@@ -88,7 +93,11 @@
 												        >
 												        <span class="mdi mdi-assignment" ></span>
 												    </button>
-													  {{-- <span class="mdi mdi-assignment-o"></span> --}}
+													@else
+														<span class="badge badge-warning" title="Comprobante tipo Ticket u otro no califica para Activo Fijo" style="cursor: not-allowed;font-size: 10px;padding: 4px 6px;">
+															<span class="mdi mdi-block-helper" style="font-size: 14px;vertical-align: middle;"></span> No A/F
+														</span>
+													@endif
 												</td>
 
 											</tr>
