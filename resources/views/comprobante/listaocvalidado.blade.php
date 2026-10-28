@@ -136,6 +136,18 @@
                                     Descargar excel Marketing
                                  </a>
                               </li>
+                              <li id="li_descargarcomprobantemasivoadministracionexcel" style="{{ $operacion_id == 'CONTRATO' ? '' : 'display:none;' }}">
+                                <a href="{{url('/comprobante-masivo-administracion-excel')}}" 
+                                     onclick="var fi=$('#fecha_inicio').val(), ff=$('#fecha_fin').val(), p=$('#proveedor_id').val(), e=$('#estado_id').val(), o=$('#operacion_id').val(), id=$('#idopcion').val(); if(!fi){alert('Seleccione una fecha inicio.'); return false;} if(!ff){alert('Seleccione una fecha fin.'); return false;} if(o!='CONTRATO'){alert('Este reporte solo está disponible para la operación CONTRATO.'); return false;} this.href=this.getAttribute('data-href')+'/'+fi+'/'+ff+'/'+p+'/'+e+'/'+o+'/'+id; return true;"
+                                     class='btn btn-secondary botoncabecera tooltipcss opciones'
+                                     target="_blank"
+                                     id="descargarcomprobantemasivoadministracionexcel" 
+                                     data-href="{{url('/comprobante-masivo-administracion-excel')}}"
+                                     title="Descargar excel Administración" style="width:100%">
+                                     <span class="tooltiptext">Descargar excel Administración</span>
+                                     Descargar excel Administración
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </div>
