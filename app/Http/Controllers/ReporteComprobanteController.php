@@ -391,4 +391,175 @@ class ReporteComprobanteController extends Controller
 
         return $listadatos;
     }
+
+    public function actionComprobanteMasivoAdministracionExcel($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id, $idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa    = Session::get('usuario')->usuarioosiris_id;
+        $fechadia       = date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual   = date("Y-m-d");
+        $titulo         = 'Reporte-Administracion-Contratos-' . $operacion_id;
+        $funcion        = $this;
+
+        $listadatos = $this->con_lista_cabecera_comprobante_administracion_excel($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id);
+
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function($excel) use ($listadatos, $titulo, $funcion, $fecha_inicio, $fecha_fin, $proveedor_id) {
+            $excel->sheet('ADMINISTRACION', function($sheet) use ($listadatos, $titulo, $funcion, $fecha_inicio, $fecha_fin, $proveedor_id) {
+                $sheet->loadView('reporte/excel/listacomprobantemasivoadministracion')
+                      ->with('listadatos', $listadatos)
+                      ->with('titulo', $titulo)
+                      ->with('fecha_inicio', $fecha_inicio)
+                      ->with('fecha_fin', $fecha_fin)
+                      ->with('proveedor_id', $proveedor_id)
+                      ->with('funcion', $funcion);
+            });
+        })->export('xls');
+    }
+
+    private function con_lista_cabecera_comprobante_administracion_excel($fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id)
+    {
+        // 1. Normalizar fechas a formato Y-m-d para SQL Server
+        $f_ini = date('Y-m-d', strtotime($fecha_inicio));
+        $f_fin = date('Y-m-d', strtotime($fecha_fin));
+
+        $bindings = [
+            'f_ini' => $f_ini,
+            'f_fin' => $f_fin,
+        ];
+
+        // 2. Filtro de Proveedor (si no es 'TODO')
+        $whereProveedor = "";
+        if (trim($proveedor_id) != 'TODO' && trim($proveedor_id) != '') {
+            $whereProveedor = " AND fe.RUC_PROVEEDOR = :proveedor_id ";
+            $bindings['proveedor_id'] = $proveedor_id;
+        }
+
+        // 3. Filtro de Estado (si no es 'TODO')
+        $whereEstado = "";
+        if (trim($estado_id) != 'TODO' && trim($estado_id) != '') {
+            $whereEstado = " AND fe.COD_ESTADO = :estado_id ";
+            $bindings['estado_id'] = $estado_id;
+        }
+
+        // 4. Operación (por defecto CONTRATO)
+        $operacion = (trim($operacion_id) != '' && trim($operacion_id) != 'TODO') ? $operacion_id : 'CONTRATO';
+        $bindings['operacion'] = $operacion;
+
+        $sql = "
+            SELECT 
+                -- CONTRATO
+                fe.ID_DOCUMENTO AS ID_CONTRATO,
+                ctt.NRO_SERIE + '-' + ctt.NRO_DOC AS NRO_CONTRATO,
+                CONVERT(VARCHAR(10), ctt.FEC_EMISION, 103) AS FECHA_EMISION_CONTRATO,
+                ctt.FEC_EMISION AS FEC_EMISION_CONTRATO_RAW,
+                
+                -- EMPRESA / SEDE
+                fe.COD_EMPR,
+                fe.TXT_EMPR AS EMPRESA_RECEPTORA,
+                centro.NOM_CENTRO AS SEDE_CENTRO,
+
+                -- PROVEEDOR
+                fe.RUC_PROVEEDOR,
+                fe.RZ_PROVEEDOR,
+
+                -- FACTURA
+                fe.ID_TIPO_DOC,
+                fe.SERIE + '-' + fe.NUMERO AS NRO_COMPROBANTE,
+                CONVERT(VARCHAR(10), fe.FEC_VENTA, 103) AS FECHA_EMISION_FACTURA,
+                fe.FEC_VENTA AS FEC_VENTA_FACTURA_RAW,
+                fe.MONEDA,
+                COALESCE(ctt.CAN_TIPO_CAMBIO, 1) AS TIPO_CAMBIO,
+                fe.SUB_TOTAL_VENTA_ORIG AS SUBTOTAL_FACTURA,
+                fe.VALOR_IGV_ORIG AS IGV_FACTURA,
+                fe.TOTAL_VENTA_ORIG AS TOTAL_FACTURA,
+                fe.TXT_ESTADO AS ESTADO_COMPROBANTE,
+                fe.COD_ESTADO AS COD_ESTADO_FE,
+
+                -- DETRACCIÓN
+                fe.TIPO_DETRACCION,
+                COALESCE(fe.MONTO_DETRACCION_RED, fe.MONTO_DETRACCION, 0) AS MONTO_DETRACCION,
+                fe.FOLIO_DETRACCION,
+                fe.NRO_CUENTA,
+
+                -- PRODUCTO / GLOSA / GUIAS
+                det.PRODUCTO AS DESCRIPCION_SERVICIO,
+                (
+                    SELECT STUFF((
+                        SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
+                        FROM CMP.REFERENCIA_ASOC AS REF_INTERNO
+                        INNER JOIN CMP.DOCUMENTO_CTBLE AS DOC_INTERNO ON REF_INTERNO.COD_TABLA_ASOC = DOC_INTERNO.COD_DOCUMENTO_CTBLE
+                        WHERE REF_INTERNO.COD_TABLA = fe.ID_DOCUMENTO
+                          AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
+                        FOR XML PATH('')
+                    ), 1, 2, '')
+                ) AS GUIAS_ASOCIADAS,
+
+                fe.TXT_CONTACTO AS USUARIO_CONTACTO,
+
+                -- PAGOS AGREGADOS (100% confiable y sin duplicidad de líneas)
+                CONVERT(VARCHAR(10), pago.FECHA_PAGO_PROVEEDOR, 103) AS FECHA_PAGO,
+                pago.FECHA_PAGO_PROVEEDOR AS FECHA_PAGO_RAW,
+                pago.MEDIO_PAGO,
+                pago.BANCO_PAGO,
+                COALESCE(pago.IMPORTE_NETO_PAGADO, 0) AS IMPORTE_NETO_PAGADO,
+                COALESCE(pago.IMPORTE_DETRACCION_PAGADO, 0) AS IMPORTE_DETRACCION_PAGADO,
+                COALESCE(pago.TOTAL_IMPORTE_PAGADO, 0) AS TOTAL_IMPORTE_PAGADO,
+                CASE WHEN pago.FECHA_PAGO_PROVEEDOR IS NOT NULL THEN 'PAGADO' ELSE 'PENDIENTE' END AS ESTADO_PAGO,
+
+                -- DÍAS DE DIFERENCIA (CLAVE)
+                CASE 
+                    WHEN pago.FECHA_PAGO_PROVEEDOR IS NOT NULL 
+                    THEN DATEDIFF(day, fe.FEC_VENTA, pago.FECHA_PAGO_PROVEEDOR) 
+                    ELSE DATEDIFF(day, fe.FEC_VENTA, GETDATE()) 
+                END AS DIAS_DIFERENCIA_FACTURA,
+
+                CASE 
+                    WHEN pago.FECHA_PAGO_PROVEEDOR IS NOT NULL 
+                    THEN DATEDIFF(day, ctt.FEC_EMISION, pago.FECHA_PAGO_PROVEEDOR) 
+                    ELSE DATEDIFF(day, ctt.FEC_EMISION, GETDATE()) 
+                END AS DIAS_DIFERENCIA_CONTRATO
+
+            FROM FE_DOCUMENTO fe
+            INNER JOIN CMP.DOCUMENTO_CTBLE ctt ON fe.ID_DOCUMENTO = ctt.COD_DOCUMENTO_CTBLE
+            LEFT JOIN ALM.CENTRO centro ON ctt.COD_CENTRO = centro.COD_CENTRO
+            LEFT JOIN (
+                SELECT ID_DOCUMENTO, MAX(PRODUCTO) AS PRODUCTO
+                FROM FE_DETALLE_DOCUMENTO
+                GROUP BY ID_DOCUMENTO
+            ) det ON fe.ID_DOCUMENTO = det.ID_DOCUMENTO
+
+            LEFT JOIN (
+                SELECT r.COD_TABLA, d.COD_DOCUMENTO_CTBLE
+                FROM CMP.DOCUMENTO_CTBLE d
+                INNER JOIN CMP.REFERENCIA_ASOC r ON d.COD_DOCUMENTO_CTBLE = r.COD_TABLA_ASOC
+                WHERE d.COD_ESTADO = '1' AND r.COD_ESTADO = '1'
+                  AND d.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000003','TDO0000000000002','TDO0000000000010')
+            ) fac ON fe.ID_DOCUMENTO = fac.COD_TABLA
+
+            LEFT JOIN (
+                SELECT 
+                    COD_DOCUMENTO_CTBLE,
+                    MIN(FECHA_PAGO) AS PRIMERA_FECHA_PAGO,
+                    MAX(FECHA_PAGO) AS ULTIMA_FECHA_PAGO,
+                    COALESCE(MAX(CASE WHEN TXT_GLOSA NOT LIKE '%DETR%' THEN FECHA_PAGO ELSE NULL END), MAX(FECHA_PAGO)) AS FECHA_PAGO_PROVEEDOR,
+                    COALESCE(MAX(CASE WHEN TXT_GLOSA NOT LIKE '%DETR%' THEN NOMBRE_BANCO ELSE NULL END), MAX(NOMBRE_BANCO)) AS BANCO_PAGO,
+                    COALESCE(MAX(CASE WHEN TXT_GLOSA NOT LIKE '%DETR%' THEN MEDIO_PAGO ELSE NULL END), MAX(MEDIO_PAGO)) AS MEDIO_PAGO,
+                    SUM(CASE WHEN TXT_GLOSA NOT LIKE '%DETR%' THEN IMPORTE ELSE 0 END) AS IMPORTE_NETO_PAGADO,
+                    SUM(CASE WHEN TXT_GLOSA LIKE '%DETR%' THEN IMPORTE ELSE 0 END) AS IMPORTE_DETRACCION_PAGADO,
+                    SUM(IMPORTE) AS TOTAL_IMPORTE_PAGADO
+                FROM WEBPAGOSOC
+                GROUP BY COD_DOCUMENTO_CTBLE
+            ) pago ON fac.COD_DOCUMENTO_CTBLE = pago.COD_DOCUMENTO_CTBLE
+
+            WHERE fe.OPERACION = :operacion
+              AND CAST(COALESCE(ctt.FEC_EMISION, fe.FEC_VENTA) AS DATE) >= :f_ini
+              AND CAST(COALESCE(ctt.FEC_EMISION, fe.FEC_VENTA) AS DATE) <= :f_fin
+              {$whereProveedor}
+              {$whereEstado}
+            ORDER BY ctt.FEC_EMISION DESC
+        ";
+
+        return DB::select($sql, $bindings);
+    }
 }
