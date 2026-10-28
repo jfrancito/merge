@@ -4132,6 +4132,30 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_total_tes_sp($cliente_id, $proveedor_id, $fecha_inicio, $fecha_fin)
+    {
+
+        $codigosOrden = DB::table('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION')
+            ->select('COD_ORDEN')
+            ->distinct()
+            ->pluck('COD_ORDEN')
+            ->toArray();
+
+        $listadatos = FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+            ->select(DB::raw('FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+            ->where('OPERACION', '=', 'ORDEN_COMPRA')
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000005')
+            ->Fecha('RE', $fecha_inicio, $fecha_fin)
+            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO', $codigosOrden)
+            ->ProveedorFE($proveedor_id)
+            ->orderBy('fecha_uc', 'desc')
+            ->get();
+
+        return $listadatos;
+    }
+
+
     private function con_lista_cabecera_comprobante_total_tes_estiba($cliente_id, $proveedor_id, $operacion_id, $fecha_inicio, $fecha_fin)
     {
 
