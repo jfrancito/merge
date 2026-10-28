@@ -605,8 +605,8 @@ $(document).ready(function(){
 
 
 
-    $(document).on('change', '#operacion_id', function() {
-        var op = $(this).val();
+    function toggleOperacionBotones() {
+        var op = $('#operacion_id').val();
         if (op === 'ORDEN_COMPRA') {
             $('.caja_sede').show();
             $('#descargargestionocvalidadoexceldetallado').show();
@@ -621,7 +621,12 @@ $(document).ready(function(){
         } else {
             $('#li_descargarcomprobantemasivoadministracionexcel').hide();
         }
+    }
+
+    $(document).on('change', '#operacion_id', function() {
+        toggleOperacionBotones();
     });
+    toggleOperacionBotones();
 
     $(".cfedocumento").on('click','.buscardocumento', function(event) {
 
