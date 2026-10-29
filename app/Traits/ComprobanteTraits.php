@@ -4061,14 +4061,19 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_tes_contrato($cliente_id, $proveedor_id, $fecha_inicio, $fecha_fin)
     {
 
+        $codigosOrden = DB::table('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION')
+            ->select('COD_ORDEN')
+            ->distinct()
+            ->pluck('COD_ORDEN')
+            ->toArray();
+
         $listadatos = FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-            ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
-            ->whereNull('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
             ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
             ->where('OPERACION', '=', 'CONTRATO')
             ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
             ->ProveedorFE($proveedor_id)
             ->Fecha('RE', $fecha_inicio, $fecha_fin)
+            ->whereNotIn('FE_DOCUMENTO.ID_DOCUMENTO', $codigosOrden)
             ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000005')
             ->orderBy('fecha_uc', 'desc')
             ->get();
@@ -4114,13 +4119,18 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_tes($cliente_id, $proveedor_id, $fecha_inicio, $fecha_fin)
     {
 
+        $codigosOrden = DB::table('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION')
+            ->select('COD_ORDEN')
+            ->distinct()
+            ->pluck('COD_ORDEN')
+            ->toArray();
+
         $listadatos = FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-            ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
-            ->select(DB::raw('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN COD,FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-            ->whereNull('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+            ->select(DB::raw('NULL as COD,FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
             ->where('OPERACION', '=', 'ORDEN_COMPRA')
             ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
             ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000005')
+            ->whereNotIn('FE_DOCUMENTO.ID_DOCUMENTO', $codigosOrden)
             ->ProveedorFE($proveedor_id)
             ->Fecha('RE', $fecha_inicio, $fecha_fin)
             ->orderBy('fecha_uc', 'desc')
