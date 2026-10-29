@@ -86,10 +86,17 @@ function array_canjes() {
 
 
 function error500(data) {
-    if(data.status = 500){
+    if(data.status === 500){
         var contenido = $(data.responseText);
-        alerterror505ajax($(contenido).find('.trace-message').html()); 
-        console.log($(contenido).find('.trace-message').html());     
+        var mensaje = $(contenido).find('.trace-message').html();
+        alerterror505ajax(mensaje ? mensaje : "Error interno en el servidor (500)."); 
+        console.log(mensaje);     
+    } else if (data.status === 524 || data.status === 504) {
+        alerterror505ajax("El servidor tardó demasiado tiempo en responder (Tiempo de espera agotado).");
+    } else {
+        var contenido = $(data.responseText);
+        var mensaje = $(contenido).find('.trace-message').html();
+        alerterror505ajax(mensaje ? mensaje : ("Error en el servidor (Código " + (data.status || "desconocido") + ")."));
     }
 }
 
