@@ -440,6 +440,7 @@ class GestionOCValidadoController extends Controller
 
         $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
                                         'CONTRATO' => 'CONTRATO',
+                                        'CONTRATO_INTERMEDIO' => 'CONTRATO INTERMEDIO',
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
@@ -467,6 +468,8 @@ class GestionOCValidadoController extends Controller
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            }else if($operacion_id=='CONTRATO_INTERMEDIO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
             }else{
                 if (in_array($operacion_id, $array_canjes)) {
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
@@ -1049,6 +1052,65 @@ class GestionOCValidadoController extends Controller
                          ]);
     }
 
+
+    public function actionDetalleComprobanteOCValidadoContratoIntermedio($idopcion, $lote, Request $request) {
+
+        View::share('titulo', 'Detalle de Comprobante');
+
+        $idoc                   =   $lote;
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+
+        $xmlarchivo             =   $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $lote . '\\' . $fedocumento->ARCHIVO_XML;
+        $cdrarchivo             =   $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $lote . '\\' . $fedocumento->ARCHIVO_CDR;
+        $pdfarchivo             =   $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $lote . '\\' . $fedocumento->ARCHIVO_PDF;
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO', '=', $lote)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                                    ->orderBy('FECHA', 'DESC')
+                                    ->get();
+        $funcion                =   $this;
+        $archivos               =   $this->lista_archivos_total($idoc, $fedocumento->DOCUMENTO_ITEM);
+        $archivospdf            =   $this->lista_archivos_total_pdf($idoc, $fedocumento->DOCUMENTO_ITEM);
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO', '=', $idoc)->where('ACTIVO', '=', '0')->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+
+        $idoc                   =   rtrim($idoc, "X");
+        $fereftop1              =   FeRefAsoc::where('lote', '=', $idoc)->first();
+
+        $lotes = FeRefAsoc::where('lote', '=', $idoc)
+            ->select(DB::raw("REPLACE(ID_DOCUMENTO, 'X', '') as ID_DOCUMENTO"))
+            ->pluck('ID_DOCUMENTO')
+            ->toArray();
+
+        $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE', $lotes)->get();
+        $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE', $lotes)->first();
+        $ordencompra            =   $documento_top;
+        $empresa_contrato       =   STDEmpresa::where('COD_EMPR', '=', ($documento_top ? $documento_top->COD_EMPR_EMISOR : ''))->first();
+        if (empty($empresa_contrato)) {
+            $empresa_contrato   =   STDEmpresa::where('NOM_EMPR', 'like', '%FULL LOGISTICS%')->first();
+        }
+
+        return View::make('comprobante/registrocomprobantevalidadoestibaconinter',
+                         [
+                            'fedocumento'           =>  $fedocumento,
+                            'fereftop1'             =>  $fereftop1,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'documento_asociados'   =>  $documento_asociados,
+                            'documento_top'         =>  $documento_top,
+                            'ordencompra'           =>  $ordencompra,
+                            'empresa_contrato'      =>  $empresa_contrato,
+                            'lote'                  =>  $lote,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
+                            'archivosanulados'      =>  $archivosanulados,
+                            'archivospdf'           =>  $archivospdf,                         
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                            'idoc'                  =>  isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
+                         ]);
+    }
 
     public function actionDetalleComprobanteOCValidadoEstiba($idopcion,$lote, Request $request) {
 

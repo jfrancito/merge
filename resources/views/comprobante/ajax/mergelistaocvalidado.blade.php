@@ -7,6 +7,8 @@
 
       @if($operacion_id == 'CONTRATO')
         @include('comprobante.ajax.alistaocvalidadocontrato')
+      @elseif($operacion_id == 'CONTRATO_INTERMEDIO')
+        @include('comprobante.ajax.alistaocvalidadocontratointermedio')
       @else
         @if($operacion_id == 'COMISION')
           @include('comprobante.ajax.alistaocvalidadocomision')

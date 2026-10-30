@@ -90,6 +90,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" id="asientosgenerados" name="asientosgenerados" value=""/>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
@@ -110,6 +111,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                     {{ csrf_field() }}
                                                     <input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" id="asientosgenerados" name="asientosgenerados" value=""/>
 
                                                     <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
@@ -132,6 +134,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" id="asientosgenerados" name="asientosgenerados" value=""/>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
@@ -153,6 +156,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" id="asientosgenerados" name="asientosgenerados" value=""/>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">

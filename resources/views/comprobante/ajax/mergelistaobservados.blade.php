@@ -9,6 +9,8 @@
 
       @if($operacion_id == 'CONTRATO')
         @include('comprobante.ajax.alistaocobservadoscontrato')
+      @elseif($operacion_id == 'CONTRATO_INTERMEDIO')
+        @include('comprobante.ajax.alistaocobservadoscontratointermedio')
       @else
         @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
           @include('comprobante.ajax.alistaocobservadosliquidacioncompraanticipo')

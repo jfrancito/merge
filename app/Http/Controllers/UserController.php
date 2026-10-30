@@ -2173,6 +2173,12 @@ class UserController extends Controller
 		$count_observados_contratoa = 0;
 		$count_observadoscontratoa_le = 0;
 
+		//contrato intermedio
+		$urlcontratoconint = '';
+		$count_x_aprobar_contratoconint = 0;
+		$count_observados_contratoconint = 0;
+		$count_observadoscontratoconint_le = 0;
+
 
 		if ($trol->ind_uc == 1) {
 
@@ -2300,6 +2306,7 @@ class UserController extends Controller
 				$urloca = '/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA_ANTICIPO';
 				$urlcom = '/gestion-de-contabilidad-aprobar/g56?operacion_id=COMISION';
 				$urlcontratoa = '/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO_ANTICIPO';
+				$urlcontratoconint = '/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO_INTERMEDIO';
 				$urllg = '/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
 				$urlrenta = '/gestion-de-aprobar-cuarta-categoria/YWp';
 
@@ -2482,6 +2489,15 @@ class UserController extends Controller
 
 
 
+				//CONTRATO INTERMEDIO
+				$operacion_id = 'CONTRATO_INTERMEDIO';
+				$listadatos = $this->con_lista_cabecera_comprobante_total_cont_contrato_intermedio($cod_empresa, $operacion_id);
+				$count_x_aprobar_contratoconint = count($listadatos);
+				$lisadatosob = $this->con_lista_cabecera_comprobante_total_cont_contrato_intermedio_obs($cod_empresa, $operacion_id);
+				$count_observados_contratoconint = count($lisadatosob);
+				$listadatosob = $this->con_lista_cabecera_comprobante_total_cont_contrato_intermedio_levantadas($cod_empresa, $operacion_id);
+				$count_observadoscontratoconint_le = count($listadatosob);
+
 				//COMISION
 				$operacion_id = 'COMISION';
 				$listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
@@ -2530,6 +2546,7 @@ class UserController extends Controller
 					$urlnod = '/gestion-de-administracion-aprobar/j25?operacion_id=NOTA_DEBITO';
 					$urloca = '/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA_ANTICIPO';
 					$urlcontratoa = '/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO_ANTICIPO';
+					$urlcontratoconint = '/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO_INTERMEDIO';
 
 
 
@@ -2696,6 +2713,15 @@ class UserController extends Controller
 					$listadatosob = $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cod_empresa, $operacion_id);
 					$count_observadoslqa_le = count($listadatosob);
 
+					//CONTRATO_INTERMEDIO
+					$operacion_id = 'CONTRATO_INTERMEDIO';
+					$listadatos = $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio($cod_empresa, $operacion_id);
+					$count_x_aprobar_contratoconint = count($listadatos);
+					$lisadatosob = $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs($cod_empresa, $operacion_id);
+					$count_observados_contratoconint = count($lisadatosob);
+					$listadatosob = $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs_levantadas($cod_empresa, $operacion_id);
+					$count_observadoscontratoconint_le = count($listadatosob);
+
 
 					//VALE
 					$listadatos = $this->listaValeRendirAprueba(
@@ -2792,6 +2818,11 @@ class UserController extends Controller
 				'count_observados_contratoa' => $count_observados_contratoa,
 				'count_observadoscontratoa_le' => $count_observadoscontratoa_le,
 				'urlcontratoa' => $urlcontratoa,
+
+				'count_x_aprobar_contratoconint' => $count_x_aprobar_contratoconint,
+				'count_observados_contratoconint' => $count_observados_contratoconint,
+				'count_observadoscontratoconint_le' => $count_observadoscontratoconint_le,
+				'urlcontratoconint' => $urlcontratoconint,
 
 
 

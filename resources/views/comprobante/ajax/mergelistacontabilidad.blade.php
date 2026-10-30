@@ -11,6 +11,9 @@
     @if($operacion_id == 'CONTRATO')
       @include('comprobante.ajax.alistacontabilidadcontrato')
     @else
+      @if($operacion_id == 'CONTRATO_INTERMEDIO')
+        @include('comprobante.ajax.alistacontabilidadestibaconinter')
+      @else
 
       @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
         @include('comprobante.ajax.alistaliquidacioncompraanticipocontabilidad')
@@ -51,3 +54,4 @@
   @endif
 
 @endif
+  @endif
