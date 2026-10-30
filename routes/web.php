@@ -479,6 +479,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validar-xml-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXML');
 
 	Route::any('/ajax-buscar-documento-gestion-admin', 'GestionOCController@actionListarAjaxBuscarDocumentoAdmin');
+	Route::any('/ajax-buscar-documento-gestion-admin-contrato-intermedio', 'GestionOCController@actionListarAjaxBuscarDocumentoAdminContratoIntermedio');
 	Route::any('/migracion-rioja/{idopcion}', 'GestionOCController@actionListarOCAdminMR');
 	Route::any('/migracion-bellavista/{idopcion}', 'GestionOCController@actionListarOCAdminMB');
 	Route::any('/ajax-estiba-proveedor-estiba', 'GestionOCController@actionEstibaProveedorEstiba');
@@ -570,6 +571,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-liquidacion-compra-anticipo-administrator/{procedencia}/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionDetalleComprobanteLiquidacionCompraAnticipoAdministrator');
 	Route::any('/subir-xml-cargar-datos-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionCargarXMLLiquidacionCompraAnticipoAdministrator');
 	Route::any('/validar-xml-oc-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionValidarXMLLiquidacionCompraAnticipoAdministrator');
+
+	//ADMINISTRATOR CONTRATO INTERMEDIO
+	Route::any('/select-xml-contrato-intermedio/{idopcion}', 'GestionEstibaController@actionDetalleSelectContratoIntermedio');
+	Route::any('/detalle-comprobante-contrato-intermedio-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteContratoIntermedioAdministrator');
+	Route::any('/subir-xml-cargar-datos-contrato-intermedio-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLContratoIntermedioAdministrator');
+	Route::any('/validar-xml-oc-contrato-intermedio-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLContratoIntermedioAdministrator');
+	Route::any('/agregar-suspension-contrato-intermedio/{idopcion}/{lote}', 'GestionEstibaController@actionAgregarSuspensionContratoIntermedio');
 
 	//ADMINISTRATOR ESTIBA
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');

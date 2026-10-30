@@ -70,23 +70,23 @@ $(document).ready(function(){
         debugger;
         if(valores.includes(operacion_id)){
             $('.sec_estiba').removeClass('ocultar');
+            $.ajax({
+                  type    :     "POST",
+                  url     :     carpeta+"/ajax-estiba-proveedor-estiba",
+                  data    :     {
+                                    _token              : _token,
+                                    operacion_id        : operacion_id
+                                },
+                    success: function (data) {
+                        $('.ajax_proveedor').html(data);
+                    },
+                    error: function (data) {
+                        error500(data);
+                    }
+            });
         }else{
             $('.sec_estiba').addClass('ocultar');
         }
-        $.ajax({
-              type    :     "POST",
-              url     :     carpeta+"/ajax-estiba-proveedor-estiba",
-              data    :     {
-                                _token              : _token,
-                                operacion_id        : operacion_id
-                            },
-                success: function (data) {
-                    $('.ajax_proveedor').html(data);
-                },
-                error: function (data) {
-                    error500(data);
-                }
-        });
 
 
 
@@ -687,7 +687,11 @@ $(document).ready(function(){
                                 proveedor_id            : proveedor_id
 
                             };
-        ajax_normal(data,"/ajax-buscar-documento-gestion-admin");
+        if (operacion_id === 'CONTRATO_INTERMEDIO') {
+            ajax_normal(data, "/ajax-buscar-documento-gestion-admin-contrato-intermedio");
+        } else {
+            ajax_normal(data, "/ajax-buscar-documento-gestion-admin");
+        }
 
     });
 

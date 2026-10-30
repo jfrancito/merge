@@ -10,6 +10,8 @@
 
         @if($operacion_id == 'CONTRATO')
           @include('comprobante.ajax.alistacontratoadministrador')
+        @elseif($operacion_id == 'CONTRATO_INTERMEDIO')
+          @include('comprobante.ajax.alistacontratointermedioadministrador')
         @else
           @if($operacion_id == 'PROVISION_GASTO')
             @include('comprobante.ajax.alistarprovisiongastoadministrador')

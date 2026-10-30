@@ -775,6 +775,7 @@ class GestionOCController extends Controller
         $combo_operacion = array(
             'ORDEN_COMPRA' => 'ORDEN COMPRA',
             'CONTRATO' => 'CONTRATO',
+            'CONTRATO_INTERMEDIO' => 'CONTRATO INTERMEDIO',
             'ESTIBA' => 'ESTIBA',
             'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
             'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
@@ -826,6 +827,8 @@ class GestionOCController extends Controller
             } else {
                 if ($operacion_id == 'CONTRATO') {
                     $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+                } else if ($operacion_id == 'CONTRATO_INTERMEDIO') {
+                    $listadatos = $this->con_lista_cabecera_contrato_intermedio_administrativo($cod_empresa);
                 } else {
 
                     if ($operacion_id == 'PROVISION_GASTO') {
@@ -974,6 +977,32 @@ class GestionOCController extends Controller
 
 
 
+    public function actionListarAjaxBuscarDocumentoAdminContratoIntermedio(Request $request)
+    {
+
+        $operacion_id = $request['operacion_id'];
+        $idopcion = $request['idopcion'];
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+
+        $listadatos = $this->con_lista_cabecera_contrato_intermedio_administrativo($cod_empresa);
+
+        $procedencia = 'ADM';
+        $funcion = $this;
+        return View::make(
+            'comprobante/ajax/alistacontratointermedioadministrador',
+            [
+                'operacion_id' => $operacion_id,
+                'idopcion' => $idopcion,
+                'idoc' => null,
+                'cod_empresa' => $cod_empresa,
+                'listadatos' => $listadatos,
+                'procedencia' => $procedencia,
+                'ajax' => true,
+                'funcion' => $funcion
+            ]
+        );
+    }
+
     public function actionListarAjaxBuscarDocumentoAdmin(Request $request)
     {
 
@@ -998,6 +1027,8 @@ class GestionOCController extends Controller
             } else {
                 if ($operacion_id == 'CONTRATO') {
                     $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+                } else if ($operacion_id == 'CONTRATO_INTERMEDIO') {
+                    $listadatos = $this->con_lista_cabecera_contrato_intermedio_administrativo($cod_empresa);
                 } else {
                 if ($operacion_id == 'CONTRATO_ANTICIPO') {
                     $listadatos = $this->con_lista_cabecera_contrato_administrativo_anticipo($cod_empresa);

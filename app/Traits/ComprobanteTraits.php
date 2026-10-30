@@ -11039,6 +11039,116 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_contrato_intermedio_administrativo($cliente_id)
+    {
+
+        $trabajador = STDTrabajador::where('COD_TRAB', '=', $cliente_id)->first();
+        $array_trabajadores = STDTrabajador::where('NRO_DOCUMENTO', '=', $trabajador->NRO_DOCUMENTO)
+            ->pluck('COD_TRAB')
+            ->toArray();
+
+        $array_usuarios = SGDUsuario::whereIn('COD_TRABAJADOR', $array_trabajadores)
+            ->pluck('COD_USUARIO')
+            ->toArray();
+
+        $estado_no = 'ETM0000000000006';
+
+
+
+        $centro_id = $trabajador->COD_ZONA_TIPO;
+        $tipodoc_id = 'TDO0000000000014';
+
+
+        if (Session::get('usuario')->id == '1CIX00000001') {
+
+            $listadatos = VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin) {
+                $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                    ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            })
+                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no) {
+                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                })
+                ->where('VMERGEDOCUMENTOS.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+                ->where(function ($query) {
+                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                        ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                        ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                })
+                ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
+                ->where('TXT_EMPR_EMISOR', 'like', '%GRUPO FULL LOGISTICS%')
+                ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
+                ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
+                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            FE_REF_ASOC.LOTE AS LOTE_DOC,
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                ->get();
+
+        } else {
+
+            $listadatos = VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin) {
+                $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                    ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            })
+                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no) {
+                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                })
+                ->where('VMERGEDOCUMENTOS.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+                ->where(function ($query) {
+                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                        ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                        ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                })
+                ->where('TXT_EMPR_EMISOR', 'like', '%GRUPO FULL LOGISTICS%')
+                ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
+                ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
+                ->where('COD_CENTRO', '=', $centro_id)
+                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                        FEC_EMISION,
+                                                        TXT_CATEGORIA_MONEDA,
+                                                        TXT_EMPR_EMISOR,
+                                                        COD_USUARIO_CREA_AUD,
+                                                        CAN_TOTAL,
+                                                        NRO_SERIE,
+                                                        NRO_DOC,
+                                                        FE_REF_ASOC.LOTE AS LOTE_DOC,
+                                                        FE_DOCUMENTO.ID_DOCUMENTO,
+                                                        FE_DOCUMENTO.COD_ESTADO,
+                                                        FE_DOCUMENTO.TXT_ESTADO
+                                                    '))
+                ->get();
+
+        }
+
+        $codigos = $listadatos->pluck('COD_DOCUMENTO_CTBLE')->unique();
+
+        if ($codigos->isNotEmpty()) {
+
+            $firmas = DB::table('CMP.DOCUMENTO_CTBLE')
+                ->whereIn('COD_DOCUMENTO_CTBLE', $codigos)
+                ->pluck('ESTADO_FIRMA', 'COD_DOCUMENTO_CTBLE');
+
+            $listadatos->transform(function ($item) use ($firmas) {
+                $item->ESTADO_FIRMA = $firmas[$item->COD_DOCUMENTO_CTBLE] ?? 0;
+                return $item;
+            });
+
+        }
+
+        return $listadatos;
+    }
+
     private function con_lista_cabecera_contrato_administrativo($cliente_id)
     {
 
@@ -11073,6 +11183,7 @@ trait ComprobanteTraits
                         ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                 })
                 ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
+                ->where('TXT_EMPR_EMISOR', 'not like', '%GRUPO FULL LOGISTICS%')
                 ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
                 ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
                 ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
@@ -11104,6 +11215,7 @@ trait ComprobanteTraits
                         ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                         ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                 })
+                ->where('TXT_EMPR_EMISOR', 'not like', '%GRUPO FULL LOGISTICS%')
                 ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
                 ->where('COD_CATEGORIA_TIPO_DOC', '=', $tipodoc_id)
                 ->where('COD_CENTRO', '=', $centro_id)
