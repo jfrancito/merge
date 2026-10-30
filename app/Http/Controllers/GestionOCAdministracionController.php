@@ -84,6 +84,7 @@ class GestionOCAdministracionController extends Controller
 
         $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
                                         'CONTRATO' => 'CONTRATO',
+                                        'CONTRATO_INTERMEDIO' => 'CONTRATO INTERMEDIO',
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
@@ -149,7 +150,11 @@ class GestionOCAdministracionController extends Controller
                                         } else {
 
 
-                                            if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                            if($operacion_id=='CONTRATO_INTERMEDIO'){
+                                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio($cod_empresa,$operacion_id);
+                                                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs($cod_empresa,$operacion_id);
+                                                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs_levantadas($cod_empresa,$operacion_id);
+                                            }else if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
                                                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba_dic($cod_empresa,$operacion_id);
                                                 $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cod_empresa,$operacion_id);
                                                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cod_empresa,$operacion_id);
@@ -249,7 +254,11 @@ class GestionOCAdministracionController extends Controller
                                         $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
                                     }else{
 
-                                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                        if($operacion_id=='CONTRATO_INTERMEDIO'){
+                                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio($cod_empresa,$operacion_id);
+                                            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs($cod_empresa,$operacion_id);
+                                            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs_levantadas($cod_empresa,$operacion_id);
+                                        }else if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
                                             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba_dic($cod_empresa,$operacion_id);
                                             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cod_empresa,$operacion_id);
                                             $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cod_empresa,$operacion_id);
@@ -6098,5 +6107,359 @@ class GestionOCAdministracionController extends Controller
     }
 
 
+
+
+
+    public function actionAprobarAdministracionContratoIntermedio($idopcion, $lote, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') { return $validarurl; }
+        /******************************************************/
+        $idoc                   =   $lote;
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Aprobar Comprobante Contrato Intermedio');
+
+        if ($_POST) {
+            try {
+                DB::beginTransaction();
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000004')->first();
+                if (count($fedocumento_ap) > 0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
+
+                if ($fedocumento->ind_observacion == 1) {
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+                $descripcion        =   $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR ADMINISTRACION';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                }
+
+                $filespdf          =   $request['otros'];
+                if (!is_null($filespdf)) {
+                    foreach ($filespdf as $file) {
+                        $contadorArchivos = Archivo::count();
+                        $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                        $rutafile        =      $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $idoc;
+                        $nombrefilepdf   =      $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile . '\\' . $nombrefilepdf;
+                        copy($file->getRealPath(), $rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $idoc;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                    }
+                }
+
+                FeDocumento::where('ID_DOCUMENTO', $pedido_id)
+                    ->update([
+                        'COD_ESTADO'              => 'ETM0000000000003',
+                        'TXT_ESTADO'              => 'POR APROBAR CONTABILIDAD',
+                        'IND_CONTABILIDAD_APRO'   => '0',
+                        'IND_EMAIL_APROBADO'      => '0',
+                        'IND_EMAIL_APROBADO_ADMIN'=> '0',
+                        'ind_email_clap'          => 0,
+                        'fecha_ap'                => $this->fechaactual,
+                        'usuario_ap'              => Session::get('usuario')->id
+                    ]);
+
+                // HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                // Geolocalización
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $fedocumento, 'APROBADO POR ADMINISTRACION');
+
+                DB::commit();
+
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $pedido_id . ' APROBADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        } else {
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                                        ->where('TXT_ASIGNADO', '=', 'CONTACTO')
+                                        ->get();
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA', 'DESC')
+                                        ->get();
+            $archivos               =   $this->lista_archivos_total($idoc, $fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc, $fedocumento->DOCUMENTO_ITEM);
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO', '=', $idoc)->where('ACTIVO', '=', '0')->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO', '=', 1)
+                                        ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
+                                        ->get();
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-fileestiba', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption'       => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl'   => route('serve-fileestiba', ['file' => $archivo->NOMBRE_ARCHIVO])
+                ];
+            }
+
+            $fereftop1              =   FeRefAsoc::where('lote', '=', $idoc)->first();
+            $lotes                  =   FeRefAsoc::where('lote', '=', $idoc)->pluck('ID_DOCUMENTO')->toArray();
+            $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE', $lotes)->get();
+            $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE', $lotes)->first();
+
+            $funciones = $this;
+
+            return View::make('comprobante/aprobaradmcontratointermedio', [
+                'fedocumento'           =>  $fedocumento,
+                'fereftop1'             =>  $fereftop1,
+                'initialPreview'        =>  json_encode($initialPreview),
+                'initialPreviewConfig'  =>  json_encode($initialPreviewConfig),
+                'archivos'              =>  $archivos,
+                'archivosanulados'      =>  $archivosanulados,
+                'trabajador'            =>  $trabajador,
+                'documento_asociados'   =>  $documento_asociados,
+                'documento_top'         =>  $documento_top,
+                'documentoscompra'      =>  $documentoscompra,
+                'totalarchivos'         =>  $totalarchivos,
+                'documentohistorial'    =>  $documentohistorial,
+                'archivospdf'           =>  $archivospdf,
+                'detallefedocumento'    =>  $detallefedocumento,
+                'tarchivos'             =>  $tarchivos,
+                'lote'                  =>  $idoc,
+                'idopcion'              =>  $idopcion,
+                'idoc'                  =>  $idoc,
+                'funciones'             =>  $funciones,
+                'funcion'               =>  $funciones,
+            ]);
+        }
+    }
+
+    public function actionAgregarObservacionAdministracionContratoIntermedio($idopcion, $lote, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') { return $validarurl; }
+        /******************************************************/
+        $idoc                   =   $lote;
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('TXT_PROCEDENCIA', '<>', 'SUE')->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Observar Comprobante Contrato Intermedio');
+
+        if ($_POST) {
+            try {
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('TXT_PROCEDENCIA', '<>', 'SUE')->first();
+                $descripcion        =   $request['descripcion'];
+                $archivoob          =   $request['archivoob'];
+
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
+                $contadorArchivos = Archivo::count();
+                $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                $rutafile        =      $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $pedido_id;
+
+                if (!empty($archivoob)) {
+                    $nombrefileob   =      $contadorArchivos . '-' . $this->limpiarTildes($archivoob->getClientOriginalName());
+                    $valor           =      $this->versicarpetanoexiste($rutafile);
+                    $rutacompleta    =      $rutafile . '\\' . $nombrefileob;
+                    copy($archivoob->getRealPath(), $rutacompleta);
+                    $path            =      $rutacompleta;
+
+                    $nombreoriginal             =   $archivoob->getClientOriginalName();
+                    $info                       =   new SplFileInfo($nombreoriginal);
+                    $extension                  =   $info->getExtension();
+
+                    $dcontrol                   =   new Archivo;
+                    $dcontrol->ID_DOCUMENTO     =   $pedido_id;
+                    $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO     =   'OBSERVACION';
+                    $dcontrol->NOMBRE_ARCHIVO   =   $nombrefileob;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =   'OBSERVACION ADMINISTRACION';
+                    $dcontrol->URL_ARCHIVO      =   $path;
+                    $dcontrol->SIZE             =   filesize($archivoob);
+                    $dcontrol->EXTENSION        =   $extension;
+                    $dcontrol->ACTIVO           =   1;
+                    $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                    $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                    $dcontrol->save();
+                }
+
+                FeDocumento::where('ID_DOCUMENTO', $pedido_id)
+                    ->update([
+                        'ind_observacion'   => 1,
+                        'area_observacion'  => 'ADM',
+                        'TXT_OBSERVADO'     => $descripcion,
+                        'fecha_adm'         => $this->fechaactual,
+                        'usuario_adm'       => Session::get('usuario')->id,
+                        'mensaje_exadm'     => $descripcion,
+                        'ind_email_adm'     => 0
+                    ]);
+
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'OBSERVADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+
+                // Geolocalización
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $fedocumento, 'OBSERVADO POR ADMINISTRACION');
+
+                DB::commit();
+
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $pedido_id . ' OBSERVADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
+
+    public function actionAgregarExtornoContratoIntermedioAdministracion($idopcion, $lote, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') { return $validarurl; }
+        /******************************************************/
+        $idoc = $lote;
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Extorno Comprobante Contrato Intermedio');
+
+        if ($_POST) {
+            try {
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
+                $descripcion = $request['descripcionextorno'];
+
+                // GUARDAR LA REFERENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', $idoc)
+                    ->update([
+                        'TXT_REFERENCIA' => $fedocumento->ID_DOCUMENTO
+                    ]);
+
+                // ELIMINAR LOS ARCHIVOS ASOCIADOS DEL MERGE
+                $archivos = Archivo::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+                foreach ($archivos as $index => $item) {
+                    if (File::exists($item->URL_ARCHIVO)) {
+                        File::delete($item->URL_ARCHIVO);
+                    }
+                }
+
+                // ELIMINAR ARCHIVOS Y REGISTROS RELACIONADOS
+                DB::table('ARCHIVOS')->where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->delete();
+                DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->delete();
+                DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->delete();
+                DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN', '=', $idoc)->delete();
+
+                // MARCAR FE_DOCUMENTO EN ESTADO EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', '=', $idoc)
+                    ->update([
+                        'COD_ESTADO'    => 'ETM0000000000006',
+                        'TXT_ESTADO'    => 'EXTORNADO',
+                        'usuario_ex'    => Session::get('usuario')->id,
+                        'fecha_ex'      => $this->fechaactual,
+                        'mensaje_exap'  => $descripcion,
+                        'ind_email_ap'  => 0,
+                    ]);
+
+                // REACTIVAR LOTES EN FE_REF_ASOC
+                FeRefAsoc::where('LOTE', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                    ->update([
+                        'COD_ESTADO'    => 0,
+                        'ESTATUS'       => 'OFF',
+                        'USUARIO_MOD'   => Session::get('usuario')->id,
+                        'FECHA_MOD'     => $this->fechaactual
+                    ]);
+
+                // HISTORIAL
+                $documento                  =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO    =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM  =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA           =   $this->fechaactual;
+                $documento->USUARIO_ID      =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE  =   Session::get('usuario')->nombre;
+                $documento->TIPO            =   'EXTORNADO POR ADMINISTRACION';
+                $documento->MENSAJE         =   $descripcion;
+                $documento->save();
+
+                // Geolocalización
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $fedocumento, 'EXTORNADO POR ADMINISTRACION');
+
+                DB::commit();
+
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $pedido_id . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
 
 }
