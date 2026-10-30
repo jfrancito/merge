@@ -4674,7 +4674,7 @@ class GestionEstibaController extends Controller
                             }else{
 
                                 $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000006'])
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000026','DCC0000000000008','DCC0000000000009'])
                                                         ->get();
 
 
@@ -4727,7 +4727,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le = 'R1';
                             $moneda_le = 'PEN';
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000013','DCC0000000000003','DCC0000000000006'])->get();
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000013','DCC0000000000003','DCC0000000000026','DCC0000000000008','DCC0000000000009'])->get();
 
 
                             //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
@@ -4914,7 +4914,7 @@ class GestionEstibaController extends Controller
                         if($request['operacion_id']=='DOCUMENTO_INTERNO_COMPRA'){
                             $this->con_validar_documento_proveedor_estiba_doc_int_com($idoc,$documento_top,$fedocumento,$detallefedocumento,$idoc);
                         }else{
-                            $this->con_validar_documento_proveedor_estiba($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc);
+                            $this->con_validar_documento_proveedor_contrato_intermedio($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc);
                         }
 
                         
@@ -5169,70 +5169,15 @@ class GestionEstibaController extends Controller
                     }
                 }
 
-                ///////////////////////////////////////////// GUARDAR TODOS LOS CONTRATOS /////////////////////////////////////////
+                ///////////////////////////////////////////// GUARDAR GUIAS REMITENTE AUTOMATICAMENTE /////////////////////////////////////////
                 $lotes_contratos = FeRefAsoc::where('lote', '=', $idoc)->pluck('ID_DOCUMENTO')->toArray();
                 $documentos_lote = CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE', $lotes_contratos)->get();
-
-                $array_guias_faltantes = array();
                 $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                 $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $idoc;
                 $this->versicarpetanoexiste($rutafile);
+                $directorio_origen = '\\\\10.1.0.201\\cpe\\Contratos';
 
                 foreach ($documentos_lote as $doc_item) {
-                    $directorio = '\\\\10.1.0.201\\cpe\\Contratos';
-                    $nombreArchivoContrato = $doc_item->COD_DOCUMENTO_CTBLE . '.pdf';
-                    $ruta_contrato_disco = $directorio . '\\' . $nombreArchivoContrato;
-
-                    if (file_exists($ruta_contrato_disco)) {
-                        $contadorArchivos = Archivo::count();
-                        $nombrefilecdr = $contadorArchivos . '-' . $doc_item->COD_DOCUMENTO_CTBLE . '.pdf';
-                        $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
-                        copy($ruta_contrato_disco, $rutacompleta);
-
-                        $dcontrol = new Archivo;
-                        $dcontrol->ID_DOCUMENTO = $idoc;
-                        $dcontrol->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
-                        $dcontrol->TIPO_ARCHIVO = 'DCC0000000000026';
-                        $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
-                        $dcontrol->DESCRIPCION_ARCHIVO = 'CONTRATO DE TRANS. CARGA ' . $doc_item->COD_DOCUMENTO_CTBLE;
-                        $dcontrol->URL_ARCHIVO = $rutacompleta;
-                        $dcontrol->SIZE = 100;
-                        $dcontrol->EXTENSION = '.pdf';
-                        $dcontrol->ACTIVO = 1;
-                        $dcontrol->FECHA_CREA = $this->fechaactual;
-                        $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
-                        $dcontrol->save();
-                    } else {
-                        $files_c = $request[$doc_item->COD_DOCUMENTO_CTBLE];
-                        if (!is_null($files_c)) {
-                            foreach ($files_c as $file) {
-                                $contadorArchivos = Archivo::count();
-                                $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
-                                $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
-                                copy($file->getRealPath(), $rutacompleta);
-
-                                $nombreoriginal = $file->getClientOriginalName();
-                                $info = new SplFileInfo($nombreoriginal);
-                                $extension = $info->getExtension();
-
-                                $dcontrol = new Archivo;
-                                $dcontrol->ID_DOCUMENTO = $idoc;
-                                $dcontrol->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
-                                $dcontrol->TIPO_ARCHIVO = 'DCC0000000000026';
-                                $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
-                                $dcontrol->DESCRIPCION_ARCHIVO = 'CONTRATO DE TRANS. CARGA ' . $doc_item->COD_DOCUMENTO_CTBLE;
-                                $dcontrol->URL_ARCHIVO = $rutacompleta;
-                                $dcontrol->SIZE = filesize($file);
-                                $dcontrol->EXTENSION = $extension;
-                                $dcontrol->ACTIVO = 1;
-                                $dcontrol->FECHA_CREA = $this->fechaactual;
-                                $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
-                                $dcontrol->save();
-                            }
-                        }
-                    }
-
-                    // Guias relacionadas al contrato
                     $arrayref_guia = CMPReferecenciaAsoc::where('COD_TABLA', '=', $doc_item->COD_DOCUMENTO_CTBLE)
                         ->where('COD_TABLA_ASOC', 'like', '%GRR%')
                         ->where('COD_ESTADO', '=', 1)
@@ -5244,7 +5189,7 @@ class GestionEstibaController extends Controller
 
                     foreach ($guias_rel as $guia) {
                         $nombreArchivoGuia = $guia->COD_DOCUMENTO_CTBLE . '.pdf';
-                        $ruta_guia_disco = $directorio . '\\' . $nombreArchivoGuia;
+                        $ruta_guia_disco = $directorio_origen . '\\' . $nombreArchivoGuia;
 
                         if (file_exists($ruta_guia_disco)) {
                             $ya_registrado = Archivo::where('ID_DOCUMENTO', $idoc)
@@ -5272,43 +5217,6 @@ class GestionEstibaController extends Controller
                                 $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
                                 $dcontrol->save();
                             }
-                        } else {
-                            $array_guias_faltantes[] = array(
-                                'COD_DOCUMENTO_CTBLE' => $guia->COD_DOCUMENTO_CTBLE,
-                                'NRO_SERIE' => $guia->NRO_SERIE,
-                                'NRO_DOC' => $guia->NRO_DOC,
-                            );
-                        }
-                    }
-                }
-
-                // Guardar guias remitentes que no estaban en disco y fueron subidas manualmente
-                foreach ($array_guias_faltantes as $item_g) {
-                    $filescdm = $request[$item_g['COD_DOCUMENTO_CTBLE']];
-                    if (!is_null($filescdm)) {
-                        foreach ($filescdm as $file) {
-                            $contadorArchivos = Archivo::count();
-                            $nombrefilecdr = $contadorArchivos . '-' . $this->limpiarTildes($file->getClientOriginalName());
-                            $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
-                            copy($file->getRealPath(), $rutacompleta);
-
-                            $nombreoriginal = $file->getClientOriginalName();
-                            $info = new SplFileInfo($nombreoriginal);
-                            $extension = $info->getExtension();
-
-                            $dcontrol = new Archivo;
-                            $dcontrol->ID_DOCUMENTO = $idoc;
-                            $dcontrol->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
-                            $dcontrol->TIPO_ARCHIVO = $item_g['COD_DOCUMENTO_CTBLE'];
-                            $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
-                            $dcontrol->DESCRIPCION_ARCHIVO = 'GUIA REMITENTE ' . $item_g['NRO_SERIE'] . '-' . $item_g['NRO_DOC'];
-                            $dcontrol->URL_ARCHIVO = $rutacompleta;
-                            $dcontrol->SIZE = filesize($file);
-                            $dcontrol->EXTENSION = $extension;
-                            $dcontrol->ACTIVO = 1;
-                            $dcontrol->FECHA_CREA = $this->fechaactual;
-                            $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
-                            $dcontrol->save();
                         }
                     }
                 }

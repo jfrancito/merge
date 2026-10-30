@@ -12566,4 +12566,65 @@ trait ComprobanteTraits
 
 
 
+
+    private function con_validar_documento_proveedor_contrato_intermedio($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc)
+    {
+        $ind_ruc = 1;
+        $ind_rz = 1;
+        $ind_moneda = 0;
+        $ind_total = 0;
+        $ind_cantidaditem = 1;
+        $ind_formapago = 1;
+        $ind_errototal = 1;
+
+        // Validar RUC con empresa emisora o FULL LOGISTICS
+        $empresa_contrato = STDEmpresa::where('COD_EMPR', '=', ($documento_top ? $documento_top->COD_EMPR_EMISOR : ''))->first();
+        if (empty($empresa_contrato)) {
+            $empresa_contrato = STDEmpresa::where('NOM_EMPR', 'like', '%FULL LOGISTICS%')->first();
+        }
+        if (!empty($empresa_contrato)) {
+            if ($empresa_contrato->NRO_DOCUMENTO == $fedocumento->RUC_PROVEEDOR) {
+                $ind_ruc = 1;
+            }
+        }
+
+        // Moneda
+        $txtmoneda = '';
+        if ($fedocumento->MONEDA == 'PEN') {
+            $txtmoneda = 'SOLES';
+        } else {
+            $txtmoneda = 'DOLARES';
+        }
+        if ($documento_top && $documento_top->TXT_CATEGORIA_MONEDA == $txtmoneda) {
+            $ind_moneda = 1;
+        } else {
+            $ind_errototal = 0;
+        }
+
+        // Total
+        $total_1 = $documento_asociados->sum('CAN_TOTAL');
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+        $diferencia_total = 0;
+
+        if ($tt_totales <= 0.09) {
+            $ind_total = 1;
+            $diferencia_total = round($total_1 - $total_2, 2);
+        } else {
+            $ind_errototal = 0;
+        }
+
+        FeDocumento::where('ID_DOCUMENTO', '=', $idoc)
+            ->update([
+                'ind_ruc' => $ind_ruc,
+                'ind_rz' => $ind_rz,
+                'ind_moneda' => $ind_moneda,
+                'ind_total' => $ind_total,
+                'ind_cantidaditem' => $ind_cantidaditem,
+                'ind_formapago' => $ind_formapago,
+                'ind_errototal' => $ind_errototal,
+                'CAN_CENTIMO' => $diferencia_total,
+            ]);
+    }
+
 }

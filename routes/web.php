@@ -936,6 +936,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-administracion-estiba/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAprobarAdministracionEstiba');
 	Route::any('/agregar-observacion-administracion-estiba/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionEstiba');
 
+	Route::any('/aprobar-comprobante-administracion-contrato-intermedio/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAprobarAdministracionContratoIntermedio');
+	Route::any('/agregar-observacion-administracion-contrato-intermedio/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionContratoIntermedio');
+	Route::any('/agregar-extorno-contrato-intermedio-administracion/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarExtornoContratoIntermedioAdministracion');
+
 
 	//ACOPIO
 	Route::any('/gestion-de-acopio-liquidacion-compra/{idopcion}', 'GestionOCAcopioController@actionListarComprobanteAcopio');

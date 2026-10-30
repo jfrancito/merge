@@ -336,38 +336,10 @@
                     <div class="panel-body panel-body-contrast">
 
                             <div class="row">
-                                  @if($array_contratos != '')
-                                    <div><b>LOS ARCHIVOS DE CONTRATOS Y GUIAS RELACIONADAS SE CARGARAN DESPUES DE GUARDAR</b></div><br>
-                                  @endif
-                                  @foreach($tarchivos as $index => $item) 
-                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026')
-                                      @if($array_contratos != '')
-                                        
-                                      @else
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                            <label class="col-sm-12 control-label" style="text-align: left; height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
-                                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>)@endif </label>
-                                          <div class="form-group sectioncargarimagen">
-
-
-                                              <div class="col-sm-12">
-                                                  <div class="file-loading">
-                                                      <input 
-                                                      id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
-                                                      name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
-                                                      class="file-es"  
-                                                      type="file" 
-                                                      multiple data-max-file-count="1"
-                                                      required>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                        </div> 
-                                      @endif
-                                    @else
+                                  <div class="col-xs-12"><b>LOS ARCHIVOS DE GUIAS REMITENTES RELACIONADAS SE CARGARAN AUTOMATICAMENTE DESPUES DE GUARDAR</b></div><br>
+                                  @foreach($tarchivos as $index => $item)
                                       @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
-
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion" style="margin-top:15px;">
+                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion ocultar" style="margin-top:15px;">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;height: 50px;">
                                               <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
@@ -391,7 +363,6 @@
                                             <label class="col-sm-12 control-label" style="text-align: left;height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
                                               @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else @endif </label>
                                           <div class="form-group sectioncargarimagen">
-
                                               <div class="col-sm-12">
                                                   <div class="file-loading">
                                                       <input 
@@ -400,67 +371,13 @@
                                                       class="file-es"  
                                                       type="file" 
                                                       multiple data-max-file-count="1"
-                                                      required>
+                                                      @if($item->IND_OBLIGATORIO == 1) required @endif>
                                                   </div>
                                               </div>
                                           </div>
                                         </div>
                                       @ENDIF
-
-
-
-
-
-                                    @endif
                                   @endforeach
-
-                                  @foreach($array_guias as $index => $item)
-                                    @if($item['rutaordenguia'] == '')
-                                      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                        <label class="col-sm-12 control-label" style="text-align: left;height: 50px;"><b>GUIA REMITENTE {{$item['NRO_SERIE']}} - {{$item['NRO_DOC']}} (PDF)</b></label>
-                                        <div class="form-group sectioncargarimagen">
-                                          
-                                            <div class="col-sm-12">
-                                                <div class="file-loading">
-                                                    <input 
-                                                    id="file-{{$item['COD_DOCUMENTO_CTBLE']}}" 
-                                                    name="{{$item['COD_DOCUMENTO_CTBLE']}}[]" 
-                                                    class="file-es"  
-                                                    type="file" 
-                                                    multiple data-max-file-count="1"
-                                                    required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                      </div> 
-                                    @endif
-                                  @endforeach
-
-
-
-                                  @foreach($array_contratos as $index => $item)
-                                    @if($item['rutaordencontrato'] == '')
-                                      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                        <label class="col-sm-12 control-label" style="text-align: left;height: 50px;"><b>CONTRATO DE TRANS. CARGA {{$item['COD_DOCUMENTO_CTBLE']}} (PDF)</b></label>
-                                        <div class="form-group sectioncargarimagen">
-                                          
-                                            <div class="col-sm-12">
-                                                <div class="file-loading">
-                                                    <input 
-                                                    id="file-{{$item['COD_DOCUMENTO_CTBLE']}}" 
-                                                    name="{{$item['COD_DOCUMENTO_CTBLE']}}[]" 
-                                                    class="file-es"  
-                                                    type="file" 
-                                                    multiple data-max-file-count="1"
-                                                    required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                      </div> 
-                                    @endif
-                                  @endforeach
-
-                                  
                             </div>
                             <div class="row">
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
@@ -499,7 +416,7 @@
                                           <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="valor_igv" id='valor_igv' value = '{{(float)$fedocumento->VALOR_IGV_ORIG}}'>
-                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$empresa->COD_EMPR}}'>
+                                          <input type="hidden" name="empresa_id" id='empresa_id' value = "{{Session::get('empresas')->COD_EMPR}}">
                                           <input type="hidden" name="monto_total" id='monto_total' value = '{{$fedocumento->TOTAL_VENTA_ORIG}}'>
                                           <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7)}}'>
                                           <input type="hidden" name="orden_id" id='orden_id' value = '{{$idoc}}'>
