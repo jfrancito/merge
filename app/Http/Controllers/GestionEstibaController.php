@@ -4311,7 +4311,7 @@ class GestionEstibaController extends Controller
             $documento_id           =   'DCC0000000000043';
         }else{
             $combodocumento         =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
-            $documento_id           =   'DCC0000000000013';
+            $documento_id           =   'DCC0000000000002';
         }
         
         $funcion                =   $this;

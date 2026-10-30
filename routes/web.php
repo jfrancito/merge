@@ -716,6 +716,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAprobarUCContrato');
 
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
+	Route::any('/detalle-comprobante-oc-validado-contrato-intermedio/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoIntermedio');
+
 	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
 
 	Route::any('/detalle-comprobante-oc-validado-estiba-oca/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstibaOCA');
@@ -779,6 +781,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/observacion-comprobante-uc-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCNotaCredito');
 	Route::any('/observacion-comprobante-uc-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCNotaDebito');
 	Route::any('/observacion-comprobante-uc-estiba/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstiba');
+	Route::any('/observacion-comprobante-uc-contrato-intermedio/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCContratoIntermedio');
 	Route::any('/observacion-comprobante-uc-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCPG');
 
 
@@ -811,6 +814,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaCredito');
 	Route::any('/aprobar-comprobante-contabilidad-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaDebito');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
+	Route::any('/aprobar-comprobante-contabilidad-estiba-conint/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadContratoIntermedio');
+
 	Route::any('/aprobar-comprobante-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaDIC');
 
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');

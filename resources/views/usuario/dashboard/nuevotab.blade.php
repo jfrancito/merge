@@ -20,10 +20,11 @@
                       $countoca    =   $count_x_aprobar_oca+$count_observados_oca+$count_observadosoca_le;
                       $countcom    =   $count_x_aprobar_com+$count_observados_com+$count_observadosoca_com;
                       $countcontratoa    =   $count_x_aprobar_contratoa+$count_observados_contratoa+$count_observadoscontratoa_le;
+                      $countconint      =   $count_x_aprobar_contratoconint+$count_observados_contratoconint+$count_observadoscontratoconint_le;
 
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca+$countcom+$countcontratoa;
+                      $cantotal   =   $countoc+$countcon+$countconint+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca+$countcom+$countcontratoa;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -47,6 +48,15 @@
                                 <span class="nav-text">CONTRATO</span>
                                 <div class="notification-container">
                                     @if(($trol->UC=='CT' || $trol->UC==NULL))<span class="notification-badge">{{$countcon}}</span>@endif
+                                </div>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="contratointermedio">
+                                <span class="nav-text">CONTRATO INTERMEDIO</span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countconint}}</span>
                                 </div>
                             </a>
                         </li>
@@ -215,6 +225,10 @@
             <!-- Contenido de Categoría 02 -->
             <div id="contrato" class="category-content">
                 @include('usuario.dashboard.contrato')
+            </div>
+
+            <div id="contratointermedio" class="category-content">
+                @include('usuario.dashboard.contratointermedio')
             </div>
 
             <!-- Contenido de Categoría 03 -->

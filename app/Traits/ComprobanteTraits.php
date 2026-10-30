@@ -12567,6 +12567,154 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_cabecera_comprobante_total_adm_contrato_intermedio($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->leftJoin(
+                DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                'STD.EMPRESA.COD_EMPR',
+                '=',
+                'deuda.COD_EMPR_CLIENTE'
+            )
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where(function ($query) {
+                $query->where('ind_observacion', '<>', 1)
+                    ->orWhereNull('ind_observacion');
+            })
+            ->where(function ($query) {
+                $query->where('area_observacion', '=', '')
+                    ->orWhereNull('area_observacion')
+                    ->orWhereIn('area_observacion', ['UCO']);
+            })
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000004')
+            ->orderBy('fecha_uc', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->leftJoin(
+                DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                'STD.EMPRESA.COD_EMPR',
+                '=',
+                'deuda.COD_EMPR_CLIENTE'
+            )
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('ind_observacion', '=', 1)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000004')
+            ->orderBy('fecha_uc', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs_levantadas($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->leftJoin(
+                DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                'STD.EMPRESA.COD_EMPR',
+                '=',
+                'deuda.COD_EMPR_CLIENTE'
+            )
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where('ind_observacion', '=', 0)
+            ->where('area_observacion', '=', 'ADM')
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000004')
+            ->orderBy('ind_observacion', 'asc')
+            ->orderBy('fecha_uc', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_cont_contrato_intermedio($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where(function ($query) {
+                $query->where('ind_observacion', '<>', 1)
+                    ->orWhereNull('ind_observacion');
+            })
+            ->where(function ($query) {
+                $query->where('area_observacion', '=', '')
+                    ->orWhereIn('area_observacion', ['ADM', 'UCO'])
+                    ->orWhereNull('area_observacion');
+            })
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000003')
+            ->orderBy('ind_observacion', 'asc')
+            ->orderBy('fecha_pr', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_cont_contrato_intermedio_obs($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where('ind_observacion', '=', 1)
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000003')
+            ->orderBy('ind_observacion', 'asc')
+            ->orderBy('fecha_uc', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_cont_contrato_intermedio_levantadas($cliente_id, $operacion_id)
+    {
+        $listadatos = FeDocumento::leftJoin('STD.EMPRESA', function ($join) {
+            $join->on('FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                ->where('STD.EMPRESA.COD_ESTADO', '=', 1);
+        })
+            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,STD.EMPRESA.COD_EMPR'))
+            ->where('OPERACION', '=', $operacion_id)
+            ->where('ind_observacion', '=', 0)
+            ->where('area_observacion', '=', 'CONT')
+            ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000003')
+            ->orderBy('ind_observacion', 'asc')
+            ->orderBy('fecha_uc', 'asc')
+            ->get();
+
+        return $listadatos;
+    }
+
     private function con_validar_documento_proveedor_contrato_intermedio($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc)
     {
         $ind_ruc = 1;
