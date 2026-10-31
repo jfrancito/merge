@@ -560,9 +560,9 @@ var App = (function () {
         $("#tablaconsolidadopedido").dataTable({
             responsive: true,
             autoWidth: true,
+            pageLength: 5000,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "300px",
             ordering: false
         });
 

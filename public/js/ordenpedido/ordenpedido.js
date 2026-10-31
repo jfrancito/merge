@@ -772,7 +772,7 @@ $(document).ready(function () {
         let _token = $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content') || $('#token').val();
 
         // Si es el usuario especial IITR000000000482, actualizar sedes dinámicamente
-        if (cod_solicita === 'IITR000000000482') {
+        if (['IITR000000000482', 'ICTR000000000220', 'ICTR0000000220'].indexOf(cod_solicita) !== -1) {
             let $selectCentro = $('#cod_centro');
             $selectCentro.empty();
 
