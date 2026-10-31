@@ -68,7 +68,7 @@ class GestionOrdenPedidoController extends Controller
         $nombre = $empresaSesion->NOM_EMPR;
         $combo = ['' => 'Seleccione Empresa'] + [$empresa => $nombre];
 
-        if ($usuario_solicita == 'IITR000000000482') {
+        if (in_array($usuario_solicita, ['IITR000000000482', 'ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && in_array($usuarioSesion->id, ['1CIX00000462', '1CIX00000284']))) {
             $combo = [
                 'IACHEM0000010394' => 'INDUAMERICA INTERNACIONAL S.A.C.',
                 'IACHEM0000007086' => 'INDUAMERICA COMERCIAL S.A.C.'
@@ -120,7 +120,7 @@ class GestionOrdenPedidoController extends Controller
                 $cod_centro = key($combo_sede);
                 $nom_centro = $combo_sede[$cod_centro];
             }
-        } elseif ($usuario_solicita == 'IITR000000000482') {
+        } elseif (in_array($usuario_solicita, ['IITR000000000482', 'ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && in_array($usuarioSesion->id, ['1CIX00000462', '1CIX00000284']))) {
             // Habilitar Sedes según Empresa:
             // INTERNACIONAL: CHICLAYO y LIMA
             // COMERCIAL: BELLAVISTA y RIOJA
@@ -278,6 +278,18 @@ class GestionOrdenPedidoController extends Controller
 
         $area_id = $area->area_id ?? '';
         $nomArea = $area->cadarea ?? '';
+
+        // Caso exclusivo para Vanessa Chavez Samame (1CIX00000284 / ICTR000000000220)
+        if (empty($nomArea) && (in_array($usuario_solicita, ['ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && $usuarioSesion->id == '1CIX00000284'))) {
+            $area_alt = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('situacion_id', 'PRMAECEN000000000002')
+                ->where('COD_TRAB', $usuario_solicita)
+                ->select('area_id', 'cadarea')
+                ->first();
+
+            $area_id = $area_alt->area_id ?? 'PRMAECEN000000000197';
+            $nomArea = $area_alt->cadarea ?? 'MARKETING Y DESARROLLO';
+        }
 
         $nro_pedido = $this->obtenerNumeroPedido($empresa, $cod_centro);
 

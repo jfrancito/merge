@@ -182,6 +182,9 @@
 
 <script>
     $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#table-productos-seleccionados')) {
+            $('#table-productos-seleccionados').DataTable().destroy();
+        }
         $('#table-productos-seleccionados').DataTable({
             "language": {
                 "decimal": "",
@@ -207,7 +210,8 @@
                     "sortDescending": ": activar para ordenar la columna descendente"
                 }
             },
-            "pageLength": 25,
+            "pageLength": 5000,
+            "lengthMenu": [[5000, 7500, 10000], [5000, 7500, 10000]],
             "order": [[ 1, "asc" ]]
         });
     });

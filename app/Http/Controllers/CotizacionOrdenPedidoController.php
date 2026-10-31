@@ -222,7 +222,14 @@ class CotizacionOrdenPedidoController extends Controller
             $listacotizaciones = $listacotizaciones->where('C.COD_CENTRO', $cod_centro);
         }
 
-        $listacotizaciones = $listacotizaciones->orderBy('C.ID_COTIZACION', 'DESC')->get();
+        $listacotizaciones = $listacotizaciones
+            ->orderByRaw("CASE 
+                WHEN CEN.NOM_CENTRO LIKE '%CHICLAYO%' OR C.COD_CENTRO = 'CEN0000000000001' THEN 1 
+                WHEN CEN.NOM_CENTRO LIKE '%LIMA%' OR C.COD_CENTRO = 'CEN0000000000002' THEN 2 
+                ELSE 3 
+            END ASC")
+            ->orderBy('C.ID_COTIZACION', 'DESC')
+            ->get();
 
         return view('ordenpedido.cotizacion.cotizacionordenpedido', [
             'combo_tipo_pago' => $combo_tipo_pago,

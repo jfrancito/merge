@@ -257,9 +257,14 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tabla-detalle-consolidado-ap')) {
+            $('#tabla-detalle-consolidado-ap').DataTable().destroy();
+        }
         $('#tabla-detalle-consolidado-ap').DataTable({
             scrollX: true,
             responsive: false,
+            pageLength: 5000,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             language: {
                 search: "Buscar:",
                 lengthMenu: "Mostrar _MENU_ registros",

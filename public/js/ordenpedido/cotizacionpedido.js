@@ -1654,7 +1654,7 @@ $(document).ready(function () {
         "pageLength": 20,
         "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "Todos"]],
         "dom": "ltip", // Ocultamos el buscador nativo "f" de DataTable
-        "order": [[1, "desc"]], // Ordenar descendente por ID COTIZACIÓN (columna 1)
+        "order": [[2, "asc"], [1, "desc"]], // Primero CHICLAYO (1), luego LIMA (2), y por ID descendente
         "language": {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -1676,6 +1676,36 @@ $(document).ready(function () {
                 "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
+        }
+    });
+
+    /* =======================================
+       FILTRO POR SEDE DE COTIZACIONES
+       ======================================= */
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) {
+            if (settings.nTable.id !== 'tabla_cotizaciones') {
+                return true;
+            }
+            var rowNode = tabla_cotizaciones.row(dataIndex).node();
+            var centroRow = ($(rowNode).data('centro') || '').toString().toUpperCase();
+            var abrevRow = ($(rowNode).data('abrev') || '').toString().toUpperCase();
+            var filtroSede = ($('#filtro_sede_cotizacion').val() || '').toString().toUpperCase();
+
+            if (!filtroSede || filtroSede === 'TODOS' || filtroSede === '') {
+                return true;
+            }
+
+            return (centroRow === filtroSede || abrevRow === filtroSede || centroRow.indexOf(filtroSede) !== -1);
+        }
+    );
+
+    $(document).on('change', '#filtro_sede_cotizacion', function () {
+        var filtroSede = ($(this).val() || '').toString().toUpperCase();
+        if (!filtroSede || filtroSede === 'TODOS') {
+            tabla_cotizaciones.order([[2, 'asc'], [1, 'desc']]).draw();
+        } else {
+            tabla_cotizaciones.order([[1, 'desc']]).draw();
         }
     });
 

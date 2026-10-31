@@ -3,16 +3,38 @@
         <div class="panel panel-default panel-table"
             style="border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
             <div class="panel-body">
+                @php
+                    $sedes_existentes = $listacotizaciones->pluck('NOM_CENTRO')->filter()->map(function($c) { return strtoupper(trim($c)); })->unique();
+                @endphp
                 <div class="row" style="margin-bottom: 20px;">
                     <div class="col-md-12">
-                        <div class="input-group shadow-soft"
-                            style="border-radius: 20px; overflow: hidden; max-width: 400px; margin-left: auto;">
-                            <span class="input-group-addon" style="background: #1d3a6d; color: #fff; border: none;">
-                                <i class="fa fa-search"></i>
-                            </span>
-                            <input type="text" id="buscar_cotizacion_principal" class="form-control"
-                                placeholder="Buscar por ID, proveedor o estado..."
-                                style="border: none; height: 40px; font-weight: 500;">
+                        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label for="filtro_sede_cotizacion" style="margin-bottom: 0; font-weight: bold; color: #1d3a6d; font-size: 13px;">
+                                    <i class="fa fa-map-marker"></i> SEDE:
+                                </label>
+                                <select id="filtro_sede_cotizacion" class="form-control shadow-soft"
+                                    style="width: 170px; height: 40px; border-radius: 20px; font-weight: 600; border: 1px solid #cbd5e1; padding: 6px 14px; color: #1d3a6d; background-color: #fff;">
+                                    <option value="">TODOS</option>
+                                    <option value="CHICLAYO">CHICLAYO</option>
+                                    <option value="LIMA">LIMA</option>
+                                    @foreach($sedes_existentes as $sede)
+                                        @if(!in_array($sede, ['CHICLAYO', 'LIMA']))
+                                            <option value="{{ $sede }}">{{ $sede }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="input-group shadow-soft"
+                                style="border-radius: 20px; overflow: hidden; max-width: 400px; width: 100%;">
+                                <span class="input-group-addon" style="background: #1d3a6d; color: #fff; border: none;">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input type="text" id="buscar_cotizacion_principal" class="form-control"
+                                    placeholder="Buscar por ID, proveedor o estado..."
+                                    style="border: none; height: 40px; font-weight: 500;">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -37,10 +59,21 @@
                         </thead>
                         <tbody>
                             @foreach($listacotizaciones as $index => $item)
-                                <tr style="transition: all 0.3s; border-bottom: 1px solid #f2f2f2;">
+                                @php
+                                    $prioridad_sede = 3;
+                                    $nom_centro_upper = strtoupper(trim($item->NOM_CENTRO ?? ''));
+                                    if (strpos($nom_centro_upper, 'CHICLAYO') !== false || ($item->COD_CENTRO ?? '') == 'CEN0000000000001') {
+                                        $prioridad_sede = 1;
+                                    } elseif (strpos($nom_centro_upper, 'LIMA') !== false || ($item->COD_CENTRO ?? '') == 'CEN0000000000002') {
+                                        $prioridad_sede = 2;
+                                    }
+                                @endphp
+                                <tr style="transition: all 0.3s; border-bottom: 1px solid #f2f2f2;"
+                                    data-centro="{{ strtoupper(trim($item->NOM_CENTRO ?? '')) }}"
+                                    data-abrev="{{ strtoupper(trim($item->ABREV_CENTRO ?? '')) }}">
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td class="text-center"><b style="color: #1d3a6d;">{{ $item->ID_COTIZACION }}</b></td>
-                                    <td class="text-center">
+                                    <td class="text-center" data-order="{{ $prioridad_sede }}">
                                         <span class="label label-info"
                                             style="background: #34aadc; color: #fff; font-weight: bold;">
                                             {{ $item->ABREV_CENTRO }}
