@@ -1,0 +1,1140 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Http\Request;
+use App\Traits\OrdenPedidoTraits;
+use App\Traits\EnviarCorreoOPApruebaGerenciaTraits;
+use App\Modelos\STDTrabajadorVale;
+use App\Modelos\WEBTipoMotivoValeRendir;
+use App\Modelos\WEBValeRendir;
+use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBRegistroImporteGastos;
+use App\Modelos\ALMCentro;
+use App\Modelos\STDEmpresa;
+use App\Modelos\STDTrabajador;
+
+//use Illuminate\Support\Carbon;
+use Session;
+use App\WEBRegla, APP\User, App\CMPCategoria;
+use View;
+use Validator;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\Modelos\FeDocumentoHistorial;
+
+class GestionOrdenPedidoController extends Controller
+{
+    use OrdenPedidoTraits;
+    use EnviarCorreoOPApruebaGerenciaTraits;
+
+    public function actionOrdenPedido(Request $request)
+    {
+        $usuarioSesion = Session::get('usuario');
+        $usuario_solicita = $usuarioSesion->usuarioosiris_id;
+        $usuario_id = $usuarioSesion->id ?? '';
+        $usuario_name = $usuarioSesion->name ?? '';
+
+        // Buscar si el usuario actual pertenece a users_planner_mantenimiento
+        $planner_user = DB::table('dbo.users_planner_mantenimiento')
+            ->where(function ($q) {
+                $q->where('activo', 1)->orWhereNull('activo');
+            })
+            ->where(function ($q) use ($usuario_id, $usuario_solicita, $usuario_name) {
+                if (!empty($usuario_id)) {
+                    $q->orWhere('id', $usuario_id);
+                }
+                if (!empty($usuario_solicita)) {
+                    $q->orWhere('usuarioosiris_id', $usuario_solicita);
+                }
+                if (!empty($usuario_name)) {
+                    $q->orWhere('name', $usuario_name);
+                }
+            })
+            ->first();
+
+        $es_planner_mantenimiento = $planner_user ? true : false;
+        $confirmado_por = $planner_user ? ($planner_user->nombre_jefe_man ?? '') : '';
+        $cod_trabajador_confirma = $planner_user ? ($planner_user->usuarioosiris_id_jefe ?? '') : '';
+
+        $nombre_solicita = $usuarioSesion->nombre;
+        $combo4 = ['' => 'Seleccione Empresa'] + [$usuario_solicita => $nombre_solicita];
+
+        $empresaSesion = Session::get('empresas');
+
+        $empresa = $empresaSesion->COD_EMPR;
+        $nombre = $empresaSesion->NOM_EMPR;
+        $combo = ['' => 'Seleccione Empresa'] + [$empresa => $nombre];
+
+        if (in_array($usuario_solicita, ['IITR000000000482', 'ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && in_array($usuarioSesion->id, ['1CIX00000462', '1CIX00000284']))) {
+            $combo = [
+                'IACHEM0000010394' => 'INDUAMERICA INTERNACIONAL S.A.C.',
+                'IACHEM0000007086' => 'INDUAMERICA COMERCIAL S.A.C.'
+            ];
+            if (!array_key_exists($empresa, $combo)) {
+                $empresa = 'IACHEM0000010394';
+            }
+        }
+
+        $dni = DB::table('STD.TRABAJADOR')
+            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+            ->value('NRO_DOCUMENTO');
+
+        $centro_id = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->value('centro_osiris_id');
+
+        $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $centro_id)->first();
+
+        $cod_centro = $centro ? $centro->COD_CENTRO : '';
+        $nom_centro = $centro ? $centro->NOM_CENTRO : '';
+
+        $combo_sede = [];
+        if ($usuario_solicita == 'ISTR000000000205') {
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', [$cod_centro, 'CEN0000000000006'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+        } elseif ($usuario_solicita == 'IITR000000000173') {
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', [$cod_centro, 'CEN0000000000004', 'CEN0000000000006'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+        } elseif ($usuario_solicita == 'ISTR000000000387') {
+            // Habilitar Chiclayo y Lima para Franklyn Fabian Llontop Cruz
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+        } elseif ($usuario_solicita == 'IITR000000000490' || (isset($usuarioSesion->id) && $usuarioSesion->id == '1CIX00000473')) {
+            // Habilitar Chiclayo y Lima para Lily Jannet Gonzales Tarrillo (users id: 1CIX00000473)
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+            if (!array_key_exists($cod_centro, $combo_sede)) {
+                $cod_centro = key($combo_sede);
+                $nom_centro = $combo_sede[$cod_centro];
+            }
+        } elseif (in_array($usuario_solicita, ['IITR000000000482', 'ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && in_array($usuarioSesion->id, ['1CIX00000462', '1CIX00000284']))) {
+            // Habilitar Sedes según Empresa:
+            // INTERNACIONAL: CHICLAYO y LIMA
+            // COMERCIAL: BELLAVISTA y RIOJA
+            if ($empresa == 'IACHEM0000007086') {
+                $combo_sede = DB::table('ALM.CENTRO')
+                    ->whereIn('COD_CENTRO', ['CEN0000000000006', 'CEN0000000000004'])
+                    ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                    ->toArray();
+            } else {
+                $combo_sede = DB::table('ALM.CENTRO')
+                    ->whereIn('COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002'])
+                    ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                    ->toArray();
+            }
+            if (!array_key_exists($cod_centro, $combo_sede)) {
+                $cod_centro = key($combo_sede);
+                $nom_centro = $combo_sede[$cod_centro];
+            }
+        }
+
+        $tipoOrden = DB::table('WEB.TIPO_PEDIDO_ORDEN')->where('cod_estado', 1)->pluck('TXT_TIPO_PEDIDO', 'COD_TIPO_PEDIDO')->toArray();
+        $combo2 = array('' => 'Seleccione Tipo Orden de Pedido') + $tipoOrden;
+
+        $usuarioAutoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
+            ->where(function ($query) {
+                $query->where('cadcargo', 'LIKE', '%JEFE%')
+                    ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
+                    ->orWhere('COD_TRAB', 'IITR000000000391')
+                    ->orWhere('COD_TRAB', 'ICTR000000000250')
+                    ->orWhere('COD_TRAB', 'IATR000000000097')
+                    ->orWhere('COD_TRAB', 'ICTR000000000274')
+                    ->orWhere('COD_TRAB', '1CIX00000291');
+            })
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->whereIn('empresa_osiris_id', [
+                'IACHEM0000010394',
+                'IACHEM0000007086'
+            ])
+            ->orderBy('apellidopaterno')
+            ->orderBy('apellidomaterno')
+            ->orderBy('nombres')
+            ->pluck(
+                DB::raw("
+					            LTRIM(RTRIM(
+					                ISNULL(apellidopaterno,'') + ' ' +
+					                ISNULL(apellidomaterno,'') + ' ' +
+					                ISNULL(nombres,'')
+					            ))
+					        "),
+                'COD_TRAB'
+            )
+            ->toArray();
+        $combo5 = array('' => 'Seleccione Jefe Autoriza') + $usuarioAutoriza;
+
+        $usuario_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
+            ->where('cadcargo', 'LIKE', '%GERENTE%')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->whereIn('empresa_osiris_id', [
+                'IACHEM0000010394',
+                'IACHEM0000007086'
+            ])
+            ->orderBy('apellidopaterno')
+            ->orderBy('apellidomaterno')
+            ->orderBy('nombres')
+            ->pluck(
+                DB::raw("
+							            LTRIM(RTRIM(
+							                ISNULL(apellidopaterno,'') + ' ' +
+							                ISNULL(apellidomaterno,'') + ' ' +
+							                ISNULL(nombres,'')
+							            ))
+							        "),
+                'COD_TRAB'
+            )
+            ->toArray();
+        $combo6 = array('' => 'Seleccione  Aprueba Gerente') + $usuario_aprueba_ger;
+
+        $usuario_aprueba_adm = DB::table('WEB.ListaplatrabajadoresGenereal')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->whereIn('empresa_osiris_id', [
+                'IACHEM0000010394',
+                'IACHEM0000007086'
+            ])
+            ->whereIn('cod_trab', [
+                'IITR000000000391',
+                'IATR000000000199',
+                'IATR000000000061'
+            ])
+            ->orderBy('apellidopaterno')
+            ->orderBy('apellidomaterno')
+            ->orderBy('nombres')
+            ->pluck(
+                DB::raw("
+							            LTRIM(RTRIM(
+							                ISNULL(apellidopaterno,'') + ' ' +
+							                ISNULL(apellidomaterno,'') + ' ' +
+							                ISNULL(nombres,'')
+							            ))
+							        "),
+                'COD_TRAB'
+            )
+            ->toArray();
+        $combo7 = array('' => 'Seleccione  Aprueba Administracion') + $usuario_aprueba_adm;
+        $estadosMerge = DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', 'ESTADO_MERGE')->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')->toArray();
+        $estado_merge = 'ETM0000000000001';
+
+
+        /* $periodo_anio = DB::table('Web.periodos')
+         ->select('anio')
+         ->whereIn('anio', ['2026'])
+         ->where('COD_EMPR', $empresa)
+         ->where('activo', 1)
+         ->distinct()
+         ->orderBy('anio')
+         ->pluck('anio', 'anio')
+         ->toArray();
+         $combo8 = ['' => 'Seleccione Año'] + $periodo_anio;*/
+
+        $periodo_anio = DB::table('Web.periodos')->where('activo', 1)->where('COD_EMPR', $empresa)->pluck('anio', 'anio')->toArray();
+        $combo8 = array('' => 'Seleccione Año') + $periodo_anio;
+
+
+        /*$periodo_mes = DB::table('Web.periodos')
+         ->where('anio', $periodo_anio)
+         ->where('COD_EMPR', $empresa)
+         ->where('activo', 1)
+         ->orderBy('anio')
+         ->orderByRaw("CAST(SUBSTRING(TXT_NOMBRE, 2, CHARINDEX(')', TXT_NOMBRE)-2) AS INT)")
+         ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+         ->toArray();
+         $combo9 = ['' => 'Seleccione Mes'] + $periodo_mes;*/
+
+        $periodo_mes = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $empresa)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+
+        $registrosPeriodos = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $empresa)
+            ->get(['COD_PERIODO', 'mes']);
+
+        $tipFecoOrden = '';
+
+        $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
+
+
+        $area = DB::table('WEB.ListaplatrabajadoresGenereal')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->select('area_id', 'cadarea')
+            ->first();
+
+        $area_id = $area->area_id ?? '';
+        $nomArea = $area->cadarea ?? '';
+
+        // Caso exclusivo para Vanessa Chavez Samame (1CIX00000284 / ICTR000000000220)
+        if (empty($nomArea) && (in_array($usuario_solicita, ['ICTR000000000220', 'ICTR00000220']) || (isset($usuarioSesion->id) && $usuarioSesion->id == '1CIX00000284'))) {
+            $area_alt = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('situacion_id', 'PRMAECEN000000000002')
+                ->where('COD_TRAB', $usuario_solicita)
+                ->select('area_id', 'cadarea')
+                ->first();
+
+            $area_id = $area_alt->area_id ?? 'PRMAECEN000000000197';
+            $nomArea = $area_alt->cadarea ?? 'MARKETING Y DESARROLLO';
+        }
+
+        $nro_pedido = $this->obtenerNumeroPedido($empresa, $cod_centro);
+
+
+        // DETALLE DEL PEDIDO
+
+        // $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
+        /*$producto = DB::table('ALM.PRODUCTO as PRD')
+         ->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
+         ->where('PRD.COD_ESTADO', 1)
+         ->select(
+         'PRD.COD_PRODUCTO',
+         'PRD.NOM_PRODUCTO',
+         'PRD.IND_MATERIAL_SERVICIO',
+         'CAT.COD_CATEGORIA as COD_UNIDAD',
+         'CAT.NOM_CATEGORIA as UNIDAD')
+         ->get();*/
+
+        $producto = [];
+        $registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
+            ->where('COD_ESTADO', 1)
+            ->orderBy('MONTO', 'asc')
+            ->get();
+
+
+          $listapedido = DB::connection('sqlsrv')->select("
+              SELECT TOP 200 OP.*,
+              STUFF((
+                  SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                  FROM dbo.ARCHIVOS ARCH
+                  WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                  AND ARCH.ACTIVO = 1
+                  FOR XML PATH(''), TYPE
+              ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
+              FROM WEB.ORDEN_PEDIDO OP
+              WHERE OP.ACTIVO = 1
+              AND OP.COD_TRABAJADOR_SOLICITA = ?
+              ORDER BY OP.FEC_PEDIDO DESC
+          ", [$usuario_solicita]);
+
+        // Convertir el resultado a array asociativo para mantener compatibilidad con la vista
+        $listapedido = json_decode(json_encode($listapedido), true);
+
+        // Tipo de Cambio del día para requerimientos de Servicios (CMP.TIPO_CAMBIO)
+        $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+            ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+            ->where('COD_ESTADO', 1)
+            ->first();
+
+        $es_tipo_cambio_hoy = true;
+        if (!$tipo_cambio) {
+            $es_tipo_cambio_hoy = false;
+            $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+                ->where('COD_ESTADO', 1)
+                ->orderBy('FEC_CAMBIO', 'desc')
+                ->first();
+        }
+
+        $can_tipo_cambio_venta = 0;
+        $can_tipo_cambio_compra = 0;
+        $fec_tipo_cambio = '';
+        $fec_aud_tipo_cambio = '';
+
+        if ($tipo_cambio) {
+            $can_tipo_cambio_venta = (float) $tipo_cambio->CAN_VENTA;
+            if ($can_tipo_cambio_venta > 100) {
+                $can_tipo_cambio_venta = $can_tipo_cambio_venta / 10000;
+            }
+
+            $can_tipo_cambio_compra = (float) $tipo_cambio->CAN_COMPRA;
+            if ($can_tipo_cambio_compra > 100) {
+                $can_tipo_cambio_compra = $can_tipo_cambio_compra / 10000;
+            }
+
+            $fec_tipo_cambio = date('d/m/Y', strtotime($tipo_cambio->FEC_CAMBIO));
+            $fec_aud_tipo_cambio = $tipo_cambio->FEC_USUARIO_CREA_AUD ? date('d/m/Y H:i', strtotime($tipo_cambio->FEC_USUARIO_CREA_AUD)) : '';
+        }
+
+        return view('ordenpedido.ajax.ordenpedido', [
+            'listaempresa' => $combo,
+            'empresa' => $empresa,
+            'cod_centro' => $cod_centro,
+            'nom_centro' => $nom_centro,
+            'combo_sede' => $combo_sede,
+            'listatipopedido' => $combo2,
+            'listasolicita' => $combo4,
+            'tipFecoOrden' => $tipFecoOrden,
+            'usuario_solicita' => $usuario_solicita,
+            'usuario_autoriza' => $combo5,
+            'usuario_aprueba_ger' => $combo6,
+            'usuario_aprueba_adm' => $combo7,
+            'estadosMerge' => $estadosMerge,
+            'estado_merge' => $estado_merge,
+            'periodo_mes' => $combo9,
+            'periodo_anio' => $combo8,
+            'nro_pedido' => $nro_pedido,
+            'producto' => $producto,
+            'listapedido' => $listapedido,
+            'nomArea' => $nomArea,
+            'area_id' => $area_id,
+            'registrosMonto' => $registrosMonto,
+            'registrosPeriodos' => $registrosPeriodos,
+            'tipo_cambio' => $tipo_cambio,
+            'can_tipo_cambio_venta' => $can_tipo_cambio_venta,
+            'can_tipo_cambio_compra' => $can_tipo_cambio_compra,
+            'fec_tipo_cambio' => $fec_tipo_cambio,
+            'fec_aud_tipo_cambio' => $fec_aud_tipo_cambio,
+            'es_tipo_cambio_hoy' => $es_tipo_cambio_hoy,
+            'es_planner_mantenimiento' => $es_planner_mantenimiento,
+            'confirmado_por' => $confirmado_por,
+            'cod_trabajador_confirma' => $cod_trabajador_confirma,
+            'ajax' => true,
+        ]);
+    }
+
+    /* public function obtenerMeses(Request $request)
+     {
+     $anio    = $request->anio;
+     $empresa = $request->empresa;
+     $meses = DB::table('Web.periodos')
+     ->where('anio', $anio)
+     ->where('COD_EMPR', $empresa)
+     ->where('activo', 1)
+     ->orderByRaw("CAST(SUBSTRING(TXT_NOMBRE, 2, CHARINDEX(')', TXT_NOMBRE)-2) AS INT)")
+     ->pluck('TXT_NOMBRE', 'COD_PERIODO');
+     return response()->json($meses);
+     }
+     */
+
+
+    private function obtenerNumeroPedido($cod_empr, $cod_centro)
+    {
+        $prefijo_empr = DB::table('STD.EMPRESA')
+            ->where('COD_EMPR', $cod_empr)
+            ->value('TXT_ABREVIATURA');
+
+        $prefijo_centro = DB::table('ALM.CENTRO')
+            ->where('COD_CENTRO', $cod_centro)
+            ->value('TXT_ABREVIATURA');
+
+        $prefijo = trim($prefijo_empr) . trim($prefijo_centro) . 'OP';
+
+        $ultimo = DB::table('WEB.ORDEN_PEDIDO')
+            ->where('COD_EMPR', $cod_empr)
+            ->where('COD_CENTRO', $cod_centro)
+            ->where('ID_PEDIDO', 'like', $prefijo . '%')
+            ->orderBy('ID_PEDIDO', 'desc')
+            ->value('ID_PEDIDO');
+
+        if ($ultimo) {
+            $numero = intval(substr($ultimo, -10)) + 1;
+        } else {
+            $numero = 1; // 👈 SI NO HAY REGISTROS
+        }
+
+        return $prefijo . str_pad($numero, 10, '0', STR_PAD_LEFT);
+    }
+
+
+    public function insertOrdenPedidoAction(Request $request)
+    {
+        ob_start();
+        try {
+            // Capturar valores del formulario
+            $fec_pedido = $request->input('fec_pedido');
+            $cod_periodo = $request->input('cod_periodo');
+            $cod_anio = $request->input('cod_anio');
+            $cod_empr = $request->input('cod_empr');
+            $cod_centro = $request->input('cod_centro');
+            $cod_tipo_pedido = $request->input('cod_tipo_pedido');
+            $cod_trabajador_solicita = $request->input('cod_trabajador_solicita');
+            $cod_trabajador_autoriza = $request->input('cod_trabajador_autoriza');
+            $cod_trabajador_confirma = $request->input('cod_trabajador_confirma', '');
+            $txt_trabajador_confirma = $request->input('txt_trabajador_confirma', '');
+            $cod_trabajador_aprueba_ger = $request->input('cod_trabajador_aprueba_ger');
+            $cod_trabajador_aprueba_adm = $request->input('cod_trabajador_aprueba_adm');
+            $txt_glosa = $request->input('txt_glosa');
+            $cod_estado = $request->input('cod_estado');
+            $cod_area = $request->input('cod_area');
+            $orden_pedido_id = $request->input('orden_pedido_id');
+            $opcion = $request->input('opcion');
+            //$array_detalle = $request->input('array_detalle');
+
+            $array_detalle = json_decode($request->input('array_detalle'), true) ?? [];
+
+            $archivos_info = []; // Almacenar info de cada archivo para insertar después
+
+            if ($request->hasFile('select_file')) {
+
+                $archivos = $request->file('select_file');
+
+                // Soportar tanto un archivo como múltiples
+                if (!is_array($archivos)) {
+                    $archivos = [$archivos];
+                }
+
+                foreach ($archivos as $archivo) {
+                    $nombre_original = $archivo->getClientOriginalName();
+                    $extension_item = $archivo->getClientOriginalExtension();
+                    $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+                    $size_item = $archivo->getSize();
+                    $mime_item = $archivo->getMimeType();
+                    $nombre_guardado = time() . '_' . $nombre_original;
+
+                    $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+                    $ruta_item = $destino_remoto . '\\' . $nombre_guardado;
+
+                    if (!copy($archivo->getRealPath(), $ruta_item)) {
+                        throw new \Symfony\Component\HttpFoundation\File\Exception\FileException(
+                            "No se pudo escribir en el directorio de red: " . $destino_remoto
+                        );
+                    }
+
+                    $archivos_info[] = [
+                        'nombre_original'     => $nombre_original,
+                        'nombre_sin_extension'=> $nombre_sin_extension,
+                        'extension'           => $extension_item,
+                        'size'                => $size_item,
+                        'mime'                => $mime_item,
+                        'ruta'                => $ruta_item,
+                    ];
+                }
+            }
+
+            // =======================
+            // Procesar nombres y textos relacionados
+            // =======================
+            $registro_periodo = DB::table('Web.periodos')
+                ->where('COD_PERIODO', $cod_periodo)
+                ->first();
+            $txt_nombre = $registro_periodo->TXT_NOMBRE ?? '';
+
+            $registro_tipo_pedido = DB::table('WEB.TIPO_PEDIDO_ORDEN')
+                ->where('COD_TIPO_PEDIDO', $cod_tipo_pedido)
+                ->first();
+            $txt_tipo_pedido = $registro_tipo_pedido->TXT_TIPO_PEDIDO ?? '';
+
+            $registro_solicita = DB::table('dbo.users')
+                ->where('usuarioosiris_id', $cod_trabajador_solicita)
+                ->first();
+            $txt_trabajador_solicita = $registro_solicita->nombre ?? '';
+
+            $registro_autoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_autoriza)
+                ->first();
+            $txt_trabajador_autoriza = $registro_autoriza ? trim(
+                ($registro_autoriza->nombres ?? '') . ' ' .
+                ($registro_autoriza->apellidopaterno ?? '') . ' ' .
+                ($registro_autoriza->apellidomaterno ?? '')
+            ) : '';
+
+            $registro_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_aprueba_ger)
+                ->first();
+            $txt_trabajador_aprueba_ger = $registro_aprueba_ger ? trim(
+                ($registro_aprueba_ger->nombres ?? '') . ' ' .
+                ($registro_aprueba_ger->apellidopaterno ?? '') . ' ' .
+                ($registro_aprueba_ger->apellidomaterno ?? '')
+            ) : '';
+
+            $registro_aprueba_adm = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('COD_TRAB', $cod_trabajador_aprueba_adm)
+                ->first();
+            $txt_trabajador_aprueba_adm = $registro_aprueba_adm ? trim(
+                ($registro_aprueba_adm->nombres ?? '') . ' ' .
+                ($registro_aprueba_adm->apellidopaterno ?? '') . ' ' .
+                ($registro_aprueba_adm->apellidomaterno ?? '')
+            ) : '';
+
+            $registro_estado = DB::table('CMP.CATEGORIA')
+                ->where('COD_CATEGORIA', $cod_estado)
+                ->first();
+            $txt_estado = $registro_estado->NOM_CATEGORIA ?? '';
+
+            $registro_area = DB::table('WEB.ListaplatrabajadoresGenereal')
+                ->where('area_id', $cod_area)
+                ->first();
+            $txt_area = $registro_area->cadarea ?? '';
+
+            // =======================
+            // Determinar acción: Insertar o Actualizar
+            // =======================
+            $accion = ($opcion === 'U') ? 'U' : 'I';
+
+            // Insertar cabecera
+            $orden_pedido_id =
+                $this->insertOrdenPedido(
+                    $accion,
+                    $orden_pedido_id,
+                    $fec_pedido,
+                    $cod_periodo,
+                    $txt_nombre,
+                    $cod_anio,
+                    $cod_empr,
+                    $cod_centro,
+                    $cod_tipo_pedido,
+                    $txt_tipo_pedido,
+                    $cod_trabajador_solicita,
+                    $txt_trabajador_solicita,
+                    $cod_trabajador_autoriza,
+                    $txt_trabajador_autoriza,
+                    $cod_trabajador_aprueba_ger,
+                    $txt_trabajador_aprueba_ger,
+                    $cod_trabajador_aprueba_adm,
+                    $txt_trabajador_aprueba_adm,
+                    $txt_glosa,
+                    $cod_estado,
+                    $txt_estado,
+                    $cod_area,
+                    $txt_area,
+                    true,
+                    "",
+                    $cod_trabajador_confirma,
+                    $txt_trabajador_confirma
+                );
+
+            // determine if update, deactivate existing details
+            if ($accion === 'U') {
+                $productosEnviados = collect($array_detalle)->pluck('cod_producto')->toArray();
+
+                // 1. Desactivar unicamente los productos que fueron eliminados en la edicion
+                DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                    ->where('ID_PEDIDO', $orden_pedido_id)
+                    ->whereNotIn('COD_PRODUCTO', $productosEnviados)
+                    ->update([
+                        'ACTIVO' => 0,
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                        'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+                // 2. Sincronizar los productos enviados (actualizar los existentes y registrar los nuevos)
+                if (_count($array_detalle) > 0) {
+                    foreach ($array_detalle as $item) {
+                        $productoExistente = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                            ->where('ID_PEDIDO', $orden_pedido_id)
+                            ->where('COD_PRODUCTO', $item['cod_producto'])
+                            ->first();
+
+                        if ($productoExistente) {
+                            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                ->where('ID_PEDIDO', $orden_pedido_id)
+                                ->where('COD_PRODUCTO', $item['cod_producto'])
+                                ->update([
+                                    'NOM_PRODUCTO' => $item['nom_producto'],
+                                    'COD_CATEGORIA' => $item['cod_categoria'] ?? '',
+                                    'NOM_CATEGORIA' => $item['nom_categoria'] ?? '',
+                                    'CANTIDAD' => $item['cantidad'],
+                                    'CAN_PRECIO' => $item['precio'],
+                                    'TXT_OBSERVACION' => $item['txt_observacion'] ?? '',
+                                    'IND_MATERIAL_SERVICIO' => $item['ind_material_servicio'] ?? ($item['nom_categoria'] === 'SERVICIO' ? 'S' : 'M'),
+                                    'ACTIVO' => 1,
+                                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                                ]);
+                        } else {
+                            $this->insertOrdenPedidoDetalle(
+                                'I',
+                                $orden_pedido_id,
+                                $cod_empr,
+                                $cod_centro,
+                                $item['cod_producto'],
+                                $item['nom_producto'],
+                                $item['cod_categoria'] ?? '',
+                                $item['nom_categoria'] ?? '',
+                                $item['cantidad'],
+                                $item['precio'],
+                                $item['txt_observacion'] ?? '',
+                                true,
+                                ""
+                            );
+
+                            if (isset($item['ind_material_servicio'])) {
+                                DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                    ->where('ID_PEDIDO', $orden_pedido_id)
+                                    ->where('COD_PRODUCTO', $item['cod_producto'])
+                                    ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Insercion limpia inicial (Accion 'I')
+                if (_count($array_detalle) > 0) {
+                    foreach ($array_detalle as $item) {
+                        $this->insertOrdenPedidoDetalle(
+                            'I',
+                            $orden_pedido_id,
+                            $cod_empr,
+                            $cod_centro,
+                            $item['cod_producto'],
+                            $item['nom_producto'],
+                            $item['cod_categoria'] ?? '',
+                            $item['nom_categoria'] ?? '',
+                            $item['cantidad'],
+                            $item['precio'],
+                            $item['txt_observacion'] ?? '',
+                            true,
+                            ""
+                        );
+
+                        if (isset($item['ind_material_servicio'])) {
+                            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                                ->where('ID_PEDIDO', $orden_pedido_id)
+                                ->where('COD_PRODUCTO', $item['cod_producto'])
+                                ->update(['IND_MATERIAL_SERVICIO' => $item['ind_material_servicio']]);
+                        }
+                    }
+                }
+            }
+
+            if (_count($archivos_info) > 0) {
+                if ($accion === 'U') {
+                    DB::table('dbo.ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $orden_pedido_id)
+                        ->update(['ACTIVO' => 0]);
+                }
+
+                foreach ($archivos_info as $idx => $info) {
+                    DB::table('dbo.ARCHIVOS')->insert([
+                        'ID_DOCUMENTO'       => $orden_pedido_id ?? '',
+                        'DOCUMENTO_ITEM'     => $idx + 1,
+                        'TIPO_ARCHIVO'       => $info['mime'],
+                        'NOMBRE_ARCHIVO'     => $info['nombre_sin_extension'],
+                        'DESCRIPCION_ARCHIVO'=> $info['nombre_original'],
+                        'URL_ARCHIVO'        => $info['ruta'],
+                        'EXTENSION'          => $info['extension'],
+                        'SIZE'               => $info['size'],
+                        'ACTIVO'             => 1,
+                        'FECHA_CREA'         => DB::raw('GETDATE()'),
+                        'USUARIO_CREA'       => Session::get('usuario')->usuario ?? 'SISTEMA',
+                    ]);
+                }
+            }
+
+            $this->replicateOrdenPedidoToZona($orden_pedido_id);
+
+            if ($accion === 'I') {
+                $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $orden_pedido_id;
+                $documento->DOCUMENTO_ITEM = 1;
+                
+                $fecha_crea = !empty($pedido_db->FEC_USUARIO_CREA_AUD) ? $pedido_db->FEC_USUARIO_CREA_AUD : date('Y-m-d H:i:s');
+                $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_crea));
+                
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'PEDIDO GENERADO POR USUARIO';
+                $documento->MENSAJE = '';
+                $documento->save();
+            }
+
+            ob_clean();
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al registrar orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function actionDetallePedido(Request $request)
+    {
+        $id_buscar = $request->input('orden_pedido_id');
+        $es_resumen = $request->input('es_resumen', 0);
+
+        $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
+        
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+            ->where('D.ID_PEDIDO', $id_buscar)
+            ->where('D.ACTIVO', 1)
+            ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
+            ->get();
+
+        $historial = DB::table('FE_DOCUMENTO_HISTORIAL')
+            ->where('ID_DOCUMENTO', $id_buscar)
+            ->orderBy('FECHA', 'asc')
+            ->get();
+
+        $tiene_consolidado = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA', $id_buscar)
+            ->exists();
+
+        return view('ordenpedido.ajax.detalletabpedido', [
+            'ajax' => true,
+            'pedido' => $pedido,
+            'pedillodetalle' => $pedillodetalle,
+            'historial' => $historial,
+            'tiene_consolidado' => $tiene_consolidado,
+            'es_resumen' => (bool)$es_resumen
+        ]);
+    }
+
+
+    public function insertEmitirOrdenPedido(Request $request)
+    {
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
+
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+
+            if (!$pedido) {
+                ob_clean();
+                return response()->json(['success' => false, 'mensaje' => 'No se encontró el pedido.'], 404);
+            }
+
+            // Verificar si el usuario que solicita está configurado en users_planner_mantenimiento
+            $es_planner = DB::table('dbo.users_planner_mantenimiento')
+                ->where('usuarioosiris_id', $pedido->COD_TRABAJADOR_SOLICITA)
+                ->where(function ($q) {
+                    $q->where('activo', 1)->orWhereNull('activo');
+                })
+                ->exists();
+
+            if (!$es_planner && !empty($pedido->COD_TRABAJADOR_AUTORIZA_MAN)) {
+                $es_planner = true;
+            }
+
+            // Si es usuario planner mantenimiento, el primer proceso es pasar a ETM0000000000019 (POR APROBAR JEFE MANTENIMIENTO)
+            // Caso contrario, el flujo estándar pasa a ETM0000000000010 (POR APROBAR AUTORIZACION)
+            $cod_estado_destino = $es_planner ? 'ETM0000000000019' : 'ETM0000000000010';
+
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('COD_CATEGORIA', $cod_estado_destino)
+                ->first();
+
+            $this->insertOrdenPedido(
+                'U',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                "",
+                $pedido->COD_TRABAJADOR_AUTORIZA_MAN ?? '',
+                $pedido->TXT_TRABAJADOR_AUTORIZA_MAN ?? ''
+            );
+
+            if (!$es_planner) {
+                $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+            }
+
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'PEDIDO EMITIDO POR USUARIO';
+            $documento->MENSAJE = '';
+            $documento->save();
+
+            ob_clean();
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al emitir orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
+    }
+
+    public function actionAjaxPedidoEditar(Request $request)
+    {
+        try {
+            $id_pedido = $request->input('id_pedido');
+
+            // 1. Cabecera del pedido
+            $header = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $id_pedido)
+                ->first();
+
+            if (!$header) {
+                return response()->json(['success' => false, 'mensaje' => 'No se encontró el pedido.'], 404);
+            }
+
+            // Formatear fecha para el input date (AAAA-MM-DD)
+            if ($header->FEC_PEDIDO) {
+                $header->FEC_PEDIDO = date('Y-m-d', strtotime($header->FEC_PEDIDO));
+            }
+
+            // 2. Detalle del pedido (productos registrados)
+            $details = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+                ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+                ->where('D.ID_PEDIDO', $header->ID_PEDIDO)
+                ->where('D.ACTIVO', 1)
+                ->select('D.*', 'P.IND_MATERIAL_SERVICIO')
+                ->get();
+
+            // 3. Precios actualizados desde el SP solicitado
+            $empresa = $header->COD_EMPR;
+            $productos_precios = DB::select("EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?", [$empresa]);
+
+            // Mapear precios por producto para inyectar al detalle
+            $precios_map = [];
+            foreach ($productos_precios as $p) {
+                $precios_map[$p->COD_PRODUCTO] = $p->PRECIO;
+            }
+
+            // Inyectar el precio actualizado en cada item del detalle
+            foreach ($details as $d) {
+                if ($d->IND_MATERIAL_SERVICIO === 'S') {
+                    // Para servicios usamos el precio guardado en el detalle
+                    $d->PRECIO = $d->CAN_PRECIO;
+                } else {
+                    // Para materiales intentamos obtener el precio actual del catálogo
+                    $d->PRECIO = isset($precios_map[$d->COD_PRODUCTO]) ? $precios_map[$d->COD_PRODUCTO] : $d->CAN_PRECIO;
+                }
+            }
+
+            // 4. Buscar si ya existe un archivo subido para este pedido
+            $archivo = DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_pedido)
+                ->where('ACTIVO', 1)
+                ->select('ID_DOCUMENTO', 'URL_ARCHIVO', 'NOMBRE_ARCHIVO', 'DESCRIPCION_ARCHIVO')
+                ->first();
+
+            return response()->json([
+                'success' => true,
+                'pedido' => $header,
+                'detalle' => $details,
+                'archivo' => $archivo
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error en actionAjaxPedidoEditar: " . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function insertAnularOrdenPedido(Request $request)
+    {
+        ob_start();
+        try {
+            $id_buscar = $request->input('orden_pedido_id');
+            $orden_pedido_id = $request->input('orden_pedido_id');
+
+            $pedido = DB::table('WEB.ORDEN_PEDIDO')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->first();
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('NOM_CATEGORIA', 'ANULADO')
+                ->first();
+
+
+            $this->insertOrdenPedido(
+                'D',
+                $id_buscar,
+                $pedido->FEC_PEDIDO,
+                $pedido->COD_PERIODO,
+                $pedido->TXT_NOMBRE,
+                $pedido->COD_ANIO,
+                $pedido->COD_EMPR,
+                $pedido->COD_CENTRO,
+                $pedido->COD_TIPO_PEDIDO,
+                $pedido->TXT_TIPO_PEDIDO,
+                $pedido->COD_TRABAJADOR_SOLICITA,
+                $pedido->TXT_TRABAJADOR_SOLICITA,
+                $pedido->COD_TRABAJADOR_AUTORIZA,
+                $pedido->TXT_TRABAJADOR_AUTORIZA,
+                $pedido->COD_TRABAJADOR_APRUEBA_GER,
+                $pedido->TXT_TRABAJADOR_APRUEBA_GER,
+                $pedido->COD_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_TRABAJADOR_APRUEBA_ADM,
+                $pedido->TXT_GLOSA,
+                $estado->COD_CATEGORIA,
+                $estado->NOM_CATEGORIA,
+                $pedido->COD_AREA,
+                $pedido->TXT_AREA,
+                true,
+                ""
+            );
+
+            DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                ->where('ID_PEDIDO', $orden_pedido_id)
+                ->update([
+                    'ACTIVO' => 0
+                ]);
+
+            $this->replicateOrdenPedidoToZona($orden_pedido_id);
+
+            $pedido_db = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $orden_pedido_id)->first();
+            $documento = new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO = $orden_pedido_id;
+            $documento->DOCUMENTO_ITEM = 1;
+            
+            $fecha_modif = !empty($pedido_db->FEC_USUARIO_MODIF_AUD) ? $pedido_db->FEC_USUARIO_MODIF_AUD : date('Y-m-d H:i:s');
+            $documento->FECHA = date('Y-m-d\TH:i:s', strtotime($fecha_modif));
+            
+            $documento->USUARIO_ID = Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+            $documento->TIPO = 'ANULACIÓN DEL PEDIDO';
+            $documento->MENSAJE = '';
+            $documento->save();
+
+            ob_clean();
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            ob_clean();
+            \Log::error('Error al anular orden de pedido: ' . $e->getMessage());
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        }
+    }
+
+    public function actionAjaxObtenerCorrelativoPedido(Request $request)
+    {
+        $cod_empr = $request->input('cod_empr');
+        $cod_centro = $request->input('cod_centro');
+        $nro_pedido = $this->obtenerNumeroPedido($cod_empr, $cod_centro);
+        return response()->json($nro_pedido);
+    }
+
+    public function actionAjaxBuscarProducto(Request $request)
+    {
+        $term = $request->input('term');
+        $tipo = $request->input('tipo'); // 'M' o 'S' (Material o Servicio)
+        $empresa = $request->input('cod_empr') ? $request->input('cod_empr') : (Session::has('empresas') ? Session::get('empresas')->COD_EMPR : '');
+
+        $productos_raw = DB::select(
+            "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
+            [$empresa]
+        );
+
+        $productos = collect($productos_raw)->filter(function ($item) use ($tipo, $term) {
+            // Filtrar por tipo
+            if ($tipo && $item->IND_MATERIAL_SERVICIO !== $tipo) {
+                return false;
+            }
+            // Filtrar por término
+            if ($term) {
+                $term_lower = strtolower(trim($term));
+                $nom_lower = strtolower($item->NOM_PRODUCTO);
+                $cod_lower = strtolower($item->COD_PRODUCTO);
+                return (strpos($nom_lower, $term_lower) !== false) || (strpos($cod_lower, $term_lower) !== false);
+            }
+            return true;
+        })->map(function ($item) {
+            return [
+                'id' => $item->COD_PRODUCTO,
+                'text' => $item->COD_PRODUCTO . ' - ' . $item->NOM_PRODUCTO,
+                'NOM_PRODUCTO' => $item->NOM_PRODUCTO,
+                'UNIDAD' => $item->UNIDAD,
+                'COD_UNIDAD' => $item->COD_UNIDAD,
+                'PRECIO' => $item->PRECIO,
+                'IND_MATERIAL_SERVICIO' => $item->IND_MATERIAL_SERVICIO
+            ];
+        })->values();
+
+        return response()->json($productos);
+    }
+
+    public function actionBuscarProductoCompra(Request $request)
+    {
+        return $this->actionAjaxBuscarProducto($request);
+    }
+
+    public function actionAjaxVerificarAlmacenProducto(Request $request)
+    {
+        $cod_producto = $request->input('cod_producto');
+        $cod_centro = $request->input('cod_centro');
+        $cod_empr = $request->input('cod_empr');
+
+        // Obtener columnas de ALM.ALMACEN y ALM.CENTRO para determinar el campo de empresa dinámicamente
+        $schema = DB::connection('sqlsrv')->getSchemaBuilder();
+        $cols_almacen = $schema->getColumnListing('ALM.ALMACEN');
+        $cols_centro = $schema->getColumnListing('ALM.CENTRO');
+
+        $query = DB::connection('sqlsrv')->table('ALM.REFERENCIA_ALMACEN as RA')
+            ->join('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'RA.COD_TABLA_ASOC')
+            ->join('ALM.ALMACEN as AL', 'AL.COD_ALMACEN', '=', 'RA.COD_ALMACEN')
+            ->join('ALM.CENTRO as CE', 'CE.COD_CENTRO', '=', 'AL.COD_CENTRO')
+            ->where('RA.TXT_TABLA_ASOC', 'ALM.PRODUCTO')
+            ->where('RA.COD_TABLA_ASOC', $cod_producto)
+            ->where('CE.COD_CENTRO', $cod_centro)
+            ->where('RA.COD_ESTADO', 1);
+
+        if (in_array('COD_EMPR', $cols_almacen)) {
+            $query->where('AL.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_almacen)) {
+            $query->where('AL.COD_EMPRESA', $cod_empr);
+        }
+
+        if (in_array('COD_EMPR', $cols_centro)) {
+            $query->where('CE.COD_EMPR', $cod_empr);
+        } elseif (in_array('COD_EMPRESA', $cols_centro)) {
+            $query->where('CE.COD_EMPRESA', $cod_empr);
+        }
+
+        $existe = $query->exists();
+
+        return response()->json([
+            'success' => true,
+            'tiene_almacen' => $existe
+        ]);
+    }
+
+    public function actionAjaxObtenerPeriodosEmpresa(Request $request)
+    {
+        $cod_empr = $request->input('cod_empr') ? $request->input('cod_empr') : (Session::has('empresas') ? Session::get('empresas')->COD_EMPR : '');
+        $periodo_mes = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+        $registrosPeriodos = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->get(['COD_PERIODO', 'mes']);
+
+        return response()->json([
+            'periodo_mes' => $periodo_mes,
+            'registrosPeriodos' => $registrosPeriodos
+        ]);
+    }
+}

@@ -1,0 +1,82 @@
+/* base container */
+/*.map-container {
+  max-width: 100px;
+  margin: 18px auto;
+  padding: 12px;
+}*/
+
+/* header */
+/*.map-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom: 12px;
+}
+*/
+/*.vehicle-title { display:flex; flex-direction:column; }
+.map-actions .btn { margin-left:6px; }
+*/
+/* tire map area */
+/*.tire-map {
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  border-radius:18px;
+  padding:20px;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.06);
+  position:relative;
+  overflow:hidden;
+}*/
+
+/* legend */
+/*.map-legend { display:flex; gap:16px; margin-top:12px; align-items:center; }
+.legend-item { display:flex; gap:6px; align-items:center; color:#5b6673; font-size:13px; }
+.dot { width:14px; height:14px; border-radius:6px; display:inline-block; }
+.dot.ok { background:#2ecc71; }
+.dot.warn { background:#f1c40f; }
+.dot.fail { background:#e74c3c; }*/
+
+/* inspector panel */
+/*.inspector-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 100px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow: 0 12px 30px rgba(2,6,23,0.12);
+  padding:12px;
+  z-index:9999;
+}
+.inspector-header { display:flex; justify-content:space-between; align-items:center; }
+.inspector-body { padding-top:8px; }*/
+
+/* SVG tire node style via classes */
+/*.tire-node { cursor:pointer; transition: transform .12s ease, opacity .12s; }
+.tire-node:hover { transform: scale(1.02); }*/
+
+/* state classes */
+/*.tire-state-none { stroke:#d1d5db; fill:#f8fafc; }
+.tire-state-ok { stroke:#2ecc71; fill:#2ecc71; fill-opacity:.12; }
+.tire-state-warn { stroke:#f1c40f; fill:#f1c40f; fill-opacity:.12; }
+.tire-state-fail { stroke:#e74c3c; fill:#e74c3c; fill-opacity:.12; }*/
+
+/* small responsive tweaks */
+/*@media (max-width: 768px) {
+  .map-container { padding: 8px; }
+  .inspector-panel { width: 92%; left: 4%; right: 4%; bottom: 12px; }
+  .map-header { flex-direction:column; align-items:flex-start; gap:8px; }
+}*/
+
+/* control look */
+/*.btn-gradient {
+  background: linear-gradient(90deg,#0da3ff,#21d4fd);
+  color: white;
+  padding:8px 14px;
+  border-radius:10px;
+  border: none;
+}
+*/
+/*#inspector-below {
+    min-height: 180px;
+}
+*/

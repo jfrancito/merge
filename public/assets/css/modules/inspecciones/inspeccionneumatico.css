@@ -1,0 +1,263 @@
+
+/*tarjetas de inspección*/
+/*badges de estado*/
+/*botones especiales*/
+/*layout de neumáticos*/
+/*cards reutilizables*/
+
+/* TITULO */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 15px;
+}
+
+/* LISTADO */
+.unit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+}
+
+.unit-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 15px;
+    border-left: 6px solid #3498db;
+    transition: 0.2s ease;
+}
+
+.unit-card:hover {
+    transform: scale(1.01);
+}
+
+.unit-card-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.unit-info {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* ACCIONES */
+.unit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-inspeccionar,
+.btn-ver {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.btn-inspeccionar { background: #27ae60; }
+.btn-ver { background: #2980b9; }
+
+.btn-inspeccionar:hover,
+.btn-ver:hover {
+    opacity: 0.85;
+}
+
+/* COLORES POR ESTADO */
+.terminada { background-color: #ffffff; }
+.confirmada { background-color: #abdb9f; }
+.en\ proceso { background-color: #FFF085; }
+
+
+/* --- Contenedor general responsive --- */
+.inspeccion-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    margin: 20px auto;
+    width: 100%;
+    max-width: 450px; /* Móvil default */
+}
+
+/* --- Texto título --- */
+.inspeccion-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* --- Información --- */
+.info-label {
+    font-weight: 600;
+    color: #333;
+    margin-top: 10px;
+}
+
+.info-value {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+/* --- Inputs Trezo --- */
+.inspeccion-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    margin-bottom: 12px;
+    font-size: 15px;
+    transition: all .2s;
+}
+
+.inspeccion-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 4px rgba(13, 110, 253, 0.3);
+    outline: none;
+}
+
+/* --- Botón --- */
+.btn-inspeccion {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-inspeccion:hover {
+    background: #0b5ed7;
+}
+
+/* --- Nota debajo --- */
+.inspeccion-note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+}
+
+
+
+
+
+/* ----------------------------------------------------------
+   RESPONSIVE DESIGN - Crear Inspeccion - Inicio
+----------------------------------------------------------- */
+
+/* CARD GENERAL */
+.inspeccion-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--bs-box-shadow);
+    border: 1px solid #e4e6ef;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+/* TÍTULO */
+.inspeccion-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* CAMPOS */
+.inspeccion-form label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #3f4254;
+}
+
+.inspeccion-form input,
+.inspeccion-form select,
+.inspeccion-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+}
+
+/* BOTÓN */
+.btn-inspeccion {
+    background: #0095e8;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 12px;
+    transition: 0.2s;
+}
+
+.btn-inspeccion:hover {
+    background: #007ac2;
+}
+
+/* RESPONSIVE */
+
+/* MOVIL – ya está bien por defecto */
+@media (max-width: 480px) {
+    .inspeccion-card {
+        padding: 16px;
+    }
+}
+
+/* TABLET */
+@media (min-width: 481px) and (max-width: 991px) {
+    .inspeccion-card {
+        max-width: 720px;
+        padding: 24px;
+    }
+
+    .inspeccion-title {
+        font-size: 1.4rem;
+    }
+}
+
+/* WEB / ESCRITORIO */
+@media (min-width: 992px) {
+    .inspeccion-card {
+        max-width: 800px;
+        padding: 30px;
+    }
+
+    .inspeccion-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* Observación ocupa dos columnas */
+    .campo-observacion {
+        grid-column: span 2;
+    }
+}
+
+
+
+
+/* ----------------------------------------------------------
+   RESPONSIVE DESIGN - Crear Inspeccion - Fin
+----------------------------------------------------------- */

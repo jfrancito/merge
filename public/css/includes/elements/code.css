@@ -1,0 +1,119 @@
+/*------------------------------------------------------------------
+  [Code]
+*/
+/* Pretty printing styles. Used with prettify.js. */
+.prettyprint {
+  font-size: 12px;
+  line-height: 1.5;
+}
+/* Light Theme*/
+pre {
+  color: #555555;
+}
+pre .pln {
+  color: #777777;
+}
+pre .str {
+  color: #DD1144;
+}
+pre .kwd {
+  color: #445588;
+}
+pre .com {
+  color: #b8b6b1;
+}
+pre .typ {
+  color: #008080;
+}
+pre .lit {
+  color: #DD1144;
+}
+pre .pun,
+pre .opn,
+pre .clo {
+  color: #949494;
+}
+pre .tag {
+  color: #4285F4;
+}
+pre .atn {
+  color: #ef6e62;
+}
+pre .atv {
+  color: #697ce8;
+}
+pre .dec,
+pre .var {
+  color: #DD1144;
+}
+pre .fun {
+  color: #445588;
+}
+/*Dark Theme*/
+pre.be-code-dark {
+  background-color: #4d4342;
+  color: #FFFFFF;
+}
+pre.be-code-dark .pln {
+  color: #ffffff;
+}
+pre.be-code-dark .str {
+  color: #b5db99;
+}
+pre.be-code-dark .kwd {
+  color: #e9c865;
+}
+pre.be-code-dark .com {
+  color: #c3b8b7;
+}
+pre.be-code-dark .typ {
+  color: #FF9787;
+}
+pre.be-code-dark .lit {
+  color: #b5db99;
+}
+pre.be-code-dark .pun,
+pre.be-code-dark .opn,
+pre.be-code-dark .clo {
+  color: #ffffff;
+}
+pre.be-code-dark .tag {
+  color: #e9c865;
+}
+pre.be-code-dark .atn {
+  color: #FF9787;
+}
+pre.be-code-dark .atv {
+  color: #b5db99;
+}
+pre.be-code-dark .dec,
+pre.be-code-dark .var {
+  color: #b5db99;
+}
+pre.be-code-dark .fun {
+  color: #e9c865;
+}
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+/* IE indents via margin-left */
+li.L0,
+li.L1,
+li.L2,
+li.L3,
+li.L5,
+li.L6,
+li.L7,
+li.L8 {
+  list-style-type: none;
+}
+/* Alternate shading for lines */
+li.L1,
+li.L3,
+li.L5,
+li.L7,
+li.L9 {
+  background: #eeeeee;
+}

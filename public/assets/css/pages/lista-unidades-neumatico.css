@@ -1,0 +1,164 @@
+    /* =========================================================
+       1. CARD PRINCIPAL
+    ========================================================= */
+    .card-neu {
+        border-radius: 15px;
+        padding: 22px;
+        background: #fff;
+        border: none;
+        box-shadow: 0 3px 18px rgba(0,0,0,.07);
+    }
+
+    /* =========================================================
+       2. BUSCADOR
+    ========================================================= */
+    .lista-resultados {
+        margin-top: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .item-resultado {
+        padding: 14px 16px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #000000;              /* TEXTO NEGRO */
+        background-color: #ffffff;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .item-resultado:last-child {
+        border-bottom: none;
+    }
+
+    /* feedback táctil móvil */
+    .item-resultado:active {
+        background-color: #f1f1f1;
+    }
+
+
+    /* =========================================================
+       3. CARD VEHÍCULO SELECCIONADO (BASE)
+    ========================================================= */
+    .info-vehiculo {
+        border-radius: 14px;
+    }
+
+    /* =========================================================
+       4. ESTADOS SEGÚN INSPECCIÓN
+    ========================================================= */
+
+    /* SIN INSPECCIÓN */
+    .info-vehiculo.verde {
+        background: #1F9D3A;
+        color: #ffffff;
+    }
+
+    .info-vehiculo.verde strong,
+    .info-vehiculo.verde span,
+    .info-vehiculo.verde h5 {
+        color: #ffffff;
+    }
+
+    /* CON INSPECCIÓN */
+    .info-vehiculo.amarillo {
+        background: #ffc107;
+        color: #000000;
+    }
+
+    .info-vehiculo.amarillo strong,
+    .info-vehiculo.amarillo span,
+    .info-vehiculo.amarillo h5 {
+        color: #000000;
+    }
+
+    /* =========================================================
+       5. FILAS DE INFORMACIÓN
+    ========================================================= */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        font-size: 1.05rem;
+        border-bottom: 1px solid rgba(255,255,255,.25);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    /* Estado inspección */
+    .estado-inspeccion {
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    /* Amarillo → letras negras */
+    .info-vehiculo.amarillo .estado-inspeccion {
+        color: #000;
+    }
+
+    /* Verde → letras blancas (por si se reutiliza) */
+    .info-vehiculo.verde .estado-inspeccion {
+        color: #fff;
+    }
+
+    /* =========================================================
+       6. BOTONES (NO MODIFICADOS)
+    ========================================================= */
+    .action-buttons {
+        display: grid;
+        gap: 14px;
+    }
+
+    .action-btn {
+        width: 100%;
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-weight: 600;
+    }
+
+    .btn-atras {
+        background-color: #3A4252;
+        color: #ffffff;
+        border: 2px solid #3A4252;
+        font-weight: 600;
+    }
+
+    /* ANULAR hover, active, focus */
+    .btn-atras:hover,
+    .btn-atras:active,
+    .btn-atras:focus,
+    .btn-atras:focus-visible {
+        background-color: #3A4252 !important;
+        color: #ffffff !important;
+        border-color: #3A4252 !important;
+        box-shadow: none !important;
+    }
+
+    /* =========================================================
+       7. SELECT
+    ========================================================= */
+    .select-elegante {
+        height: 46px;
+        font-size: 1rem;
+        border-radius: .375rem;
+    }
+
+    /* =========================================================
+       8. RESPONSIVE
+    ========================================================= */
+    @media (min-width: 768px) {
+        .action-buttons {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .action-buttons {
+            max-width: 700px;
+            margin: auto;
+        }
+    }

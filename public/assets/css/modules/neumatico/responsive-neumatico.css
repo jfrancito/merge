@@ -1,0 +1,49 @@
+/* ===== CARD ===== */
+/*.neumatico-card {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}*/
+
+/* ===== TEXTO ===== */
+/*.neumatico-detalle {
+    font-size: 15px;
+}*/
+
+/* ===== BOTONES DESKTOP ===== */
+/*.neumatico-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}*/
+
+/* ===== TABLET ===== */
+/*@media (max-width: 992px) {
+    .neumatico-buttons {
+        justify-content: center;
+    }
+}
+*/
+/* ===== MÓVIL ===== */
+/*@media (max-width: 768px) {
+
+    .neumatico-card {
+        padding: 16px 14px !important;
+    }
+
+    .neumatico-buttons {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .neumatico-buttons .btn {
+        width: 100%;
+        max-width: 260px;
+    }
+
+    .neumatico-detalle {
+        text-align: center;
+        font-size: 14px;
+    }
+}
+*/

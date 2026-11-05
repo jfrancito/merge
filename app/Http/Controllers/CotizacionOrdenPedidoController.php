@@ -1,0 +1,1981 @@
+<?php
+
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Http\Request;
+use App\Traits\OrdenPedidoCotizacionTraits;
+use App\Modelos\ALMCentro;
+use App\Modelos\STDEmpresa;
+use App\Modelos\STDTrabajador;
+use Illuminate\Support\Carbon;
+use Session;
+use App\WEBRegla, APP\User, App\CMPCategoria;
+use View;
+use Validator;
+
+
+class CotizacionOrdenPedidoController extends Controller
+{
+    use OrdenPedidoCotizacionTraits;
+
+    public function actionCotizacionOrdenPedido($idopcion)
+    {
+        $combo_tipo_pago = DB::table('CMP.CATEGORIA')
+            ->where('TXT_GRUPO', 'TIPO_PAGO')
+            ->where('COD_ESTADO', 1)
+            ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
+            ->toArray();
+        $combo_tipo_pago = ['' => 'Seleccione tipo de pago'] + $combo_tipo_pago;
+
+        $combo_moneda = DB::table('CMP.CATEGORIA')
+            ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
+            ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
+            ->toArray();
+        $combo_moneda = ['' => 'Seleccione moneda'] + $combo_moneda;
+
+        // Calcular correlativo siguiendo la lógica del SP
+        $empresa_sesion = Session::get('empresas');
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+
+        // Obtener el centro del trabajador (equivalente a lo que hace el sistema en otros módulos)
+        $centro = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->where('C.COD_ESTADO', 1)
+            ->select('C.COD_CENTRO', 'C.TXT_ABREVIATURA as ABREV_CENTRO')
+            ->first();
+
+        $abrev_empresa = trim($empresa_sesion->TXT_ABREVIATURA);
+        $abrev_centro = $centro ? trim($centro->ABREV_CENTRO) : '';
+        $prefijo = $abrev_empresa . $abrev_centro . 'COT';
+
+        $max_id = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', 'LIKE', $prefijo . '%')
+            ->max('ID_COTIZACION');
+
+        if ($max_id) {
+            $number = (int) substr($max_id, strlen($prefijo));
+            $new_number = $number + 1;
+            // Asumiendo longitud total de 16 caracteres como en el ejemplo IICOT00000000001
+            $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        } else {
+            $nro_cotizacion = $prefijo . str_pad(1, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        }
+
+        // Obtener tipo de cambio actual (específico para la fecha de hoy, usando la lógica nativa SQL Server)
+        $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+            ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+            ->where('COD_ESTADO', 1)
+            ->first();
+
+        $valor_tipo_cambio = 0;
+        if ($tipo_cambio) {
+            $valor_tipo_cambio = $tipo_cambio->CAN_COMPRA;
+            // Normalizar si el ERP lo guarda escalado por 10000 (ej: 34480.0000 -> 3.4480)
+            if ($valor_tipo_cambio > 100) {
+                $valor_tipo_cambio = $valor_tipo_cambio / 10000;
+            }
+        }
+
+        $cod_centro = $centro ? $centro->COD_CENTRO : '';
+
+        // Anular automáticamente cotizaciones aprobadas con más de 7 días de antigüedad
+        // siempre y cuando NO esté referenciada a una ORDEN DE COMPRA
+        $cotizaciones_a_anular = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('COD_ESTADO', 'ETM0000000000005') // APROBADO
+            ->where('ACTIVO', 1)
+            ->whereRaw('DATEDIFF(day, FEC_USUARIO_CREA_AUD, GETDATE()) >= 7')
+            ->whereRaw("ID_COTIZACION NOT IN (
+                SELECT RA.COD_TABLA 
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN CMP.ORDEN O ON O.COD_ORDEN = RA.COD_TABLA_ASOC
+                WHERE RA.TXT_TABLA = 'WEB.ORDEN_COTIZACION' 
+                AND RA.TXT_TABLA_ASOC = 'CMP.ORDEN'
+                AND O.COD_CATEGORIA_ESTADO_ORDEN NOT IN ('EOR0000000000005', 'EOR0000000000017')
+            )")
+            ->pluck('ID_COTIZACION')
+            ->toArray();
+
+        if (!empty($cotizaciones_a_anular)) {
+            foreach ($cotizaciones_a_anular as $id_cot) {
+                // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+                $cot_temp = DB::table('WEB.ORDEN_COTIZACION')
+                    ->where('ID_COTIZACION', $id_cot)
+                    ->first();
+
+                if ($cot_temp) {
+                    $cod_centro_temp = trim($cot_temp->COD_CENTRO);
+                    $conexionbd_temp = 'sqlsrv';
+                    if ($cod_centro_temp == 'CEN0000000000004') {
+                        $conexionbd_temp = 'sqlsrv_r';
+                    } else {
+                        if ($cod_centro_temp == 'CEN0000000000006') {
+                            $conexionbd_temp = 'sqlsrv_b';
+                        }
+                    }
+
+                    // 1. Actualizar Cabecera a ANULADO
+                    DB::table('WEB.ORDEN_COTIZACION')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->update([
+                            'COD_ESTADO' => 'ETM0000000000014',
+                            'TXT_ESTADO' => 'ANULADO',
+                            'TXT_GLOSA_ANULACION' => 'pasaron los 7 días de vigencia',
+                            'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                            'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                        ]);
+
+                    // 2. Desactivar Detalles
+                    DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->update(['ACTIVO' => 0]);
+
+                    // Réplica de cabecera y detalle a zonas
+                    if ($conexionbd_temp !== 'sqlsrv') {
+                        try {
+                            DB::connection($conexionbd_temp)->table('WEB.ORDEN_COTIZACION')
+                                ->where('ID_COTIZACION', $id_cot)
+                                ->update([
+                                    'COD_ESTADO' => 'ETM0000000000014',
+                                    'TXT_ESTADO' => 'ANULADO',
+                                    'TXT_GLOSA_ANULACION' => 'pasaron los 7 días de vigencia',
+                                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                                ]);
+
+                            DB::connection($conexionbd_temp)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                                ->where('ID_COTIZACION', $id_cot)
+                                ->update(['ACTIVO' => 0]);
+                        } catch (\Exception $ez) {
+                            \Log::error('Error al replicar anulación automática de cotización a zona (' . $conexionbd_temp . '): ' . $ez->getMessage());
+                        }
+                    }
+
+                    // 3. Desactivar Archivos
+                    DB::table('dbo.ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $id_cot)
+                        ->update(['ACTIVO' => 0]);
+
+                    // Obtener referencias asociadas para limpiar consolidado
+                    $referencias_temp = DB::table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA_ASOC', $id_cot)
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                        ->get();
+
+                    // 4. Eliminar referencias
+                    DB::table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA_ASOC', $id_cot)
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                        ->delete();
+
+                    // Réplica de eliminación REFERENCIA_ASOC en zonas
+                    if ($conexionbd_temp !== 'sqlsrv') {
+                        try {
+                            DB::connection($conexionbd_temp)->table('CMP.REFERENCIA_ASOC')
+                                ->where('COD_TABLA_ASOC', $id_cot)
+                                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                                ->delete();
+                        } catch (\Exception $ez) {
+                            \Log::error('Error al replicar eliminación de CMP.REFERENCIA_ASOC a zona (' . $conexionbd_temp . '): ' . $ez->getMessage());
+                        }
+                    }
+
+                    // 5. Restaurar TXT_COTIZACION en Consolidados
+                    $detalles_temp = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->where('ID_COTIZACION', $id_cot)
+                        ->get();
+
+                    foreach ($detalles_temp as $det_temp) {
+                        foreach ($referencias_temp as $ref_temp) {
+                            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $ref_temp->COD_TABLA)
+                                ->where('COD_PRODUCTO', $det_temp->COD_PRODUCTO)
+                                ->update(['TXT_COTIZACION' => null]);
+                        }
+                    }
+
+                    // Réplica general de la cotización
+                    $this->replicateCotizacionToZona($id_cot);
+                }
+            }
+        }
+
+        $listacotizaciones = DB::table('WEB.ORDEN_COTIZACION as C')
+            ->leftJoin('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
+            ->select('C.*', 'CEN.NOM_CENTRO', 'CEN.TXT_ABREVIATURA as ABREV_CENTRO', DB::raw("(SELECT STUFF((
+                SELECT '|' + A.URL_ARCHIVO + '*' + ISNULL(A.NOMBRE_ARCHIVO, 'Archivo')
+                FROM dbo.ARCHIVOS A
+                WHERE A.ID_DOCUMENTO = C.ID_COTIZACION
+                AND A.ACTIVO = 1
+                FOR XML PATH('')
+            ), 1, 1, '')) as RUTAS_ARCHIVOS"))
+            ->where('C.COD_EMPR', isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : ''))
+            ->where('C.ACTIVO', 1);
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        if ($usuario_actual_id == '1CIX00000422') {
+            $listacotizaciones = $listacotizaciones->whereIn('C.COD_CENTRO', ['CEN0000000000001', 'CEN0000000000002']);
+        } else if ($cod_centro != '') {
+            $listacotizaciones = $listacotizaciones->where('C.COD_CENTRO', $cod_centro);
+        }
+
+        $listacotizaciones = $listacotizaciones
+            ->orderByRaw("CASE 
+                WHEN CEN.NOM_CENTRO LIKE '%CHICLAYO%' OR C.COD_CENTRO = 'CEN0000000000001' THEN 1 
+                WHEN CEN.NOM_CENTRO LIKE '%LIMA%' OR C.COD_CENTRO = 'CEN0000000000002' THEN 2 
+                ELSE 3 
+            END ASC")
+            ->orderBy('C.ID_COTIZACION', 'DESC')
+            ->get();
+
+        return view('ordenpedido.cotizacion.cotizacionordenpedido', [
+            'combo_tipo_pago' => $combo_tipo_pago,
+            'combo_moneda' => $combo_moneda,
+            'nro_cotizacion' => $nro_cotizacion,
+            'valor_tipo_cambio' => $valor_tipo_cambio,
+            'listacotizaciones' => $listacotizaciones,
+            'cod_centro' => $cod_centro,
+            'funcion' => $this,
+            'idopcion' => $idopcion
+        ]);
+    }
+
+    public function actionAjaxListarDetalleCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+        $es_aprobacion = $request->input('es_aprobacion', false);
+
+        $cotizacion = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        $lista_detalle = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        // Agrupar por COD_PRODUCTO para evitar duplicados en la vista de detalle
+        $grouped_lista = [];
+        foreach ($lista_detalle as $d) {
+            $key = trim($d->COD_PRODUCTO);
+            $cant_actual = (float) $d->CANTIDAD;
+            if (!isset($grouped_lista[$key])) {
+                $grouped_lista[$key] = $d;
+                $grouped_lista[$key]->CANTIDAD = $cant_actual;
+            } else {
+                $grouped_lista[$key]->CANTIDAD += $cant_actual;
+            }
+        }
+        $lista_detalle = collect(array_values($grouped_lista));
+
+        $archivos = DB::table('dbo.ARCHIVOS')
+            ->where('ID_DOCUMENTO', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        $es_servicio = false;
+        $primer_detalle = $lista_detalle->first();
+        if ($primer_detalle) {
+            $prod = DB::table('ALM.PRODUCTO')
+                ->where('COD_PRODUCTO', trim($primer_detalle->COD_PRODUCTO))
+                ->first();
+            if ($prod && isset($prod->IND_MATERIAL_SERVICIO) && trim($prod->IND_MATERIAL_SERVICIO) == 'S') {
+                $es_servicio = true;
+            }
+        }
+
+        return view('ordenpedido.cotizacion.ajax.detalletabcotizacion', [
+            'cotizacion' => $cotizacion,
+            'lista_detalle' => $lista_detalle,
+            'archivos' => $archivos,
+            'es_servicio' => $es_servicio,
+            'es_aprobacion' => $es_aprobacion
+        ]);
+    }
+
+    public function actionAjaxEditarCotizacion(Request $request)
+    {
+        $id_cotizacion = trim($request->input('id_cotizacion'));
+
+        $cotizacion = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        if (!$cotizacion) {
+            return response()->json(['success' => false, 'message' => 'Cotización ' . $id_cotizacion . ' no encontrada.']);
+        }
+
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $centro_usuario = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->where('C.COD_ESTADO', 1)
+            ->select('C.NOM_CENTRO')
+            ->first();
+
+        $nom_centro_usuario = $centro_usuario ? trim($centro_usuario->NOM_CENTRO) : '---';
+
+        // Limpiar espacios en blanco de las propiedades (SQL Server char sometimes pads)
+        $cot_data = [];
+        foreach ((array) $cotizacion as $key => $value) {
+            $cot_data[trim($key)] = is_string($value) ? trim($value) : $value;
+        }
+
+        // Obtener detalles recuperando solo los consolidados que corresponden a cada producto específico
+        $detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE as D')
+            ->select(
+                'D.*',
+                DB::raw("(SELECT TOP 1 DP.CAN_PRECIO_UNIT_IGV 
+                          FROM CMP.ORDEN OC 
+                          INNER JOIN CMP.DETALLE_PRODUCTO DP ON OC.COD_ORDEN = DP.COD_TABLA 
+                          INNER JOIN CMP.CATEGORIA CA ON OC.COD_CATEGORIA_TIPO_ORDEN = CA.COD_CATEGORIA AND CA.TXT_GLOSA = 'COMPRAS' 
+                          WHERE OC.COD_ESTADO = 1 
+                          AND DP.COD_ESTADO = 1 
+                          AND DP.COD_PRODUCTO = D.COD_PRODUCTO 
+                          ORDER BY OC.FEC_ORDEN DESC) as PRECIO_COMPRA_ANTERIOR")
+            )
+            ->where('D.ID_COTIZACION', $id_cotizacion)
+            ->where('D.ACTIVO', 1)
+            ->get();
+
+        // DETERMINAR SI LA COTIZACIÓN ES DE SERVICIO
+        $es_servicio = false;
+        $primer_detalle = $detalles->first();
+        if ($primer_detalle) {
+            $prod = DB::table('ALM.PRODUCTO')
+                ->where('COD_PRODUCTO', $primer_detalle->COD_PRODUCTO)
+                ->first();
+            if ($prod && isset($prod->IND_MATERIAL_SERVICIO) && $prod->IND_MATERIAL_SERVICIO == 'S') {
+                $es_servicio = true;
+            }
+        }
+
+        // Obtener los IDs de consolidados/pedidos asociados a esta cotización en REFERENCIA_ASOC
+        $ref_ids = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA_ASOC', $id_cotizacion)
+            ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+            ->pluck('COD_TABLA')
+            ->toArray();
+
+        $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+        $cod_centro_cot = $cotizacion ? trim($cotizacion->COD_CENTRO) : null;
+        if ($es_servicio) {
+            $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion, $cod_centro_cot);
+        } else {
+            $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion, $cod_centro_cot);
+        }
+
+        // Enriquecer y agrupar detalles en PHP
+        $grouped = [];
+        foreach ($detalles as $d) {
+            $cod_producto = trim($d->COD_PRODUCTO);
+            $cant_actual = (float) $d->CANTIDAD;
+
+            if (!isset($grouped[$cod_producto])) {
+                $grouped[$cod_producto] = $d;
+                $grouped[$cod_producto]->CANTIDAD = $cant_actual;
+                $grouped[$cod_producto]->ID_CONSOLIDADOS_LISTA = $ref_ids;
+
+                // Calcular Saldo Pendiente del producto sobre todos los consolidados/pedidos referenciados
+                $saldo_disponible = 0;
+                $breakdown = [];
+
+                foreach ($ref_ids as $ref_id) {
+                    $saldo_ref = isset($saldos[$cod_producto][trim($ref_id)]) ? $saldos[$cod_producto][trim($ref_id)] : 0;
+                    $saldo_disponible += $saldo_ref;
+                    if ($saldo_ref > 0) {
+                        $breakdown[] = ['id' => trim($ref_id), 'cant' => $saldo_ref];
+                    }
+                }
+
+                // Si por alguna razón el desglose queda vacío, ponemos uno por defecto
+                if (_count($breakdown) == 0 && _count($ref_ids) > 0) {
+                    $breakdown[] = ['id' => trim($ref_ids[0]), 'cant' => 0.0];
+                }
+
+                $grouped[$cod_producto]->SALDO_PENDIENTE = $saldo_disponible;
+                $grouped[$cod_producto]->BREAKDOWN = $breakdown;
+            } else {
+                $grouped[$cod_producto]->CANTIDAD += $cant_actual;
+            }
+        }
+
+        foreach ($grouped as $item) {
+            $item->ID_PEDIDO_CONSOLIDADO = implode(' - ', array_unique(array_map('trim', $item->ID_CONSOLIDADOS_LISTA)));
+        }
+
+        $detalles = collect(array_values($grouped));
+
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
+        $productos_html = view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
+            'lista_detalle' => $detalles,
+            'es_edicion' => true,
+            'es_servicio' => $es_servicio,
+            'lista_centro_costo' => $lista_centro_costo
+        ])->render();
+
+        $archivos = DB::table('dbo.ARCHIVOS')
+            ->where('ID_DOCUMENTO', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'cotizacion' => $cot_data, // Enviamos el array limpio
+            'productos_html' => $productos_html,
+            'archivos' => $archivos,
+            'es_servicio' => $es_servicio
+        ]);
+    }
+
+    public function actionAjaxBuscarProveedorRuc(Request $request)
+    {
+        $ruc = trim($request->input('ruc'));
+
+        // 1. Intentar buscar por RUC exacto
+        $empresa = DB::table('STD.EMPRESA')
+            ->where('NRO_DOCUMENTO', $ruc)
+            ->where('IND_PROVEEDOR', 1)
+            ->where('COD_ESTADO', 1)
+            ->first();
+
+        // 2. Si no se encuentra, intentar buscar por Nombre de la Empresa (coincidencia parcial)
+        if (!$empresa) {
+            $empresa = DB::table('STD.EMPRESA')
+                ->where('NOM_EMPR', 'like', '%' . $ruc . '%')
+                ->where('IND_PROVEEDOR', 1)
+                ->where('COD_ESTADO', 1)
+                ->first();
+        }
+
+        if ($empresa) {
+            $direccion = DB::table('STD.EMPRESA_DIRECCION')
+                ->where('COD_EMPR', $empresa->COD_EMPR)
+                ->where('IND_DIRECCION_FISCAL', 1)
+                ->where('COD_ESTADO', 1)
+                ->first();
+
+            return response()->json([
+                'success' => true,
+                'nombre' => trim($empresa->NOM_EMPR),
+                'telefono' => trim($empresa->TXT_TELEFONO),
+                'direccion' => $direccion ? trim($direccion->NOM_DIRECCION) : '',
+                'ruc' => trim($empresa->NRO_DOCUMENTO)
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Proveedor no encontrado']);
+    }
+
+    public function actionAjaxObtenerCorrelativoCotizacion(Request $request)
+    {
+        $cod_centro = $request->input('cod_centro');
+        $empresa_sesion = Session::get('empresas');
+
+        $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro)->first();
+        $abrev_empresa = trim($empresa_sesion->TXT_ABREVIATURA ?? '');
+        $abrev_centro = $centro ? trim($centro->TXT_ABREVIATURA) : '';
+        $prefijo = $abrev_empresa . $abrev_centro . 'COT';
+
+        $max_id = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', 'LIKE', $prefijo . '%')
+            ->max('ID_COTIZACION');
+
+        if ($max_id) {
+            $number = (int) substr($max_id, strlen($prefijo));
+            $new_number = $number + 1;
+            $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        } else {
+            $nro_cotizacion = $prefijo . str_pad(1, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
+        }
+
+        return response()->json([
+            'success' => true,
+            'nro_cotizacion' => $nro_cotizacion,
+            'prefijo' => $prefijo
+        ]);
+    }
+
+    public function actionAjaxGetCorrelativoSinCotizacion(Request $request)
+    {
+        $serie = 'C001';
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
+        if ($usuario_actual_id == '1CIX00000422' && !empty($request->input('cod_centro'))) {
+            $cod_centro = trim($request->input('cod_centro'));
+        } else {
+            // Obtener el centro del trabajador
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->select('P.centro_osiris_id')
+                ->first();
+
+            $cod_centro = $centro ? $centro->centro_osiris_id : '';
+        }
+
+        // Obtener el máximo número para la serie 0001 y tipo SIN COTIZACION filtrado por Empresa y Centro
+        $ultimo = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('COD_EMPR', $cod_empr)
+            ->where('COD_CENTRO', $cod_centro)
+            ->where('NRO_SERIE', $serie)
+            ->where('TXT_TIPO_COTIZACION', 'SIN COTIZACION')
+            ->select(DB::raw('MAX(CAST(ISNULL(NULLIF(NRO_DOC, \'\'), \'0\') AS INT)) as max_nro'))
+            ->first();
+
+        $nuevo_nro = ($ultimo && $ultimo->max_nro) ? $ultimo->max_nro + 1 : 1;
+        $numero = str_pad($nuevo_nro, 8, '0', STR_PAD_LEFT);
+
+        return response()->json([
+            'success' => true,
+            'serie' => $serie,
+            'numero' => $numero
+        ]);
+    }
+
+    public function actionAjaxListarConsolidadoGeneralAprobado(Request $request)
+    {
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_req)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
+
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
+
+        $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
+            ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
+            ->select(
+                'C.*',
+                'CEN.NOM_CENTRO',
+                DB::raw("(SELECT STUFF((
+                    SELECT ' - ' + OP.ID_PEDIDO
+                    FROM CMP.REFERENCIA_ASOC RA
+                    INNER JOIN WEB.ORDEN_PEDIDO OP ON OP.ID_PEDIDO = RA.COD_TABLA
+                    WHERE RA.COD_TABLA_ASOC = C.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    FOR XML PATH('')
+                ), 1, 3, '')) as ID_PEDIDOS"),
+                DB::raw("(SELECT TOP 1 D.NOM_CATEGORIA_FAMILIA 
+                          FROM WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE D 
+                          WHERE D.ID_PEDIDO_CONSOLIDADO = C.ID_PEDIDO_CONSOLIDADO) as NOM_CATEGORIA_FAMILIA")
+            )
+            ->where('C.COD_EMPR', $cod_empr)
+            ->where('C.COD_ESTADO', 'ETM0000000000005') // APROBADO
+            ->where('C.ACTIVO', 1)
+            ->orderBy('C.ID_PEDIDO_CONSOLIDADO', 'DESC')
+            ->get();
+
+        // Calcular saldos pendientes usando FIFO en PHP
+        $saldos = $this->obtenerSaldosPendientesConsolidados(null, $id_cotizacion_edit, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
+
+        $lista_consolidado = $lista_consolidado->filter(function ($item) use ($saldos, $nom_centro_usuario) {
+            $detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO', $item->ID_PEDIDO_CONSOLIDADO)
+                ->where('ACTIVO', 1)
+                ->where('IND_COMPRA', '=', $nom_centro_usuario)
+                ->get();
+
+            foreach ($detalles as $det) {
+                $cod_prod = trim($det->COD_PRODUCTO);
+                $id_cons = trim($item->ID_PEDIDO_CONSOLIDADO);
+                $saldo = isset($saldos[$cod_prod][$id_cons]) ? $saldos[$cod_prod][$id_cons] : 0;
+                if ($saldo > 0) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return view('ordenpedido.modal.ajax.lista_consolidado_general', [
+            'lista_consolidado' => $lista_consolidado
+        ]);
+    }
+
+    public function actionAjaxListarPedidosAprobadosServicio(Request $request)
+    {
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $cod_centro_usuario = trim($cod_centro_req);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
+                ->first();
+
+            $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+        }
+
+        $lista_pedidos = DB::table('WEB.ORDEN_PEDIDO as O')
+            ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'O.COD_CENTRO')
+            ->select('O.*', 'CEN.NOM_CENTRO')
+            ->where('O.COD_EMPR', $cod_empr)
+            ->where('O.COD_CENTRO', $cod_centro_usuario)
+            ->where('O.COD_ESTADO', 'ETM0000000000005') // APROBADO
+            ->where('O.ACTIVO', 1)
+            ->orderBy('O.FEC_PEDIDO', 'DESC')
+            ->get();
+
+        // Calcular saldos pendientes de servicio usando FIFO
+        $saldos = $this->obtenerSaldosPendientesPedidos(null, $id_cotizacion_edit, $cod_centro_usuario);
+
+        $lista_pedidos = $lista_pedidos->filter(function ($item) use ($saldos) {
+            $detalles = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                ->where('ID_PEDIDO', $item->ID_PEDIDO)
+                ->where('ACTIVO', 1)
+                ->where('IND_MATERIAL_SERVICIO', '=', 'S')
+                ->get();
+
+            foreach ($detalles as $det) {
+                $cod_prod = trim($det->COD_PRODUCTO);
+                $id_ped = trim($item->ID_PEDIDO);
+                $saldo = isset($saldos[$cod_prod][$id_ped]) ? $saldos[$cod_prod][$id_ped] : 0;
+                if ($saldo > 0) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return view('ordenpedido.modal.ajax.lista_pedidos_servicios', [
+            'lista_pedidos' => $lista_pedidos
+        ]);
+    }
+
+    public function actionAjaxListarDetalleConsolidadoGeneralSeleccionado(Request $request)
+    {
+        $id_consolidado_individales = $request->input('selected_ids');
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_req)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
+
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
+
+        $detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->select(
+                'D.*',
+                DB::raw("(SELECT TOP 1 DP.CAN_PRECIO_UNIT_IGV 
+                          FROM CMP.ORDEN OC 
+                          INNER JOIN CMP.DETALLE_PRODUCTO DP ON OC.COD_ORDEN = DP.COD_TABLA 
+                          INNER JOIN CMP.CATEGORIA CA ON OC.COD_CATEGORIA_TIPO_ORDEN = CA.COD_CATEGORIA AND CA.TXT_GLOSA = 'COMPRAS' 
+                          WHERE OC.COD_ESTADO = 1 
+                          AND DP.COD_ESTADO = 1 
+                          AND DP.COD_PRODUCTO = D.COD_PRODUCTO 
+                          ORDER BY OC.FEC_ORDEN DESC) as PRECIO_COMPRA_ANTERIOR")
+            )
+            ->whereIn('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado_individales)
+            ->where('D.ACTIVO', 1)
+            ->where('D.IND_COMPRA', '=', $nom_centro_usuario)
+            ->get();
+
+        $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, $id_cotizacion_edit, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
+
+        // Agrupar por COD_PRODUCTO
+        $grouped = [];
+        foreach ($detalles as $d) {
+            $key = trim($d->COD_PRODUCTO);
+            $id_cons = trim($d->ID_PEDIDO_CONSOLIDADO);
+            $saldo_real = isset($saldos[$key][$id_cons]) ? $saldos[$key][$id_cons] : 0;
+
+            if ($saldo_real <= 0)
+                continue;
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = $d;
+                $grouped[$key]->ID_CONSOLIDADOS_LISTA = [$id_cons];
+                $grouped[$key]->BREAKDOWN = [
+                    ['id' => $id_cons, 'cant' => $saldo_real]
+                ];
+                // Asegurar que SALDO_PENDIENTE exista para la vista
+                $grouped[$key]->SALDO_PENDIENTE = $saldo_real;
+            } else {
+                $grouped[$key]->SALDO_PENDIENTE += $saldo_real;
+                $grouped[$key]->ID_CONSOLIDADOS_LISTA[] = $id_cons;
+                $grouped[$key]->BREAKDOWN[] = ['id' => $id_cons, 'cant' => $saldo_real];
+            }
+        }
+
+        foreach ($grouped as $item) {
+            $item->ID_PEDIDO_CONSOLIDADO = implode(' - ', array_unique(array_map('trim', $item->ID_CONSOLIDADOS_LISTA)));
+        }
+
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
+        return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
+            'lista_detalle' => array_values($grouped),
+            'lista_centro_costo' => $lista_centro_costo
+        ]);
+    }
+
+    public function actionAjaxListarDetallePedidosAprobadosSeleccionados(Request $request)
+    {
+        $id_pedidos = $request->input('selected_ids');
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+        $cod_centro_param = ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) ? $cod_centro_req : null;
+
+        $detalles = DB::table('WEB.ORDEN_PEDIDO_DETALLE as D')
+            ->join('WEB.ORDEN_PEDIDO as OP', 'OP.ID_PEDIDO', '=', 'D.ID_PEDIDO')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'D.COD_PRODUCTO')
+            ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
+            ->select(
+                'D.*',
+                'CAT.COD_CATEGORIA as COD_CATEGORIA_FAMILIA',
+                'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
+                'D.COD_CATEGORIA as COD_CATEGORIA_MEDIDA',
+                'D.NOM_CATEGORIA as NOM_CATEGORIA_MEDIDA',
+                'D.ID_PEDIDO as ID_PEDIDO_CONSOLIDADO',
+                DB::raw("(SELECT TOP 1 DP.CAN_PRECIO_UNIT_IGV 
+                          FROM CMP.ORDEN OC 
+                          INNER JOIN CMP.DETALLE_PRODUCTO DP ON OC.COD_ORDEN = DP.COD_TABLA 
+                          INNER JOIN CMP.CATEGORIA CA ON OC.COD_CATEGORIA_TIPO_ORDEN = CA.COD_CATEGORIA AND CA.TXT_GLOSA = 'COMPRAS' 
+                          WHERE OC.COD_ESTADO = 1 
+                          AND DP.COD_ESTADO = 1 
+                          AND DP.COD_PRODUCTO = D.COD_PRODUCTO 
+                          ORDER BY OC.FEC_ORDEN DESC) as PRECIO_COMPRA_ANTERIOR")
+            )
+            ->whereIn('D.ID_PEDIDO', $id_pedidos)
+            ->where('D.IND_MATERIAL_SERVICIO', '=', 'S')
+            ->where('D.ACTIVO', 1)
+            ->get();
+
+        $codigos_productos = $detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+        $saldos = $this->obtenerSaldosPendientesPedidos($codigos_productos, $id_cotizacion_edit, $cod_centro_param);
+
+        $detalles = $detalles->map(function ($d) use ($saldos) {
+            $cod_prod = trim($d->COD_PRODUCTO);
+            $id_ped = trim($d->ID_PEDIDO_CONSOLIDADO);
+            $d->SALDO_PENDIENTE = isset($saldos[$cod_prod][$id_ped]) ? $saldos[$cod_prod][$id_ped] : 0;
+            return $d;
+        })->filter(function ($d) {
+            return $d->SALDO_PENDIENTE > 0;
+        });
+
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = isset($empresa_sesion->COD_EMPR) ? $empresa_sesion->COD_EMPR : (isset($empresa_sesion->COD_EMR) ? $empresa_sesion->COD_EMR : '');
+        $lista_centro_costo = DB::connection('sqlsrv')->table('CON.CENTRO_COSTO')
+            ->where('COD_ESTADO', 1)
+            ->where('IND_MOVIMIENTO', 1)
+            ->where('COD_EMPR', $cod_empr)
+            ->select('COD_CENTRO_COSTO', 'TXT_NOMBRE')
+            ->get();
+
+        return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
+            'lista_detalle' => $detalles->values(),
+            'es_servicio' => true,
+            'lista_centro_costo' => $lista_centro_costo
+        ]);
+    }
+    public function actionGuardarCotizacion(Request $request)
+    {
+        try {
+            $usuario_id = Session::get('usuario')->usuarioosiris_id;
+
+            $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+            if ($usuario_actual_id == '1CIX00000422' && !empty($request->input('cod_centro'))) {
+                $cod_centro = trim($request->input('cod_centro'));
+            } else {
+                // 1. Obtener el centro actual del usuario
+                $centro = DB::table('STD.TRABAJADOR as T')
+                    ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                    ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                    ->where('T.COD_TRAB', $usuario_id)
+                    ->where('P.situacion_id', 'PRMAECEN000000000002')
+                    ->where('C.COD_ESTADO', 1)
+                    ->select('C.COD_CENTRO')
+                    ->first();
+
+                $cod_centro = $centro ? trim($centro->COD_CENTRO) : '';
+            }
+
+            // Determinar la conexión de réplica según el centro
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+
+            // Validar conexión a la zona si corresponde
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->getPdo();
+                } catch (\Exception $ex_conn) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). Por favor, intente más tarde.'
+                    ]);
+                }
+            }
+
+            DB::beginTransaction();
+
+            $empresa_sesion = Session::get('empresas');
+
+            // 2. Obtener el código de la empresa proveedora (desde el RUC)
+            $empresa_proveedor = DB::table('STD.EMPRESA')
+                ->where('NRO_DOCUMENTO', $request->input('nro_ruc'))
+                ->where('COD_ESTADO', 1)
+                ->first();
+
+            $cod_empr_proveedor = $empresa_proveedor ? $empresa_proveedor->COD_EMPR : '';
+
+            // 3. Obtener el código de la dirección (preferiblemente fiscal)
+            $direccion = DB::table('STD.EMPRESA_DIRECCION')
+                ->where('COD_EMPR', $cod_empr_proveedor)
+                ->where('IND_DIRECCION_FISCAL', 1)
+                ->where('COD_ESTADO', 1)
+                ->first();
+
+            $cod_direccion = $direccion ? $direccion->COD_DIRECCION : '';
+
+            $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+            $accion = 'I';
+            $id_cotizacion = '';
+
+            if (!empty($id_cotizacion_edit)) {
+                $accion = 'U';
+                $id_cotizacion = $id_cotizacion_edit;
+            }
+
+            // 4. Inserción/Actualización de cabecera usando el Trait
+            $id_cotizacion = $this->insertOrdenCotizacion(
+                $accion,
+                $id_cotizacion,
+                $request->input('fec_cotizacion'),
+                $request->input('nro_serie'),
+                $request->input('nro_doc'),
+                '',
+                $cod_centro,
+                $request->input('nro_ruc'),
+                $cod_empr_proveedor,
+                $request->input('nom_empr_proveedor'),
+                $request->input('txt_telefono'),
+                $cod_direccion,
+                $request->input('nom_direccion'),
+                $request->input('fec_validez'),
+                $request->input('fec_entrega'),
+                $request->input('cod_categoria_moneda'),
+                $request->input('txt_categoria_moneda'),
+                $request->input('cod_categoria_tipo_pago'),
+                $request->input('txt_categoria_tipo_pago'),
+                $request->input('txt_observacion'),
+                $request->input('can_total'),
+                $request->input('ind_igv'), // @IND_IGV
+                'ETM0000000000001',
+                'GENERADO',
+                1,
+                ''
+            );
+
+            // --- Conexión para réplica en Zonas ---
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } else {
+                if ($cod_centro == 'CEN0000000000006') {
+                    $conexionbd = 'sqlsrv_b';
+                }
+            }
+
+            // 4.1 Guardar el tipo de cotización (CON/SIN)
+            DB::table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update(['TXT_TIPO_COTIZACION' => $request->input('txt_tipo_cotizacion')]);
+
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION')
+                        ->where('ID_COTIZACION', $id_cotizacion)
+                        ->update(['TXT_TIPO_COTIZACION' => $request->input('txt_tipo_cotizacion')]);
+                } catch (\Exception $ez) {
+                    Log::error('Error al replicar actualización tipo cotización a zona (' . $conexionbd . '): ' . $ez->getMessage());
+                }
+            }
+
+            // 5. Inserción / Actualización de detalles
+            $productos_existentes = [];
+            if ($accion == 'U') {
+                // 1. Obtener detalles previos para resetear su estado en consolidados (DEBE HACERSE ANTES DE ELIMINAR REFERENCIAS)
+                $detalles_previos = DB::table('WEB.ORDEN_COTIZACION_DETALLE as CD')
+                    ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
+                    ->where('CD.ID_COTIZACION', $id_cotizacion)
+                    ->where('CD.ACTIVO', 1)
+                    ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+                    ->select('CD.COD_PRODUCTO', 'RA.COD_TABLA as ID_PEDIDO_CONSOLIDADO_GENERAL')
+                    ->get();
+
+                // 2. Eliminar referencias anteriores en CMP.REFERENCIA_ASOC
+                DB::table('CMP.REFERENCIA_ASOC')
+                    ->where('COD_TABLA_ASOC', $id_cotizacion)
+                    ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                    ->delete();
+
+                foreach ($detalles_previos as $dp) {
+                    DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $dp->ID_PEDIDO_CONSOLIDADO_GENERAL)
+                        ->where('COD_PRODUCTO', $dp->COD_PRODUCTO)
+                        ->update(['TXT_COTIZACION' => null]);
+                }
+
+                // 3. Obtener códigos de producto actualmente registrados para esta cotización
+                $productos_existentes = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->pluck('COD_PRODUCTO')
+                    ->map(function ($item) { return trim($item); })
+                    ->toArray();
+
+                // 4. Limpiar posibles registros inactivos huérfanos creados en ediciones anteriores
+                DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->where('ACTIVO', 0)
+                    ->delete();
+
+                if ($conexionbd !== 'sqlsrv') {
+                    try {
+                        DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                            ->where('ID_COTIZACION', $id_cotizacion)
+                            ->where('ACTIVO', 0)
+                            ->delete();
+                    } catch (\Exception $ez) {
+                        Log::error('Error al eliminar detalles inactivos anteriores en zona (' . $conexionbd . '): ' . $ez->getMessage());
+                    }
+                }
+            }
+
+            $detalles_json = $request->input('detalles');
+            $detalles = json_decode($detalles_json, true);
+
+            if (is_array($detalles)) {
+                // Agrupar en PHP por COD_PRODUCTO para asegurar una sola fila por producto en la base de datos
+                $grouped_detalles = [];
+                foreach ($detalles as $det) {
+                    $key = trim($det['cod_producto']);
+                    if (!isset($grouped_detalles[$key])) {
+                        $grouped_detalles[$key] = $det;
+                    } else {
+                        // Sumar cantidades
+                        $grouped_detalles[$key]['cantidad'] = (float) $grouped_detalles[$key]['cantidad'] + (float) $det['cantidad'];
+
+                        // Combinar breakdowns
+                        $old_bd = isset($grouped_detalles[$key]['breakdown']) ? $grouped_detalles[$key]['breakdown'] : [];
+                        $new_bd = isset($det['breakdown']) ? $det['breakdown'] : [];
+
+                        $bd_by_id = [];
+                        foreach ($old_bd as $b) {
+                            $bd_by_id[trim($b['id'])] = (float) $b['cant'];
+                        }
+                        foreach ($new_bd as $b) {
+                            $id_b = trim($b['id']);
+                            if (isset($bd_by_id[$id_b])) {
+                                $bd_by_id[$id_b] += (float) $b['cant'];
+                            } else {
+                                $bd_by_id[$id_b] = (float) $b['cant'];
+                            }
+                        }
+
+                        $merged_bd = [];
+                        foreach ($bd_by_id as $id_b => $cant) {
+                            $merged_bd[] = ['id' => $id_b, 'cant' => $cant];
+                        }
+                        $grouped_detalles[$key]['breakdown'] = $merged_bd;
+
+                        // Combinar IDs de consolidados
+                        $old_ids = explode(' - ', $grouped_detalles[$key]['id_consolidado']);
+                        $new_ids = explode(' - ', $det['id_consolidado']);
+                        $all_ids = array_unique(array_merge($old_ids, $new_ids));
+                        $grouped_detalles[$key]['id_consolidado'] = implode(' - ', $all_ids);
+                    }
+                }
+                $detalles = array_values($grouped_detalles);
+
+                foreach ($detalles as $det) {
+                    $total_por_distribuir = (float) $det['cantidad'];
+                    $breakdown = isset($det['breakdown']) ? $det['breakdown'] : null;
+
+                    // Si no hay breakdown (caso raro), creamos uno ficticio con el ID principal
+                    if (!is_array($breakdown) || _count($breakdown) == 0) {
+                        $breakdown = [['id' => $det['id_consolidado'], 'cant' => $total_por_distribuir]];
+                    }
+
+                    $cod_prod_trim = trim($det['cod_producto']);
+                    $tipo_op_det = ($accion == 'U' && in_array($cod_prod_trim, $productos_existentes)) ? 'U' : 'I';
+
+                    // 1. Inserción/Actualización de detalle de cotización (UNA ÚNICA FILA POR PRODUCTO)
+                    $this->insertOrdenCotizacionDetalle(
+                        $tipo_op_det,
+                        $id_cotizacion,
+                        '', // @ID_PEDIDO_CONSOLIDADO_GENERAL vacío (se usan las referencias)
+                        '',
+                        $cod_centro,
+                        $det['cod_producto'],
+                        $det['nom_producto'],
+                        $det['cod_medida'],
+                        $det['nom_medida'],
+                        $total_por_distribuir,
+                        $det['precio'],
+                        $det['precio_igv'],
+                        isset($det['cod_familia']) ? $det['cod_familia'] : '',
+                        isset($det['nom_familia']) ? $det['nom_familia'] : '',
+                        1,
+                        '',
+                        isset($det['cod_centro_costo']) ? $det['cod_centro_costo'] : null,
+                        isset($det['txt_nombre']) ? $det['txt_nombre'] : null
+                    );
+
+                    // 2. Guardar relación en CMP.REFERENCIA_ASOC para cada consolidado que aporta
+                    foreach ($breakdown as $index => $b) {
+                        $id_consolidado_linea = trim($b['id']);
+
+                        $es_tipo_servicio = ($request->input('ind_mat_o_ser') === 'S');
+                        $ref_txt_tabla = $es_tipo_servicio ? 'WEB.ORDEN_PEDIDO' : 'WEB.ORDEN_PEDIDO_CONSOLIDADO';
+                        $ref_tipo = $es_tipo_servicio ? 'COTIZACION_PEDIDO' : 'COTIZACION_CONSOLIDADO';
+
+                        $existe_ref = DB::table('CMP.REFERENCIA_ASOC')
+                            ->where('COD_TABLA', $id_consolidado_linea)
+                            ->where('COD_TABLA_ASOC', $id_cotizacion)
+                            ->where('TXT_TIPO_REFERENCIA', $ref_tipo)
+                            ->exists();
+
+                        if (!$existe_ref) {
+                            DB::table('CMP.REFERENCIA_ASOC')->insert([
+                                'COD_TABLA' => $id_consolidado_linea,
+                                'COD_TABLA_ASOC' => $id_cotizacion,
+                                'TXT_TABLA' => $ref_txt_tabla,
+                                'TXT_TABLA_ASOC' => 'WEB.ORDEN_COTIZACION',
+                                'TXT_TIPO_REFERENCIA' => $ref_tipo,
+                                'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
+                                'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
+                                'COD_ESTADO' => 1
+                            ]);
+                        }
+
+                        // Réplica de relación REFERENCIA_ASOC en zonas
+                        if ($conexionbd !== 'sqlsrv') {
+                            try {
+                                $existe_ref_z = DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')
+                                    ->where('COD_TABLA', $id_consolidado_linea)
+                                    ->where('COD_TABLA_ASOC', $id_cotizacion)
+                                    ->where('TXT_TIPO_REFERENCIA', $ref_tipo)
+                                    ->exists();
+
+                                if (!$existe_ref_z) {
+                                    DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->insert([
+                                        'COD_TABLA' => $id_consolidado_linea,
+                                        'COD_TABLA_ASOC' => $id_cotizacion,
+                                        'TXT_TABLA' => $ref_txt_tabla,
+                                        'TXT_TABLA_ASOC' => 'WEB.ORDEN_COTIZACION',
+                                        'TXT_TIPO_REFERENCIA' => $ref_tipo,
+                                        'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
+                                        'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
+                                        'COD_ESTADO' => 1
+                                    ]);
+                                }
+                            } catch (\Exception $ez) {
+                                Log::error('Error al replicar relación CMP.REFERENCIA_ASOC a zona (' . $conexionbd . '): ' . $ez->getMessage());
+                            }
+                        }
+
+                        // 3. Actualizar estado de TXT_COTIZACION en el consolidado (SOLO SI ES MATERIAL)
+                        if (!$es_tipo_servicio) {
+                            $saldos_actuales = $this->obtenerSaldosPendientesConsolidados([$det['cod_producto']], null, $cod_centro);
+                            $saldo_cons = isset($saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea])
+                                ? $saldos_actuales[trim($det['cod_producto'])][$id_consolidado_linea]
+                                : 0;
+
+                            if ($saldo_cons <= 0) {
+                                DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                    ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_linea)
+                                    ->where('COD_PRODUCTO', $det['cod_producto'])
+                                    ->update(['TXT_COTIZACION' => 'SI']);
+                            } else {
+                                DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                                    ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_linea)
+                                    ->where('COD_PRODUCTO', $det['cod_producto'])
+                                    ->update(['TXT_COTIZACION' => null]);
+                            }
+                        }
+                    }
+                }
+
+                // 4. Desactivar productos quitados durante la edición
+                if ($accion == 'U') {
+                    $productos_nuevos = array_map(function ($d) { return trim($d['cod_producto']); }, $detalles);
+                    $productos_eliminados = array_diff($productos_existentes, $productos_nuevos);
+
+                    foreach ($productos_eliminados as $cod_prod_elim) {
+                        DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                            ->where('ID_COTIZACION', $id_cotizacion)
+                            ->where('COD_PRODUCTO', $cod_prod_elim)
+                            ->update(['ACTIVO' => 0]);
+
+                        if ($conexionbd !== 'sqlsrv') {
+                            try {
+                                DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                                    ->where('ID_COTIZACION', $id_cotizacion)
+                                    ->where('COD_PRODUCTO', $cod_prod_elim)
+                                    ->update(['ACTIVO' => 0]);
+                            } catch (\Exception $ez) {
+                                Log::error('Error al desactivar detalle eliminado en zona (' . $conexionbd . '): ' . $ez->getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 6. Manejo de archivos adjuntos (Eliminación selectiva y adición)
+            $archivos_a_eliminar_json = $request->input('archivos_a_eliminar');
+            $archivos_a_eliminar = json_decode($archivos_a_eliminar_json, true);
+
+            if (is_array($archivos_a_eliminar) && _count($archivos_a_eliminar) > 0) {
+                DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->whereIn('DOCUMENTO_ITEM', $archivos_a_eliminar)
+                    ->update(['ACTIVO' => 0]);
+            }
+
+            // Limpieza de archivos huérfanos solo en INSERT
+            // Cambiamos update a delete para asegurar que no queden registros residuales si no se sube nada
+            if ($accion == 'I') {
+                DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->delete();
+            }
+
+            // Procesar nuevos archivos
+            if ($request->hasFile('archivo')) {
+                $archivos_raw = $request->file('archivo');
+                // Asegurar que siempre sea un array para el foreach
+                $archivos = is_array($archivos_raw) ? $archivos_raw : [$archivos_raw];
+
+                $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
+
+                // Obtener el último DOCUMENTO_ITEM para no colisionar si ya existen archivos
+                $ultimo_item = DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $id_cotizacion)
+                    ->max('DOCUMENTO_ITEM');
+                $ultimo_item = isset($ultimo_item) ? $ultimo_item : 0;
+
+                foreach ($archivos as $index => $archivo) {
+                    $nombre_original = $archivo->getClientOriginalName();
+                    $extension = $archivo->getClientOriginalExtension();
+                    $size = $archivo->getSize();
+                    $mime = $archivo->getMimeType();
+                    $nombre_guardado = time() . '_' . $index . '_' . $nombre_original;
+
+                    $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+                    // Copia al servidor remoto UNC
+                    if (copy($archivo->getRealPath(), $ruta_final)) {
+                        DB::table('dbo.ARCHIVOS')->insert([
+                            'ID_DOCUMENTO' => $id_cotizacion,
+                            'DOCUMENTO_ITEM' => $ultimo_item + $index + 1,
+                            'TIPO_ARCHIVO' => $mime,
+                            'NOMBRE_ARCHIVO' => pathinfo($nombre_original, PATHINFO_FILENAME),
+                            'DESCRIPCION_ARCHIVO' => $nombre_original,
+                            'URL_ARCHIVO' => $ruta_final,
+                            'EXTENSION' => $extension,
+                            'SIZE' => $size,
+                            'ACTIVO' => 1,
+                            'FECHA_CREA' => DB::raw('GETDATE()'),
+                            'USUARIO_CREA' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            $this->replicateCotizacionToZona($id_cotizacion);
+            return response()->json(['success' => true, 'id_cotizacion' => $id_cotizacion, 'mensaje' => 'Cotización guardada correctamente con ID: ' . $id_cotizacion]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Error al guardar cotización: ' . $e->getMessage()]);
+        }
+    }
+
+    public function actionAjaxEliminarCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+        $cot = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        if (!$cot) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró la cotización especificada.'
+            ]);
+        }
+
+        $cod_centro = trim($cot->COD_CENTRO);
+        $conexionbd = 'sqlsrv';
+        if ($cod_centro == 'CEN0000000000004') {
+            $conexionbd = 'sqlsrv_r';
+        } else {
+            if ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+        }
+
+        // Validar conexión a la zona si corresponde
+        if ($conexionbd !== 'sqlsrv') {
+            try {
+                DB::connection($conexionbd)->getPdo();
+            } catch (\Exception $ex_conn) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). No se puede anular la cotización en este momento.'
+                ]);
+            }
+        }
+
+        // Validar si la cotización está referenciada a una Orden de Compra activa en Osiris en su conexión respectiva
+        $referencia_oc = DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC as R')
+            ->join('CMP.ORDEN as O', 'O.COD_ORDEN', '=', 'R.COD_TABLA_ASOC')
+            ->where('R.COD_TABLA', $id_cotizacion)
+            ->where('R.TXT_TABLA', 'WEB.ORDEN_COTIZACION')
+            ->where('R.TXT_TABLA_ASOC', 'CMP.ORDEN')
+            ->where('R.COD_ESTADO', 1)
+            ->select('O.COD_ORDEN', 'O.COD_CATEGORIA_ESTADO_ORDEN')
+            ->first();
+
+        if ($referencia_oc) {
+            $estado_oc = trim($referencia_oc->COD_CATEGORIA_ESTADO_ORDEN);
+            if ($estado_oc !== 'EOR0000000000017' && $estado_oc !== 'EOR0000000000005') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar la cotización porque está vinculada a una Orden de Compra activa en Osiris (' . trim($referencia_oc->COD_ORDEN) . '). Primero tiene que anular o rechazar la Orden de compra en Osiris.'
+                ]);
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Mantener Cabecera Activa y Cambiar Estado a ANULADO con Auditoría
+            DB::table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update([
+                    'ACTIVO' => 1,
+                    'COD_ESTADO' => 'ETM0000000000014',
+                    'TXT_ESTADO' => 'ANULADO',
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                ]);
+
+            // 2. Desactivar Detalle
+            DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update(['ACTIVO' => 0]);
+
+            // Réplica de anulación a zonas
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION')
+                        ->where('ID_COTIZACION', $id_cotizacion)
+                        ->update([
+                            'ACTIVO' => 1,
+                            'COD_ESTADO' => 'ETM0000000000014',
+                            'TXT_ESTADO' => 'ANULADO',
+                            'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                            'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                        ]);
+
+                    DB::connection($conexionbd)->table('WEB.ORDEN_COTIZACION_DETALLE')
+                        ->where('ID_COTIZACION', $id_cotizacion)
+                        ->update(['ACTIVO' => 0]);
+                } catch (\Exception $ez) {
+                    Log::error('Error al replicar anulación de cotización a zona (' . $conexionbd . '): ' . $ez->getMessage());
+                }
+            }
+
+            // 3. Desactivar Archivos
+            DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_cotizacion)
+                ->update(['ACTIVO' => 0]);
+
+            // 4. Eliminar referencias en CMP.REFERENCIA_ASOC
+            $referencias = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_cotizacion)
+                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                ->get();
+
+            DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_cotizacion)
+                ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                ->delete();
+
+            // Réplica de eliminación REFERENCIA_ASOC en zonas
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA_ASOC', $id_cotizacion)
+                        ->whereIn('TXT_TIPO_REFERENCIA', ['COTIZACION_CONSOLIDADO', 'COTIZACION_PEDIDO'])
+                        ->delete();
+                } catch (\Exception $ez) {
+                    Log::error('Error al replicar eliminación de CMP.REFERENCIA_ASOC a zona (' . $conexionbd . '): ' . $ez->getMessage());
+                }
+            }
+
+            // 5. Restaurar TXT_COTIZACION en Consolidados
+            $detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->get();
+
+            foreach ($detalles as $det) {
+                foreach ($referencias as $ref) {
+                    // Al desactivar esta cotización, el TXT_COTIZACION del consolidado debe volver a NULL 
+                    // para que el saldo pendiente sea recalculado correctamente en las consultas
+                    DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $ref->COD_TABLA)
+                        ->where('COD_PRODUCTO', $det->COD_PRODUCTO)
+                        ->update(['TXT_COTIZACION' => null]);
+                }
+            }
+
+            DB::commit();
+            $this->replicateCotizacionToZona($id_cotizacion);
+            return response()->json(['success' => true, 'message' => 'Cotización eliminada correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar: ' . $e->getMessage()]);
+        }
+    }
+
+    public function actionAjaxSubirArchivoCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        if ($request->hasFile('archivo')) {
+            $archivos = $request->file('archivo');
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
+
+            // Obtener el último DOCUMENTO_ITEM para este documento
+            $ultimo_item = DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_cotizacion)
+                ->max('DOCUMENTO_ITEM');
+            $ultimo_item = isset($ultimo_item) ? $ultimo_item : 0;
+
+            foreach ($archivos as $index => $archivo) {
+                $nombre_original = $archivo->getClientOriginalName();
+                $extension = $archivo->getClientOriginalExtension();
+                $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+                $size = $archivo->getSize();
+                $mime = $archivo->getMimeType();
+
+                $nombre_guardado = time() . '_' . $index . '_' . $nombre_original;
+                $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+                // Copia al servidor remoto UNC
+                try {
+                    if (copy($archivo->getRealPath(), $ruta_final)) {
+                        // Registro en la tabla ARCHIVOS
+                        DB::table('dbo.ARCHIVOS')->insert([
+                            'ID_DOCUMENTO' => $id_cotizacion,
+                            'DOCUMENTO_ITEM' => $ultimo_item + $index + 1,
+                            'TIPO_ARCHIVO' => $mime,
+                            'NOMBRE_ARCHIVO' => $nombre_sin_extension,
+                            'DESCRIPCION_ARCHIVO' => $nombre_original,
+                            'URL_ARCHIVO' => $ruta_final,
+                            'EXTENSION' => $extension,
+                            'SIZE' => $size,
+                            'ACTIVO' => 1,
+                            'FECHA_CREA' => DB::raw('GETDATE()'),
+                            'USUARIO_CREA' => isset(Session::get('usuario')->usuario) ? Session::get('usuario')->usuario : 'SISTEMA',
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but continue with other files if any
+                    \Log::error("Error subiendo archivo de cotización: " . $e->getMessage());
+                }
+            }
+
+            return response()->json(['ok' => true]);
+        }
+
+        return response()->json(['ok' => false, 'mensaje' => 'No se recibió ningún archivo.']);
+    }
+
+    public function actionAjaxAprobarCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+        \Log::info("Intentando aprobar cotización: " . $id_cotizacion);
+
+        // Obtener la cotización para determinar a qué centro/conexión de zona pertenece
+        $cot = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        if ($cot) {
+            $cod_centro = trim($cot->COD_CENTRO);
+            $conexionbd = 'sqlsrv';
+            if ($cod_centro == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($cod_centro == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
+
+            if ($conexionbd !== 'sqlsrv') {
+                try {
+                    DB::connection($conexionbd)->getPdo();
+                } catch (\Exception $ex_conn) {
+                    return response()->json([
+                        'success' => false,
+                        'mensaje' => 'No hay conexión con el servidor de la zona (' . ($conexionbd === 'sqlsrv_r' ? 'Rioja' : 'Bellavista') . '). No se puede aprobar la cotización en este momento.'
+                    ]);
+                }
+            }
+        }
+
+        // Obtener el límite de monto
+        $monto_config = DB::table('WEB.MONTO_ORDEN_PEDIDO')
+            ->where('COD_MONTO', 'IICHMO0000000002')
+            ->first();
+        $limite = $monto_config ? (float) $monto_config->MONTO : 5000.00;
+
+        // Determinar el nuevo estado y monto a evaluar (conversión si es dólares)
+        $monto_evaluar = $cot ? (float) $cot->CAN_TOTAL : 0.00;
+        $es_dolares = false;
+        $tipo_cambio_usado = 0;
+
+        if ($cot && trim($cot->COD_CATEGORIA_MONEDA) === 'MON0000000000002') { // DÓLARES
+            $es_dolares = true;
+            // Buscar tipo de cambio de hoy
+            $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
+                ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
+                ->where('COD_ESTADO', 1)
+                ->first();
+            
+            if ($tipo_cambio) {
+                $tipo_cambio_usado = $tipo_cambio->CAN_COMPRA;
+            } else {
+                // Fallback al último registrado si no se cargó hoy
+                $tipo_cambio_ultimo = DB::table('CMP.TIPO_CAMBIO')
+                    ->where('COD_ESTADO', 1)
+                    ->orderBy('FEC_CAMBIO', 'desc')
+                    ->first();
+                if ($tipo_cambio_ultimo) {
+                    $tipo_cambio_usado = $tipo_cambio_ultimo->CAN_COMPRA;
+                }
+            }
+
+            if ($tipo_cambio_usado > 100) {
+                $tipo_cambio_usado = $tipo_cambio_usado / 10000;
+            }
+
+            if ($tipo_cambio_usado > 0) {
+                $monto_evaluar = $monto_evaluar * $tipo_cambio_usado;
+            }
+        }
+
+        // Determinar si la cotización es de tipo SERVICIO ('S')
+        $es_servicio = false;
+        $primer_detalle = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->first();
+
+        if ($primer_detalle) {
+            $prod = DB::table('ALM.PRODUCTO')
+                ->where('COD_PRODUCTO', trim($primer_detalle->COD_PRODUCTO))
+                ->first();
+            if ($prod && isset($prod->IND_MATERIAL_SERVICIO) && trim($prod->IND_MATERIAL_SERVICIO) === 'S') {
+                $es_servicio = true;
+            }
+        }
+
+        if (!$es_servicio) {
+            $tiene_ref_pedido = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_cotizacion)
+                ->where('TXT_TIPO_REFERENCIA', 'COTIZACION_PEDIDO')
+                ->exists();
+            if ($tiene_ref_pedido) {
+                $es_servicio = true;
+            }
+        }
+
+        // Determinar el nuevo estado
+        $nuevo_cod_estado = 'ETM0000000000005';
+        $nuevo_txt_estado = 'APROBADO';
+        $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ha sido aprobada correctamente.';
+
+        // Verificar si el pedido de servicio asociado ya fue aprobado previamente por Gerencia Administrativa (IITR000000000391) con monto mayor al límite
+        $aprobado_previamente_ger_adm = false;
+        if ($es_servicio) {
+            $pedidos_asoc = DB::table('CMP.REFERENCIA_ASOC as RA')
+                ->join('WEB.ORDEN_PEDIDO as OP', 'OP.ID_PEDIDO', '=', 'RA.COD_TABLA')
+                ->where('RA.COD_TABLA_ASOC', $id_cotizacion)
+                ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_PEDIDO')
+                ->where('OP.ACTIVO', 1)
+                ->select('OP.ID_PEDIDO', 'OP.COD_TRABAJADOR_APRUEBA_ADM', 'OP.COD_ESTADO')
+                ->get();
+
+            if ($pedidos_asoc->isNotEmpty()) {
+                $todos_aprobados_ger_adm = true;
+                $total_monto_pedidos = 0.0;
+
+                foreach ($pedidos_asoc as $ped) {
+                    $fue_aprobado_adm = (!empty(trim($ped->COD_TRABAJADOR_APRUEBA_ADM)) && trim($ped->COD_ESTADO) === 'ETM0000000000005');
+                    if (!$fue_aprobado_adm) {
+                        $todos_aprobados_ger_adm = false;
+                    }
+
+                    $monto_ped = (float) DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+                        ->where('ID_PEDIDO', $ped->ID_PEDIDO)
+                        ->where('ACTIVO', 1)
+                        ->sum(DB::raw('CANTIDAD * ISNULL(CAN_PRECIO, 0)'));
+
+                    $total_monto_pedidos += $monto_ped;
+                }
+
+                // Si todos los pedidos asociados fueron aprobados por Gerencia Administrativa y el total superaba el límite
+                if ($todos_aprobados_ger_adm && $total_monto_pedidos > $limite) {
+                    $aprobado_previamente_ger_adm = true;
+                }
+            }
+        }
+
+        // La validación de POR APROBAR GERENCIA ADMINISTRATIVA aplica ÚNICAMENTE a cotizaciones de SERVICIO
+        // que no hayan sido aprobadas previamente por Gerencia Administrativa con monto mayor al límite
+        if ($es_servicio && $cot && trim($cot->COD_ESTADO) !== 'ETM0000000000018' && $monto_evaluar > $limite && !$aprobado_previamente_ger_adm) {
+            $nuevo_cod_estado = 'ETM0000000000018';
+            $nuevo_txt_estado = 'POR APROBAR GERENCIA ADMINISTRATIVA';
+            if ($es_dolares) {
+                $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> ($ ' . number_format($cot->CAN_TOTAL, 2) . ') equivale a <b>S/ ' . number_format($monto_evaluar, 2) . '</b> (T.C. ' . number_format($tipo_cambio_usado, 4) . '), superando el límite de S/ ' . number_format($limite, 2) . ', y ha sido enviada a <b>POR APROBAR GERENCIA ADMINISTRATIVA</b>.';
+            } else {
+                $mensaje_exito = 'La cotización <b>' . $id_cotizacion . '</b> supera el límite de S/ ' . number_format($limite, 2) . ' y ha sido enviada a <b>POR APROBAR GERENCIA ADMINISTRATIVA</b>.';
+            }
+        }
+
+        try {
+            DB::table('WEB.ORDEN_COTIZACION')
+                ->where('ID_COTIZACION', $id_cotizacion)
+                ->update([
+                    'COD_ESTADO' => $nuevo_cod_estado,
+                    'TXT_ESTADO' => $nuevo_txt_estado,
+                    'FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()'),
+                    'COD_USUARIO_MODIF_AUD' => isset(Session::get('usuario')->id) ? Session::get('usuario')->id : 'SISTEMA',
+                ]);
+
+            $this->replicateCotizacionToZona($id_cotizacion);
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => $mensaje_exito
+            ]);
+
+        } catch (\Throwable $e) {
+            \Log::error("Error en aprobación de cotización: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Ocurrió un error al intentar aprobar la cotización: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function obtenerSaldosPendientesConsolidados($codigos_productos = null, $id_cotizacion_excluir = null, $cod_centro_param = null)
+    {
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
+        if (!empty($cod_centro_param) && ($usuario_actual_id == '1CIX00000422' || !empty($id_cotizacion_excluir))) {
+            $centro = DB::table('ALM.CENTRO')->where('COD_CENTRO', $cod_centro_param)->first();
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.NOM_CENTRO')
+                ->first();
+
+            $nom_centro_usuario = $centro ? trim($centro->NOM_CENTRO) : '---';
+        }
+
+        // 1. Obtener detalles de consolidados activos aprobados
+        $consolidado_detalles = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D', 'D.ID_PEDIDO_CONSOLIDADO', '=', 'C.ID_PEDIDO_CONSOLIDADO')
+            ->where('C.COD_EMPR', $cod_empr)
+            ->where('C.COD_ESTADO', 'ETM0000000000005') // APROBADO
+            ->where('C.ACTIVO', 1)
+            ->where('D.ACTIVO', 1)
+            ->where('D.IND_COMPRA', '=', $nom_centro_usuario)
+            ->when($codigos_productos, function ($q) use ($codigos_productos) {
+                return $q->whereIn('D.COD_PRODUCTO', $codigos_productos);
+            })
+            ->select('D.ID_PEDIDO_CONSOLIDADO', 'D.COD_PRODUCTO', 'D.CAN_COMPRADA', 'C.FEC_PEDIDO')
+            ->orderBy('C.FEC_PEDIDO', 'asc')
+            ->orderBy('D.ID_PEDIDO_CONSOLIDADO', 'asc')
+            ->get();
+
+        if ($consolidado_detalles->isEmpty()) {
+            return [];
+        }
+
+        $cods = $consolidado_detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+
+        // 2. Obtener cotizaciones asociadas a estos consolidados
+        $cotizacion_detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE as CD')
+            ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
+            ->where('CD.ACTIVO', 1)
+            ->whereIn('CD.COD_PRODUCTO', $cods)
+            ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_CONSOLIDADO')
+            ->when($id_cotizacion_excluir, function ($q) use ($id_cotizacion_excluir) {
+                return $q->where('CD.ID_COTIZACION', '<>', $id_cotizacion_excluir);
+            })
+            ->select('CD.ID_COTIZACION', 'CD.COD_PRODUCTO', 'CD.CANTIDAD', 'RA.COD_TABLA as ID_PEDIDO_CONSOLIDADO')
+            ->get();
+
+        // Agrupar cotizaciones por ID_COTIZACION y COD_PRODUCTO
+        $grouped_cotizaciones = [];
+        foreach ($cotizacion_detalles as $row) {
+            $key = $row->ID_COTIZACION . '_' . trim($row->COD_PRODUCTO);
+            if (!isset($grouped_cotizaciones[$key])) {
+                $grouped_cotizaciones[$key] = [
+                    'id_cotizacion' => $row->ID_COTIZACION,
+                    'cod_producto' => trim($row->COD_PRODUCTO),
+                    'cantidad' => (float) $row->CANTIDAD,
+                    'consolidados' => [trim($row->ID_PEDIDO_CONSOLIDADO)]
+                ];
+            } else {
+                if (!in_array(trim($row->ID_PEDIDO_CONSOLIDADO), $grouped_cotizaciones[$key]['consolidados'])) {
+                    $grouped_cotizaciones[$key]['consolidados'][] = trim($row->ID_PEDIDO_CONSOLIDADO);
+                }
+            }
+        }
+
+        // Inicializar saldos
+        $saldos = [];
+        foreach ($consolidado_detalles as $det) {
+            $cod_prod = trim($det->COD_PRODUCTO);
+            $id_cons = trim($det->ID_PEDIDO_CONSOLIDADO);
+            $saldos[$cod_prod][$id_cons] = (float) $det->CAN_COMPRADA;
+        }
+
+        // Aplicar FIFO
+        foreach ($grouped_cotizaciones as $cot) {
+            $cod_prod = $cot['cod_producto'];
+            $qty = $cot['cantidad'];
+            $assoc_consolidados = $cot['consolidados'];
+
+            if (!isset($saldos[$cod_prod])) {
+                continue;
+            }
+
+            foreach ($saldos[$cod_prod] as $id_cons => &$saldo_pen) {
+                if (in_array($id_cons, $assoc_consolidados)) {
+                    if ($saldo_pen > 0) {
+                        $take = min($qty, $saldo_pen);
+                        $saldo_pen -= $take;
+                        $qty -= $take;
+                        if ($qty <= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            unset($saldo_pen);
+        }
+
+        return $saldos;
+    }
+
+    public function obtenerSaldosPendientesPedidos($codigos_productos = null, $id_cotizacion_excluir = null, $cod_centro_param = null)
+    {
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMPR ?? $empresa_sesion->COD_EMR;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+
+        if (!empty($cod_centro_param) && ($usuario_actual_id == '1CIX00000422' || !empty($id_cotizacion_excluir))) {
+            $cod_centro_usuario = trim($cod_centro_param);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO')
+                ->first();
+
+            $cod_centro_usuario = $centro ? $centro->COD_CENTRO : '---';
+        }
+
+        // 1. Obtener detalles de pedidos de servicio activos aprobados
+        $pedido_detalles = DB::table('WEB.ORDEN_PEDIDO as O')
+            ->join('WEB.ORDEN_PEDIDO_DETALLE as D', 'D.ID_PEDIDO', '=', 'O.ID_PEDIDO')
+            ->where('O.COD_EMPR', $cod_empr)
+            ->where('O.COD_CENTRO', $cod_centro_usuario)
+            ->where('O.COD_ESTADO', 'ETM0000000000005') // APROBADO
+            ->where('O.ACTIVO', 1)
+            ->where('D.ACTIVO', 1)
+            ->where('D.IND_MATERIAL_SERVICIO', '=', 'S')
+            ->when($codigos_productos, function ($q) use ($codigos_productos) {
+                return $q->whereIn('D.COD_PRODUCTO', $codigos_productos);
+            })
+            ->select('D.ID_PEDIDO', 'D.COD_PRODUCTO', 'D.CANTIDAD', 'O.FEC_PEDIDO')
+            ->orderBy('O.FEC_PEDIDO', 'asc')
+            ->orderBy('O.ID_PEDIDO', 'asc')
+            ->get();
+
+        if ($pedido_detalles->isEmpty()) {
+            return [];
+        }
+
+        $cods = $pedido_detalles->pluck('COD_PRODUCTO')->unique()->toArray();
+
+        // 2. Obtener cotizaciones asociadas a estos pedidos
+        $cotizacion_detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE as CD')
+            ->join('CMP.REFERENCIA_ASOC as RA', 'RA.COD_TABLA_ASOC', '=', 'CD.ID_COTIZACION')
+            ->where('CD.ACTIVO', 1)
+            ->whereIn('CD.COD_PRODUCTO', $cods)
+            ->where('RA.TXT_TIPO_REFERENCIA', 'COTIZACION_PEDIDO')
+            ->when($id_cotizacion_excluir, function ($q) use ($id_cotizacion_excluir) {
+                return $q->where('CD.ID_COTIZACION', '<>', $id_cotizacion_excluir);
+            })
+            ->select('CD.ID_COTIZACION', 'CD.COD_PRODUCTO', 'CD.CANTIDAD', 'RA.COD_TABLA as ID_PEDIDO')
+            ->get();
+
+        // Agrupar cotizaciones por ID_COTIZACION y COD_PRODUCTO
+        $grouped_cotizaciones = [];
+        foreach ($cotizacion_detalles as $row) {
+            $key = $row->ID_COTIZACION . '_' . trim($row->COD_PRODUCTO);
+            if (!isset($grouped_cotizaciones[$key])) {
+                $grouped_cotizaciones[$key] = [
+                    'id_cotizacion' => $row->ID_COTIZACION,
+                    'cod_producto' => trim($row->COD_PRODUCTO),
+                    'cantidad' => (float) $row->CANTIDAD,
+                    'pedidos' => [trim($row->ID_PEDIDO)]
+                ];
+            } else {
+                if (!in_array(trim($row->ID_PEDIDO), $grouped_cotizaciones[$key]['pedidos'])) {
+                    $grouped_cotizaciones[$key]['pedidos'][] = trim($row->ID_PEDIDO);
+                }
+            }
+        }
+
+        // Inicializar saldos
+        $saldos = [];
+        foreach ($pedido_detalles as $det) {
+            $cod_prod = trim($det->COD_PRODUCTO);
+            $id_ped = trim($det->ID_PEDIDO);
+            $saldos[$cod_prod][$id_ped] = (float) $det->CANTIDAD;
+        }
+
+        // Aplicar FIFO
+        foreach ($grouped_cotizaciones as $cot) {
+            $cod_prod = $cot['cod_producto'];
+            $qty = $cot['cantidad'];
+            $assoc_pedidos = $cot['pedidos'];
+
+            if (!isset($saldos[$cod_prod])) {
+                continue;
+            }
+
+            foreach ($saldos[$cod_prod] as $id_ped => &$saldo_pen) {
+                if (in_array($id_ped, $assoc_pedidos)) {
+                    if ($saldo_pen > 0) {
+                        $take = min($qty, $saldo_pen);
+                        $saldo_pen -= $take;
+                        $qty -= $take;
+                        if ($qty <= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            unset($saldo_pen);
+        }
+
+        return $saldos;
+    }
+
+    public function actionAjaxProductosConsolidadoSinCotizar(Request $request)
+    {
+        $id_consolidado = $request->input('id_consolidado');
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
+
+        $usuario_actual_id = Session::has('usuario') ? Session::get('usuario')->id : '';
+        $cod_centro_req = $request->input('cod_centro');
+
+        if ($usuario_actual_id == '1CIX00000422' && !empty($cod_centro_req)) {
+            $cod_centro_usuario = trim($cod_centro_req);
+        } else {
+            // Obtener el centro del trabajador logueado
+            $centro = DB::table('STD.TRABAJADOR as T')
+                ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+                ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
+                ->where('T.COD_TRAB', $usuario_id)
+                ->where('P.situacion_id', 'PRMAECEN000000000002')
+                ->where('C.COD_ESTADO', 1)
+                ->select('C.COD_CENTRO')
+                ->first();
+
+            $cod_centro_usuario = $centro ? trim($centro->COD_CENTRO) : '---';
+        }
+
+        // 1. Obtener todos los productos activos del consolidado asignados al centro del usuario
+        $productos_todos = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+            ->where('D.ACTIVO', 1)
+            ->where('D.CAN_COMPRADA', '>', 0)
+            ->where('D.COD_CENTRO_COMPRA', '=', $cod_centro_usuario)
+            ->get();
+
+        // 2. Obtener los saldos pendientes de los productos del consolidado
+        $codigos_productos = $productos_todos->pluck('COD_PRODUCTO')->unique()->toArray();
+        $saldos = $this->obtenerSaldosPendientesConsolidados($codigos_productos, null, ($usuario_actual_id == '1CIX00000422' ? $cod_centro_req : null));
+
+        // 3. Filtrar aquellos productos que tengan saldo pendiente > 0
+        $productos = $productos_todos->filter(function ($prod) use ($saldos, $id_consolidado) {
+            $cod_prod = trim($prod->COD_PRODUCTO);
+            $id_cons = trim($id_consolidado);
+            $saldo = isset($saldos[$cod_prod][$id_cons]) ? $saldos[$cod_prod][$id_cons] : 0;
+            
+            // Adjuntar el saldo calculado al objeto
+            $prod->SALDO_PENDIENTE = $saldo;
+            
+            return $saldo > 0;
+        });
+
+        return view('ordenpedido.modal.ajax.lista_productos_deshabilitar', [
+            'productos' => $productos,
+            'id_consolidado' => $id_consolidado
+        ]);
+    }
+
+    public function actionAjaxDeshabilitarProductosConsolidado(Request $request)
+    {
+        $id_consolidado = $request->input('id_consolidado');
+        $productos = $request->input('productos');
+
+        if (empty($productos) || !is_array($productos)) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se seleccionaron productos.'
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Actualizar en base de datos principal
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                ->whereIn('COD_PRODUCTO', $productos)
+                ->update(['ACTIVO' => 0]);
+
+            // 2. Replicar la desactivación a las zonas
+            foreach (['sqlsrv_r', 'sqlsrv_b'] as $conn) {
+                try {
+                    DB::connection($conn)->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                        ->whereIn('COD_PRODUCTO', $productos)
+                        ->update(['ACTIVO' => 0]);
+                } catch (\Exception $ez) {
+                    Log::error("Error al desactivar productos en zona ($conn): " . $ez->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Productos deshabilitados correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error al deshabilitar productos del consolidado: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error en el servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
+}
+

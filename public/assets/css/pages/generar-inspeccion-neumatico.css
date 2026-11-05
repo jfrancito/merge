@@ -1,0 +1,973 @@
+/* =============================== */
+/*   DISEÑO RESPONSIVE PRINCIPAL   */
+/* =============================== */
+
+.layout-inspeccion {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	font-family: Arial, sans-serif;
+	background-color: #ffffff;
+	padding: 10px;
+}
+
+@media(min-width: 992px) {
+	.layout-inspeccion {
+		flex-direction: row;
+	}
+}
+
+/* Panel MAPA */
+.panel-mapa {
+	flex: 0 0 350px;
+	max-width: 350px;
+}
+
+@media(max-width: 991px) {
+	.panel-mapa {
+		max-width: 100%;
+		flex: none;
+	}
+}
+
+/* Panel LISTA */
+.panel-lista {
+	flex: 1 1 auto;
+}
+
+/* =============================== */
+/*     TARJETAS DE POSICIONES      */
+/* =============================== */
+.llanta-box {
+	width: 70px;
+	height: 70px;
+	border-radius: 12px;
+	border: 2px solid #444;
+	background: #fff;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	flex-direction: column;
+	cursor: pointer;
+	transition: transform .25s, box-shadow .25s;
+	padding: 4px;
+	color: #000;
+	font-weight: bold;
+	text-align: center;
+	box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+
+.llanta-box:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+
+
+/* Tamaño estándar (desktop) */
+/*.llanta-box {
+	width: 95px;
+	height: 110px;
+	padding: 6px;
+	border-radius: 10px;
+}*/
+
+/* Colores de alto contraste para luz solar */
+.bg-vacio { background:#ffffff; border-color:#888; color:#000; }
+.bg-ocupado { background:#1B71A3; border-color:#145A86; color:#fff; } /* azul oscuro */
+.bg-repuesto { background:#ffffff; border-color:#888; color:#000; }
+
+/* Tipografía */
+.llanta-num { font-size:18px; font-weight:700; }
+.llanta-cod { font-size:12px; font-weight:600; }
+.llanta-info { font-size:11px; color:#000; }
+.titulo-eje { font-size:16px; font-weight:700; margin-bottom:8px; color:#333; }
+
+/* =============================== */
+/*      LISTA DE NEUMÁTICOS        */
+/* =============================== */
+
+.neumatico-card {
+	border: 1px solid #ccc !important;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	border-radius: 12px;
+	transition: transform .2s, box-shadow .2s;
+}
+
+.neumatico-buttons button {
+	margin-right: 10px;
+	font-size: 16px;
+	padding: 10px 18px;
+	min-width: 100px;
+}
+
+.is-invalid {
+	border-color: #dc3545 !important;
+	background:#ffe6e6;
+}
+
+.r-mini, .input-mini {
+	max-width: 80px;
+	text-align: center;
+}
+
+/* Estados de neumático con contraste alto */
+.bg-generada { background-color: #fff; color: #000; }
+.bg-proceso { background-color: #FFA500; color: #000; }  /* naranja intenso */
+.bg-confirmada { background-color: #28a745; color: #fff; } /* verde intenso */
+
+/* Inputs alineados */
+.d-flex.align-items-center label {
+	min-width: 50px;
+	font-size: 14px;
+	color: #000;
+}
+
+/* Botones grandes y visibles para campo */
+.btn-warning { background-color:#FF9800; border-color:#F57C00; color:#fff; font-weight:700; }
+.btn-warning:hover { background-color:#F57C00; }
+
+.btn-success { background-color:#28a745; border-color:#218838; color:#fff; font-weight:700; font-size:16px; padding:10px 18px; }
+.btn-success:hover { background-color:#218838; }
+
+.btn-light { font-weight:700; font-size:16px; padding:10px 18px; }
+
+/* Responsive tarjetas neumático */
+@media (max-width: 768px) {
+	.llanta-box { width: 60px; height: 60px; font-size:14px; }
+	.neumatico-card { font-size:14px; padding:6px; }
+	.neumatico-buttons button { padding:8px 14px; font-size:15px; min-width:80px; }
+}
+@media (max-width: 480px) {
+	.llanta-box { width: 55px; height: 55px; font-size:12px; }
+	.neumatico-card { font-size:13px; padding:10px; }
+	.neumatico-buttons button { padding:6px 10px; font-size:15px; min-width:70px; }
+}
+
+/* =============================== */
+/* BOTONES GRANDES PARA MOVIL      */
+/* =============================== */
+/* Contenedor botones */
+.neumatico-buttons {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start; /* Desktop: alineado a la izquierda */
+	gap: 12px;
+	width: 100%;
+}
+
+/* Botones comunes */
+.btn-mobile {
+	font-weight: 700;
+	border-radius: 7px;
+	text-align: center;
+	padding: 14px 0;   /* altura suficiente */
+	font-size: 18px;   /* tamaño base desktop */
+	width: auto;
+	min-width: 120px;
+	max-width: 300px;
+	transition: 0.2s;
+}
+
+/* Colores */
+.btn-inspeccionar {
+	background-color: #0056D2;
+	color: #fff;
+	border: none;
+}
+.btn-inspeccionar:hover { background-color: #003EAA; }
+
+.btn-foto {
+	background-color: #C40000;
+	color: #fff;
+	border: none;
+}
+.btn-foto:hover { background-color: #A30000; }
+
+/* radio botones más separados y fáciles de pulsar */
+.form-check {
+	padding: 3px 6px;
+}
+
+.form-check-input {
+	transform: scale(1.2); /* más grande para el técnico */
+}
+
+
+.text-uppercase {
+	text-transform: uppercase;
+}
+
+.modal-footer .btn {
+	min-height: 38px; /* Ajusta según necesites */
+}
+
+
+/* =============================== */
+/* TABLET (<992px) - centrado y grande */
+/* =============================== */
+@media (max-width: 991px) {
+	.neumatico-buttons {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 18px;
+		width: 100%;
+		min-height: 60px;  /* más altos */
+	}
+
+	.btn-mobile {
+		width: 85%;
+		max-width: 320px;
+		font-size: 22px;
+		padding: 20px 0;
+	}
+
+	.llanta-box {
+		width: 73px;        /* más ancho */
+		height: 73px;       /* más alto */
+		padding: 10px;       /* respiración */
+		border-radius: 12px;
+	}
+
+	.llanta-num {
+		font-size: 17px;     /* número grande */
+		font-weight: bold;
+	}
+
+	.llanta-cod {
+		font-size: 13px;
+	}
+
+	.llanta-info {
+		font-size: 13px;
+	}
+
+	/* más espacio entre cuadros */
+	.d-flex.flex-wrap.gap-2 {
+		gap: 14px !important;
+	}
+
+}
+
+/* =============================== */
+/* MÓVIL PEQUEÑO (<768px) - botones muy grandes */
+/* =============================== */
+@media (max-width: 767px) {
+	.btn-mobile {
+		width: 90%;
+		max-width: 350px;
+		font-size: 24px;
+		padding: 24px 0;
+		min-height: 60px;  /* más altos */
+	}
+}
+
+
+/* Ocultar mapa inicialmente en móvil/tablet si quieres */
+/* Opcional: puedes dejarlo visible por defecto */
+/* Por defecto, mapa minimizado en tablet/móvil */
+@media (max-width: 991px) {
+	#mapaContent {
+		display: none; /* empieza colapsado */
+		transition: all 0.3s ease;
+	}
+}
+
+
+/* CARD INFORMATIVO */
+.card-info-inspeccion {
+	background-color: #f5f7fa;
+	color: #333;
+	border-left: 4px solid #0056D2; /* resalta el card */
+}
+
+/* Items internos */
+.card-info-inspeccion .info-item {
+	font-size: 16px;
+	margin-bottom: 8px;
+}
+
+/* Tablet / móvil: apilar items */
+@media (max-width: 991px) {
+	.card-info-inspeccion .info-item {
+		width: 100%;
+		text-align: center;
+		font-size: 18px;
+		margin-bottom: 6px;
+	}
+}
+
+/* Desktop: alinear en fila */
+@media (min-width: 992px) {
+	.card-info-inspeccion .info-item {
+		margin-bottom: 0;
+	}
+}
+
+
+.neu-action-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.action-btn {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 1.3rem;
+    color: #444 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-btn:hover {
+    background: #f1f1f1;
+}
+
+/* Estilos personalizados para el modal de fotos */
+.files-preview-upload ul li,
+.fotos-agregadas-container ul li {
+	padding: 0.75rem;
+	border-bottom: 1px solid #e0e0e0;
+	transition: background-color 0.2s;
+}
+
+.files-preview-upload ul li:hover,
+.fotos-agregadas-container ul li:hover {
+	background-color: #f8f9fa;
+}
+
+.files-preview-upload ul li:last-child,
+.fotos-agregadas-container ul li:last-child {
+	border-bottom: none;
+}
+
+.foto-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.foto-item-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.foto-item-categoria {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+}
+
+.cat-dano { background-color: #dc3545; color: white; }
+.cat-corte { background-color: #fd7e14; color: white; }
+.cat-desgaste { background-color: #ffc107; color: black; }
+.cat-normal { background-color: #28a745; color: white; }
+
+.foto-item-nombre {
+	font-size: 0.875rem;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.foto-item-detalles {
+	font-size: 0.75rem;
+	color: #6c757d;
+	margin-top: 0.25rem;
+}
+
+.foto-item-observacion {
+	font-size: 0.75rem;
+	color: #495057;
+	font-style: italic;
+	margin-top: 0.25rem;
+	padding-left: 0.5rem;
+	border-left: 2px solid #dee2e6;
+}
+
+.foto-item-acciones {
+	display: flex;
+	gap: 5px;
+}
+
+.camera-switch-categoria {
+	cursor: pointer;
+}
+
+.btn-clear-upload {
+	font-size: 0.75rem;
+	padding: 0.25rem 0.5rem;
+}
+
+/* Scroll personalizado */
+.fotos-agregadas-container::-webkit-scrollbar,
+.files-preview-upload::-webkit-scrollbar {
+	width: 8px;
+}
+
+.fotos-agregadas-container::-webkit-scrollbar-track,
+.files-preview-upload::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 10px;
+}
+
+.fotos-agregadas-container::-webkit-scrollbar-thumb,
+.files-preview-upload::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 10px;
+}
+
+.fotos-agregadas-container::-webkit-scrollbar-thumb:hover,
+.files-preview-upload::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+/* Animación para items agregados */
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.foto-item-new {
+	animation: slideIn 0.3s ease-out;
+}
+
+/* Estilos para tabs */
+.nav-tabs-lg .nav-link {
+	font-size: 1.1rem;
+	padding: 0.75rem 1.5rem;
+	font-weight: 600;
+}
+
+/* Estilos para galería de fotos */
+.foto-card {
+	position: relative;
+	border: 2px solid #dee2e6;
+	border-radius: 12px;
+	overflow: hidden;
+	transition: transform 0.2s, box-shadow 0.2s;
+	background: white;
+}
+
+.foto-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.foto-card-img {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+	cursor: pointer;
+}
+
+.foto-card-body {
+	padding: 1rem;
+}
+
+.foto-card-categoria {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	padding: 0.35rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.foto-card-actions {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 0.75rem;
+}
+
+.foto-card-actions .btn {
+	flex: 1;
+	font-size: 0.85rem;
+}
+
+/* Loading spinner */
+.spinner-foto {
+	display: inline-block;
+	width: 2rem;
+	height: 2rem;
+	border: 3px solid rgba(0,0,0,.1);
+	border-radius: 50%;
+	border-top-color: #007bff;
+	animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+/*datos informativos*/
+/* Cada bloque */
+.info-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-right: 10px;
+}
+
+.info-box:last-child {
+    border-right: none;
+}
+
+.info-box .label {
+    font-size: .75rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 3px;
+}
+
+.info-box .value {
+    font-size: .9rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.info-box .value.highlight {
+    color: #0d6efd;
+}
+
+.value {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.value.highlight {
+    color: #0d6efd;
+}
+
+.info-row .highlight {
+    color: #0d6efd; /* Azul agradable estilo Trezo */
+}
+
+.info-box .value.highlight {
+    color: #0d6efd;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .info-row-3 {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .info-box {
+        border-right: none !important;
+        padding-right: 0;
+        padding-bottom: 8px;
+    }
+
+    .info-box:last-child {
+        border-bottom: none;
+    }
+}
+
+.pending-solid {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: #FFC107;
+    border-radius: 4px;
+}
+
+
+/* ============================
+   TARJETA PRINCIPAL
+============================ */
+.card-neu {
+    border-radius: 15px;
+    padding: 10px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 3px 18px rgba(0,0,0,0.07);
+}
+
+
+/* Contenedor botones */
+.neu-buttons-container button {
+    flex: 1;                /* Igual tamaño */
+    min-width: 140px;       /* Ancho mínimo */
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Confirmar Azul */
+.btn-confirm {
+    background-color: #0d6efd;  /* Azul bootstrap */
+    color: #ffffff;
+    border: none;
+}
+
+.btn-confirm i {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.btn-confirm:hover {
+    background-color: #0b5ed7;
+}
+
+/* Anular Rojo */
+.btn-cancel {
+    background-color: #dc3545;  /* Rojo */
+    color: #ffffff;
+    border: none;
+}
+
+.btn-cancel i {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .neu-buttons-container {
+        gap: 10px;
+    }
+    .neu-buttons-container button {
+        font-size: 0.95rem;
+        padding: 8px 12px;
+    }
+}
+
+/* Etiquetas */
+.info-card .label {
+    font-size: 1rem;        /* tamaño legible pero no gigante */
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.info-card .value {
+    font-size: 1.5rem;      /* destacado pero proporcional */
+    font-weight: 700;
+    color: #212529;
+    line-height: 1.3;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 100px;
+    background-color: #f8f9fa; /* sutil contraste */
+}
+
+.info-card .value.highlight {
+    color: #0d6efd; 
+    background-color: #e7f1ff; 
+}
+
+/* Ajustes para tablet y móviles */
+@media (max-width: 992px) {
+    .info-card .label {
+        font-size: 1.1rem;
+    }
+    .info-card .value {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-card .label {
+        font-size: 1.2rem;
+    }
+    .info-card .value {
+        font-size: 1.8rem;
+        padding: 8px 12px;
+    }
+}
+
+
+/* ============================
+   CONTENEDOR DE BOTONES
+============================ */
+.action-buttons {
+    display: flex;
+    gap: 12px;          /* separación */
+    width: 100%;
+}
+
+/* ============================
+   BOTONES UNIFORMES
+============================ */
+.btn-action {
+    flex: 1;            /* mismo ancho */
+    height: 52px;       /* misma altura */
+    font-size: 1rem;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* ============================
+   MÓVIL / TABLET
+============================ */
+@media (max-width: 576px) {
+    .action-buttons {
+        flex-direction: column;  /* stack limpio */
+        gap: 10px;
+    }
+
+    .btn-action {
+        height: 54px;
+    }
+}
+
+/* ============================
+   BOTONES DENTRO DE INFO-BOX
+   (MISMO LOOK SIEMPRE)
+============================ */
+.info-box > .btn,
+.info-box > a.btn {
+    height: 52px;                 /* mismo alto visual */
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: none !important;  /* evita diferencias */
+}
+
+/* ============================
+   BOTÓN MAPA (MISMO TAMAÑO)
+============================ */
+.btn-action {
+    height: 52px;               /* igual que ATRÁS / CONTINUAR */
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: none !important;
+}
+
+/* CONTENEDOR TITULO */
+.neu-title {
+    border-bottom: dashed #e0e0e0;
+}
+
+/* SUBTÍTULO */
+.neu-title-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #6c757d;
+    margin-bottom: 6px;
+}
+
+/* TITULO PRINCIPAL */
+.neu-title-main {
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* CÓDIGO */
+.neu-codigo {
+    color: #0d6efd; /* Azul Trezo */
+}
+
+/* PLACA */
+.neu-placa {
+    background: #212529;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    letter-spacing: 1px;
+}
+
+/* SEPARADOR */
+.neu-separador {
+    color: #adb5bd;
+    font-weight: 600;
+}
+
+/* TABLET */
+@media (max-width: 991px) {
+    .neu-title-main {
+        font-size: 1.5rem;
+    }
+}
+
+/* MÓVIL */
+@media (max-width: 576px) {
+    .neu-title-main {
+        font-size: 1.2rem;       
+        gap: 3px;
+    }
+
+    .neu-placa {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* Contenedor */
+.r-inputs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+/* Cada input */
+.r-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Label compacto */
+.r-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 32px;
+    text-align: right;
+}
+
+/* Input base (MÓVIL) */
+.r-input {
+    width: 68px;              /* tamaño ideal para 2 dígitos */
+    text-align: center;
+    padding: 2px 4px;
+}
+
+/* Tablet */
+@media (min-width: 576px) {
+    .r-input {
+        width: 66px;
+    }
+}
+
+/* Web */
+@media (min-width: 992px) {
+    .r-input {
+        width: 74px;
+    }
+}
+
+/* Escritorio grande */
+@media (min-width: 1200px) {
+    .r-input {
+        width: 80px;
+    }
+}
+
+.btn-add-mini {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+/* En móvil un poquito más grande para el dedo */
+@media (max-width: 576px) {
+    .btn-add-mini {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+}
+
+.btn-plus-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-plus-info i {
+    font-size: 16px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.info-item span {
+    color: #6c757d;
+}
+
+.info-item strong {
+    color: #000;
+    font-weight: 700;
+}
+
+.info-item.small {
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .info-item {
+        font-size: 13px;
+    }
+}

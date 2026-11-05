@@ -1,0 +1,218 @@
+<style>
+    /* Estilos personalizados para select2 dentro de la tabla */
+    .table .select2-container--default .select2-selection--single {
+        border-radius: 6px !important;
+        border: 1px solid #eaecf4 !important;
+        height: 32px !important;
+        background-color: #fdfefe !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        display: block !important;
+    }
+    .table .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057 !important;
+        line-height: 30px !important; /* Centrado vertical exacto para 32px de alto */
+        padding-left: 8px !important;
+        padding-right: 24px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        text-align: left !important;
+        width: 100% !important;
+        display: block !important;
+        margin-top: 0 !important;
+        top: 0 !important;
+    }
+    .table .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px !important;
+        right: 4px !important;
+    }
+    .table .select2-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .select2-container--default .select2-results__option {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+    }
+</style>
+<div class="panel panel-default box-seccion shadow-soft">
+    <div class="panel-heading subheader-seccion">
+        <i class="mdi mdi-format-list-bulleted"></i> {{ isset($es_servicio) && $es_servicio ? 'Servicios de Pedidos Seleccionados' : 'Productos de Consolidados Seleccionados' }}
+        <div class="pull-right" style="margin-top: -5px;">
+             <button class="btn btn-danger btn-sm btn-eliminar-seleccionados shadow-soft" title="Eliminar seleccionados">
+                <i class="mdi mdi-delete"></i> {{ isset($es_servicio) && $es_servicio ? 'Eliminar Servicios' : 'Eliminar Productos' }}
+            </button>
+        </div>
+    </div>
+    <div class="panel-body">
+        <table id="table-productos-seleccionados" class="table table-striped table-hover table-fw-widget listatabla" data-tipo="{{ isset($es_servicio) && $es_servicio ? 'S' : 'M' }}">
+            <thead>
+                <tr>
+                    <th class="text-center" width="30">
+                        <div class="be-checkbox be-checkbox-sm inline">
+                            <input id="check-all-productos" type="checkbox" class="check-todos-productos">
+                            <label for="check-all-productos"></label>
+                        </div>
+                    </th>
+                    <th class="text-center" width="50">ITEM</th>
+                    <th>{{ isset($es_servicio) && $es_servicio ? 'ID PEDIDO' : 'ID CONSOLIDADO' }}</th>
+                    <th>CÓDIGO</th>
+                    <th>PRODUCTO</th>
+                    <th class="text-center">U.M.</th>
+                    <th class="text-center">CANTIDAD</th>
+                    <th class="text-center" width="120">PRECIO</th>
+                    <th class="text-center" width="120">PRECIO IGV</th>
+                    @if(isset($es_servicio) && $es_servicio)
+                    <th class="text-center" style="min-width: 180px;">CENTRO COSTO</th>
+                    @endif
+                    @if(!(isset($es_servicio) && $es_servicio))
+                    <th>FAMILIA</th>
+                    @endif
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($lista_detalle as $index => $item)
+                @php
+                    $id_pedido_consolidado = isset($item->ID_PEDIDO_CONSOLIDADO) ? $item->ID_PEDIDO_CONSOLIDADO : 
+                                            (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL : 
+                                            (isset($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE) ? $item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE : ''));
+                    $cod_producto = trim($item->COD_PRODUCTO);
+                    $nom_producto = $item->NOM_PRODUCTO;
+                    
+                    // Nombres de columnas varían entre Consolidado y Detalle Cotización
+                    $nom_medida = isset($item->NOM_CATEGORIA_MEDIDA) ? $item->NOM_CATEGORIA_MEDIDA : (isset($item->NOM_MEDIDA) ? $item->NOM_MEDIDA : '');
+                    $cod_medida = isset($item->COD_CATEGORIA_MEDIDA) ? $item->COD_CATEGORIA_MEDIDA : (isset($item->COD_MEDIDA) ? $item->COD_MEDIDA : '');
+                    $cod_familia = isset($item->COD_CATEGORIA_FAMILIA) ? $item->COD_CATEGORIA_FAMILIA : (isset($item->COD_FAMILIA) ? $item->COD_FAMILIA : '');
+                    $nom_familia = isset($item->NOM_CATEGORIA_FAMILIA) ? $item->NOM_CATEGORIA_FAMILIA : (isset($item->NOM_FAMILIA) ? $item->NOM_FAMILIA : '');
+
+                    $modo_edicion = isset($es_edicion) ? $es_edicion : false;
+                    $cantidad = $modo_edicion ? $item->CANTIDAD : (isset($item->SALDO_PENDIENTE) ? $item->SALDO_PENDIENTE : 0);
+                    $sin_cantidad = !$modo_edicion && ($cantidad <= 0);
+                    $cantidad_val = isset($cantidad) ? $cantidad : 0;
+
+                    $precio = isset($item->CAN_PRECIO) ? $item->CAN_PRECIO : (isset($item->CAN_PRECIO_UNITARIO) ? $item->CAN_PRECIO_UNITARIO : 0);
+                @endphp
+                <tr>
+                    <td class="text-center">
+                        <div class="be-checkbox be-checkbox-sm inline">
+                            <input class="check-producto" type="checkbox" id="check-{{ $cod_producto }}-{{ $index }}">
+                            <label for="check-{{ $cod_producto }}-{{ $index }}"></label>
+                        </div>
+                    </td>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td class="font-bold">{{ $id_pedido_consolidado }}</td>
+                    <td class="text-primary">{{ $cod_producto }}</td>
+                    <td>{{ $nom_producto }}</td>
+                    <td class="text-center">{{ $nom_medida }}</td>
+                    <td class="text-center">
+                        @if($sin_cantidad)
+                            <div class="alert alert-danger" style="font-size: 11px; margin: 0; padding: 4px; line-height: 1.2;">
+                                <i class="fa fa-warning"></i> El consolidado no tiene cantidad a comprar
+                            </div>
+                        @else
+                            <input type="number" 
+                                   class="form-control input-sm text-center cantidad-producto premium-input" 
+                                   value="{{ number_format($cantidad_val, 2, '.', '') }}" 
+                                   step="0.01" 
+                                   min="0.01"
+                                   data-max-cantidad="{{ isset($item->SALDO_PENDIENTE) ? $item->SALDO_PENDIENTE : $cantidad_val }}"
+                                   style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
+                        @endif
+                    </td>
+                    <td class="text-center" style="vertical-align: middle;">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                            <div class="input-group" style="width: 110px; margin: 0;">
+                                <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
+                                <input type="number" 
+                                       class="form-control input-sm text-right precio-producto premium-input" 
+                                       value="{{ number_format($precio, 2, '.', '') }}" 
+                                       step="0.01" 
+                                       min="0"
+                                       style="height: 32px !important; font-weight: 700;"
+                                       data-cantidad="{{ $cantidad_val }}"
+                                       data-id-consolidado="{{ $id_pedido_consolidado }}"
+                                       data-breakdown="{{ json_encode(isset($item->BREAKDOWN) ? $item->BREAKDOWN : [['id' => $id_pedido_consolidado, 'cant' => $cantidad_val]]) }}"
+                                       data-cod-producto="{{ trim($cod_producto) }}"
+                                       data-nom-producto="{{ $nom_producto }}"
+                                       data-cod-medida="{{ $cod_medida }}"
+                                       data-nom-medida="{{ $nom_medida }}"
+                                       data-cod-familia="{{ $cod_familia }}"
+                                       data-nom-familia="{{ $nom_familia }}"
+                                       data-precio-compra-anterior="{{ isset($item->PRECIO_COMPRA_ANTERIOR) ? number_format($item->PRECIO_COMPRA_ANTERIOR, 2, '.', '') : '0.00' }}">
+                            </div>
+                            <div class="precio-alerta-info" style="display: none; white-space: normal; word-break: break-word;"></div>
+                        </div>
+                    </td>
+
+                    <td class="text-center">
+                        <div class="input-group" style="width: 110px; margin: 0 auto;">
+                            <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
+                            <input type="number" 
+                                   class="form-control input-sm text-right precio-igv-producto premium-input" 
+                                   value="{{ number_format($precio * 1.18, 2, '.', '') }}" 
+                                   step="0.01" 
+                                   min="0"
+                                   style="height: 32px !important; font-weight: 700; background-color: #fdfefe;">
+                        </div>
+                    </td>
+                    @if(isset($es_servicio) && $es_servicio)
+                    <td class="text-center" style="vertical-align: middle;">
+                        <select class="form-control input-sm centro-costo-producto select2 premium-input" style="width: 100%; font-size: 12px; height: 32px !important;" required>
+                            <option value="">[Seleccione Centro Costo]</option>
+                            @foreach($lista_centro_costo as $cc)
+                                <option value="{{ trim($cc->COD_CENTRO_COSTO) }}" {{ (isset($item->COD_CENTRO_COSTO) && trim($item->COD_CENTRO_COSTO) === trim($cc->COD_CENTRO_COSTO)) ? 'selected' : '' }}>{{ trim($cc->TXT_NOMBRE) }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    @endif
+                    @if(!(isset($es_servicio) && $es_servicio))
+                    <td>{{ $nom_familia }}</td>
+                    @endif
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+<!-- Cerca del botón de SUBIR ARCHIVO en ajax/listaproductoscotizacion.blade.php -->
+<input type="file" class="input-file-general-cotizacion" accept=".pdf" style="display: none;">
+
+        <!-- Se eliminó el botón de subir aquí para usar la sección general de la cabecera -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#table-productos-seleccionados')) {
+            $('#table-productos-seleccionados').DataTable().destroy();
+        }
+        $('#table-productos-seleccionados').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay datos disponibles",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "No se encontraron registros coincidentes",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": activar para ordenar la columna ascendente",
+                    "sortDescending": ": activar para ordenar la columna descendente"
+                }
+            },
+            "pageLength": 5000,
+            "lengthMenu": [[5000, 7500, 10000], [5000, 7500, 10000]],
+            "order": [[ 1, "asc" ]]
+        });
+    });
+</script>

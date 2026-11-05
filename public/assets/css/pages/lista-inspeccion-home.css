@@ -1,0 +1,99 @@
+/* Bordes generales */
+.card {
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    border: none;
+}
+
+.btn {
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+/* =========================
+   INSPECCIONAR
+========================= */
+.btn-inspeccionar {
+    background-color: #1F9D3A;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-inspeccionar:hover {
+    background-color: #146a0a;
+    color: #ffffff;
+}
+
+.btn-inspeccionar i {
+    font-size: 1.2rem;
+}
+
+/* =========================
+   REPARACIÓN
+========================= */
+.badge-reparacion {
+    background-color: #ffffff;
+    color: #D35400;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0.45em 0.7em;
+    border-radius: 12px;
+}
+
+.btn-reparacion {
+    background-color: #D35400;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-reparacion:hover {
+    background-color: #e85732;
+    color: #ffffff;
+}
+
+/* =========================
+   MOVIMIENTO
+========================= */
+
+.badge-movimiento {
+    background-color: #ffffff;
+    color: #4169E1;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0.45em 0.7em;
+    border-radius: 12px;
+}
+
+.btn-movimiento {
+    background-color: #4169E1;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-movimiento:hover {
+    background-color: #1aa6e6;
+    color: #ffffff;
+}
+
+/* =========================
+   PENDIENTE
+========================= */
+.badge-pendiente {
+    background-color: #ffffff;
+    color: #288D85;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0.45em 0.7em;
+    border-radius: 12px;
+}
+
+.btn-pendiente {
+    background-color: #288D85;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-pendiente:hover {
+    background-color: #288D85;
+    color: #ffffff;
+}

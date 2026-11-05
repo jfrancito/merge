@@ -1,0 +1,462 @@
+.color_virtual{
+  background: #e9e9c8;
+}
+
+.tutorial-btn {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-text {
+    position: absolute;
+    bottom: 125%; /* Posición arriba del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffc107;
+    color: black;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 500000;
+    opacity: 1; /* Siempre visible */
+    visibility: visible; /* Siempre visible */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Flecha del tooltip */
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #ffc107;
+}
+
+
+.bloqueadolq {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.filalg{
+  cursor: pointer;
+}
+.activofl{
+  background-color: #78a9ff !important;
+}
+
+.nav-tabs .disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.colordeuda{
+  background-color: #e3aba9 !important;
+}
+.ocultar{
+  display: none;
+}
+.mdisel{
+  color: #5f99f5;
+}
+
+.mdidet{
+  color: #34a853;
+}
+
+.mdiex{
+  color: #cc0000;
+}
+.neto_pagar{
+  font-size: 18px;
+}
+
+.mdisave{
+  color: #1d3a6d;
+}
+
+.mdidetoi{
+  color: #34a853;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+
+
+/********** tooltip **********/
+
+.tooltipfr {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltipfr .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 2px;
+  position: absolute;
+  z-index: 1026;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+.tooltipfr .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltipfr:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+.bienvenidocontenedor {
+
+  background-image: url("../img/fondonyr.png");
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+.pintar_sel{
+  background: #a2beed !important;
+}
+.widget-chart-container{
+  margin-top: 15px;
+}
+.chart-legend-horizontal li span{
+  border: 2px solid #ddd;
+}
+.chart-legend-horizontal li .main-chart-color2{
+  border: inherit !important;
+  background: #f9a39d;
+}
+
+.fila-desactivada{
+  background-color : #f9a39d !important;
+}
+
+.navbar-header{
+  padding-top: 20px;
+  padding-left: 19px;
+  font-size: 18px;
+  font-style: italic;
+}
+.color-iin{
+    background-color: #cc0000 !important;
+    border-bottom-color: #cc0000 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
+}
+.color-ico{
+    background-color: #045204 !important;
+    border-bottom-color: #045204 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+}
+.color-itr{
+    background-color: #DCDCDC !important;
+    border-bottom-color: #DCDCDC !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
+}
+.color-ich{
+    background-color: #ADD8E6 !important;
+    border-bottom-color: #ADD8E6 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
+}
+.color-iaa{
+    background-color: #b0c4de !important;
+    border-bottom-color: #b0c4de !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+    
+}
+.main-content {
+    padding: 8px;
+}
+
+.dt-buttons{
+    margin-left: 20px;
+}
+.dataTables_filter{
+    margin-right: 21px;
+}
+.dataTables_info{
+    margin-left: 20px;
+}
+.dataTables_paginate{
+    margin-right: 21px !important;
+}
+tbody .mdi-check{
+color: #34a853;
+}
+tbody .mdi-close{
+color: #ea4335;
+}
+.splash-acceso-container{
+  max-width: 600px; 
+  margin: 60px auto;
+}
+.splash-acceso-container .empresa-centro{
+  cursor: pointer;
+}
+
+.alertaw_error{
+width: 50%;
+z-index: 1;
+float: right;
+margin-bottom: 0px ;
+}
+
+.alertaw{
+    width: 50%;
+    z-index: 1;
+    /* float: right; */
+    margin-bottom: 0px;
+    position: absolute;
+    right: 22px;
+    top: 69px;
+}
+.msg-close{
+    position: inherit !important;
+    right: 23px !important;
+}
+
+.panel-ajax-alert{
+  position: fixed;
+  bottom: 38px;
+  right: 4px;
+  width: 40%;
+  z-index: 1205;
+}
+
+.panel-ajax-alert-mobil{
+  position: fixed;
+  bottom: 38px;
+  z-index: 1205;
+  padding: 0px !important;
+  width: 100%;
+}
+.panel-ajax-alert-mobil .alert{
+  margin-bottom: 1px !important;
+}
+.panel-ajax-alert-mobil .alert{
+  padding: 14px !important;
+  border-radius: 0px !important;
+}
+.filtrotabla {
+    
+    padding-bottom: 20px;
+    border-bottom: 1px solid #2572f2;
+}
+.contenido .dt-buttons{
+  margin-top: 9px;
+}
+.td-color-borde td {
+  border-top: 1px solid #fff  !important;
+}
+
+.td-padding-8 td {
+  padding: 8px 10px !important;
+}
+.td-padding-7 td {
+  padding: 7px 10px !important;
+}
+.td-padding-6 td {
+  padding: 6px 10px !important;
+}
+
+#WindowLoad
+{
+    position:fixed;
+    top:0px;
+    left:0px;
+    z-index:3200;
+    filter:alpha(opacity=65);
+   -moz-opacity:65;
+    opacity:0.65;
+    background:#fff;
+}
+.msjcargando{
+  color: #eee;
+}
+
+.msjcargando .texto{
+  font-size: 1.2em;
+  display: inline-block;
+  background: red;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-style: italic;
+}
+.seleccionar{
+  cursor: pointer;
+}
+.negrita{
+  font-weight: bold;
+}
+.titulo-contenedor-modal{
+  font-size: 1.1em;
+  font-weight: bold;
+  font-style: italic;
+
+
+}
+.select2-selection__rendered {
+    line-height: 31px !important;
+}
+.select2-container .select2-selection--single {
+    height: 35px !important;
+}
+
+
+.select2-selection__arrow {
+    height: 34px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b{
+  top: -5px !important;
+}
+
+/******************** tooltip *******************/
+.tooltiptop{
+  font-size: 1em !important;
+}
+.tooltipcss {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltipcss .tooltiptext {
+    visibility: hidden;
+    width: 100px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 3000;
+    bottom: 125%;
+    left: 95%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.7em;
+}
+
+
+.tooltipcss .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipcss:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.background-th-azul{
+    background: #1d3a6d;
+    color: white
+}
+.negrita{
+  font-weight: bold !important;
+}
+
+/* Modal styling for niftyModals and colored headers */
+.full-width {
+  width: 90% !important;
+  max-width: none !important;
+}
+.modal-content {
+  background-color: #ffffff !important;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.colored-header .modal-content .modal-header {
+  background-color: #e6e6e6;
+  color: #ffffff;
+  padding: 15px 20px;
+}
+.colored-header .modal-content .modal-header .modal-title {
+  font-size: 18px;
+  color: #ffffff;
+}
+.colored-header .modal-content .modal-header .close {
+  color: #ffffff;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+.colored-header .modal-content .modal-header .close:hover {
+  opacity: 1;
+}
+.colored-header .modal-content .modal-body {
+  padding: 20px;
+  background-color: #ffffff;
+  color: #404040;
+}
+.colored-header .modal-content .modal-footer {
+  background-color: #f5f5f5;
+  padding: 15px 20px;
+}
+.colored-header-success .modal-content .modal-header {
+  background-color: #37b358;
+}
+.colored-header-primary .modal-content .modal-header {
+  background-color: #4285f4;
+}
+.colored-header-warning .modal-content .modal-header {
+  background-color: #f6c163;
+}
+.colored-header-danger .modal-content .modal-header {
+  background-color: #eb6357;
+}
+.colored-header-dark .modal-content .modal-header {
+  background-color: #3d3c3c;
+}

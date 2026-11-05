@@ -1,0 +1,57 @@
+
+.scrollpanel {
+
+  height: 200px;
+  border: 1px solid #ccc;
+}
+.scrollpanel .sp-scrollbar {
+  width: 5px;
+  background-color: #ccc;
+  cursor: pointer;
+}
+.scrollpanel .sp-scrollbar .sp-thumb {
+  background-color: #aaa;
+  transition: height 0.2s ease-in-out;
+}
+.scrollpanel .sp-scrollbar.active .sp-thumb {
+  background-color: #999;
+}
+.no2 .sp-scrollbar,
+.no4 .sp-scrollbar {
+  margin: 4px;
+}
+
+.no3,
+.no4 {
+
+  border-radius: 9px;
+}
+.no3 .sp-scrollbar,
+.no4 .sp-scrollbar {
+  border-radius: 5px;
+}
+.no3 .sp-scrollbar .sp-thumb,
+.no4 .sp-scrollbar .sp-thumb {
+  border-radius: 5px;
+}
+.foo {
+  min-height: 30px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  margin: 1em;
+  padding: 1em;
+}
+.xml_content .panel-body{
+  padding: 20px 20px 20px;
+}
+.xml_content .xmlclose{
+  position: relative !important;
+  top: -36px !important;
+  right: -33px !important;
+  font-size: 14px !important;
+}
+
+.xml_content .xmlocultarmostrar{
+  top: 11px !important;
+  right: 8px !important;
+}

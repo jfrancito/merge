@@ -1,0 +1,67 @@
+
+<nav class="navbar navbar-default navbar-fixed-top be-top-header {{Session::get('color_meta')}}">
+  <div class="container-fluid">
+    <div class="navbar-header" style="padding-top: 14px;"> 
+      <div class="color-blanco"><img width="160px" style="margin-bottom: 12px" src="{{ asset('public/img/indulogo_menu.png') }}" alt="Avatar"> <span> | ({{strtoupper(Session::get('usuario')->name)}})</span></div>
+    </div>
+
+    <div class="be-right-navbar {{Session::get('color_meta')}}">
+      <ul class="nav navbar-nav navbar-right be-user-nav">
+        @if(Session::get('usuario')->id == '1CIX00000001' || Session::has('usuario_original'))
+          <li class="dropdown">
+            <div class="row" style="margin-top: 10px; margin-right: 15px;">
+              <select name="user_imposter" id="user_imposter" class="form-control input-sm select2" onchange="location = this.value;">
+                  @if(Session::has('usuario_original'))
+                    <option value="{{ url('/impostar-usuario/'.Session::get('usuario_original')->id) }}">VOLVER A: {{ Session::get('usuario_original')->nombre }}</option>
+                  @else
+                    <option value="">IMPOSTAR USUARIO</option>
+                  @endif
+                  
+                  @php
+                    $usuarios_impostar = App\User::where('activo', 1)->orderBy('nombre', 'asc')->get();
+                  @endphp
+                  @foreach($usuarios_impostar as $item)
+                    <option value="{{ url('/impostar-usuario/'.$item->id) }}" {{ Session::get('usuario')->id == $item->id ? 'selected' : '' }}>
+                      {{ $item->nombre }}
+                    </option>
+                  @endforeach
+              </select>
+            </div>
+          </li>
+        @endif
+
+        <li><div class="page-title"><span>{{Session::get('usuario')->nombre}}</span></div></li>
+
+        <li class="dropdown">
+          <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle">
+            <img src="{{ asset('public/img/iconos_7.png') }}" alt="Avatar">
+            <span class="user-name">{{Session::get('usuario')->nombre}}</span></a>
+          <ul role="menu" class="dropdown-menu">
+            <li>
+              <div class="user-info color_azul" >
+                <div class="user-name">{{Session::get('usuario')->nombre}}</div>
+                <div class="user-position online">disponible</div>
+              </div>
+            </li>
+            <li><a href="{{ url('/cambiarperfil/') }}"><span class="icon mdi mdi-settings"></span> Cambiar de perfil</a></li>
+            <li><a href="#" id="cambiarclave"><span class="icon mdi mdi-key"></span> Cambiar clave</a></li>
+            <li><a href="{{ url('/cerrarsession') }}"><span class="icon mdi mdi-power"></span>Cerrar sesión</a></li>
+
+
+          </ul>
+        </li>
+      </ul>
+    </div>
+      <a href="#" data-toggle="collapse" data-target="#be-navbar-collapse" class="be-toggle-top-header-menu collapsed">Opciones</a>
+      <div id="be-navbar-collapse" class="navbar-collapse collapse">
+      </div>
+  </div>
+</nav>
+
+<div id="modal-cambiar-clave" class="modal-container colored-header colored-header-primary modal-effect-8">
+  <div class="modal-content ">
+	<div class='modal-cambiar-clave-container'>
+	</div>
+  </div>
+</div>
+<div class="modal-overlay"></div>

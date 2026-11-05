@@ -1,0 +1,346 @@
+/* 
+   EXECUTIVE SOFT DESIGN SYSTEM 
+   Focused on readability, subtle contrasts and professional aesthetics for management.
+*/
+
+:root {
+    --executive-bg: #f8fafc;
+    --executive-primary: #334155;
+    /* Slate 700 - Professional & Soft */
+    --executive-accent: #3b82f6;
+    /* Soft Blue for highlights */
+    --executive-header-bg: #f1f5f9;
+    /* Very Light Slate */
+    --executive-header-text: #1e293b;
+    --executive-footer-bg: #1e293b;
+    /* Deep Slate */
+    --executive-border: #e2e8f0;
+    --executive-text-main: #334155;
+    --executive-text-muted: #64748b;
+}
+
+/* 1. Global Table Refinement */
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+    color: var(--executive-text-main) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* 2. UNIVERSAL HEADER - Soft Executive Style */
+#tbl-resumen-calidad thead th,
+#tbl-resumen-solo-calidad thead th,
+#tbl-resumen-mensual thead th,
+#tbl-resumen-precios-calidad thead th,
+#tbl-pu-humedo thead th,
+#tbl-precio-zona thead th,
+#tbl-comparativo-precios thead th,
+#tbl-analisis-pesos thead th,
+#tbl-analisis-precios thead th,
+#tbl-ventas-mes thead th,
+#tbl-precio-promedio-mes thead th,
+.table thead th {
+    background-color: var(--executive-header-bg) !important;
+    color: var(--executive-header-text) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 10px !important;
+    letter-spacing: 0.05em !important;
+    padding: 14px 10px !important;
+    border-top: 1px solid var(--executive-border) !important;
+    border-bottom: 2px solid var(--executive-primary) !important;
+    border-left: none !important;
+    border-right: none !important;
+    vertical-align: middle !important;
+    text-align: center !important;
+}
+
+/* 3. UNIVERSAL FOOTER/TOTALS - Softened */
+#tbl-resumen-calidad tfoot td,
+#tbl-resumen-solo-calidad tfoot td,
+#tbl-resumen-mensual tfoot td,
+#tbl-resumen-precios-calidad tfoot td,
+#tbl-pu-humedo tfoot td,
+#tbl-precio-zona tfoot td,
+#tbl-comparativo-precios tfoot td,
+#tbl-analisis-pesos tfoot td,
+#tbl-analisis-precios tfoot td,
+#tbl-ventas-mes tfoot td,
+#tbl-precio-promedio-mes tfoot td,
+.table tfoot td {
+    background-color: var(--executive-footer-bg) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 12px 10px !important;
+    border: none !important;
+}
+
+/* 4. BODY & ROWS - Subtle & Clean */
+.table tbody td {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid var(--executive-border) !important;
+    padding: 12px 10px !important;
+    font-size: 12px !important;
+    color: var(--executive-text-main) !important;
+    vertical-align: middle !important;
+}
+
+/* 5. CATEGORY GROUPS - The "Suave" distinction */
+.centro-group,
+.year-group,
+.zona-group,
+.variedad-group,
+.group-header {
+    background-color: #f8fafc !important;
+}
+
+.centro-group td,
+.zona-group td {
+    font-weight: 700 !important;
+    color: var(--executive-primary) !important;
+    border-top: 1px solid var(--executive-border) !important;
+    border-bottom: 1px solid var(--executive-border) !important;
+}
+
+.variedad-group td {
+    font-weight: 600 !important;
+    color: var(--executive-text-muted) !important;
+    background-color: #fafafa !important;
+}
+
+/* 6. METRIC HIGHLIGHTS - Subtle blue accent */
+.text-primary-value {
+    color: var(--executive-accent) !important;
+    font-weight: 600 !important;
+}
+
+.bg-metric-h {
+    background-color: rgba(59, 130, 246, 0.03) !important;
+}
+
+.bg-metric-s {
+    background-color: rgba(16, 185, 129, 0.03) !important;
+}
+
+/* 7. FILTERS - Minimalist & Elegant */
+.filter-box {
+    border: 1px solid var(--executive-border) !important;
+    background: #ffffff !important;
+    padding: 15px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.filter-title {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: var(--executive-text-muted) !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid var(--executive-border) !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 12px !important;
+}
+
+.btn-filter {
+    border: 1px solid var(--executive-border) !important;
+    color: var(--executive-text-muted) !important;
+    background: white !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-filter:hover {
+    border-color: var(--executive-accent) !important;
+    color: var(--executive-accent) !important;
+}
+
+.btn-filter.active {
+    background-color: var(--executive-accent) !important;
+    border-color: var(--executive-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* 8. STICKY COLUMNS - Integrated style */
+.sticky-col-1,
+.sticky-col-2,
+.sticky-col-3 {
+    position: sticky !important;
+    left: 0;
+    z-index: 5 !important;
+    background-color: inherit !important;
+    border-right: 1px solid var(--executive-border) !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+.sticky-col-1 {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
+#tbl-promedio-af .sticky-col-1 {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+.sticky-col-2 {
+    left: 80px !important;
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+.sticky-col-3 {
+    left: 180px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+#tbl-ventas-mes .sticky-col-1 {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+#tbl-ventas-mes .sticky-col-2 {
+    left: 100px !important;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+}
+
+/* PRECIO PROMEDIO MES - 3 Sticky Columns */
+#tbl-precio-promedio-mes .sticky-col-1 {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+#tbl-precio-promedio-mes .sticky-col-2 {
+    left: 100px !important;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+}
+
+#tbl-precio-promedio-mes .sticky-col-3 {
+    left: 350px !important;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+}
+
+#header-days th.sticky-col-1,
+#header-metrics th.sticky-col-1,
+#tbl-precio-zona thead th.sticky-col-1,
+#tbl-precio-zona thead th.sticky-col-2,
+#tbl-precio-zona thead th.sticky-col-3,
+#tbl-promedio-ih thead th.sticky-col-1,
+#tbl-promedio-ih thead th.sticky-col-2,
+#tbl-promedio-ih-anual thead th.sticky-col-1,
+#tbl-promedio-is thead th.sticky-col-1,
+#tbl-promedio-is thead th.sticky-col-2,
+#tbl-promedio-is-anual thead th.sticky-col-1,
+#tbl-promedio-iv thead th.sticky-col-1,
+#tbl-promedio-iv thead th.sticky-col-2,
+#tbl-promedio-iv-anual thead th.sticky-col-1,
+#tbl-promedio-af thead th.sticky-col-1,
+#tbl-ventas-mes thead th.sticky-col-1,
+#tbl-ventas-mes thead th.sticky-col-2,
+#tbl-precio-promedio-mes thead th.sticky-col-1,
+#tbl-precio-promedio-mes thead th.sticky-col-2,
+#tbl-precio-promedio-mes thead th.sticky-col-3 {
+    background-color: var(--executive-header-bg) !important;
+    z-index: 10 !important;
+}
+
+/* 9. UTILS & CARDS */
+.card {
+    border: 1px solid var(--executive-border) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.exp-icon {
+    font-size: 14px !important;
+    color: var(--executive-text-muted) !important;
+    vertical-align: middle;
+}
+
+.badge.bg-light {
+    font-size: 9px !important;
+    letter-spacing: 0.05em;
+    padding: 4px 8px !important;
+}
+
+/* Scrollbar for better experience */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* 10. INTERACTIVITY */
+.dbl-click-export {
+    cursor: pointer !important;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.dbl-click-export:hover {
+    background-color: rgba(59, 130, 246, 0.08) !important;
+    color: var(--executive-blue) !important;
+    box-shadow: inset 0 0 0 1px var(--executive-blue);
+}
+
+.export-hint {
+    font-size: 0.75rem;
+    color: var(--executive-text-muted);
+    font-style: italic;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Sales Report Helpers */
+.bg-light-blue {
+    background-color: #f0f9ff !important;
+}
+
+.bg-light-green {
+    background-color: #f0fdf4 !important;
+}
+
+.fs-9 {
+    font-size: 9px !important;
+}
+
+.fs-10 {
+    font-size: 10px !important;
+}
+
+.fs-11 {
+    font-size: 11px !important;
+}
+
+.text-muted-value {
+    color: #64748b !important;
+}

@@ -1,0 +1,64 @@
+/* ===============================
+   Breadcrumb Card estilo Trezo
+================================ */
+.breadcrumb-card {
+    background: #ffffff;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    margin-bottom: 25px;
+}
+
+/* título */
+.breadcrumb-card h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* breadcrumb base */
+.breadcrumb {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+/* items */
+.breadcrumb-item {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* links */
+.breadcrumb-item a {
+    color: #3584fc;
+    text-decoration: none;
+    padding-left: 22px;
+    position: relative;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* icono home */
+.breadcrumb-item a i {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    font-size: 18px;
+    transform: translateY(-50%);
+    color: #3584fc;
+}
+
+/* separador */
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    padding: 0 8px;
+    color: #adb5bd;
+}
+
+/* activo */
+.breadcrumb-item.active {
+    color: #6c757d;
+}
