@@ -7,7 +7,7 @@
     <meta name="description" content="Sistemas de Ventas">
     <meta name="author" content="Jorge Francelli Saldaña Reyes">
     <link rel="icon" href="{{ asset('public/img/icono/merge1.ico') }}">
-    <title>{{$titulo}}</title>
+    <title>{{$titulo ?? ''}}</title>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/perfect-scrollbar/css/perfect-scrollbar.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/material-design-icons/css/material-design-iconic-font.min.css') }} "/>

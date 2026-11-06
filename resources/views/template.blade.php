@@ -9,7 +9,7 @@
   <meta name="author" content="Jorge Francelli Saldaña Reyes">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="icon" href="{{ asset('public/img/icono/ugel.ico') }}">
-  <title>UGEL CHICLAYO - {{$titulo}}</title>
+  <title>UGEL CHICLAYO - {{$titulo ?? ''}}</title>
 
 
   <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/perfect-scrollbar/css/perfect-scrollbar.min.css') }}" />

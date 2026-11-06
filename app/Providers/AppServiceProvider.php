@@ -37,6 +37,21 @@ class AppServiceProvider extends ServiceProvider
         View::share('capeta', '/merge');
         View::share('version', '1');
         View::share('vapp', '2026.03.18.01');
+        View::share('titulo', '');
+
+        Validator::extend('unico', function ($attribute, $value, $parameters, $validator) {
+            $tabla = $parameters[0] . '.' . $parameters[1];
+            $count = DB::table($tabla)->where($attribute, '=', $value)->count();
+            return $count === 0;
+        });
+
+        Validator::extend('unico_menos', function ($attribute, $value, $parameters, $validator) {
+            $tabla = $parameters[0] . '.' . $parameters[1];
+            $attr = $parameters[2];
+            $valor = $parameters[3];
+            $count = DB::table($tabla)->where($attribute, '=', $value)->where($attr, '<>', $valor)->count();
+            return $count === 0;
+        });
 
         Blade::componentNamespace('App\\View\\Components\\Form', 'form');
 

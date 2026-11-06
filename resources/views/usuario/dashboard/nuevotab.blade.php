@@ -39,7 +39,7 @@
                             <a class="nav-link active category-tab" data-category="ordencompra">
                                 <span class="nav-text">ORDEN COMPRA</span>
                                 <div class="notification-container">
-                                    @if(($trol->UC=='OC' || $trol->UC==NULL))<span class="notification-badge">{{$countoc}}</span>@endif
+                                    @if(($trol->UC=='OC' || empty($trol->UC)))<span class="notification-badge">{{$countoc}}</span>@endif
                                 </div>
                             </a>
                         </li>
@@ -47,7 +47,7 @@
                             <a class="nav-link category-tab" data-category="contrato">
                                 <span class="nav-text">CONTRATO</span>
                                 <div class="notification-container">
-                                    @if(($trol->UC=='CT' || $trol->UC==NULL))<span class="notification-badge">{{$countcon}}</span>@endif
+                                    @if(($trol->UC=='CT' || empty($trol->UC)))<span class="notification-badge">{{$countcon}}</span>@endif
                                 </div>
                             </a>
                         </li>

@@ -10,9 +10,19 @@ class HashidsServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // Registrar singleton
-        $this->app->singleton('hashids', function () {
-            return new Hashids(config('app.key') ?: 'default-salt-string-for-hashids', 8);
+        // Registrar singleton con los parámetros originales de Torann\Hashids
+        $this->app->singleton('hashids', function ($app) {
+            $config = $app['config']->get('hashids');
+
+            $salt = $config['salt'] ?? '';
+            $length = $config['length'] ?? 0;
+            $alphabet = $config['alphabet'] ?? '';
+
+            if (empty($alphabet)) {
+                return new Hashids($salt, $length);
+            }
+
+            return new Hashids($salt, $length, $alphabet);
         });
     }
 
