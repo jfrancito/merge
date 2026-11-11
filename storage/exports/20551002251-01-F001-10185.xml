@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <ext:UBLExtensions>
+      <ext:UBLExtension>
+         <ext:ExtensionContent>
+            <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="IdSingEfact">
+               <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                  <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                     </ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                     <ds:DigestValue>j0A8hAyDEmT7Tuik1rk6wZ/Fc+U=</ds:DigestValue>
+                  </ds:Reference>
+               </ds:SignedInfo>
+               <ds:SignatureValue>elkDWT/mO0vOdbW8Uk/0hNGYzoZFLSvQjOg2iAgiNpGQmLdvaEuSc9CVD/ic50BRkTxmWgLQyCGy&#13;
+ryppEDMeRyk7hz5NjaUVlZu1xafBrSS8dEwWOOB2rrUIc/D5H4Gtvq3Yvv6QWV26fCsrT3AJyRvE&#13;
+FtHn0xsA53+1QaNZpGg3wt0l6HCbYG2i8DxZxloppgPyBXJqIjwDT6o9qeJcjml/omShKi5HgxtL&#13;
+CJtxKKI7l3BX3C8ChhSXjAApnv1RHcztI8wn/ra6vFDMkX/z7GDxxbqP0Oy3DQD3Wtn2Sp4xzTHY&#13;
+kGp7GrxpTRHokaloue/gDkJt0dA74KEXeiPU9Q==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIF/zCCBOegAwIBAgITVXuntTUWr+ycc112dudpVO7r7jANBgkqhkiG9w0BAQsFADCBkjELMAkG&#13;
+A1UEBhMCQ0gxEDAOBgNVBAoTB1dJU2VLZXkxJjAkBgNVBAsTHUNvcHlyaWdodCAoYykgMjAxNiBX&#13;
+SVNlS2V5IFNBMRYwFAYDVQQLEw1JbnRlcm5hdGlvbmFsMTEwLwYDVQQDEyhXSVNlS2V5IENlcnRp&#13;
+ZnlJRCBBZHZhbmNlZCBTZXJ2aWNlcyBDQSA0MB4XDTI1MDkxNjE1MjcyNFoXDTI4MDkxNTE1Mjcy&#13;
+M1owggE7MQswCQYDVQQGEwJQRTENMAsGA1UEBwwETGltYTEVMBMGA1UECgwMRUZBQ1QgUy5BLkMu&#13;
+MSswKQYDVQQLDCJWYWxpZGF0ZWQgYnkgUGVydSBTZWN1cmUgRSBOZXQgU0FDMRgwFgYDVQQLDA9S&#13;
+VUMgMjA1NTEwOTMwMzUxHDAaBgNVBAsME1JFUFJFU0VOVEFOVEUgTEVHQUwxNTAzBgNVBAsMLE1J&#13;
+UklBTSBNQVJJQkVMIE9MQVlBIFJBTcONUkVaIC0gRE5JIDA5MTM0MTcyMTMwMQYDVQQLDCpDZXJ0&#13;
+aWZpY2FkbyBjb3Jwb3JhdGl2byBkZSByZXByZXNlbnRhY2nDs24xFTATBgNVBAMMDEVGQUNUIFMu&#13;
+QS5DLjEeMBwGCSqGSIb3DQEJARYPbW9sYXlhQGVmYWN0LnBlMIIBIjANBgkqhkiG9w0BAQEFAAOC&#13;
+AQ8AMIIBCgKCAQEAr4Em7LXJ8OySzxb9Mmtgor883wxGsGO7tt1BKYZuZ4qwchNbd7C2X9Y58+g6&#13;
+lMciRG1G7G2edazlGBGkNp9vfsbeMiObzDWLsz2ipplZhhq4xl5oNsYlWtl16qO7MdtW6rQaXvf8&#13;
+2UHueHAzbwwqcWdT8LkmkRKEWQWPayD/BSPbIiMHHk1UMOde1/S86G1ht7rxv9py+KcdTsISpqg0&#13;
+r8iAD4PET5shCls+zDBhono3osGaFEqsOyKLsypfC+w9dhACiw4UuuySNradCKGkL6i/CsPpgrg1&#13;
+jewr8snW5OBC1+bTFUoEBQNzS4K/FgacxQRdxPprNI9yic7IarnL4QIDAQABo4IBoDCCAZwwDAYD&#13;
+VR0TAQH/BAIwADAfBgNVHSMEGDAWgBT05JtX0q7CnohNALorr2XJY6mHmzBsBggrBgEFBQcBAQRg&#13;
+MF4wNwYIKwYBBQUHMAKGK2h0dHA6Ly9wdWJsaWMud2lzZWtleS5jb20vY3J0L3djaWRhc2NhNC5j&#13;
+cnQwIwYIKwYBBQUHMAGGF2h0dHA6Ly9vY3NwLndpc2VrZXkuY29tMBoGA1UdEQQTMBGBD21vbGF5&#13;
+YUBlZmFjdC5wZTBHBgNVHSAEQDA+MDwGCGCFdAUOBwQDMDAwLgYIKwYBBQUHAgEWImh0dHA6Ly93&#13;
+d3cud2lzZWtleS5jb20vcmVwb3NpdG9yeS8wPAYDVR0fBDUwMzAxoC+gLYYraHR0cDovL3B1Ymxp&#13;
+Yy53aXNla2V5LmNvbS9jcmwvd2NpZGFzY2E0LmNybDAdBgNVHQ4EFgQU7x7m/mPLQqUnoFYpPyo/&#13;
+St/tvXIwKwYDVR0lBCQwIgYIKwYBBQUHAwIGCisGAQQBgjcUAgIGCisGAQQBgjcKAwwwDgYDVR0P&#13;
+AQH/BAQDAgbAMA0GCSqGSIb3DQEBCwUAA4IBAQCqt2edLcj02fyouvq72BVYcKYJWopO2sGmHDBN&#13;
+J0KdU/TuH5rmLy0cnjD+Yb8nuzkAG6ftofb5fYOgyHsXGrCgWgNKJJiQ/wJ7iKVh5wc8sg+37+VB&#13;
+0DUZQPA/OxXgGsipp2lhlHueeeDwjp0/p4OTZHWqiE/WmmXMe7aRgFTTs1cbGRV56Gg+Sp3hP+lr&#13;
+pU9ysF9/cstvu2vJ87YHMSRdEYvzkNqRAjmtFNsFcGRuCJEIZ9xl8stSiXquiQjCETMDgq31ZMdc&#13;
+19G4+az2S5yWJCNaRnSMzpEqY3Hgpqh+zHsac5RNW+MkRkWDZvYMC8Dy5IeoBvTAodFPvSLjyxfo</ds:X509Certificate><ds:X509IssuerSerial><ds:X509IssuerName>1.2.840.113549.1.9.1=#160f6d6f6c6179614065666163742e7065,CN=EFACT S.A.C.,OU=Certificado corporativo de representaciC3n,OU=MIRIAM MARIBEL OLAYA RAMC
+REZ - DNI 09134172,OU=REPRESENTANTE LEGAL,OU=RUC 20551093035,OU=Validated by Peru Secure E Net SAC,O=EFACT S.A.C.,L=Lima,C=PE</ds:X509IssuerName><ds:X509SerialNumber>1906335221065904395830907911209275094452857838</ds:X509SerialNumber></ds:X509IssuerSerial></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>
+</ext:UBLExtension>
+</ext:UBLExtensions>
+   <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+   <cbc:CustomizationID schemeAgencyName="PE:SUNAT">2.0</cbc:CustomizationID>
+   <cbc:ID>F001-00010185</cbc:ID>
+   <cbc:IssueDate>2026-06-13</cbc:IssueDate>
+   <cbc:IssueTime>12:14:44</cbc:IssueTime>
+   <cbc:DueDate>2026-06-23</cbc:DueDate>
+   <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="1004" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>
+   <cbc:Note languageLocaleID="1000">CUATRO MIL TRESCIENTOS CUARENTA Y DOS Y 38/100 SOLES</cbc:Note>
+   <cbc:Note languageLocaleID="2006">OperaciC3n sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central</cbc:Note>
+   <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>
+   <cbc:LineCountNumeric>1</cbc:LineCountNumeric>
+   <cac:Signature>
+      <cbc:ID>IDSignature</cbc:ID>
+      <cac:SignatoryParty>
+         <cac:PartyIdentification>
+            <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20551002251</cbc:ID>
+         </cac:PartyIdentification>
+         <cac:PartyName>
+            <cbc:Name>CARHUAS TRANSPORT SOCIEDAD ANONIMA CERRADA</cbc:Name>
+         </cac:PartyName>
+      </cac:SignatoryParty>
+      <cac:DigitalSignatureAttachment>
+         <cac:ExternalReference>
+            <cbc:URI>IDSignature</cbc:URI>
+         </cac:ExternalReference>
+      </cac:DigitalSignatureAttachment>
+   </cac:Signature>
+   <cac:AccountingSupplierParty>
+      <cac:Party>
+         <cac:PartyIdentification>
+            <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20551002251</cbc:ID>
+         </cac:PartyIdentification>
+         <cac:PartyName>
+            <cbc:Name>CARHUAS TRANSPORT SOCIEDAD ANONIMA CERRADA</cbc:Name>
+         </cac:PartyName>
+         <cac:PartyLegalEntity>
+            <cbc:RegistrationName>CARHUAS TRANSPORT SOCIEDAD ANONIMA CERRADA</cbc:RegistrationName>
+            <cac:RegistrationAddress>
+               <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150103</cbc:ID>
+               <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>
+               <cbc:CityName>LIMA</cbc:CityName>
+               <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>
+               <cbc:District>ATE</cbc:District>
+               <cac:AddressLine>
+                  <cbc:Line>MZA. B LOTE. 3 ASOC PROGR VIV STA MARTHA (ALT. KM 12.5 CARRETERA CENTRAL) </cbc:Line>
+               </cac:AddressLine>
+               <cac:Country>
+                  <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>
+               </cac:Country>
+            </cac:RegistrationAddress>
+         </cac:PartyLegalEntity>
+         <cac:Contact>
+            <cbc:ElectronicMail>administracion@transcarhuas.com</cbc:ElectronicMail>
+         </cac:Contact>
+      </cac:Party>
+   </cac:AccountingSupplierParty>
+   <cac:AccountingCustomerParty>
+      <cac:Party>
+         <cac:PartyIdentification>
+            <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20600004027</cbc:ID>
+         </cac:PartyIdentification>
+         <cac:PartyLegalEntity>
+            <cbc:RegistrationName>INDUAMERICA COMERCIAL SOCIEDAD ANONIMA CERRADA</cbc:RegistrationName>
+            <cac:RegistrationAddress>
+               <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">220206</cbc:ID>
+               <cbc:CityName>BELLAVISTA</cbc:CityName>
+               <cbc:CountrySubentity>SAN MARTIN</cbc:CountrySubentity>
+               <cbc:District>SAN RAFAEL</cbc:District>
+               <cac:AddressLine>
+                  <cbc:Line>CAR. FERNANDO BELAUNDE TERRY NRO. S/N</cbc:Line>
+               </cac:AddressLine>
+               <cac:Country>
+                  <cbc:IdentificationCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 3166-1" listName="Country">PE</cbc:IdentificationCode>
+               </cac:Country>
+            </cac:RegistrationAddress>
+         </cac:PartyLegalEntity>
+         <cac:Contact>
+            <cbc:ElectronicMail>facturacion@transcarhuas.com</cbc:ElectronicMail>
+         </cac:Contact>
+      </cac:Party>
+   </cac:AccountingCustomerParty>
+   <cac:PaymentMeans>
+      <cbc:ID>Detraccion</cbc:ID>
+      <cbc:PaymentMeansCode listAgencyName="PE:SUNAT" listName="Medio de pago" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo59">001</cbc:PaymentMeansCode>
+      <cac:PayeeFinancialAccount>
+         <cbc:ID>00099049340</cbc:ID>
+      </cac:PayeeFinancialAccount>
+   </cac:PaymentMeans>
+   <cac:PaymentTerms>
+      <cbc:ID>Detraccion</cbc:ID>
+      <cbc:PaymentMeansID schemeAgencyName="PE:SUNAT" schemeName="Codigo de detraccion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo54">027</cbc:PaymentMeansID>
+      <cbc:Note>4168.68</cbc:Note>
+      <cbc:PaymentPercent>4</cbc:PaymentPercent>
+      <cbc:Amount currencyID="PEN">173.70</cbc:Amount>
+   </cac:PaymentTerms>
+   <cac:PaymentTerms>
+      <cbc:ID>FormaPago</cbc:ID>
+      <cbc:PaymentMeansID>Credito</cbc:PaymentMeansID>
+      <cbc:Amount currencyID="PEN">4168.68</cbc:Amount>
+   </cac:PaymentTerms>
+   <cac:PaymentTerms>
+      <cbc:ID>FormaPago</cbc:ID>
+      <cbc:PaymentMeansID>Cuota001</cbc:PaymentMeansID>
+      <cbc:Amount currencyID="PEN">4168.68</cbc:Amount>
+      <cbc:PaymentDueDate>2026-06-23</cbc:PaymentDueDate>
+   </cac:PaymentTerms>
+   <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">662.40</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+         <cbc:TaxableAmount currencyID="PEN">3679.98</cbc:TaxableAmount>
+         <cbc:TaxAmount currencyID="PEN">662.40</cbc:TaxAmount>
+         <cac:TaxCategory>
+            <cac:TaxScheme>
+               <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+               <cbc:Name>IGV</cbc:Name>
+               <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+            </cac:TaxScheme>
+         </cac:TaxCategory>
+      </cac:TaxSubtotal>
+   </cac:TaxTotal>
+   <cac:LegalMonetaryTotal>
+      <cbc:LineExtensionAmount currencyID="PEN">3679.98</cbc:LineExtensionAmount>
+      <cbc:TaxInclusiveAmount currencyID="PEN">4342.38</cbc:TaxInclusiveAmount>
+      <cbc:AllowanceTotalAmount currencyID="PEN">0.00</cbc:AllowanceTotalAmount>
+      <cbc:PayableAmount currencyID="PEN">4342.38</cbc:PayableAmount>
+   </cac:LegalMonetaryTotal>
+   <cac:InvoiceLine>
+      <cbc:ID>1</cbc:ID>
+      <cbc:Note>TM</cbc:Note>
+      <cbc:InvoicedQuantity unitCode="ZZ" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">31</cbc:InvoicedQuantity>
+      <cbc:LineExtensionAmount currencyID="PEN">3679.98</cbc:LineExtensionAmount>
+      <cac:PricingReference>
+         <cac:AlternativeConditionPrice>
+            <cbc:PriceAmount currencyID="PEN">140.0768</cbc:PriceAmount>
+            <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>
+         </cac:AlternativeConditionPrice>
+      </cac:PricingReference>
+      <cac:Delivery>
+         <cac:DeliveryLocation>
+            <cac:Address>
+               <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150137</cbc:ID>
+               <cbc:CityName>LIMA</cbc:CityName>
+               <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>
+               <cbc:District>SANTA ANITA</cbc:District>
+               <cac:AddressLine>
+                  <cbc:Line>PJ SEOR DE MURUHUAY NRO SN INT 20 (MERCADO DE PRODUCTORES)</cbc:Line>
+               </cac:AddressLine>
+            </cac:Address>
+         </cac:DeliveryLocation>
+         <cac:Despatch>
+            <cbc:Instructions>SERVICIO DE TRASNPORTE</cbc:Instructions>
+            <cac:DespatchAddress>
+               <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">220206</cbc:ID>
+               <cbc:CityName>BELLAVISTA</cbc:CityName>
+               <cbc:CountrySubentity>SAN MARTIN</cbc:CountrySubentity>
+               <cbc:District>SAN RAFAEL</cbc:District>
+               <cac:AddressLine>
+                  <cbc:Line>CAR FERNANDO BELAUNDE TERRY NRO SN</cbc:Line>
+               </cac:AddressLine>
+            </cac:DespatchAddress>
+         </cac:Despatch>
+         <cac:DeliveryTerms>
+            <cbc:ID>01</cbc:ID>
+            <cbc:Amount currencyID="PEN">4342.38</cbc:Amount>
+         </cac:DeliveryTerms>
+         <cac:DeliveryTerms>
+            <cbc:ID>02</cbc:ID>
+            <cbc:Amount currencyID="PEN">4342.38</cbc:Amount>
+         </cac:DeliveryTerms>
+         <cac:DeliveryTerms>
+            <cbc:ID>03</cbc:ID>
+            <cbc:Amount currencyID="PEN">4342.38</cbc:Amount>
+         </cac:DeliveryTerms>
+      </cac:Delivery>
+      <cac:TaxTotal>
+         <cbc:TaxAmount currencyID="PEN">662.40</cbc:TaxAmount>
+         <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="PEN">3679.98</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="PEN">662.40</cbc:TaxAmount>
+            <cac:TaxCategory>
+               <cbc:Percent>18</cbc:Percent>
+               <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>
+               <cac:TaxScheme>
+                  <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+                  <cbc:Name>IGV</cbc:Name>
+                  <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+               </cac:TaxScheme>
+            </cac:TaxCategory>
+         </cac:TaxSubtotal>
+      </cac:TaxTotal>
+      <cac:Item>
+         <cbc:Description>POR SERVICIO DE TRANSPORTE DE ARROZ MI CHACRITA TRANSP. X 49 KG SEGUN G.R.R T020-3283 Y G.R.T EG03-5643</cbc:Description>
+         <cac:SellersItemIdentification>
+            <cbc:ID>001</cbc:ID>
+         </cac:SellersItemIdentification>
+      </cac:Item>
+      <cac:Price>
+         <cbc:PriceAmount currencyID="PEN">118.70912</cbc:PriceAmount>
+      </cac:Price>
+   </cac:InvoiceLine>
+</Invoice>

@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use Mail;
+use DB;
+use DateTime;
+use App\Modelos\SuperPrecio;
+
+use App\Traits\UserTraits;
+use App\Traits\ComprobanteTraits;
+use App\Traits\PrecioCompetenciaTraits;
+use App\Traits\SunatTraits;
+
+use Maatwebsite\Excel\Facades\Excel;
+
+class NotificacionOC extends Command
+{
+    use UserTraits;
+    use ComprobanteTraits;
+    use PrecioCompetenciaTraits;
+    use SunatTraits;
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'notificacion:oc';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Notificacion OC';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        set_time_limit(0);
+        /****************************************************************************/
+        \Log::error('Otros notifica.');
+        $this->envio_correo_confirmacion();
+        $this->ejecutar_orden_ingreso();
+        $this->orden_ingreso_ejecutada();
+        $this->envio_correo_tesoreria_lq();
+        $this->modificarglosahabilitacion();
+
+        //envio de usuario contacto a jefe de acopio
+        $this->envio_correo_jefeacopiodic();
+        $this->envio_correo_jefeacopiolqc();
+
+        //envio de usuario contacto a administracion
+        $this->envio_correo_admindic();
+        $this->envio_correo_adminlqc();
+
+        //$this->envio_correo_reparacion_levantada();
+        $horaActual = date("H:i");
+
+        if ($horaActual == '06:00' || $horaActual == '07:00' || $horaActual == '08:00') {
+            $this->crear_excel_aporbado_admin();
+        }
+
+
+        if (
+            $horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
+            $horaActual == '10:00' || $horaActual == '11:00' ||
+            $horaActual == '12:00' || $horaActual == '13:00' ||
+            $horaActual == '14:00' || $horaActual == '15:00' ||
+            $horaActual == '16:00' || $horaActual == '17:00' ||
+            $horaActual == '20:00'
+        ) {
+
+            $this->sunat_cdr();
+            $this->sunat_cdr_contrato();
+            $this->cambiar_parcialmente();
+
+        }
+
+
+        if ($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00') {
+            $this->documentolgautomaticonuevo();
+            $this->eliminacion_vales_arendir();
+        }
+
+        $this->guadarpdfoi();
+        $this->envio_correo_aprobado();
+
+        if ($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00') {
+            $this->cambiar_fecha_vencimiento();
+            $this->envio_detraccion_sunat();
+        }
+
+        if ($horaActual == '01:00' || $horaActual == '01:30') {
+            $this->sut_traer_data_sunat('IACHEM0000010394');
+        }
+        if ($horaActual == '02:00' || $horaActual == '02:30') {
+            $this->sut_traer_data_sunat('IACHEM0000007086');
+        }
+
+        if ($horaActual == '03:00') {
+            $this->ejecutar_query_osiris_compras();
+            $this->update_serie_correlativo_cpe();
+        }
+
+        if ($horaActual == '03:30' || $horaActual == '04:30' || $horaActual == '05:30') {
+            $this->sunatarchivos();
+        }
+
+        // //precios de supermercado
+        // try{    
+        //     if($horaActual == '03:00' || 
+        //         $horaActual == '04:00'){
+        //         DB::beginTransaction();
+        //         SuperPrecio::whereDate('FECHA',date('Ymd'))->delete();
+        //         $this->scrapear_plazavea('PLAZAVEA');
+        //         $this->scrapear_metro('METRO');
+        //         $this->scrapear_tottus('TOTTUS');
+        //         $this->scrapear_wong('WONG');
+        //         $lista_precios = SuperPrecio::orderby('MARCA','asc')->get();
+        //         //dd($lista_precios);
+        //         Excel::create('DATAAUTOMATICA_BD', function($excel) use ($lista_precios) {
+        //             $excel->sheet('PRECIOS_SUPER', function($sheet) use ($lista_precios) {
+        //                 $sheet->loadView('reporte/excel/listapreciossupermercados')->with('lista_precios',$lista_precios);                                               
+        //             });
+        //         })->store('xlsx', 'F:/Data_Drive');
+        //         DB::commit();
+        //     }
+        // }catch(\Exception $ex){
+        //     DB::rollback();
+        //     dd($ex);
+        // }
+
+    }
+}

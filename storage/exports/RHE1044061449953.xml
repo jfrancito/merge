@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?xml-stylesheet type="text/xsl" href="recibo.xsl"?>
+<Invoice 
+	xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" 
+	xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" 
+	xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" 
+	xmlns:ccts="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-2" 
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#" 
+	xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" 
+	xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" 
+	xmlns:stat="urn:oasis:names:specification:ubl:schema:xsd:DocumentStatusCode-1.0" 
+	xmlns:udt="urn:un:unece:uncefact:data:draft:UnqualifiedDataTypesSchemaModule:2">
+	<ext:UBLExtensions>
+		<ext:UBLExtension>
+			<ext:ExtensionContent><ds:Signature>
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<ds:Reference URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue>0Vz6yH815UM5lkVkpn72Oi2ltULdC+0+I1/Io9IQHMg=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+N/+Jhxyu2rrby3nmBOv7e7womgPNopCQKPE6gEID7GC8ZNTMptgWnGv4rJaCg3jZn0FH/h6iu0vw
+2FfWKGVqsBizCgaQVyIKY4gs7KhN95lrggkoEd8Nn7OhztciYEYtetrfacZ0DOzAZWTHLCuZNxmE
+tIr1vwuwzahiBMlaLTrriSjMNy7ttPEOKXj5RHFF9vfy6u5lc6bqiKG/rHcD0gi1Qn2LoMFgGXkE
+7psseLupA22FfwaEbKvdMKmBDNWB0sNbAAGr/QESVeGAKnh5Y/wi0b4ml9pA5P4pnuDAOIQ9XAPL
+ZptjBHgcrHLfBIe//wp8krclh0l3JdQmDxjayw==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIIlTCCBn2gAwIBAgIJTSQkZX6VFEvxMA0GCSqGSIb3DQEBCwUAMIIBIjELMAkGA1UEBhMCUEUx
+DTALBgNVBAgMBExJTUExDTALBgNVBAcMBExJTUExPTA7BgNVBAsMNHNlZSBjdXJyZW50IGFkZHJl
+c3MgYXQgd3d3LmNhbWVyZmlybWEuY29tLnBlL2FkZHJlc3MxMDAuBgNVBAsMJ0FDIENBTUVSRklS
+TUEgUEVSw5ogQ0VSVElGSUNBRE9TIC0gMjAxNjEUMBIGA1UEBRMLMjA1NjYzMDI0NDcxGjAYBgNV
+BGEMEU5UUlBFLTIwNTY2MzAyNDQ3MSAwHgYDVQQKDBdDQU1FUkZJUk1BIFBFUsOaIFMuQS5DLjEw
+MC4GA1UEAwwnQUMgQ0FNRVJGSVJNQSBQRVLDmiBDRVJUSUZJQ0FET1MgLSAyMDE2MB4XDTIyMDkx
+MzEzMTA0M1oXDTI0MDkxMjEzMTA0M1owgfkxIzAhBgkqhkiG9w0BCQEWFG1kaWF6c2FAc3VuYXQu
+Z29iLnBlMUEwPwYDVQQDDDhTVVBFUklOVC4gTkFDLiBERSBBRFVBTkFTIFkgREUgQURNSU5JU1RS
+QUNJT04gVFJJQlVUQVJJQTENMAsGA1UEBwwETElNQTEUMBIGA1UECAwLTElNQSAtIExJTUExFDAS
+BgNVBAsMCzIwMTMxMzEyOTU1MTcwNQYDVQQLDC5Jc3N1ZWQgYnkgQ0FNRVJGSVJNQSBQRVLDmiAy
+MDE2ICBBQyBDQU1FUkZJUk1BMQ4wDAYDVQQKDAVTVU5BVDELMAkGA1UEBhMCUEUwggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQC3s//LbU1CWSNSGedES2BROJLgF9SOipNNdAb/1HIxvzu7
+pfUD5XQDKpcRwZ2i/1vIB8vVoVTS+t4jCogo21ok2Yx9wrnCEZjIvj8rUnYSfB2oqp4Bt1Oi80ew
+VGsPJiS7QxnMnwN/wzrYC6FNi9q/TyFqpsp0shVA5gKhOSUzfZrRZ1LcOZw1rmLc3cR6Ar6uTO0i
+D6EIDf/5FiXhwUZPfEVamU2XKigSKC5NeR3/7x0+29YUS68g8s68jAwZZ/Qmtqo8/QqNst3Kar2M
+6A6sd/p3vGuYRXddpVPVRVXORNIM6DX9sKwfsULfqmHYlUxuYnyxkqKNfpQY/k2OR+DbAgMBAAGj
+ggLyMIIC7jAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIGwDAdBgNVHSUEFjAUBggrBgEFBQcD
+AgYIKwYBBQUHAwQwHQYDVR0OBBYEFEDigdbnWKLpN8Pjf7XmfTdotkA5MIGNBggrBgEFBQcBAQSB
+gDB+MFQGCCsGAQUFBzAChkhodHRwOi8vd3d3LmNhbWVyZmlybWEuY29tL2NlcnRzL2FjX2NhbWVy
+ZmlybWFfcGVydV9jZXJ0aWZpY2Fkb3MtMjAxNi5jcnQwJgYIKwYBBQUHMAGGGmh0dHA6Ly9vY3Nw
+LmNhbWVyZmlybWEuY29tMB8GA1UdIwQYMBaAFDpuZRjnVtLk8y3dpXxybf8w4YYnMIGgBgNVHR8E
+gZgwgZUwSKBGoESGQmh0dHA6Ly9jcmwuY2FtZXJmaXJtYS5jb20vYWNfY2FtZXJmaXJtYV9wZXJ1
+X2NlcnRpZmljYWRvcy0yMDE2LmNybDBJoEegRYZDaHR0cDovL2NybDEuY2FtZXJmaXJtYS5jb20v
+YWNfY2FtZXJmaXJtYV9wZXJ1X2NlcnRpZmljYWRvcy0yMDE2LmNybDB7BgNVHREEdDBygRRtZGlh
+enNhQHN1bmF0LmdvYi5wZaRaMFgxVjBUBgorBgEEAYGHLh4KDEZDRVJUSUZJQ0FETyBERSBTRUxM
+TyBFTEVDVFJPTklDTyBERSBFTVBSRVNBIFBBUkEgQUdFTlRFUyBBVVRPTUFUSVpBRE9TMBwGA1Ud
+EgQVMBOBEWNhQGNhbWVyZmlybWEuY29tMIGgBgNVHSAEgZgwgZUwgZIGDCsGAQQBgYcuHhAyATCB
+gTApBggrBgEFBQcCARYdaHR0cHM6Ly9wb2xpY3kuY2FtZXJmaXJtYS5jb20wVAYIKwYBBQUHAgIw
+SAxGQ0VSVElGSUNBRE8gREUgU0VMTE8gRUxFQ1RST05JQ08gREUgRU1QUkVTQSBQQVJBIEFHRU5U
+RVMgQVVUT01BVElaQURPUzANBgkqhkiG9w0BAQsFAAOCAgEAhwcRvJZBWsYd7x7rOpbJ5glac6L+
+WYRiUWqdhCGnoVvWKU3c/1BPxjNBWGUMUxxBaXYXs0xOLzylBqdOGXx0ai9Lk4pX1cqE2bClwlyO
+rxwQfY6aLvHgIKO1qmi3B54GgXpgnquvTnCVer2D+hgEGi4s36CLW92Ip8gz+5UIGUiBvH7yNQ2I
+VujYLbhZB2HIMidUU8OqMqVsIS4HwTTrZfB+Id9UEh6dUcgXPLkeOOCcExNfWh1Yz+VoMJBZtwSw
+4iRwDH2qvrujJhx3RZ6z8Ur+EgdYy3LZw+r5mYmeq77QOyWaE1IUob9dFX9DTSrdjjshVvnL1ckY
+qdetoc5wj2WZto7x4rb95a10hLoXfe4rNb6nDTsTsX2Py2/CE6Y97LHmYw6kiv8QbaShSIjsLVBv
+RwpdLW2mJBlrnmz5NVCvPpaJQq5MW6yoabvfxCUwxog2qGqjqdjZYsz0REUu4FAYa/Xv0e3soZxE
+Rss6gTOP+cIKb2uqYRB/3TrESOvohC/nBWItSWH67iR5FMRwx20SCNC8afoPhhYEgG2K7xVsMY7e
+WbCny/BCPvzmebPG1Ekr/wYhpbveloawR8R6LwKgmYaP3IDVAQaDQ9uMDxE0oLvKP2ndWZ6EG6sB
+jTifA/W8JKsY3/Ww/w6a4RvLj+C5wBdm+YXooSGLWZzNPhw=
+</ds:X509Certificate>
+</ds:X509Data>
+<ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>
+t7P/y21NQlkjUhnnREtgUTiS4BfUjoqTTXQG/9RyMb87u6X1A+V0AyqXEcGdov9byAfL1aFU0vre
+IwqIKNtaJNmMfcK5whGYyL4/K1J2EnwdqKqeAbdTovNHsFRrDyYku0MZzJ8Df8M62AuhTYvav08h
+aqbKdLIVQOYCoTklM32a0WdS3DmcNa5i3N3EegK+rkztIg+hCA3/+RYl4cFGT3xFWplNlyooEigu
+TXkd/+8dPtvWFEuvIPLOvIwMGWf0JraqPP0KjbLdymq9jOgOrHf6d7xrmEV3XaVT1UVVzkTSDOg1
+/bCsH7FC36ph2JVMbmJ8sZKijX6UGP5Njkfg2w==
+</ds:Modulus>
+<ds:Exponent>AQAB</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+</ds:KeyInfo>
+<ds:Proposito>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA cumple con el proposito de firma digital</ds:Proposito>
+<ds:Revocacion>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA no se encuentra revocado</ds:Revocacion>
+<ds:TSL>El certificado raiz o intermedio AC CAMERFIRMA PERÚ CERTIFICADOS - 2016 se encuentra en la TSL de Indecopi</ds:TSL>
+<ds:Expiracion>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA no se encuentra expirado</ds:Expiracion>
+<ds:Object><QualifyingProperties xmlns:xad="http://uri.etsi.org/01903/v1.3.2#" Target="#"><SignedProperties id="SignedProperties-2604319792947559607"><SignedSignatureProperties><SigningTime>2024-04-25T16:05:50</SigningTime><SigningCertificate><Cert><CertDigest><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>wHxNeYYuq6C56yeJSqLk3mCXvo4=</DigestValue></CertDigest><IssuerSerial><ds:X509IssuerName>CN=AC CAMERFIRMA PERÚ CERTIFICADOS - 2016, O=CAMERFIRMA PERÚ S.A.C., OID.2.5.4.97=NTRPE-20566302447, SERIALNUMBER=20566302447, OU=AC CAMERFIRMA PERÚ CERTIFICADOS - 2016, OU=see current address at www.camerfirma.com.pe/address, L=LIMA, ST=LIMA, C=PE</ds:X509IssuerName><ds:X509SerialNumber>1423003611754503883761</ds:X509SerialNumber></IssuerSerial></Cert></SigningCertificate></SignedSignatureProperties></SignedProperties><UnsignedProperties id="SignedProperties-2604319792947559607"><UnsignedSignatureProperties/></UnsignedProperties></QualifyingProperties></ds:Object>
+</ds:Signature></ext:ExtensionContent>
+		</ext:UBLExtension>
+	</ext:UBLExtensions>
+	<cbc:ID>E001-53</cbc:ID>
+	<cbc:IssueDate>2024-04-25</cbc:IssueDate>
+	<cbc:IssueTime>16:05:47</cbc:IssueTime>
+	
+	
+	<cbc:ExpiryDate/>
+	
+	
+	<cbc:InvoiceTypeCode>01</cbc:InvoiceTypeCode>
+	<cbc:Note> DOS MIL QUINIENTOS Y 00/100 SOLES</cbc:Note>
+       <cac:OrderReference>
+		<cbc:ID>E001-53</cbc:ID>
+		<cac:DocumentReference>			
+				<cbc:ID>0</cbc:ID>
+				<cbc:IssueDate>2024-04-25</cbc:IssueDate>
+				<cbc:DocumentTypeCode>0</cbc:DocumentTypeCode>
+				<cbc:DocumentType>-</cbc:DocumentType>
+											
+		</cac:DocumentReference>
+	</cac:OrderReference>
+
+	<cac:Signature>
+		<cbc:ID>0001-0001</cbc:ID>
+		<cac:SignatoryParty>
+			<cac:PartyName>
+				<cbc:Name>-</cbc:Name>
+			</cac:PartyName>
+		</cac:SignatoryParty>
+		<cac:DigitalSignatureAttachment>
+			<cac:ExternalReference>
+				<cbc:URI>sunatSign</cbc:URI>
+			</cac:ExternalReference>
+		</cac:DigitalSignatureAttachment>
+	</cac:Signature>
+
+
+
+
+	<cac:AccountingSupplierParty>
+		<cbc:CustomerAssignedAccountID>10440614499</cbc:CustomerAssignedAccountID>
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>ROJAS VALLEJOS MANUEL JESUS</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>AV. VICTOR A. BELAUNDE NRO. REF INT. 602 CND. LOS PARQUES DE SAN GABRIE LAMBAYEQUE - CHICLAYO - CHICLAYO</cbc:StreetName>
+				<cbc:BuildingNumber/>
+				<cbc:CityName/>
+				<cbc:CountrySubentity/>
+				<cac:Country>
+					<cbc:IdentificationCode>PE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+                  <cac:Contact>
+				<cbc:Telephone>526284    </cbc:Telephone>				
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+
+
+	<cac:AccountingCustomerParty>
+		
+		<cbc:CustomerAssignedAccountID>20479729141</cbc:CustomerAssignedAccountID>
+		<cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+	
+	
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>INDUAMERICA SERVICIOS LOGISTICOS S.A.C.</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>MZA. I-1 LOTE. 6 COO. COLONIZADORA LAS VERTIENT LIMA - LIMA - VILLA EL SALVADOR</cbc:StreetName>
+				<cbc:BuildingNumber/>
+				<cbc:CityName/>
+				<cbc:CountrySubentity/>
+				<cac:Country>
+					<cbc:IdentificationCode/>
+				</cac:Country>
+			</cac:PostalAddress>
+                  <cac:Contact>
+				<cbc:Telephone/>				
+			</cac:Contact>
+		</cac:Party>
+	
+	
+	
+				
+	</cac:AccountingCustomerParty>
+
+	<cac:BuyerCustomerParty>
+		<cac:Party>
+			<cac:PartyLegalEntity>
+				<cac:RegistrationAddress>				    
+					<cbc:CityName/>
+				    <cbc:CountrySubentity/>
+					<cbc:CountrySubentityCode/>	                             
+					 <cbc:District/>
+					<cac:AddressLine>
+						<cbc:Line/>
+					</cac:AddressLine>
+					<cac:Country>
+					  <cbc:IdentificationCode/>
+					</cac:Country>
+				</cac:RegistrationAddress>
+			</cac:PartyLegalEntity>
+		</cac:Party>
+	</cac:BuyerCustomerParty>
+
+	<cac:PaymentTerms>
+		<cbc:ID>FormaPago</cbc:ID> 
+		<cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>
+		<cbc:Amount currencyID=""/>
+		<cbc:PaymentDueDate/> 
+	</cac:PaymentTerms>
+	
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="PEN">2500.00</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:ID>A</cbc:ID>
+				<cac:TaxScheme/>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<cac:LegalMonetaryTotal>
+		<cbc:LineExtensionAmount currencyID="PEN">0.00</cbc:LineExtensionAmount>
+		<cbc:TaxExclusiveAmount currencyID="PEN">0.00</cbc:TaxExclusiveAmount>
+		<cbc:PayableAmount currencyID="PEN">2500.00</cbc:PayableAmount>
+	</cac:LegalMonetaryTotal>
+	<cac:InvoiceLine>
+		<cbc:ID>0001</cbc:ID>
+		<cbc:Note>-  </cbc:Note>
+		<cbc:InvoicedQuantity unitCode="ZZ">0.00</cbc:InvoicedQuantity>
+		<cbc:LineExtensionAmount currencyID="PEN">0.00</cbc:LineExtensionAmount>
+		<cac:OrderLineReference>
+			<cbc:LineID>1</cbc:LineID>
+		</cac:OrderLineReference>
+		<cac:TaxTotal>
+			<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+			<cac:TaxSubtotal>
+				<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+				<cbc:Percent>8.00</cbc:Percent>
+				<cac:TaxCategory>
+					<cbc:ID>RET 4TA</cbc:ID>
+					<cbc:Name/>
+					<cac:TaxScheme/>
+				</cac:TaxCategory>
+			</cac:TaxSubtotal>
+		</cac:TaxTotal>
+		<cac:Item>
+			<cbc:Description>DESARROLLO DE REQUERIMIENTO MES DE ABRIL  </cbc:Description>
+		</cac:Item>
+		<cac:Price>
+			<cbc:PriceAmount currencyID="PEN">2500.00</cbc:PriceAmount>
+		</cac:Price>
+	</cac:InvoiceLine>
+
+
+     
+
+</Invoice>

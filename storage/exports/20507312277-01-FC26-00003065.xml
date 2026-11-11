@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:cec="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:fac="urn:facele:names:specification:ubl:peru:schema:xsd:FaceleAggregateComponents-1" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:sbc="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2" xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2">
+    <cec:UBLExtensions>
+        <cec:UBLExtension>
+            <cec:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signId"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>rSN737HaefCw2bkZ+grGE/DFegw=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="signatureValueId">Ia/60wEVAsdqmiAsQG0tLhA66ETkK0nUzPdf38rXgm32673XdubndFhsob7FqETF+jn5GOyw58AV&#13;
+vyQKw5Xa6I5QxAWsmyMbmamSD1g8g++IGosgP35UEbFdW39HS9qJGzk4VOHg0bcK/BMpDAVYjKG2&#13;
+1UIhPHYGC/MqjqDrwktJ5eeDanEGJoL9KmgNKmlXGa7Bv9bDiuSXhQcXGtNobZlgIdyM4cbKPddP&#13;
+mv4JPsD6iHOpfNdljpllqgonzo6terC9hP32/dwVObTad6nDIrNqHK39PabOk8WHmWBtPiFqvUiU&#13;
+prNfuyetHYMQG1WUup8zcbWhWxzC4DmJHJvZWw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509SubjectName>2.5.4.13=#0c2a436572746966696361646f207061726120466163747572616369c3b36e20456c65637472c3b36e696361,1.3.6.1.4.1.47286.30.2=#0c03525543,1.3.6.1.4.1.47286.30.3=#0c0b3230363031313232343036,1.3.6.1.4.1.47286.30.4=#0c03434558,1.2.840.113549.1.9.1=#16196664656c726973636f40677275706f666163656c652e636f6d,CN=FERNANDO DEL RISCO CASTRO,2.5.4.5=#1309303031363839313635,2.5.4.42=#0c084645524e414e444f,2.5.4.4=#0c1044454c20524953434f2043415354524f,2.5.4.12=#0c0941504f44455241444f,OU=ADMINISTRACION,OU=20601122406,O=FACELE S.A.C.,L=LIMA,C=PE</ds:X509SubjectName><ds:X509Certificate>MIIIaDCCBlCgAwIBAgIIYZGLVXFirKQwDQYJKoZIhvcNAQELBQAwgbgxCzAJBgNVBAYTAkVTMUQw&#13;
+QgYDVQQHDDtCYXJjZWxvbmEgKHNlZSBjdXJyZW50IGFkZHJlc3MgYXQgd3d3LnVhbmF0YWNhLmNv&#13;
+bS9hZGRyZXNzKTEWMBQGA1UECgwNVUFOQVRBQ0EgUy5BLjEVMBMGA1UECwwMVFNQLVVBTkFUQUNB&#13;
+MRowGAYDVQQDDBFVQU5BVEFDQSBDQTEgMjAxNjEYMBYGA1UEYQwPVkFURVMtQTY2NzIxNDk5MB4X&#13;
+DTIzMTAxNzE0NDMwMFoXDTI2MTAxNjE0NDMwMFowggGDMQswCQYDVQQGEwJQRTENMAsGA1UEBwwE&#13;
+TElNQTEWMBQGA1UECgwNRkFDRUxFIFMuQS5DLjEUMBIGA1UECwwLMjA2MDExMjI0MDYxFzAVBgNV&#13;
+BAsMDkFETUlOSVNUUkFDSU9OMRIwEAYDVQQMDAlBUE9ERVJBRE8xGTAXBgNVBAQMEERFTCBSSVND&#13;
+TyBDQVNUUk8xETAPBgNVBCoMCEZFUk5BTkRPMRIwEAYDVQQFEwkwMDE2ODkxNjUxIjAgBgNVBAMM&#13;
+GUZFUk5BTkRPIERFTCBSSVNDTyBDQVNUUk8xKDAmBgkqhkiG9w0BCQEWGWZkZWxyaXNjb0BncnVw&#13;
+b2ZhY2VsZS5jb20xEzARBgorBgEEAYLxNh4EDANDRVgxGzAZBgorBgEEAYLxNh4DDAsyMDYwMTEy&#13;
+MjQwNjETMBEGCisGAQQBgvE2HgIMA1JVQzEzMDEGA1UEDQwqQ2VydGlmaWNhZG8gcGFyYSBGYWN0&#13;
+dXJhY2nDs24gRWxlY3Ryw7NuaWNhMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmInW&#13;
+/R6GV3Kjg33APX4QP8zcQpo4X7tb+9uArwt907AUinS89sjBjnET7IU1breCjzVBdiD4HXS4Qnra&#13;
++pDreQ52GGxvM5sQKNKqAdBPA2N20Esg7rgQgcrdTHGKLcspUHDzoyKcmwKkPOVL/+wjb8phjZGb&#13;
+Lx/4iyLTw1feKRCSMDmlQguaOtzDYWBwRQGU5dgabrXaNesE7wdEWwu0wOY/fkuCvJosOHefBTDH&#13;
+J2h4bWvyi6px02BHbWINVo1SLInvbVEbTlRwvB8LdpyFyedg0VHDYSJcmhH7KpatYUAlAbxKAbsK&#13;
+2NZxixY1TqeFQ0rhul/QtY4W8vsQzsLnHQIDAQABo4ICpjCCAqIwgdcGCCsGAQUFBwEBBIHKMIHH&#13;
+MFUGCCsGAQUFBzAChklodHRwOi8vd3d3LnVhbmF0YWNhLmNvbS9wdWJsaWMvZG93bmxvYWQvdHNw&#13;
+X2NlcnRpZmljYXRlcy9zdWJvcmRpbmF0ZTEuY3J0MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcDEu&#13;
+dWFuYXRhY2EuY29tL3B1YmxpYy9wa2kvb2NzcC8wNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwMi51&#13;
+YW5hdGFjYS5jb20vcHVibGljL3BraS9vY3NwLzAdBgNVHQ4EFgQUGZWZ+CrVluU3wHNxtcVIFthe&#13;
+LlcwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBQtce+wY3/1/eCDIkR/RBAwgU9N5TCBkAYDVR0g&#13;
+BIGIMIGFMIGCBgwrBgEEAYLxNgICAgIwcjA2BggrBgEFBQcCARYqaHR0cDovL3d3dy51YW5hdGFj&#13;
+YS5jb20vcHVibGljL3BraS9kcGMtcGUvMDgGCCsGAQUFBwICMCwMKkNlcnRpZmljYWRvIHBhcmEg&#13;
+RmFjdHVyYWNpw7NuIEVsZWN0csOzbmljYTCBjwYDVR0fBIGHMIGEMECgPqA8hjpodHRwOi8vY3Js&#13;
+MS51YW5hdGFjYS5jb20vcHVibGljL3BraS9jcmwvQ0Exc3Vib3JkaW5hZGEuY3JsMECgPqA8hjpo&#13;
+dHRwOi8vY3JsMi51YW5hdGFjYS5jb20vcHVibGljL3BraS9jcmwvQ0Exc3Vib3JkaW5hZGEuY3Js&#13;
+MA4GA1UdDwEB/wQEAwIGwDAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwJAYDVR0RBB0w&#13;
+G4EZZmRlbHJpc2NvQGdydXBvZmFjZWxlLmNvbTANBgkqhkiG9w0BAQsFAAOCAgEA1lGGhYISkYe0&#13;
+Sr1nb81Ga64vAbGccuc/lMzIzbdyipcu/AvER+aXTBKE+b6npWSASMnW2sGdWwTi8ihmok1KN1EX&#13;
+HdvRw4NBEt7wIgTMGHLHKbumLOmTuM4jf+jDfSn/NQCr06l31B5LXXHhhYNl8qYl7DNHRdar+pHr&#13;
+ZEUI6O+/cVzEa3urOkVKc2A8/907QbWBkWQJHp0LGer9nGwhprE/qcf/zu2+M1wV8IwzegUN9GTF&#13;
+eze3SsG88TWBiUmyariMIlu6PnYxXbq6qwjISecF/Shvz4pjzsir6J6PzZlkLRsCq9rv3JL24n9D&#13;
+22DsT1jahZLSH525VfQtjMLjeoPuN0V3TdMA3eA4RZ9b80I6aJ1GZMbRH0hCPaqCT3RF2VwMMG3S&#13;
+Nh/ii7D9Wvddg0OmRM6qQtBZc7TJRRpve4zjIlKT9PpEM7Z03UOpJeUGcPy+YVZe3Y57XJsPP4VD&#13;
+rJM0q6O/I7dKXwP+Pqwr6HDOabSPyIZmk9YvcRV09r8m5uUc7Hv5WAfngY7H5lutBxWcfsQl4l0N&#13;
+M3i6WIxFLGxKbH2REGayL6jEYjj2OmJ9JRoPRCP+KLWqeIHt1u9hfL1z8Br3UIJQsMrPMUvML74+&#13;
+uewyGA6xWB/BQ37BhkFvXbJnheD4jycTYHoWPIP+ppoOOMAu0JS/ZuIfKeTjlYg=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></cec:ExtensionContent>
+        </cec:UBLExtension>
+        <cec:UBLExtension>
+            <cec:ExtensionContent>
+                <fac:AdditionalPrintedElement>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>Forma_pago_tipo</cbc:ID>
+                        <cbc:Value>Crédito 30 días</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>percepcion</cbc:ID>
+                        <cbc:Value>11.970000</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>monto_total</cbc:ID>
+                        <cbc:Value>598.500000</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>IMPORTE_TOTAL</cbc:ID>
+                        <cbc:Value>610.470000</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>DCL_PLANTILLA</cbc:ID>
+                        <cbc:Value>20507312277v2-01</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>descuento</cbc:ID>
+                        <cbc:Value>0.000000</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                    <fac:AdditionalPrintedProperty>
+                        <cbc:ID>DCL_EMAIL</cbc:ID>
+                        <cbc:Value>oscar.vega@induamerica.com.pe,cristian.sanchez@induamerica.com, oscar.vega@induamerica.com.pe, facturacion.iacm@induamerica.com.pe, facturación.iain@induamerica.com.pe</cbc:Value>
+                    </fac:AdditionalPrintedProperty>
+                </fac:AdditionalPrintedElement>
+            </cec:ExtensionContent>
+        </cec:UBLExtension>
+        <cec:UBLExtension>
+            <cec:ExtensionContent>
+                <fac:AdditionalData>
+                    <fac:AdditionalItemData>
+                        <fac:LineItem>
+                            <cbc:ID>1</cbc:ID>
+                        </fac:LineItem>
+                        <fac:AdditionalItemColumn>
+                            <cbc:Name>subTotal</cbc:Name>
+                            <cbc:Value>507.200000</cbc:Value>
+                        </fac:AdditionalItemColumn>
+                        <fac:AdditionalItemColumn>
+                            <cbc:Name>tipoImpuesto</cbc:Name>
+                            <cbc:Value>IGV</cbc:Value>
+                        </fac:AdditionalItemColumn>
+                    </fac:AdditionalItemData>
+                </fac:AdditionalData>
+            </cec:ExtensionContent>
+        </cec:UBLExtension>
+    </cec:UBLExtensions>
+    <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+    <cbc:CustomizationID>2.0</cbc:CustomizationID>
+    <cbc:ProfileID schemeAgencyName="PE:SUNAT" schemeName="SUNAT:Identificador de Tipo de Operacion" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo17">0101</cbc:ProfileID>
+    <cbc:ID>FC26-00003065</cbc:ID>
+    <cbc:IssueDate>2024-06-24</cbc:IssueDate>
+    <cbc:IssueTime>08:36:06</cbc:IssueTime>
+    <cbc:DueDate>2024-07-24</cbc:DueDate>
+    <cbc:InvoiceTypeCode listAgencyName="PE:SUNAT" listID="0101" listName="Tipo de Documento" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion">01</cbc:InvoiceTypeCode>
+    <cbc:Note languageLocaleID="2005">Leyenda "Venta realizada por emisor itinerante" </cbc:Note>
+    <cbc:DocumentCurrencyCode listAgencyName="United Nations Economic Commission for Europe" listID="ISO 4217 Alpha" listName="Currency">PEN</cbc:DocumentCurrencyCode>
+    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>
+    <cac:DespatchDocumentReference>
+        <cbc:ID>T035-00001203</cbc:ID>
+        <cbc:DocumentTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Documento" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01">09</cbc:DocumentTypeCode>
+    </cac:DespatchDocumentReference>
+    <cac:Signature>
+        <cbc:ID>signIdSP</cbc:ID>
+        <cac:SignatoryParty>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="6">20507312277</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <cbc:Name>MEGA GAS S.A.C.</cbc:Name>
+            </cac:PartyName>
+        </cac:SignatoryParty>
+        <cac:DigitalSignatureAttachment>
+            <cac:ExternalReference>
+                <cbc:URI>#signId</cbc:URI>
+            </cac:ExternalReference>
+        </cac:DigitalSignatureAttachment>
+    </cac:Signature>
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <cac:PartyIdentification>
+                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20507312277</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <cbc:Name>MEGA GAS S.A.C.</cbc:Name>
+            </cac:PartyName>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>MEGA GAS S.A.C.</cbc:RegistrationName>
+                <cac:RegistrationAddress>
+                    <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150119</cbc:ID>
+                    <cbc:AddressTypeCode listAgencyName="PE:SUNAT">0000</cbc:AddressTypeCode>
+                    <cbc:StreetName>Jr. los Gallos Mza. e Lote. 13 (las Praderas de Lurin-Zona Industrial)</cbc:StreetName>
+                    <cbc:CitySubdivisionName>-</cbc:CitySubdivisionName>
+                    <cbc:CityName>Lima</cbc:CityName>
+                    <cbc:CountrySubentity>Lima</cbc:CountrySubentity>
+                    <cbc:District>Lurin</cbc:District>
+                    <cac:AddressLine>
+                        <cbc:Line>Jr. los Gallos Mza. e Lote. 13 (las Praderas de Lurin-Zona Industrial)</cbc:Line>
+                    </cac:AddressLine>
+                    <cac:Country>
+                        <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+                    </cac:Country>
+                </cac:RegistrationAddress>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <cac:Party>
+            <cac:PartyIdentification>
+                <cbc:ID schemeAgencyName="PE:SUNAT" schemeID="6" schemeName="Documento de Identidad" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20602740278</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <cbc:Name>INDUAMERICA INTERNACIONAL S.A.C.</cbc:Name>
+            </cac:PartyName>
+            <cac:PhysicalLocation>
+                <cbc:Description>AV. CAMINO REAL   931    Dpto : 201 - San Isidro - Lima - Lima</cbc:Description>
+            </cac:PhysicalLocation>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>INDUAMERICA INTERNACIONAL S.A.C.</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+    <cac:Delivery>
+        <cac:DeliveryLocation>
+            <cac:Address>
+                <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150101</cbc:ID>
+                <cbc:StreetName>CAR.CAR. PANAMERICANA NORTE KM. 775</cbc:StreetName>
+                <cbc:CitySubdivisionName>-</cbc:CitySubdivisionName>
+                <cbc:CityName>Lambayeque</cbc:CityName>
+                <cbc:CountrySubentity>Lambayeque</cbc:CountrySubentity>
+                <cbc:District>Lambayeque</cbc:District>
+                <cac:AddressLine>
+                    <cbc:Line>CAR.CAR. PANAMERICANA NORTE KM. 775</cbc:Line>
+                </cac:AddressLine>
+            </cac:Address>
+        </cac:DeliveryLocation>
+    </cac:Delivery>
+    <cac:PaymentTerms>
+        <cbc:ID>FormaPago</cbc:ID>
+        <cbc:PaymentMeansID>Credito</cbc:PaymentMeansID>
+        <cbc:Amount currencyID="PEN">598.50</cbc:Amount>
+    </cac:PaymentTerms>
+    <cac:PaymentTerms>
+        <cbc:ID>FormaPago</cbc:ID>
+        <cbc:PaymentMeansID>Cuota001</cbc:PaymentMeansID>
+        <cbc:Amount currencyID="PEN">598.50</cbc:Amount>
+        <cbc:PaymentDueDate>2024-07-24</cbc:PaymentDueDate>
+    </cac:PaymentTerms>
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="PEN">91.30</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="PEN">507.20</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="PEN">91.30</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID schemeAgencyName="United Nations Economic Commission for Europe" schemeID="UN/ECE 5305" schemeName="Tax Category Identifier">1000</cbc:ID>
+                <cac:TaxScheme>
+                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+                    <cbc:Name>IGV</cbc:Name>
+                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:LegalMonetaryTotal>
+        <cbc:LineExtensionAmount currencyID="PEN">507.20</cbc:LineExtensionAmount>
+        <cbc:TaxInclusiveAmount currencyID="PEN">598.50</cbc:TaxInclusiveAmount>
+        <cbc:PayableAmount currencyID="PEN">598.50</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <cac:InvoiceLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="NIU" unitCodeListAgencyName="United Nations Economic Commission for Europe" unitCodeListID="UN/ECE rec 20">9.0000</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="PEN">507.20</cbc:LineExtensionAmount>
+        <cac:PricingReference>
+            <cac:AlternativeConditionPrice>
+                <cbc:PriceAmount currencyID="PEN">66.5000</cbc:PriceAmount>
+                <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>
+            </cac:AlternativeConditionPrice>
+        </cac:PricingReference>
+        <cac:Delivery/>
+        <cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">91.30</cbc:TaxAmount>
+            <cac:TaxSubtotal>
+                <cbc:TaxableAmount currencyID="PEN">507.20</cbc:TaxableAmount>
+                <cbc:TaxAmount currencyID="PEN">91.30</cbc:TaxAmount>
+                <cac:TaxCategory>
+                    <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+                    <cbc:Percent>18.00</cbc:Percent>
+                    <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>
+                    <cac:TaxScheme>
+                        <cbc:ID schemeAgencyName="PE:SUNAT" schemeName="Codigo de tributos" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+                        <cbc:Name>IGV</cbc:Name>
+                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                    </cac:TaxScheme>
+                </cac:TaxCategory>
+            </cac:TaxSubtotal>
+        </cac:TaxTotal>
+        <cac:Item>
+            <cbc:Description>COMPOSITE 15KG CHICLAYO</cbc:Description>
+            <cac:SellersItemIdentification>
+                <cbc:ID>040408VAR025</cbc:ID>
+            </cac:SellersItemIdentification>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="PEN">56.3559</cbc:PriceAmount>
+        </cac:Price>
+    </cac:InvoiceLine>
+</Invoice>

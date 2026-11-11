@@ -1,0 +1,2 @@
+@include('entregadetraccion.ajax.alistaocentregabledetraccion')
+
