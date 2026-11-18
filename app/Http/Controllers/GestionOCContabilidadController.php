@@ -12676,15 +12676,41 @@ class GestionOCContabilidadController extends Controller
 
     public function buscarProveedor(Request $request)
     {
-        $q = $request->get('busqueda', '');
+        $q = trim($request->get('busqueda', ''));
 
-        return STDEmpresa::where('COD_ESTADO', '=', 1)
-            ->where('IND_PROVEEDOR', '=', 1)
-            ->where('NOM_EMPR', 'like', "%{$q}%")
-            ->select('COD_EMPR as id', 'NOM_EMPR as text')
+        if ($q === '') {
+            return STDEmpresa::where('COD_ESTADO', '=', 1)
+                ->where('IND_PROVEEDOR', '=', 1)
+                ->select('COD_EMPR as id', 'NOM_EMPR as text')
+                ->limit(50)
+                ->get();
+        }
+
+        $query = STDEmpresa::where('COD_ESTADO', '=', 1)
+            ->where('IND_PROVEEDOR', '=', 1);
+
+        $words = array_values(array_filter(explode(' ', $q), function ($w) {
+            return trim($w) !== '';
+        }));
+
+        $query->where(function ($sub) use ($q, $words) {
+            // Coincidencia exacta o parcial de RUC / NRO_DOCUMENTO
+            $sub->where('NRO_DOCUMENTO', 'like', "%{$q}%")
+                ->orWhere('NOM_EMPR', 'like', "%{$q}%");
+
+            // Si hay múltiples palabras (ej. nombres y apellidos invertidos), buscar que contenga todas las palabras
+            if (count($words) > 1) {
+                $sub->orWhere(function ($subWords) use ($words) {
+                    foreach ($words as $w) {
+                        $subWords->where('NOM_EMPR', 'like', "%{$w}%");
+                    }
+                });
+            }
+        });
+
+        return $query->select('COD_EMPR as id', 'NOM_EMPR as text')
             ->limit(50)
             ->get();
-
     }
 
     public function actionAjaxComboPeriodoAnioEmpresa(Request $request)
