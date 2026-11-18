@@ -2711,9 +2711,12 @@ $(document).ready(function () {
         if (elEmpresaAsiento && elEmpresaAsiento.tomselect) {
             elEmpresaAsiento.tomselect.addOption({
                 id: provVal,
-                text: proveedor_asiento_txt || ''
+                text: (proveedor_asiento_txt || '').trim() || provVal
             });
-            elEmpresaAsiento.tomselect.setValue(provVal);
+            elEmpresaAsiento.tomselect.setValue(provVal, true);
+            if (typeof elEmpresaAsiento.tomselect.sync === 'function') {
+                elEmpresaAsiento.tomselect.sync();
+            }
         } else if (elEmpresaAsiento) {
             $(elEmpresaAsiento).val(provVal);
         }
@@ -2763,6 +2766,16 @@ $(document).ready(function () {
 
         $('.pnlasientos').show();
         $('.pnlasientos').focus();
+        if (elEmpresaAsiento && elEmpresaAsiento.tomselect) {
+            elEmpresaAsiento.tomselect.addOption({
+                id: provVal,
+                text: (proveedor_asiento_txt || '').trim() || provVal
+            });
+            elEmpresaAsiento.tomselect.setValue(provVal, true);
+            if (typeof elEmpresaAsiento.tomselect.sync === 'function') {
+                elEmpresaAsiento.tomselect.sync();
+            }
+        }
         $('#asientodetalle').DataTable().columns.adjust().draw();
 
         setTimeout(function () {

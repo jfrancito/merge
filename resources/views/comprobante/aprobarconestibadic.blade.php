@@ -53,6 +53,26 @@
             padding: 2px 8px; /* espacio interno */
         }
 
+        /* Estilos para TomSelect en asientos */
+        .ts-wrapper.form-control, .ts-control {
+            width: 100% !important;
+            min-height: 38px !important;
+            height: auto !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 4px 8px !important;
+            box-sizing: border-box !important;
+        }
+
+        .ts-control > input {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .ts-dropdown {
+            z-index: 1050 !important;
+        }
+
     </style>
 @stop
 @section('section')
