@@ -1819,7 +1819,7 @@ class UserController extends Controller
 				->where('activo', '=', 1)
 				->first();
 
-			if (count($tusuario) > 0) {
+			if (!is_null($tusuario)) {
 
 				if ($tusuario->ind_confirmacion == 0) {
 					return Redirect::back()->withInput()->with('errorbd', 'El usuario aun no confirmo su registro');
@@ -1887,7 +1887,7 @@ class UserController extends Controller
 			->where('activo', '=', 1)
 			->first();
 
-		if (count($tusuario) > 0) {
+		if (!is_null($tusuario)) {
 
 			$listamenu = WEBGrupoopcion::join('web.opciones', 'web.opciones.grupoopcion_id', '=', 'web.grupoopciones.id')
 				->join('web.rolopciones', 'web.rolopciones.opcion_id', '=', 'web.opciones.id')
@@ -2775,7 +2775,7 @@ class UserController extends Controller
 
 
 		//dd($trabajador);
-		if (count($trabajador) > 0) {
+		if (!is_null($trabajador)) {
 			$centro = $trabajador->COD_ZONA_TIPO;
 		}
 

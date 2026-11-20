@@ -54,7 +54,7 @@
 
                         <tr>
                           <td>OBSERVADOS</td>
-                          <td class="text-center"> <span class="badge badge-success">{{count($listaobservados)}}</span></td>
+                          <td class="text-center"> <span class="badge badge-success">{{!empty($listaobservados) ? 1 : 0}}</span></td>
                         </tr>
 
                     </tbody>
