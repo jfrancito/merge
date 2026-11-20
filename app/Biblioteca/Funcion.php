@@ -30,7 +30,7 @@ class Funcion {
 					->where('TXT_ASIGNADO','like' ,'ARCHIVO_%')
 					->first();
 
-		if(count($lote)>0){
+		if(!is_null($lote)){
 			$color = 	'color_virtual';
 		}
 		
@@ -47,7 +47,7 @@ class Funcion {
 					->where('COD_AUTORIZACION', $id_documento)
 					->first();
 
-		if(count($lote)>0){
+		if(!is_null($lote)){
 			$nombre = 	$lote->TXT_EMPRESA;
 		}
 		
@@ -65,13 +65,13 @@ class Funcion {
 					->where('COD_TIPO_DOCUMENTO', 'TDO0000000000004')
 					->first();
 
-		if(count($lote)>0){
+		if(!is_null($lote)){
 
 			$referencia = DB::table('CMP.DOCUMENTO_CTBLE')
 			    ->where('COD_DOCUMENTO_CTBLE', $lote->COD_DOC_CTBLE)
 			    ->first();
 
-			if(count($referencia)>0){
+			if(!is_null($referencia)){
 
 					$nombre = 	$referencia->TXT_EMPR_EMISOR;
 
@@ -89,18 +89,18 @@ class Funcion {
 		$lote 	= 	DB::table('FE_REF_ASOC')
 					->where('LOTE', $id_documento)
 					->first();
-		if(count($lote)>0){
+		if(!is_null($lote)){
 
 			$referencia = DB::table('CMP.REFERENCIA_ASOC')
 			    ->where('COD_TABLA', $lote->ID_DOCUMENTO)
 			    ->where('TXT_TABLA_ASOC', 'CMP.ORDEN')
 			    ->first();
 
-			if(count($referencia)>0){
+			if(!is_null($referencia)){
 				$orden = DB::table('CMP.ORDEN')
 				    ->where('COD_ORDEN', $referencia->COD_TABLA_ASOC)
 				    ->first();
-				if(count($orden)>0){
+				if(!is_null($orden)){
 					$nombre = 	$orden->TXT_EMPR_CLIENTE;
 				}
 
@@ -120,7 +120,7 @@ class Funcion {
 							->where('activo','=','1')
 							->first();
 
-		if(count($perfiles)>0){
+		if(!is_null($perfiles)){
 			return true;
 		}else{
 			return false;
@@ -240,7 +240,7 @@ class Funcion {
 	public function estorno_referencia($cod_orden) {
 		$TXT_VALOR = '';
 		$fe = FeDocumento::where('TXT_REFERENCIA', '=', $cod_orden)->first();
-		if(count($fe)>0){
+		if(!is_null($fe)){
 			$TXT_VALOR = 'SI';
 		}
 		return $TXT_VALOR;
@@ -251,7 +251,7 @@ class Funcion {
 	public function estado_nombre($id) {
 		$nombre = '';
 		$estado = Estado::where('id', '=', $id)->first();
-		if(count($estado)>0){
+		if(!is_null($estado)){
 			$nombre = $estado->nombre;
 		}
 		return $nombre;
@@ -487,7 +487,7 @@ class Funcion {
 			->where($accion, '=', 1)
 			->first();
 
-		if (count($opcion) <= 0) {
+		if (is_null($opcion)) {
 			return Redirect::back()->withInput()->with('errorurl', 'No tiene autorización para ' . $accion . ' aquí');
 		}
 		return 'true';

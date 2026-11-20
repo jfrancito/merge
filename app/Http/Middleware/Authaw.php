@@ -30,7 +30,7 @@ class Authaw {
                 /********* nuevo **********/
                 $usuario                    =   User::where('id','=',Session::get('usuario')->id)
                                                 ->where('activo','=',1)->first();                             
-                if(count($usuario)<=0){
+                if(is_null($usuario)){
 
                     Session::forget('usuario');
                     Session::forget('listamenu');

@@ -90,7 +90,6 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="device_info" id='device_info'>
-                                                <input type="hidden" id="asientosgenerados" name="asientosgenerados" value=""/>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
@@ -235,6 +234,119 @@
 
     <script type="text/javascript">
 
+        function inicializarAsientosEventos() {
+            let carpeta = $("#carpeta").val() || "";
+            let _token = $("#token").val() || "";
+            let link = '/buscar-proveedor';
+
+            if ($("#empresa_asiento").length > 0 && !(document.getElementById("empresa_asiento") && document.getElementById("empresa_asiento").tomselect)) {
+                let select = new TomSelect("#empresa_asiento", {
+                    valueField: 'id',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: "Escriba para buscar...",
+                    preload: true, // carga inicial
+                    load: function(query, callback) {
+                        let data = {
+                            _token: _token,
+                            busqueda: query
+                        };
+                        fetch(carpeta + link, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(json => { callback(json); })
+                            .catch(() => { callback(); });
+                    }
+                });
+
+                // ✅ Si hay valor por defecto, lo insertamos
+                if (typeof defaultId !== 'undefined' && defaultId) {
+                    select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                    select.setValue(defaultId); // la selecciona
+                }
+            }
+
+            if (!window.selects) window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function(el) {
+                if (!window.selects[el.id]) {
+                    window.selects[el.id] = new SlimSelect({
+                        select: el,
+                        placeholder: 'Seleccione...',
+                        allowDeselect: true
+                    });
+                }
+            });
+
+            $('.pnlasientos').hide();
+        }
+
+        function inicializarAsientosReparableEventos() {
+            let carpeta = $("#carpeta").val() || "";
+            let _token = $("#token").val() || "";
+            let link = '/buscar-proveedor';
+
+            if ($("#empresa_asiento_reparable").length > 0 && !(document.getElementById("empresa_asiento_reparable") && document.getElementById("empresa_asiento_reparable").tomselect)) {
+                let select_reparable = new TomSelect("#empresa_asiento_reparable", {
+                    valueField: 'id',
+                    labelField: 'text',
+                    searchField: 'text',
+                    placeholder: "Escriba para buscar...",
+                    preload: true, // carga inicial
+                    load: function(query, callback) {
+                        let data = {
+                            _token: _token,
+                            busqueda: query
+                        };
+                        fetch(carpeta + link, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(json => { callback(json); })
+                            .catch(() => { callback(); });
+                    }
+                });
+
+                if (typeof defaultIdReparable !== 'undefined' && defaultIdReparable) {
+                    select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
+                    select_reparable.setValue(defaultIdReparable); // la selecciona
+                }
+            }
+
+            if (!window.selects) window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function(el) {
+                if (!window.selects[el.id]) {
+                    window.selects[el.id] = new SlimSelect({
+                        select: el,
+                        placeholder: 'Seleccione...',
+                        allowDeselect: true
+                    });
+                }
+            });
+
+            $('.pnlasientos').hide();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+            $.fn.niftyModal('setDefaults', {
+                overlaySelector: '.modal-overlay',
+                closeSelector: '.modal-close',
+                classAddAfterOpen: 'modal-show',
+            });
+
+            window.selects = window.selects || {};
+            if (typeof inicializarAsientosEventos === 'function') inicializarAsientosEventos();
+            if (typeof inicializarAsientosReparableEventos === 'function') inicializarAsientosReparableEventos();
+        });
 
         $('#file-otros').fileinput({
             theme: 'fa5',

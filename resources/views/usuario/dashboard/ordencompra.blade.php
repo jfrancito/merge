@@ -105,7 +105,7 @@
           </div>
         </div>
 
-<!--         <div class="col-xs-12 col-md-4">
+{{--         <div class="col-xs-12 col-md-4">
           <div class="panel panel-default panel-table">
             <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR USUARIO</b>
               <span class="panel-subtitle" style="color: #fff;">Documentos sin integrar</span>
@@ -153,14 +153,14 @@
 
                     <tr>
                       <td>OBSERVADOS</td>
-                      <td class="text-center"> <span class="badge badge-success">{{count($listaobservados)}}</span></td>
+                      <td class="text-center"> <span class="badge badge-success">{{!empty($listaobservados) ? 1 : 0}}</span></td>
                     </tr>
 
                 </tbody>
               </table>
             </div>
           </div>
-        </div> -->
+        </div> --}}
 
       @endif
 
