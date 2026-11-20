@@ -1246,6 +1246,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-aprobar-orden-compra', 'GestionAprobarOCController@actionAjaxAprobarOrdenCompra');
 	Route::post('/ajax-rechazar-orden-compra', 'GestionAprobarOCController@actionAjaxRechazarOrdenCompra');
 
+	//ASOCIAR COTIZACION Y ORDEN COMPRA
+	Route::get('/asociar-cot-orden-compra/{idopcion}', 'AsociarCotOrdenCompraController@actionAsociarCotOrdenCompra');
+	Route::post('/ajax-buscar-cotizaciones-sin-oc', 'AsociarCotOrdenCompraController@actionAjaxBuscarCotizacionesSinOC');
+	Route::post('/ajax-modal-asociar-oc', 'AsociarCotOrdenCompraController@actionAjaxModalAsociarOC');
+	Route::post('/ajax-guardar-asociacion-cot-oc', 'AsociarCotOrdenCompraController@actionAjaxGuardarAsociacionCotOC');
+
 	Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
 	Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
 	Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');
