@@ -150,7 +150,7 @@
         [
             'mes' => 'DICIEMBRE',
             'anio' => '2026',
-            'fecha' => '02/01/2026',
+            'fecha' => '02/01/2027',
             'fecha_comparar' => '2027-01-02',
             'border' => 'border-left-emerald',
             'text_color' => '#059669'
