@@ -2178,6 +2178,10 @@ class UserController extends Controller
 		$count_x_aprobar_contratoconint = 0;
 		$count_observados_contratoconint = 0;
 		$count_observadoscontratoconint_le = 0;
+		$count_reparables_conint = 0;
+		$count_reparables__revconint = 0;
+		$url_rep_conint = '';
+		$url_rep_conint_revisar = '';
 
 
 		if ($trol->ind_uc == 1) {
@@ -2246,6 +2250,14 @@ class UserController extends Controller
 			$count_observados_dib = count($listadatosobdib);
 
 
+			$operacion_id = 'CONTRATO_INTERMEDIO';
+			$listadatosre_conint = $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa, 'TODO', 'TODO', $operacion_id);
+			$count_reparables_conint = count($listadatosre_conint);
+
+			$listadatosobconint = $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa, $operacion_id);
+			$count_observados_contratoconint = count($listadatosobconint);
+
+
 			//LIQUIDACION DE GASTOS
 			$url_obs_lg = '/gestion-de-liquidacion-gastos/oQK';
 			$listadatosoblg = LqgLiquidacionGasto::where('ACTIVO', '=', '1')
@@ -2288,6 +2300,7 @@ class UserController extends Controller
 				$url_rep_dip = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
 				$url_rep_dis = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO';
 				$url_rep_dib = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
+				$url_rep_conint = '/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO_INTERMEDIO';
 
 
 
@@ -2297,6 +2310,7 @@ class UserController extends Controller
 				$url_rep_dip_revisar = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_PRODUCCION&estado_id=2';
 				$url_rep_dis_revisar = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO&estado_id=2';
 				$url_rep_dib_revisar = '/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA&estado_id=2';
+				$url_rep_conint_revisar = '/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO_INTERMEDIO&estado_id=2';
 
 				//documento interno compra
 				$urldic = '/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_COMPRA';
@@ -2497,6 +2511,10 @@ class UserController extends Controller
 				$count_observados_contratoconint = count($lisadatosob);
 				$listadatosob = $this->con_lista_cabecera_comprobante_total_cont_contrato_intermedio_levantadas($cod_empresa, $operacion_id);
 				$count_observadoscontratoconint_le = count($listadatosob);
+				$listadatosre_conint = $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa, 'TODO', 'TODO', $operacion_id);
+				$count_reparables_conint = count($listadatosre_conint);
+				$listadatosre_conint_rev = $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa, 'TODO', '2', $operacion_id);
+				$count_reparables__revconint = count($listadatosre_conint_rev);
 
 				//COMISION
 				$operacion_id = 'COMISION';
@@ -2721,6 +2739,10 @@ class UserController extends Controller
 					$count_observados_contratoconint = count($lisadatosob);
 					$listadatosob = $this->con_lista_cabecera_comprobante_total_adm_contrato_intermedio_obs_levantadas($cod_empresa, $operacion_id);
 					$count_observadoscontratoconint_le = count($listadatosob);
+					$listadatosre_conint = $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa, 'TODO', 'TODO', $operacion_id);
+					$count_reparables_conint = count($listadatosre_conint);
+					$listadatosre_conint_rev = $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa, 'TODO', '2', $operacion_id);
+					$count_reparables__revconint = count($listadatosre_conint_rev);
 
 
 					//VALE
@@ -2822,6 +2844,10 @@ class UserController extends Controller
 				'count_x_aprobar_contratoconint' => $count_x_aprobar_contratoconint,
 				'count_observados_contratoconint' => $count_observados_contratoconint,
 				'count_observadoscontratoconint_le' => $count_observadoscontratoconint_le,
+				'count_reparables_conint' => $count_reparables_conint,
+				'count_reparables__revconint' => $count_reparables__revconint,
+				'url_rep_conint' => $url_rep_conint,
+				'url_rep_conint_revisar' => $url_rep_conint_revisar,
 				'urlcontratoconint' => $urlcontratoconint,
 
 

@@ -13082,12 +13082,27 @@ class GestionOCContabilidadController extends Controller
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
             $funciones = $this;
 
+            $empresa_doc_fe = STDEmpresa::where('COD_EMPR', '=', $fedocumento->RUC_PROVEEDOR)->first();
+            if (!$empresa_doc_fe && !empty($ordencompra->COD_EMPR_CLI)) {
+                $empresa_doc_fe = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR_CLI)->first();
+            }
+
+            $tipo_doc_fe = CMPCategoria::where('COD_CATEGORIA', '=', $fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO)->first();
+            if (!$tipo_doc_fe && !empty($fedocumento->ID_TIPO_DOC)) {
+                $tipo_doc_fe = CMPCategoria::where('CODIGO_SUNAT', '=', $fedocumento->ID_TIPO_DOC)->where('TXT_GRUPO', '=', 'TIPO_DOCUMENTO')->first();
+            }
+            if (!$tipo_doc_fe && !empty($ordencompra->COD_CATEGORIA_TIPO_DOC)) {
+                $tipo_doc_fe = CMPCategoria::where('COD_CATEGORIA', '=', $ordencompra->COD_CATEGORIA_TIPO_DOC)->first();
+            }
+
             if (session_status() === PHP_SESSION_ACTIVE) {
                 session_write_close();
             }
 
             return View::make('comprobante/aprobarconpg',
                 [
+                    'empresa_doc_fe' => $empresa_doc_fe,
+                    'tipo_doc_fe' => $tipo_doc_fe,
                     'fedocumento' => $fedocumento,
                     'ordencompra' => $ordencompra,
                     'linea' => $linea,

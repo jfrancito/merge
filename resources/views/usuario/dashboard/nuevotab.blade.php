@@ -20,7 +20,7 @@
                       $countoca    =   $count_x_aprobar_oca+$count_observados_oca+$count_observadosoca_le;
                       $countcom    =   $count_x_aprobar_com+$count_observados_com+$count_observadosoca_com;
                       $countcontratoa    =   $count_x_aprobar_contratoa+$count_observados_contratoa+$count_observadoscontratoa_le;
-                      $countconint      =   $count_x_aprobar_contratoconint+$count_observados_contratoconint+$count_observadoscontratoconint_le;
+                      $countconint      =   $count_x_aprobar_contratoconint+$count_reparables_conint+$count_reparables__revconint+$count_observados_contratoconint+$count_observadoscontratoconint_le;
 
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
@@ -31,6 +31,7 @@
                     @php
                       $countoc    =   $count_x_aprobar+$count_x_aprobar_gestion+$count_observados+$count_reparables;
                       $countcon   =   $count_x_aprobar_con+$count_x_aprobar_gestion_con+$count_observados_con+$count_reparables_con;
+                      $countconint =  $count_x_aprobar_contratoconint+$count_observados_contratoconint+$count_reparables_conint;
                     @endphp
                     @endif
 
