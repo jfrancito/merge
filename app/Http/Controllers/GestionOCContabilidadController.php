@@ -13082,6 +13082,45 @@ class GestionOCContabilidadController extends Controller
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
             $funciones = $this;
 
+            $asiento_reparable = $this->ejecutarSP(
+                "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @cod_usuario_registra = :usuario",
+                [
+                    ':anio' => $anio,
+                    ':empresa' => $empresa,
+                    ':cod_contable' => $cod_contable,
+                    ':ind_anulado' => $ind_anulado,
+                    ':ind_recalcular' => $ind_recalcular,
+                    ':ind_reversion' => $ind_reversion,
+                    ':usuario' => $usuario
+                ]
+            );
+
+            // Ajustar cuenta del gasto a 659303 (Gastos Sin Sustento) para Provisión de Gasto
+            if (!empty($asiento_reparable[2])) {
+                $cuenta_659303 = WEBCuentaContable::where('nro_cuenta', '659303')
+                    ->where('empresa_id', Session::get('empresas')->COD_EMPR)
+                    ->where('anio', $anio)
+                    ->first();
+
+                if ($cuenta_659303) {
+                    foreach ($asiento_reparable[2] as &$mov) {
+                        if (isset($mov['TXT_CUENTA_CONTABLE']) && strpos($mov['TXT_CUENTA_CONTABLE'], '6593') === 0) {
+                            $mov['COD_CUENTA_CONTABLE'] = $cuenta_659303->id;
+                            $mov['TXT_CUENTA_CONTABLE'] = $cuenta_659303->nro_cuenta;
+                            $mov['TXT_GLOSA'] = $cuenta_659303->nombre;
+                        }
+                    }
+                    unset($mov);
+                }
+            }
+
             $empresa_doc_fe = STDEmpresa::where('COD_EMPR', '=', $fedocumento->RUC_PROVEEDOR)->first();
             if (!$empresa_doc_fe && !empty($ordencompra->COD_EMPR_CLI)) {
                 $empresa_doc_fe = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR_CLI)->first();
