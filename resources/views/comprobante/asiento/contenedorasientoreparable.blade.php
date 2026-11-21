@@ -1,3 +1,7 @@
+@php
+    $es_provision_gasto = (isset($fedocumento->OPERACION) && $fedocumento->OPERACION === 'PROVISION_GASTO') 
+        || (isset($tp) && $tp === 'PROVISION_GASTO');
+@endphp
 <div class="panel panel-default panel-contrast pnl-asiento-reparable">
     <div class="panel-heading"
          style="background:#1d3a6d; color:#fff; display:flex; justify-content:space-between; align-items:center;">
@@ -64,7 +68,12 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Moneda :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'moneda_asiento_reparable', $combo_moneda_asiento, !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_CATEGORIA_MONEDA'] : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002'),
+                                @php
+                                    $default_moneda_rep = $es_provision_gasto
+                                        ? (!empty($ordencompra->COD_CATEGORIA_MONEDA) ? $ordencompra->COD_CATEGORIA_MONEDA : (!empty($fedocumento->MONEDA) ? ($fedocumento->MONEDA === 'USD' ? 'MON0000000000002' : 'MON0000000000001') : 'MON0000000000001'))
+                                        : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002');
+                                @endphp
+                                {!! Form::select( 'moneda_asiento_reparable', $combo_moneda_asiento, !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_CATEGORIA_MONEDA'] : $default_moneda_rep,
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'moneda_asiento_reparable',
@@ -80,10 +89,14 @@
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Cambio
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-
+                                @php
+                                    $default_tc_rep = $es_provision_gasto
+                                        ? (!empty($ordencompra->CAN_TIPO_CAMBIO) ? $ordencompra->CAN_TIPO_CAMBIO : (!empty($fedocumento->VALOR_TIPO_CAMBIO) ? $fedocumento->VALOR_TIPO_CAMBIO : '0.0000'))
+                                        : (!empty($fedocumento->VALOR_TIPO_CAMBIO) ? $fedocumento->VALOR_TIPO_CAMBIO : 0.0000);
+                                @endphp
                                 <input type="text" required
                                        id="tipo_cambio_asiento_reparable" name='tipo_cambio_asiento_reparable'
-                                       value="{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['CAN_TIPO_CAMBIO'] : 0.0000 }}"
+                                       value="{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['CAN_TIPO_CAMBIO'] : $default_tc_rep }}"
                                        placeholder="Tipo de cambio"
                                        autocomplete="off" class="form-control dinero input-sm" data-aw="5"/>
 
@@ -111,22 +124,28 @@
                     </div>
 
                     <script>
-                        let defaultIdReparable = "{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : '' }}";
-                        let defaultTextReparable = "{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['TXT_EMPR_CLI'] : '' }}";
+                        let defaultIdReparable = "{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->COD_EMPR : (!empty($ordencompra->COD_EMPR_CLI) ? $ordencompra->COD_EMPR_CLI : $fedocumento->RUC_PROVEEDOR)) }}";
+                        let defaultTextReparable = "{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['TXT_EMPR_CLI'] : (!empty($empresa_doc_fe) ? $empresa_doc_fe->NOM_EMPR : (!empty($ordencompra->TXT_EMPR_EMISOR) ? $ordencompra->TXT_EMPR_EMISOR : $fedocumento->RZ_PROVEEDOR)) }}";
                     </script>
 
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Asiento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_asiento_reparable', $combo_tipo_asiento, !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : '',
-                                                  [
-                                                    'class'       => 'slim',
-                                                    'id'          => 'tipo_asiento_reparable',
-                                                    'data-aw'     => '7',
-                                                    'required'    => true,
-                                                    'disabled'    => true,
-                                                  ]) !!}
+                                @php
+                                    $default_tipo_asiento_rep = $es_provision_gasto ? 'TAS0000000000007' : '';
+                                    $attrs_tipo_asiento_rep = [
+                                        'class'       => 'slim',
+                                        'id'          => 'tipo_asiento_reparable',
+                                        'data-aw'     => '7',
+                                        'required'    => true,
+                                    ];
+                                    if (!$es_provision_gasto) {
+                                        $attrs_tipo_asiento_rep['disabled'] = true;
+                                    }
+                                @endphp
+                                {!! Form::select( 'tipo_asiento_reparable', $combo_tipo_asiento, !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : $default_tipo_asiento_rep,
+                                                  $attrs_tipo_asiento_rep) !!}
                             </div>
                         </div>
                     </div>
@@ -152,7 +171,18 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Documento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_documento_asiento_reparable', $combo_tipo_documento, !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'] : '',
+                                @php
+                                    if (!empty($asiento_reparable[1])) {
+                                        $val_tipo_doc_reparable = $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'];
+                                    } elseif ($es_provision_gasto) {
+                                        $val_tipo_doc_reparable = (!empty($fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO) && isset($combo_tipo_documento[$fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO]))
+                                            ? $fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO
+                                            : 'TDO0000000000066';
+                                    } else {
+                                        $val_tipo_doc_reparable = !empty($fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO) ? $fedocumento->COD_CATEGORIA_TIPO_DOCUMENTO : '';
+                                    }
+                                @endphp
+                                {!! Form::select( 'tipo_documento_asiento_reparable', $combo_tipo_documento, $val_tipo_doc_reparable,
                                                   [
                                                     'class'       => 'slim',
                                                     'id'          => 'tipo_documento_asiento_reparable',
@@ -237,9 +267,13 @@
                             <label class="col-sm-12 control-label labelleft negrita">Glosa
                                 :</label>
                             <div class="col-sm-12 abajocaja">
+                                @php
+                                    $nombre_moneda_glosa = (!empty($ordencompra->TXT_CATEGORIA_MONEDA) ? $ordencompra->TXT_CATEGORIA_MONEDA : (!empty($fedocumento->MONEDA) ? ($fedocumento->MONEDA === 'PEN' ? 'SOLES' : ($fedocumento->MONEDA === 'USD' ? 'DOLARES' : $fedocumento->MONEDA)) : ''));
+                                    $glosa_auto = (!empty($tipo_doc_fe) ? $tipo_doc_fe->NOM_CATEGORIA : '').': '.$fedocumento->SERIE.'-'.$fedocumento->NUMERO.'//'.$fedocumento->FEC_VENTA.(!empty($nombre_moneda_glosa) ? '//'.$nombre_moneda_glosa : '').'//'.(!empty($empresa_doc_fe) ? $empresa_doc_fe->NOM_EMPR : (!empty($ordencompra->TXT_EMPR_EMISOR) ? $ordencompra->TXT_EMPR_EMISOR : $fedocumento->RZ_PROVEEDOR)).'//CANJE: '.$fedocumento->ID_DOCUMENTO;
+                                @endphp
                                 <input id="glosa_asiento_reparable" name="glosa_asiento_reparable"
                                        class="form-control control input-sm" type="text"
-                                       value="{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['TXT_GLOSA'] : (!empty($tipo_doc_fe) ? $tipo_doc_fe->NOM_CATEGORIA : '').': '.$fedocumento->SERIE.'-'.$fedocumento->NUMERO.'//'.$fedocumento->FEC_VENTA.'//'.($fedocumento->MONEDA === 'PEN' ? 'SOLES' : 'DOLARES').'//'.(!empty($empresa_doc_fe) ? $empresa_doc_fe->NOM_EMPR : '').'//CANJE: '.$fedocumento->ID_DOCUMENTO }}">
+                                       value="{{ !empty($asiento_reparable[1]) ? $asiento_reparable[1][0]['TXT_GLOSA'] : (!empty($ordencompra->TXT_GLOSA) ? $ordencompra->TXT_GLOSA : $glosa_auto) }}">
                             </div>
                         </div>
                     </div>

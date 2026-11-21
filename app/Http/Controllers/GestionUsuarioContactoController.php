@@ -702,6 +702,8 @@ class GestionUsuarioContactoController extends Controller
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
+            }else if($operacion_id=='CONTRATO_INTERMEDIO'){
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
             }else{
 
                $array_canjes               =   $this->con_array_canjes();
@@ -842,6 +844,8 @@ class GestionUsuarioContactoController extends Controller
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
+            }else if($operacion_id=='CONTRATO_INTERMEDIO'){
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
             }else{
 
                $array_canjes               =   $this->con_array_canjes();
