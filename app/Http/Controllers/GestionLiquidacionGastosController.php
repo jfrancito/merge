@@ -3073,6 +3073,7 @@ class GestionLiquidacionGastosController extends Controller
                     'combo_tipo_igv' => $combo_tipo_igv,
                     'combo_porc_tipo_igv' => $combo_porc_tipo_igv,
                     'combo_activo' => $combo_activo,
+                    'funcion' => $this,
 
                     // NUEVO
 
@@ -6715,5 +6716,77 @@ class GestionLiquidacionGastosController extends Controller
             ]);
     }
 
+    public function actionAjaxCambiarExentoAsiento(Request $request)
+    {
+        // Permitido para el usuario admin o si admin está impostando a otro usuario
+        $esAdmin = false;
+        $nombreUsuario = 'admin';
+
+        if (Session::has('usuario_original')) {
+            $uo = Session::get('usuario_original');
+            if (strtolower(trim($uo->name)) === 'admin' || strtolower(trim($uo->nombre)) === 'admin' || $uo->id === '1CIX00000001') {
+                $esAdmin = true;
+                $nombreUsuario = $uo->name;
+            }
+        }
+
+        if (Session::has('usuario')) {
+            $u = Session::get('usuario');
+            if (strtolower(trim($u->name)) === 'admin' || strtolower(trim($u->nombre)) === 'admin' || $u->id === '1CIX00000001') {
+                $esAdmin = true;
+                $nombreUsuario = $u->name;
+            }
+        }
+
+        if (!$esAdmin) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'No tiene permisos para realizar esta acción'
+            ], 403);
+        }
+
+        $id_documento = $request->input('id_documento');
+        $item = (int)$request->input('item');
+        $exento = (int)$request->input('exento'); // 0 = permitir asiento (no exento), 1 = exento
+
+        if (empty($id_documento) || empty($item)) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Datos incompletos'
+            ], 400);
+        }
+
+        $fechaActual = date('Ymd H:i:s');
+
+        $existe = DB::table('web.lg_exento_asiento_override')
+            ->where('ID_DOCUMENTO', $id_documento)
+            ->where('ITEM', $item)
+            ->first();
+
+        if ($existe) {
+            DB::table('web.lg_exento_asiento_override')
+                ->where('ID_DOCUMENTO', $id_documento)
+                ->where('ITEM', $item)
+                ->update([
+                    'EXENTO' => $exento,
+                    'FECHA_CREA' => $fechaActual,
+                    'USUARIO_CREA' => $nombreUsuario
+                ]);
+        } else {
+            DB::table('web.lg_exento_asiento_override')->insert([
+                'ID_DOCUMENTO' => $id_documento,
+                'ITEM' => $item,
+                'EXENTO' => $exento,
+                'FECHA_CREA' => $fechaActual,
+                'USUARIO_CREA' => $nombreUsuario
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'mensaje' => $exento == 0 ? 'Ahora este ítem permitirá generar asiento con normalidad.' : 'Se restableció la exención de asiento.',
+            'exento' => $exento
+        ]);
+    }
 
 }

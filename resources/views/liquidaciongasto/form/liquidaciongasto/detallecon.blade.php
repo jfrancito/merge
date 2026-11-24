@@ -30,10 +30,24 @@
                     <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
                     <td>{{$item->TOTAL}}</td>
                     <td>
+                        @php
+                            $esUsuarioAdmin = (Session::has('usuario') && (strtolower(trim(Session::get('usuario')->name)) == 'admin' || strtolower(trim(Session::get('usuario')->nombre)) == 'admin' || Session::get('usuario')->id == '1CIX00000001')) || (Session::has('usuario_original') && (strtolower(trim(Session::get('usuario_original')->name)) == 'admin' || strtolower(trim(Session::get('usuario_original')->nombre)) == 'admin' || Session::get('usuario_original')->id == '1CIX00000001'));
+                        @endphp
                         @if(isset($item->EXENTO_ASIENTO) && $item->EXENTO_ASIENTO == 1)
                             <span class="badge badge-warning" style="background-color: #f59e0b; color: #fff; padding: 5px 9px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-block;">
                                 <i class="fa fa-ban"></i> Exento de Asiento
                             </span>
+                            @if($esUsuarioAdmin)
+                                <button type="button" 
+                                        class="btn btn-xs btn-default btn-toggle-exento-asiento" 
+                                        data-iddocumento="{{$item->ID_DOCUMENTO}}" 
+                                        data-item="{{$item->ITEM}}" 
+                                        data-accion="habilitar"
+                                        title="Permitir generar asiento para este comprobante (Solo Admin)"
+                                        style="margin-left: 5px; border-color: #f59e0b; color: #b45309; font-weight: bold;">
+                                    <i class="fa fa-unlock"></i> Permitir Asiento
+                                </button>
+                            @endif
                         @else
                             @if($item->BUSQUEDAD === 1)
                                 <button type="button" class="btn btn-sm btn-primary asiento-compra">
@@ -44,6 +58,22 @@
                                 <button type="button" class="btn btn-sm btn-success asiento-reversion">
                                     👁 Asiento Reversion
                                 </button>
+                            @endif
+                            @if($esUsuarioAdmin)
+                                @php
+                                    $esAerolineaOriginal = $funcion->esAerolineaExentaAsiento((object)['COD_EMPRESA_PROVEEDOR' => $item->COD_EMPRESA_PROVEEDOR, 'TXT_EMPRESA_PROVEEDOR' => $item->TXT_EMPRESA_PROVEEDOR]);
+                                @endphp
+                                @if($esAerolineaOriginal)
+                                    <button type="button" 
+                                            class="btn btn-xs btn-default btn-toggle-exento-asiento" 
+                                            data-iddocumento="{{$item->ID_DOCUMENTO}}" 
+                                            data-item="{{$item->ITEM}}" 
+                                            data-accion="restringir"
+                                            title="Volver a marcar como Exento de Asiento (Solo Admin)"
+                                            style="margin-left: 5px; border-color: #6c757d; color: #6c757d;">
+                                        <i class="fa fa-lock"></i> Eximir
+                                    </button>
+                                @endif
                             @endif
                         @endif
                     </td>
