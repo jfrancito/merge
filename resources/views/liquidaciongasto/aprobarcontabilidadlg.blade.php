@@ -429,6 +429,56 @@
             }, 100); // Retraso para asegurar que el modal está completamente cargado
         });
 
+        // Toggle Exento de Asiento para usuario admin
+        $(document).on('click', '.btn-toggle-exento-asiento', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var iddocumento = $btn.data('iddocumento');
+            var item = $btn.data('item');
+            var accion = $btn.data('accion'); // 'habilitar' o 'restringir'
+            var nuevoExento = (accion === 'habilitar') ? 0 : 1;
+            var confirmMsg = (accion === 'habilitar') 
+                ? '¿Deseas PERMITIR generar asiento para este comprobante? Al aceptar, la página se recargará y generará los asientos normalmente.'
+                : '¿Deseas volver a marcar este comprobante como EXENTO de asiento?';
+
+            if (!confirm(confirmMsg)) {
+                return false;
+            }
+
+            abrircargando();
+            var _token = $('input[name="_token"]').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url("/ajax-cambiar-exento-asiento") }}',
+                data: {
+                    _token: _token,
+                    id_documento: iddocumento,
+                    item: item,
+                    exento: nuevoExento
+                },
+                dataType: 'json',
+                success: function (res) {
+                    cerrarcargando();
+                    if (res.status === 'success') {
+                        alertajax(res.mensaje);
+                        setTimeout(function () {
+                            window.location.reload(true);
+                        }, 1000);
+                    } else {
+                        alerterrorajax(res.mensaje || 'Ocurrió un error al procesar el cambio.');
+                    }
+                },
+                error: function (xhr) {
+                    cerrarcargando();
+                    var errMsg = 'Error al comunicarse con el servidor.';
+                    if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+                        errMsg = xhr.responseJSON.mensaje;
+                    }
+                    alerterrorajax(errMsg);
+                }
+            });
+        });
 
     </script>
 

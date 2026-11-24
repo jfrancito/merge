@@ -2725,6 +2725,20 @@ trait LiquidacionGastoTraits
             return false;
         }
 
+        // Verificar si existe anulación manual (override) para permitir generar asiento
+        $idDoc = isset($documento->ID_DOCUMENTO) ? trim($documento->ID_DOCUMENTO) : '';
+        $itemDoc = isset($documento->ITEM) ? (int)$documento->ITEM : null;
+        if (!empty($idDoc) && !is_null($itemDoc)) {
+            $override = \Illuminate\Support\Facades\DB::table('web.lg_exento_asiento_override')
+                ->where('ID_DOCUMENTO', $idDoc)
+                ->where('ITEM', $itemDoc)
+                ->first();
+            if ($override) {
+                // Si EXENTO = 0 significa que se forzó a generar asiento (no exento)
+                return ((int)$override->EXENTO === 1);
+            }
+        }
+
         // RUCs de aerolíneas exentas de generar asiento (LATAM, SKY, JETSMART, STAR UP)
         $rucsExcluidos = [
             '20341841357', // LATAM AIRLINES PERU S.A.
