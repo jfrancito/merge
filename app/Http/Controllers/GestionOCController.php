@@ -2911,6 +2911,22 @@ class GestionOCController extends Controller
 
         $fedocumento_x = FeDocumento::where('TXT_REFERENCIA', '=', $idoc)->first();
 
+        $arraybancos = DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', '=', 'BANCOS_MERGE')->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')->toArray();
+        $combobancos = array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cb_id = '';
+        $combocb = array('' => "Seleccione Cuenta Bancaria");
+
+        $banco_id = '';
+        if (count($fedocumento) > 0) {
+            $empresa_relacionada = STDEmpresa::where('NRO_DOCUMENTO', '=', $fedocumento->RUC_PROVEEDOR)
+                ->where('IND_RELACIONADO', '=', 1)
+                ->first();
+            if (count($empresa_relacionada) > 0) {
+                $banco_id = 'BAM0000000000011';
+            }
+        }
+
         return View::make(
             'comprobante/registrocomprobantenotadebitoadministrator',
             [
@@ -2930,6 +2946,10 @@ class GestionOCController extends Controller
                 'usuario' => $usuario,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
+                'combobancos' => $combobancos,
+                'cb_id' => $cb_id,
+                'combocb' => $combocb,
+                'banco_id' => $banco_id,
                 'idoc' => isset($idoc) ? $idoc : (isset($idop) ? $idop : (isset($ordencompra) ? $ordencompra->COD_ORDEN : null)),
             ]
         );
@@ -7611,24 +7631,33 @@ class GestionOCController extends Controller
                 $trabajador = STDTrabajador::where('COD_TRAB', '=', $contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
-                FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
-                    ->update(
-                        [
+                $entidadbanco_id = $request['entidadbanco_id'];
+                $bancocategoria = CMPCategoria::where('COD_CATEGORIA', '=', $entidadbanco_id)->first();
+                $cb_id = $request['cb_id'];
 
-                            'ARCHIVO_CDR' => '',
-                            'ARCHIVO_PDF' => '',
-                            'COD_ESTADO' => 'ETM0000000000002',
-                            'TXT_ESTADO' => 'POR APROBAR USUARIO CONTACTO',
-                            'dni_usuariocontacto' => $trabajador->NRO_DOCUMENTO,
-                            'COD_CONTACTO' => $contacto->COD_TRABAJADOR,
-                            'CODIGO_CDR' => $codigocdr,
-                            'RESPUESTA_CDR' => $respuestacdr,
-                            'ind_email_uc' => 0,
-                            'TXT_CONTACTO' => $contacto->NOM_TRABAJADOR,
-                            'fecha_pa' => $this->fechaactual,
-                            'usuario_pa' => Session::get('usuario')->id,
-                        ]
-                    );
+                $datos_actualizar_fe = [
+                    'ARCHIVO_CDR' => '',
+                    'ARCHIVO_PDF' => '',
+                    'COD_ESTADO' => 'ETM0000000000002',
+                    'TXT_ESTADO' => 'POR APROBAR USUARIO CONTACTO',
+                    'dni_usuariocontacto' => $trabajador->NRO_DOCUMENTO,
+                    'COD_CONTACTO' => $contacto->COD_TRABAJADOR,
+                    'CODIGO_CDR' => $codigocdr,
+                    'RESPUESTA_CDR' => $respuestacdr,
+                    'ind_email_uc' => 0,
+                    'TXT_CONTACTO' => $contacto->NOM_TRABAJADOR,
+                    'fecha_pa' => $this->fechaactual,
+                    'usuario_pa' => Session::get('usuario')->id,
+                ];
+
+                if ($bancocategoria) {
+                    $datos_actualizar_fe['COD_CATEGORIA_BANCO'] = $bancocategoria->COD_CATEGORIA;
+                    $datos_actualizar_fe['TXT_CATEGORIA_BANCO'] = $bancocategoria->NOM_CATEGORIA;
+                    $datos_actualizar_fe['TXT_NRO_CUENTA_BANCARIA'] = $cb_id;
+                }
+
+                FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                    ->update($datos_actualizar_fe);
 
 
                 $ordencompra_t = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->first();

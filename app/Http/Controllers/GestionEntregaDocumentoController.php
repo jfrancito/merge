@@ -162,6 +162,7 @@ class GestionEntregaDocumentoController extends Controller
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
         $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
                                         'CONTRATO' => 'CONTRATO',
+                                        'CONTRATO_INTERMEDIO' => 'CONTRATO INTERMEDIO',
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
@@ -529,6 +530,7 @@ class GestionEntregaDocumentoController extends Controller
 
         $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
                                         'CONTRATO' => 'CONTRATO',
+                                        'CONTRATO_INTERMEDIO' => 'CONTRATO INTERMEDIO',
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
