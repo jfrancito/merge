@@ -738,11 +738,30 @@ $(document).ready(function(){
         event.preventDefault();
         var _token                  =   $('#token').val();
         var te                      =   $('#te').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var cb_id                   =   $('#cb_id').val();
         
         var monto_total             =   parseFloat($('#monto_total').val());        
         var valor_igv               =   $('#valor_igv').val();        
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
+
+        if(!valores.includes(entidadbanco_id)){
+            if(cb_id==''){
+                alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
+            }
+        }
         
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
