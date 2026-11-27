@@ -44,7 +44,15 @@
                                           <th>Cantidad</th>
                                           <th>Precio</th>
                                           <th>Total</th>
-                                          <th>Acción</th>
+                                          <th style="text-align: center;">
+                                            Acción
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;">
+                                              <input type="checkbox" id="chkSelectAllAF" title="Seleccionar todos" style="width: 15px; height: 15px; transform: scale(1.2); cursor: pointer;">
+                                              <button type="button" id="btnActivoFijoMasivo" class="btn btn-xs btn-primary" title="Asignar categoría de Activo Fijo a seleccionados" style="font-size: 16px !important; border-radius: 5px; padding: 2px 6px;">
+                                                <span class="mdi mdi-assignment"></span>
+                                              </button>
+                                            </div>
+                                          </th>
                                         </tr>
                                       </thead>
                                       <tbody>
@@ -64,7 +72,7 @@
                                                       $esDocValidoAF = isset($funcion) && method_exists($funcion, 'es_documento_valido_para_activo_fijo') ? $funcion->es_documento_valido_para_activo_fijo($idoc, $fedocumento ?? null) : true;
                                                   @endphp
                                                   @if($esDocValidoAF)
-                                                      <input type="checkbox" id="checkboxcataf{{$index}}" class="checkboxcataf" attd="{{ json_encode($item) }}" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" style="accent-color: green;width: 15px;height:15px;border-radius: 5px; transform: scale(1.5);cursor: not-allowed;margin-right: 5px;" {{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? 'checked' : '' }}>
+                                                      <input type="checkbox" id="checkboxcataf{{$index}}" class="checkboxcataf" data-asignado="{{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? '1' : '0' }}" attd="{{ json_encode($item) }}" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" style="accent-color: green;width: 15px;height:15px;border-radius: 5px; transform: scale(1.5);cursor: pointer;margin-right: 5px;" {{ $funcion->DPAF($idoc,$item->COD_PRODUCTO ?? '') ? 'checked' : '' }}>
                                                       <button type="button" name="btnActivoFijo" class="btn btn-xs btn-primary btnActivoFijo" attcodprod="{{ $item->COD_PRODUCTO ?? '' }}" attcantprod="{{ $item->CAN_PRODUCTO ?? '' }}" attcodlote="{{ $item->COD_LOTE ?? '' }}" attnrolinea="{{ $item->NRO_LINEA ?? '' }}" atttxtdetprod="{{ $item->TXT_DETALLE_PRODUCTO ?? '' }}" atttxtnombprod="{{ $item->TXT_NOMBRE_PRODUCTO ?? '' }}" id="btnActivoFijo{{ $index }}" idcheckbox="checkboxcataf{{$index}}" title="Asignar categoría de Activo Fijo" style="font-size: 24px !important;border-radius: 5px; margin-top: -10px;">
                                                           <span class="mdi mdi-assignment"></span>
                                                       </button>

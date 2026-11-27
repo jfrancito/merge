@@ -194,7 +194,7 @@
             <td>{{ $nro_cuenta }}</td>
             <td>{{$item->TXT_CONTACTO_N}}</td>
             <td>          
-                @IF(count($item->productos_reparable)>0)
+                @IF(!empty($item->productos_reparable))
                     SI
                 @ELSE
                     NO

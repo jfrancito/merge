@@ -5453,6 +5453,8 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id, $fecha_inicio, $fecha_fin, $proveedor_id, $estado_id, $operacion_id = 'ORDEN_COMPRA')
     {
+        $fi = date('Ymd', strtotime($fecha_inicio));
+        $ff = date('Ymd', strtotime($fecha_fin . ' +1 day'));
 
         $rol = WEBRol::where('id', '=', Session::get('usuario')->rol_id)->first();
         $trabajador = STDTrabajador::where('COD_TRAB', '=', $cliente_id)->first();
@@ -5496,7 +5498,8 @@ trait ComprobanteTraits
                 })
                 ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
 
-                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
+                ->where('FE_DOCUMENTO.fecha_pa', '>=', $fi)
+                ->where('FE_DOCUMENTO.fecha_pa', '<', $ff)
                 ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
                 ->where('FE_DOCUMENTO.OPERACION', '=', $operacion_id)
                 ->ProveedorFE($proveedor_id)
@@ -5532,7 +5535,6 @@ trait ComprobanteTraits
                                         )
                                     ) AS productos_cabecera2,
 
-                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
                                         SELECT STUFF(
                                             (
@@ -5569,6 +5571,7 @@ trait ComprobanteTraits
                                     ) AS fecha_reparable_conta
                                 "))
                 ->orderBy('FEC_VENTA', 'asc')
+                ->toBase()
                 ->get();
 
 
@@ -5593,7 +5596,8 @@ trait ComprobanteTraits
                         ->addBinding($documento->getBindings());
                 })
                 ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
-                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
+                ->where('FE_DOCUMENTO.fecha_pa', '>=', $fi)
+                ->where('FE_DOCUMENTO.fecha_pa', '<', $ff)
                 ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
                 ->where('FE_DOCUMENTO.OPERACION', '=', $operacion_id)
                 ->ProveedorFE($proveedor_id)
@@ -5604,6 +5608,7 @@ trait ComprobanteTraits
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
                                     FE_DETALLE_DOCUMENTO.*,
+
                                     FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                                     CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                                     FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
@@ -5624,7 +5629,6 @@ trait ComprobanteTraits
                                         )
                                     ) AS productos_cabecera2,
 
-                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
                                         SELECT STUFF(
                                             (
@@ -5663,6 +5667,7 @@ trait ComprobanteTraits
 
                                 "))
                 ->orderBy('FEC_VENTA', 'asc')
+                ->toBase()
                 ->get();
         }
 

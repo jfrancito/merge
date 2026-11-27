@@ -66,6 +66,7 @@ class ReporteComprobanteController extends Controller
     public function actionComprobanteMasivoExcel($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id,$idopcion)
     {
         set_time_limit(0);
+        ini_set('memory_limit', '1024M');
 
         $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
         $fechadia               =   date_format(date_create(date('d-m-Y')), 'd-m-Y');
@@ -77,12 +78,103 @@ class ReporteComprobanteController extends Controller
         if($operacion_id=='ORDEN_COMPRA' || $operacion_id=='ORDEN_COMPRA_ANTICIPO'){
 
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
-            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
-                $excel->sheet($operacion_id == 'ORDEN_COMPRA_ANTICIPO' ? 'ORDEN COMPRA ANTICIPO' : 'ORDEN COMPRA', function($sheet) use ($listadatos,$titulo,$funcion) {
+            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$operacion_id) {
+                $excel->sheet($operacion_id == 'ORDEN_COMPRA_ANTICIPO' ? 'ORDEN COMPRA ANTICIPO' : 'ORDEN COMPRA', function($sheet) use ($listadatos) {
+                    $rows = [];
+                    $rows[] = [
+                        'FECHA EMISIÓN DE LA ORDEN',
+                        'FECHA EMISIÓN DE COMPROBANTE',
+                        'FECHA REVISION CONTABILIDAD',
+                        'FECHA AUTORIZACION',
+                        'TIPO DE DOCUMENTO',
+                        'CODIGO DE DOCUMENTO',
+                        'N° DOCUMENTO',
+                        'PROVEEDOR',
+                        'RUC',
+                        'DESCRIPCION DE BIEN O SERVICIO SEGÚN FACTURA',
+                        'DESCRIPCION DE BIEN O SERVICIO SEGÚN ORDEN DE COMPRA',
+                        'BIEN / SERVICIO',
+                        'MONEDA',
+                        'TIPO DE CAMBIO',
+                        'CANTIDAD',
+                        'BASE',
+                        'IGV',
+                        'TOTAL',
+                        'DETRACIÓN',
+                        'COD DETRACCIÓN',
+                        'IMPORTE DETRACCIÓN',
+                        'CONSTANCIA DETRACCIÓN',
+                        'NUMERO DE CONSTANCIA',
+                        'NUMERO DE CUENTA CONTABLE',
+                        'USUARIO CONTACTO',
+                        'REPARABLE',
+                        'MENSAJE REPARABLE',
+                        'FECHA SE LEVANTO REPARABLE (USUARIO)',
+                        'FECHA SE LEVANTO REPARABLE (CONTA)',
+                        'OBSERVACION',
+                        'MEDIO PAGO',
+                        'FECHA PAGO',
+                        'NOMBRE BANCO',
+                        'IMPORTE PAGADO',
+                        'PDF PAGO MERGE',
+                    ];
 
-                    $sheet->loadView('reporte/excel/listacomprobantemasivo')->with('listadatos',$listadatos)
-                                                                       ->with('titulo',$titulo)
-                                                                       ->with('funcion',$funcion);                                               
+                    foreach ($listadatos as $item) {
+                        $monto_real_detraccion = (float)$item->MONTO_DETRACCION_RED > 0
+                            ? (float)$item->MONTO_DETRACCION_RED
+                            : (((float)$item->CAN_DETRACCION > 0) ? (float)$item->CAN_DETRACCION : (((float)$item->MONTO_DETRACCION_XML > 0) ? (float)$item->MONTO_DETRACCION_XML : 0));
+                        $tiene_detraccion = ($monto_real_detraccion > 0);
+                        $es_tipo_det_valido = ($tiene_detraccion && !empty($item->TIPO_DETRACCION) && !in_array(trim($item->TIPO_DETRACCION), ['Credito', 'Contado']));
+                        $monto_detraccion = $tiene_detraccion ? $monto_real_detraccion : 0;
+                        $tiene_constancia = (!empty($item->FOLIO_DETRACCION) || !empty($item->FOLIO_DETRACCION_RESERVA) || !empty($item->COD_PAGO_DETRACCION));
+                        $nro_constancia = !empty($item->FOLIO_DETRACCION) ? $item->FOLIO_DETRACCION : (!empty($item->FOLIO_DETRACCION_RESERVA) ? $item->FOLIO_DETRACCION_RESERVA : (!empty($item->COD_PAGO_DETRACCION) ? $item->COD_PAGO_DETRACCION : '-'));
+                        $nro_cuenta = !empty($item->NRO_CUENTA) ? $item->NRO_CUENTA : '-';
+
+                        $rows[] = [
+                            date_format(date_create($item->FEC_ORDEN), 'd-m-Y'),
+                            date_format(date_create($item->FEC_VENTA), 'd-m-Y'),
+                            date_format(date_create($item->fecha_pr), 'd-m-Y'),
+                            date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s'),
+                            $item->ID_TIPO_DOC == '01' ? 'FACTURA' : ($item->ID_TIPO_DOC == 'R1' ? 'RECIBO POR HONORARIO' : 'RECIBO DE SERVICIOS'),
+                            $item->ID_TIPO_DOC == '01' ? $item->ID_TIPO_DOC : ($item->ID_TIPO_DOC == 'R1' ? '02' : '14'),
+                            $item->SERIE . ' - ' . str_pad($item->NUMERO, 7, '0', STR_PAD_LEFT),
+                            $item->RZ_PROVEEDOR,
+                            $item->RUC_PROVEEDOR,
+                            $item->PRODUCTO,
+                            $item->productos_cabecera2,
+                            $item->IND_MATERIAL_SERVICIO,
+                            $item->TXT_CATEGORIA_MONEDA,
+                            $item->CAN_TIPO_CAMBIO,
+                            $item->ID_TIPO_DOC == '01' ? $item->CANTIDAD : 1,
+                            $item->ID_TIPO_DOC == '01' ? $item->VAL_SUBTOTAL_ORIG : $item->SUB_TOTAL_VENTA_ORIG,
+                            $item->ID_TIPO_DOC == '01' ? $item->VAL_IGV_ORIG : $item->VALOR_IGV_ORIG,
+                            $item->ID_TIPO_DOC == '01' ? $item->VAL_VENTA_ORIG : $item->TOTAL_VENTA_ORIG,
+                            $tiene_detraccion ? 'SI' : 'NO',
+                            $es_tipo_det_valido ? trim($item->TIPO_DETRACCION) : '-',
+                            $monto_detraccion,
+                            $tiene_constancia ? 'SI' : 'NO',
+                            $nro_constancia,
+                            $nro_cuenta,
+                            $item->TXT_CONTACTO_N,
+                            !empty($item->productos_reparable) ? 'SI' : 'NO',
+                            $item->productos_reparable,
+                            $item->fecha_reparable,
+                            $item->fecha_reparable_conta,
+                            $item->TXT_GLOSA_ORDEN,
+                            $item->MEDIO_PAGO,
+                            $item->FECHA_PAGO,
+                            $item->NOMBRE_BANCO,
+                            $item->IMPORTE,
+                            $item->COD_ESTADO_FE == 'ETM0000000000008' ? 'SI' : 'NO',
+                        ];
+                    }
+
+                    $sheet->fromArray($rows, null, 'A1', false, false);
+                    $sheet->cells('A1:AI1', function($cells) {
+                        $cells->setBackground('#bababa');
+                        $cells->setFontColor('#ffffff');
+                        $cells->setFontWeight('bold');
+                    });
                 });
             })->export('xls');
 
