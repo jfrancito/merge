@@ -8565,7 +8565,7 @@ trait ComprobanteTraits
 
 
 
-        if (Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000049') {
+        if (Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000049' || (Session::get('usuario')->id == '1CIX00000268' && $operacion_id == 'CONTRATO_INTERMEDIO')) {
 
             $listadatos = FeDocumento::where('OPERACION', '=', $operacion_id)
                 ->where('FE_DOCUMENTO.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
