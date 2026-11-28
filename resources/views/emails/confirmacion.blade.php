@@ -46,7 +46,7 @@ a[x-apple-data-detectors] {
                   <td align="center" valign="top" style="padding:0;Margin:0;width:520px">
                    <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tbody><tr>
-                      <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://www.induamerica.com.pe/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:14px"><img src="http://www.alfasweb.com/email/logo_induamerica.png" alt="Registro" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" height="90" title="Registro"></a></td>
+                      <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://www.induamerica.com.pe/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:14px"><img src="https://web.grupoinduamerica.com/logo_induamerica.png" alt="Registro" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" height="90" title="Registro"></a></td>
                      </tr>
                    </tbody></table></td>
                  </tr>
@@ -66,7 +66,7 @@ a[x-apple-data-detectors] {
                   <td align="center" valign="top" style="padding:0;Margin:0;width:520px">
                    <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tbody><tr>
-                      <td align="left" class="es-m-txt-c" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://www.induamerica.com.pe/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:18px"><img src="http://www.alfasweb.com/email/email.png" alt="Confirmar email" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border-radius:100px" width="100" title="Confirmar email"></a></td>
+                      <td align="left" class="es-m-txt-c" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://www.induamerica.com.pe/" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:18px"><img src="https://web.grupoinduamerica.com/email.png" alt="Confirmar email" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border-radius:100px" width="100" title="Confirmar email"></a></td>
                      </tr>
                    </tbody></table></td>
                  </tr>
@@ -186,7 +186,7 @@ a[x-apple-data-detectors] {
                   <td align="left" style="padding:0;Margin:0;width:560px">
                    <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tbody><tr>
-                      <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-bottom:20px;font-size:0px"><img src="http://www.alfasweb.com/email/logo_induamerica.png" alt="Logo" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;font-size:12px" title="Logo" height="90"></td>
+                      <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-bottom:20px;font-size:0px"><img src="https://web.grupoinduamerica.com/logo_induamerica.png" alt="Logo" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;font-size:12px" title="Logo" height="90"></td>
                      </tr>
                      <tr>
                       <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px;font-size:0">
