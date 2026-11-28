@@ -1310,11 +1310,11 @@ trait UserTraits
             $emailfrom = WEBMaestro::where('codigoatributo', '=', '0001')->where('codigoestado', '=', '00001')->first();
             // correos principales y  copias
             $email = $item->email;
-
+            
             if (1 == 0) {
                 $url = "http://localhost:8080/merge/activar-registro/" . Hashids::encode($token);
             } else {
-                $url = "https://merge.grupoinduamerica.com/merge/activar-registro/" . Hashids::encode($token);
+                $url = "https://web.grupoinduamerica.com/gluma/activar-registro/" . Hashids::encode($token);
             }
 
             $array = array(
